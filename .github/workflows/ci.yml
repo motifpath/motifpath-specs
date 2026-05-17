@@ -1,4 +1,4 @@
-name: CI
+name: Validate Specs
 
 on:
   push:
@@ -7,25 +7,87 @@ on:
     branches: [main]
 
 jobs:
-  lint:
-    name: Lint docs
+  validate-openapi:
+    name: Validate OpenAPI Specs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Install markdownlint
-        run: npm install -g markdownlint-cli
+      - run: npm ci
 
-      - name: Lint markdown
-        run: markdownlint "**/*.md" --ignore node_modules
+      - name: Lint OpenAPI specs
+        run: npx @redocly/cli lint openapi/*.yaml
 
-      - name: Check for broken links
-        uses: lycheeverse/lychee-action@v2
+  validate-events:
+    name: Validate Event Schemas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          args: --offline --no-progress "**/*.md"
-          fail: false
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Validate JSON schemas
+        run: |
+          for schema in events/*.json; do
+            echo "Validating $schema..."
+            npx ajv validate -s "$schema" -d "$schema" --strict=false
+          done
+
+  validate-gherkin:
+    name: Validate Gherkin Syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Parse and validate feature files
+        run: |
+          for feature in features/*.feature; do
+            echo "Validating $feature..."
+            npx @cucumber/gherkin --format json "$feature" > /dev/null
+          done
+
+  eval-prompts:
+    name: Evaluate Prompts (on prompt changes)
+    runs-on: ubuntu-latest
+    # Only runs when prompt files change
+    if: |
+      github.event_name == 'pull_request' &&
+      contains(join(github.event.pull_request.changed_files.*.filename, ','), 'prompts/')
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Run PromptFoo evals
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: npx promptfoo eval --ci
+
+  all-checks:
+    name: All checks passed
+    runs-on: ubuntu-latest
+    needs: [validate-openapi, validate-events, validate-gherkin]
+    steps:
+      - run: echo "All spec validations passed"

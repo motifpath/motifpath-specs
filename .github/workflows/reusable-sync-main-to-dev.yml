@@ -1,0 +1,50 @@
+name: Reusable — Sync main → dev
+
+on:
+  workflow_call:
+
+jobs:
+  sync:
+    name: Open sync PR from main to dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if main is ahead of dev
+        id: check
+        run: |
+          git fetch origin dev
+          BEHIND=$(git rev-list origin/dev..origin/main --count)
+          echo "commits_ahead=$BEHIND" >> $GITHUB_OUTPUT
+          if [ "$BEHIND" -eq "0" ]; then
+            echo "Dev is already up to date with main. Skipping."
+          fi
+
+      - name: Create sync PR (main → dev)
+        if: steps.check.outputs.commits_ahead != '0'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: dev
+          head: main
+          branch: chore/sync-main-to-dev
+          title: "chore: sync main → dev"
+          body: |
+            ## Automated sync — main → dev
+
+            This PR was opened automatically after a merge to `main`.
+            It keeps `dev` in sync with any hotfix or release that landed on `main`.
+
+            **Review before merging:**
+            - [ ] No unintended changes included
+            - [ ] Conflicts resolved correctly (if any)
+            - [ ] CI passes
+
+            > This PR was created by the `sync-main-to-dev` reusable workflow
+            > defined in `motifpath-specs`.
+          labels: |
+            automated
+            sync
+          draft: false
