@@ -1,63 +1,150 @@
 # motifpath-specs
 
-Single source of truth for all contracts in the MotifPath platform. **Specs are written here before any implementation begins** in other repositories.
+Contract repository for the MotifPath platform. All API contracts, domain events,
+business rules, architecture decisions, AI prompts, evaluation sets, and Claude
+skills live here.
 
-## Repository Structure
+No feature is ready for implementation until its spec exists in this repository.
+
+## What Lives Here
+
+| Directory | Contents |
+|---|---|
+| `/openapi` | REST API specs (OpenAPI 3.1 YAML) |
+| `/events` | Domain event schemas (JSON Schema) |
+| `/features` | Business rule specs (Gherkin `.feature` files) |
+| `/adr` | Architecture Decision Records |
+| `/prompts` | Versioned AI task prompts |
+| `/evals` | Golden sets for PromptFoo evaluation |
+| `/skills` | Claude Code skills for the whole team |
+
+## Onboarding
+
+Run this once when setting up a new machine. It installs the global Claude Code
+context and all team skills — applies to every MotifPath repository.
+
+```bash
+# 1. Clone all repositories
+git clone git@github.com:motifpath/motifpath-specs.git
+git clone git@github.com:motifpath/motifpath-core.git
+git clone git@github.com:motifpath/motifpath-web.git
+git clone git@github.com:motifpath/motifpath-infra.git
+
+# 2. Install global CLAUDE.md (first time only — machine-level, not committed)
+mkdir -p ~/.claude
+cp motifpath-specs/global-CLAUDE.md ~/.claude/CLAUDE.md
+
+# 3. Install Claude skills
+cd motifpath-specs && bash skills/install.sh
+
+# 4. Verify
+ls ~/.claude/skills/
+# → git/
+```
+
+To update skills after pulling new changes:
+
+```bash
+cd motifpath-specs && git pull && bash skills/install.sh
+```
+
+## Branching Model
 
 ```
-openapi/      REST API specs (OpenAPI 3.1 YAML)
-events/       Domain event schemas (JSON Schema)
-features/     Business rule specs (Gherkin .feature files)
-adr/          Architecture Decision Records
-prompts/      Versioned AI task prompts
-evals/        Golden sets for PromptFoo evaluation
+main  (protected — production releases only)
+dev   (protected — integration branch, target for all feature PRs)
 ```
+
+All feature, fix, chore, and spec work branches from `dev` and targets `dev`.
+`main` only receives PRs from `dev` (releases) or `hotfix/*` branches (critical fixes).
+
+Branch naming — task code is mandatory:
+
+```
+feat/MTP-001/short-description
+fix/BUG-042/short-description
+spec/MTP-007/short-description
+hotfix/BUG-099/short-description    ← branches from main, not dev
+```
+
+After any merge to `main`, the `sync-main-to-dev` reusable workflow opens a PR
+from `main` to `dev` automatically. Review and merge it promptly.
+
+## Shared Workflows
+
+This repository defines reusable GitHub Actions workflows consumed by all other repos:
+
+| Workflow | File | Purpose |
+|---|---|---|
+| Sync main → dev | `.github/workflows/reusable-sync-main-to-dev.yml` | Auto-opens PR to sync `main` back to `dev` after any merge |
+
+> **GitHub Actions permission required:** Enable *"Allow motifpath repositories to
+> call reusable workflows"* in the org's Actions settings, or callers will fail.
+
+## Prerequisites
+
+- Node.js 20+
+- npm
+
+```bash
+npm install
+```
+
+This installs: `@redocly/cli`, `ajv-cli`, `@cucumber/gherkin`, `promptfoo`.
+
+## Commands
+
+```bash
+# Validate all OpenAPI specs
+npm run validate:openapi
+
+# Validate all event JSON schemas
+npm run validate:events
+
+# Validate all Gherkin feature files
+npm run validate:features
+
+# Run PromptFoo evals against all prompt files
+npm run eval:prompts
+
+# Run all validations at once
+npm run validate
+```
+
+## Workflow
+
+1. A product requirement arrives in the backlog
+2. PO uses the Gherkin generator prompt (`/prompts/gherkin-generator.md`) to draft scenarios
+3. PO reviews and approves — business rule accuracy is the gate, not just syntax
+4. Developer raises a PR with the spec changes
+5. CI validates all artifacts
+6. PR merges — the feature is now ready for implementation in consuming repos
 
 ## Definition of Ready
 
-A feature spec is ready for development when **all** of the following are true:
+A feature is ready for development when ALL of the following are true:
 
 - [ ] OpenAPI endpoint(s) defined (if the feature has an HTTP surface)
 - [ ] Gherkin scenarios cover: happy path + at least 2 edge cases + at least 1 failure case
-- [ ] PO has reviewed and approved business rule accuracy
+- [ ] PO has approved business rule accuracy
 - [ ] ADR exists if the feature introduces an architectural change
 
 ## Domain Events
 
-Seven domain events are defined in `/events/` and referenced across all services:
+Seven events form the core behavioral contract of MotifPath:
 
-| Event | Description |
-|-------|-------------|
-| `lesson.started` | Student begins a new lesson session |
-| `lesson.resumed` | Student returns to an in-progress lesson |
-| `lesson.completed` | Lesson session ends |
-| `exercise.started` | Student begins an exercise |
-| `exercise.answer_sent` | Student submits an answer |
-| `exercise.ended` | Exercise session ends |
-| `node.unlocked` | Student meets the accuracy threshold for a node |
+```
+lesson.started        lesson.resumed         lesson.completed
+exercise.started      exercise.answer_sent   exercise.ended
+node.unlocked
+```
 
-## Standards at a Glance
+JSON Schemas for each event live in `/events/`.
 
-**OpenAPI** — `operationId` in camelCase, all properties snake_case with descriptions, minimum responses: 200/400/401, enums for status fields.
+## Related Repositories
 
-**Gherkin** — domain language only (no HTTP codes, SQL, or framework names), one scenario per behavior, concrete steps.
-
-**ADRs** — `/adr/NNN-short-kebab-title.md`, required sections: Context / Decision / Consequences. Never deleted; superseded ADRs reference the replacing ADR.
-
-**Prompts** — version field bumped on every change, `promptfoo eval` must pass before merge.
-
-## Tooling
-
-| Tool | Purpose |
-|------|---------|
-| [Redocly CLI](https://redocly.com/docs/cli/) | OpenAPI validation |
-| [PromptFoo](https://promptfoo.dev/) | AI prompt evaluation |
-| JSON Schema validator | Event schema validation |
-| Gherkin parser | Feature file syntax check |
-
-## Contributing
-
-1. Open a PR with the spec change
-2. All CI checks must pass (see CI badge above)
-3. PO approval required on Gherkin scenarios before merge
-4. Implementation PRs in other repos must link back to the spec PR
+| Repository | Purpose |
+|---|---|
+| [motifpath-core](../motifpath-core) | Go backend — consumes OpenAPI + event schemas |
+| [motifpath-web](../motifpath-web) | Vue 3 frontend — consumes OpenAPI |
+| [motifpath-infra](../motifpath-infra) | Terraform infrastructure |
