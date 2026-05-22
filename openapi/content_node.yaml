@@ -1,0 +1,66 @@
+ContentNode:
+  type: object
+  description: |
+    The base unit of teacher-published content. A video or article that anchors a class.
+    ContentNodes are published by teachers in a YouTube-like flow — the act of publishing
+    is separate from enrichment (see ContentExpansionSettings).
+
+    Freemium model: free ContentNodes drive discovery and student acquisition; paid nodes
+    are the monetisation layer. Teachers control the is_free flag per node.
+
+    A ContentNode in draft state (published_at is null) is not visible to students.
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: Unique identifier.
+
+    title:
+      type: string
+      minLength: 1
+      maxLength: 500
+      description: Display title of the content.
+
+    content_type:
+      type: string
+      enum:
+        - video
+        - article
+      description: Media format of this content node.
+
+    teacher_id:
+      type: string
+      format: uuid
+      description: ID of the teacher who owns and published this content.
+
+    is_free:
+      type: boolean
+      description: |
+        When true, this content is accessible without a paid subscription.
+        Free content is the teacher's discovery and student acquisition layer.
+        When false, access requires the student to be subscribed to this teacher's content.
+
+    published_at:
+      type: string
+      format: date-time
+      nullable: true
+      description: |
+        Timestamp of publication. Null indicates the node is in draft state
+        and not yet visible to students.
+
+    created_at:
+      type: string
+      format: date-time
+
+    updated_at:
+      type: string
+      format: date-time
+
+  required:
+    - id
+    - title
+    - content_type
+    - teacher_id
+    - is_free
+    - created_at
+    - updated_at

@@ -1,0 +1,53 @@
+ContentExpansionSettings:
+  type: object
+  description: |
+    Teacher's enrichment configuration for a ContentNode. Created as a deliberate,
+    separate authoring act after initial content publication — the teacher first publishes
+    content, then enriches it with practice and assessment configuration.
+
+    One ContentExpansionSettings record exists per ContentNode. Its presence signals
+    that the content has been enriched beyond raw video/article delivery.
+
+    Assessment configuration (Challenges) are child records of ContentExpansionSettings.
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: Unique identifier.
+
+    content_node_id:
+      type: string
+      format: uuid
+      description: |
+        ID of the ContentNode this configuration enriches.
+        One-to-one relationship: a ContentNode has at most one ContentExpansionSettings.
+
+    practice_cue_enabled:
+      type: boolean
+      description: |
+        When true, the platform presents optional practice cues to the student
+        during content consumption. Students may bypass cues — bypass behaviour
+        is captured as a behavioral event and treated as a data signal, not a failure state.
+
+    assessment_enabled:
+      type: boolean
+      description: |
+        When true, an end-of-content assessment is presented after the student
+        completes the ContentNode. The assessment consists of one or more Challenges
+        defined in child records.
+
+    created_at:
+      type: string
+      format: date-time
+
+    updated_at:
+      type: string
+      format: date-time
+
+  required:
+    - id
+    - content_node_id
+    - practice_cue_enabled
+    - assessment_enabled
+    - created_at
+    - updated_at

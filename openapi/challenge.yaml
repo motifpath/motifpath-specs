@@ -1,0 +1,81 @@
+Challenge:
+  type: object
+  description: |
+    An assessment item within a ContentExpansionSettings configuration. Challenges are
+    presented to students as part of the end-of-content assessment sequence.
+
+    A Challenge is associated with one or more TaxonomyNodes via ChallengeClassification
+    records. This multi-node association captures the full semantic surface being assessed.
+    Exactly one ChallengeClassification per Challenge must have is_primary = true —
+    the primary node is what the recommendation engine uses for gap identification and
+    analytics attribution.
+
+    Threshold and recommendation target are defined at Challenge granularity (not per
+    TaxonomyNode). The rules-based engine fires one remediation signal per challenge:
+    if the student's score falls below threshold, recommendation_target_id is surfaced.
+    Per-node remediation granularity is a post-MVP ML-driven capability.
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: Unique identifier.
+
+    content_expansion_settings_id:
+      type: string
+      format: uuid
+      description: ID of the ContentExpansionSettings this challenge belongs to.
+
+    difficulty_level:
+      type: string
+      enum:
+        - beginner
+        - intermediate
+        - advanced
+      description: |
+        Scalar difficulty metadata for this challenge. Ordinal attribute — not a graph node.
+        Reflects the expected student level for this specific challenge, which may differ
+        from the overall ContentNode's target audience.
+
+    threshold:
+      type: integer
+      minimum: 0
+      maximum: 100
+      description: |
+        Score percentage (0–100) below which the recommendation engine triggers remediation.
+        If a student scores below this value on this challenge, recommendation_target_id
+        is surfaced. Applies to this challenge as a whole, not per taxonomy node.
+        Example: a threshold of 70 means students scoring below 70% are recommended
+        the remediation content.
+
+    recommendation_target_id:
+      type: string
+      format: uuid
+      nullable: true
+      description: |
+        ID of the ContentNode to recommend when the student scores below threshold.
+        Null indicates no remediation is configured — the teacher has not mapped
+        a remediation target for this challenge.
+
+    position:
+      type: integer
+      minimum: 1
+      description: |
+        Ordinal position of this challenge within the assessment sequence.
+        Determines display order. Must be unique within a ContentExpansionSettings.
+
+    created_at:
+      type: string
+      format: date-time
+
+    updated_at:
+      type: string
+      format: date-time
+
+  required:
+    - id
+    - content_expansion_settings_id
+    - difficulty_level
+    - threshold
+    - position
+    - created_at
+    - updated_at

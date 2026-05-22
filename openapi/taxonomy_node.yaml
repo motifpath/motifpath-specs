@@ -1,0 +1,98 @@
+TaxonomyNode:
+  type: object
+  description: |
+    A node in the MotifPath music knowledge graph. Represents a classifiable musical entity
+    with a defined semantic role. Nodes are the vocabulary of the classification system —
+    they are proposed by the AI classification agent, reviewed by the product team, and
+    confirmed as ground truth. Confirmed nodes become training data for the future
+    ML-driven classification pipeline.
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: Unique identifier.
+
+    name:
+      type: string
+      minLength: 1
+      maxLength: 200
+      description: |
+        Human-readable label for this node.
+        Examples: "Triad Shapes", "Chord Theory", "CAGED E-shape", "Minor Pentatonic Box 1".
+
+    node_type:
+      type: string
+      enum:
+        - concept
+        - skill
+        - shape
+        - resource
+        - repertoire
+      description: |
+        Semantic role of this node in the knowledge graph:
+        - concept:     Knowledge structure or theoretical abstraction. What is true.
+                       Examples: "Major Scale", "Dominant Function", "Triad Inversion".
+        - skill:       Observable capability the student performs. What the student can do.
+                       Examples: "Improvise using major pentatonic", "Visualize triads on strings 1–3".
+        - shape:       Physical guitar geometry or fretboard pattern. Spatial knowledge
+                       that must be modelled separately from the concept it represents.
+                       Examples: "CAGED A-shape major chord", "3NPS Ionian pattern".
+        - resource:    Practice material: exercise, drill, lick, backing track, audio example.
+                       These are the targets of TRAINS edges.
+        - repertoire:  Song, riff, solo, or chord progression. Contextualises abstractions
+                       and anchors abstract knowledge in musical reality.
+
+    description:
+      type: string
+      nullable: true
+      maxLength: 1000
+      description: Optional extended description or pedagogical notes for this node.
+
+    classification_status:
+      type: string
+      enum:
+        - pending
+        - confirmed
+        - overridden
+      description: |
+        Review lifecycle state:
+        - pending:    Proposed (by AI agent or product team). Awaiting human review.
+        - confirmed:  Reviewed and approved as ground truth.
+        - overridden: Reviewed and corrected. Original suggestion preserved for audit trail
+                      and ML training signal.
+
+    suggested_by:
+      type: string
+      nullable: true
+      description: |
+        Origin identifier of the node proposal.
+        Known values: "ai_agent", "product_team".
+        Nullable for seed nodes loaded before the suggestion pipeline was active.
+
+    reviewed_by:
+      type: string
+      format: uuid
+      nullable: true
+      description: ID of the user who confirmed or overrode this node.
+
+    reviewed_at:
+      type: string
+      format: date-time
+      nullable: true
+      description: Timestamp of the review action.
+
+    created_at:
+      type: string
+      format: date-time
+
+    updated_at:
+      type: string
+      format: date-time
+
+  required:
+    - id
+    - name
+    - node_type
+    - classification_status
+    - created_at
+    - updated_at

@@ -1,0 +1,124 @@
+TaxonomyEdge:
+  type: object
+  description: |
+    A directed, typed relationship between two TaxonomyNodes. Edges encode the semantic
+    structure of the music knowledge graph: prerequisite chains, skill-concept dependencies,
+    practice-to-skill mappings, and repertoire context.
+
+    Edge semantics drive curriculum sequencing, recommendation explainability, and the
+    future adaptive learning engine. Only edges with operationalisable meaning in
+    recommendation, sequencing, or assessment are included.
+
+    Edges go through the same human-in-the-loop review lifecycle as nodes.
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: Unique identifier.
+
+    source_id:
+      type: string
+      format: uuid
+      description: ID of the origin TaxonomyNode (the dependent or more specific entity).
+
+    target_id:
+      type: string
+      format: uuid
+      description: ID of the destination TaxonomyNode (the prerequisite or broader entity).
+
+    relationship_type:
+      type: string
+      enum:
+        - prerequisite_of
+        - uses
+        - trains
+        - represents
+        - appears_in
+        - part_of
+      description: |
+        Semantic type of the directed relationship:
+
+        - prerequisite_of:
+            Source must be mastered before target can be meaningfully learned.
+            Valid between: Concept→Concept, Skill→Skill, Concept→Skill.
+            This is the sequencing backbone — curriculum graphs are built by traversing
+            prerequisite_of chains.
+            Example: "Intervals" prerequisite_of "Chord Construction"
+
+        - uses:
+            A Skill draws on a Concept during execution. Not strictly sequential —
+            a student may partially use a concept before fully understanding it.
+            Powers "why am I learning this?" explainability.
+            Valid between: Skill→Concept.
+            Example: "Improvise over ii-V-I" uses "Guide Tones"
+
+        - trains:
+            A Resource develops a Skill through practice.
+            The core practice moat: every Skill node should eventually have at least
+            one Resource connected via a trains edge.
+            Valid between: Resource→Skill.
+            Example: "Alternate picking exercise" trains "Alternate Picking"
+
+        - represents:
+            A Shape is the physical fretboard instantiation of a Concept.
+            Critical for guitar: geometry IS part of the knowledge, not merely an asset.
+            Valid between: Shape→Concept.
+            Example: "CAGED A-shape" represents "Major Triad"
+
+        - appears_in:
+            A Concept or Skill is demonstrated within a Repertoire item.
+            Contextualises abstractions and enables discovery-driven learning
+            ("find the theory I already play").
+            Valid between: Concept→Repertoire, Skill→Repertoire.
+            Example: "Mixolydian" appears_in "Sweet Home Alabama solo"
+
+        - part_of:
+            Source is a component of the target — hierarchical decomposition.
+            Used to build curriculum tree structure and collapse/expand UI.
+            Valid between: any→any (same or different node types).
+            Example: "Guide Tones" part_of "Jazz Improvisation Fundamentals"
+
+    classification_status:
+      type: string
+      enum:
+        - pending
+        - confirmed
+        - overridden
+      description: |
+        Review lifecycle state. Edges proposed by the AI agent start as pending.
+        Human reviewers confirm or override. Same semantics as TaxonomyNode.classification_status.
+
+    suggested_by:
+      type: string
+      nullable: true
+      description: |
+        Origin identifier of the edge proposal.
+        Known values: "ai_agent", "product_team".
+
+    reviewed_by:
+      type: string
+      format: uuid
+      nullable: true
+      description: ID of the user who confirmed or overrode this edge.
+
+    reviewed_at:
+      type: string
+      format: date-time
+      nullable: true
+
+    created_at:
+      type: string
+      format: date-time
+
+    updated_at:
+      type: string
+      format: date-time
+
+  required:
+    - id
+    - source_id
+    - target_id
+    - relationship_type
+    - classification_status
+    - created_at
+    - updated_at

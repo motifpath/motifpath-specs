@@ -1,0 +1,95 @@
+ChallengeClassification:
+  type: object
+  description: |
+    Associates a Challenge with a TaxonomyNode. A Challenge may reference multiple
+    TaxonomyNodes to fully describe the semantic surface being assessed.
+    For example, a challenge testing "sweep arpeggios over a C major triad" may be
+    classified against both "Sweep Picking" (skill) and "Triad Shapes" (concept).
+
+    Exactly one ChallengeClassification per Challenge must have is_primary = true.
+    The primary node is the principal gap signal used by the recommendation engine.
+    Secondary nodes enrich analytics and the future ML training dataset without
+    affecting MVP recommendation logic.
+
+    Classification assignments go through the same human-in-the-loop review lifecycle
+    as TaxonomyNodes and TaxonomyEdges. AI-suggested assignments start as pending;
+    humans confirm or override. Overridden assignments are preserved as training signal.
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: Unique identifier.
+
+    challenge_id:
+      type: string
+      format: uuid
+      description: ID of the Challenge being classified.
+
+    taxonomy_node_id:
+      type: string
+      format: uuid
+      description: |
+        ID of the TaxonomyNode this classification associates with the challenge.
+        Should reference a leaf-level or sufficiently specific node — classifying
+        against overly broad parent nodes reduces recommendation precision.
+
+    is_primary:
+      type: boolean
+      description: |
+        Marks the principal TaxonomyNode for this Challenge.
+        Exactly one ChallengeClassification per Challenge must have is_primary = true.
+        The primary node is used by the recommendation engine for gap identification
+        and analytics attribution. Secondary nodes (is_primary = false) enrich the
+        semantic surface without affecting MVP remediation logic.
+
+    classification_status:
+      type: string
+      enum:
+        - pending
+        - confirmed
+        - overridden
+      description: |
+        Review lifecycle state for this specific assignment:
+        - pending:    AI agent has suggested this node-challenge association.
+                      Awaiting human review.
+        - confirmed:  Human reviewer has validated this assignment as correct.
+                      Becomes ground truth and training data.
+        - overridden: Human reviewer corrected this assignment. The original
+                      taxonomy_node_id is replaced and the original suggestion
+                      is preserved in audit log for ML training.
+
+    suggested_by:
+      type: string
+      nullable: true
+      description: |
+        Origin of this classification assignment.
+        Known values: "ai_agent", "product_team".
+
+    reviewed_by:
+      type: string
+      format: uuid
+      nullable: true
+      description: ID of the user who confirmed or overrode this assignment.
+
+    reviewed_at:
+      type: string
+      format: date-time
+      nullable: true
+      description: Timestamp of the review action.
+
+    created_at:
+      type: string
+      format: date-time
+
+    updated_at:
+      type: string
+      format: date-time
+
+  required:
+    - id
+    - challenge_id
+    - taxonomy_node_id
+    - is_primary
+    - classification_status
+    - created_at
+    - updated_at
