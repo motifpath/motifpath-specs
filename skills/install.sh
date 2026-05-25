@@ -18,8 +18,11 @@ INSTALL_DIR="${HOME}/.claude/skills"
 # All available skills — add new skills here as they are created
 ALL_SKILLS=(
   git
-  # adr-writer      ← coming soon
-  # plan-writer     ← coming soon
+  adr-writer
+  ai-consultant
+  plan-writer
+  product-discovery
+  project-index-maintenance
   # bug-refinement  ← coming soon
   # go-standards    ← coming soon
   # vue-standards   ← coming soon
