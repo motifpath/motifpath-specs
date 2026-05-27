@@ -30,7 +30,7 @@ A feature spec is ready when ALL of the following are true:
 ## Gherkin Standards
 ALWAYS use domain language — never HTTP status codes, SQL, or framework names in scenarios.
 ALWAYS reference domain events by exact names: lesson.started, lesson.resumed, lesson.completed,
-exercise.started, exercise.answer_sent, exercise.ended, node.unlocked.
+exercise.started, exercise.progress, exercise.answer_sent, exercise.ended.
 One scenario = one behavior. Never test multiple behaviors in a single scenario.
 Steps must be concrete and specific — avoid vague steps like "the system processes the request".
 
@@ -40,6 +40,7 @@ Steps must be concrete and specific — avoid vague steps like "the system proce
 - Minimum responses per endpoint: 200, 400, 401
 - Use enums for status fields — NEVER free strings
 - Breaking changes bump major version; new endpoints bump minor; corrections bump patch
+- Descriptions must be self-sufficient — NEVER reference ADR document names (e.g. "as per ADR-006") inside schema or property descriptions. The rationale belongs in the ADR; the description must stand alone for any reader without access to internal docs.
 
 ## Event Schema Standards
 Each event file in /events/ is a JSON Schema document.
