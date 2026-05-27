@@ -1,0 +1,231 @@
+openapi: 3.1.0
+
+info:
+  title: Event Ingestion Service
+  version: 0.1.0
+  description: |
+    Receives student tracking events emitted by the Vue 3 SPA, validates them against
+    the TrackingEvent schema, writes them synchronously to the MongoDB events collection,
+    and publishes them asynchronously to the motifpath.events Kafka topic.
+
+    This service is the sole Kafka producer in the MotifPath platform. All seven
+    student-facing event types flow through this single entry point.
+
+servers:
+  - url: https://events.motifpath.io/v1
+    description: Production
+  - url: http://localhost:8081
+    description: Local development
+
+security:
+  - BearerAuth: []
+
+paths:
+  /events:
+    post:
+      operationId: ingestTrackingEvent
+      summary: Submit a student tracking event
+      description: |
+        Accepts a single tracking event from the authenticated student's session.
+        On success the event is durably written to MongoDB and queued for Kafka
+        publication. The 202 response confirms durable receipt — Kafka delivery
+        is asynchronous and is not reflected in the response status.
+
+        The caller must supply the event_id. Duplicate submissions with the same
+        event_id are safe: the Aggregation Worker deduplicates on event_id, and
+        this endpoint does not reject duplicates at the HTTP layer.
+      tags:
+        - Events
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/events.yaml#/TrackingEvent'
+            examples:
+              lesson_started:
+                summary: Student begins a video lesson
+                value:
+                  event_id: "a1b2c3d4-0000-0000-0000-000000000001"
+                  event_type: lesson.started
+                  student_id: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                  session_id: "550e8400-e29b-41d4-a716-446655440000"
+                  occurred_at: "2026-05-27T14:32:00Z"
+                  content_context:
+                    content_node_id: "c9d1e2f3-0000-0000-0000-000000000001"
+                    content_type: video
+                    teacher_id: "b8c9d0e1-0000-0000-0000-000000000001"
+              exercise_answer_sent:
+                summary: Student submits an answer to a challenge exercise
+                value:
+                  event_id: "a1b2c3d4-0000-0000-0000-000000000002"
+                  event_type: exercise.answer_sent
+                  student_id: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                  session_id: "550e8400-e29b-41d4-a716-446655440000"
+                  occurred_at: "2026-05-27T14:45:10Z"
+                  exercise_id: "d2e3f4a5-0000-0000-0000-000000000001"
+                  trigger_context:
+                    source: challenge_sequence
+                    content_node_id: "c9d1e2f3-0000-0000-0000-000000000001"
+                    challenge_id: "e3f4a5b6-0000-0000-0000-000000000001"
+                  attempt_number: 1
+                  answer_payload:
+                    selected_option: "C"
+      responses:
+        "202":
+          description: |
+            Event accepted. The event has been written to the durable event log.
+            Kafka publication is in flight and will complete asynchronously.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestAccepted'
+        "400":
+          description: |
+            The request body failed schema validation. The event was not stored.
+            Inspect the errors array to identify the failing fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: |
+            Missing or invalid Bearer token. The student must be authenticated
+            via Clerk before submitting events.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
+  /healthz:
+    get:
+      operationId: livenessCheck
+      summary: Liveness probe
+      description: |
+        Returns 200 if the service process is running. Used by EKS to determine
+        whether to restart the container. Does not check downstream dependencies.
+      tags:
+        - Operations
+      security: []
+      responses:
+        "200":
+          description: Service is alive.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
+  /readyz:
+    get:
+      operationId: readinessCheck
+      summary: Readiness probe
+      description: |
+        Returns 200 if the service is ready to accept traffic — MongoDB connection
+        is established and the Kafka producer is initialised. EKS withholds traffic
+        until this probe succeeds. Returns 503 during startup or if a dependency
+        becomes unavailable.
+      tags:
+        - Operations
+      security: []
+      responses:
+        "200":
+          description: Service is ready to accept traffic.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+        "503":
+          description: Service is not ready. One or more dependencies are unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Clerk-issued JWT validated locally by the service on every request.
+        The student_id claim in the JWT must match the student_id field in the
+        event payload. Mismatches are rejected with 401.
+
+  schemas:
+    IngestAccepted:
+      type: object
+      description: Confirmation returned when a tracking event is successfully accepted.
+      properties:
+        event_id:
+          type: string
+          format: uuid
+          description: Echo of the event_id submitted by the caller. Useful for client-side logging.
+        received_at:
+          type: string
+          format: date-time
+          description: Server-side timestamp at which the event was written to the event log.
+      required:
+        - event_id
+        - received_at
+
+    ValidationError:
+      type: object
+      description: Returned when the request body fails schema validation.
+      properties:
+        message:
+          type: string
+          description: Human-readable summary of the validation failure.
+        errors:
+          type: array
+          description: One entry per failing field.
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: JSON pointer to the failing field (e.g. "/content_context/content_node_id").
+              reason:
+                type: string
+                description: Description of the constraint that was violated.
+            required:
+              - field
+              - reason
+      required:
+        - message
+        - errors
+
+    UnauthorizedError:
+      type: object
+      description: Returned when the Bearer token is missing or invalid.
+      properties:
+        message:
+          type: string
+          description: Human-readable reason for the rejection.
+      required:
+        - message
+
+    HealthStatus:
+      type: object
+      description: Response body for liveness and readiness probes.
+      properties:
+        status:
+          type: string
+          enum:
+            - ok
+            - degraded
+          description: |
+            ok — all checks passed. degraded — one or more dependency checks failed;
+            used only on the readiness probe when the service should be taken out of rotation.
+        checks:
+          type: object
+          description: |
+            Map of dependency name to its check result. Present on the readiness probe;
+            omitted on the liveness probe (which has no dependency checks).
+          additionalProperties:
+            type: string
+            enum:
+              - ok
+              - fail
+      required:
+        - status
