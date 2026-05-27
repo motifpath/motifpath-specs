@@ -3,8 +3,7 @@ TrackingEventBase:
   description: |
     Common envelope carried by every student tracking event emitted by the Vue 3 SPA.
     All event-specific schemas extend this base via allOf. Consumers use event_type to
-    route; event_id enables idempotent processing as required by ADR-006 (at-least-once
-    Kafka delivery).
+    route; event_id enables idempotent processing under at-least-once Kafka delivery.
   properties:
     event_id:
       type: string
@@ -32,8 +31,8 @@ TrackingEventBase:
       format: uuid
       description: |
         ID of the authenticated student who generated this event. Used as the Kafka
-        partition key (ADR-006), guaranteeing ordered delivery of all events for a given
-        student to the same partition and consumer.
+        partition key — guarantees ordered delivery of all events for a given student
+        to the same partition and consumer.
     session_id:
       type: string
       format: uuid
@@ -60,7 +59,7 @@ TrackingEvent:
     A student tracking event submitted by the Vue 3 SPA to the Event Ingestion Service.
     Exactly one event-specific schema applies, discriminated by event_type. The Event
     Ingestion Service persists the raw payload to MongoDB and publishes it to the
-    motifpath.events Kafka topic (ADR-006).
+    motifpath.events Kafka topic.
   discriminator:
     propertyName: event_type
     mapping:
