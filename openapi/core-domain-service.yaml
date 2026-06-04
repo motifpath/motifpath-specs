@@ -1,0 +1,241 @@
+openapi: 3.1.0
+
+info:
+  title: Core Domain Service
+  version: 0.1.0
+  description: |
+    Manages the MotifPath core domain: user identity, content (nodes, challenges,
+    exercises), learning paths, and student progress state.
+
+    This service is the authoritative source for all domain entities referenced by
+    other services. The Event Ingestion Service validates student identity against
+    user records created here. All content IDs carried in tracking events
+    (content_node_id, challenge_id, exercise_id) must exist in this service before
+    events that reference them are meaningful.
+
+servers:
+  - url: https://api.motifpath.io/v1
+    description: Production
+  - url: http://localhost:8080
+    description: Local development
+
+security:
+  - BearerAuth: []
+
+paths:
+  /users:
+    post:
+      operationId: registerUser
+      summary: Register an authenticated user
+      description: |
+        Creates a MotifPath user record for the authenticated Clerk identity. The
+        caller supplies their intended role (student or teacher); the service maps
+        the JWT sub claim to a new user_id and persists the record.
+
+        This endpoint must be called once per Clerk identity before any other
+        authenticated operation. Subsequent calls with the same JWT sub return 409.
+
+        The user_id returned in the response is the stable MotifPath identity for
+        this user. Students must use this value as the student_id field in all
+        tracking events submitted to the Event Ingestion Service.
+      tags:
+        - Identity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserRequest'
+            examples:
+              register_student:
+                summary: A new student registers
+                value:
+                  role: student
+              register_teacher:
+                summary: A new teacher registers
+                value:
+                  role: teacher
+      responses:
+        "201":
+          description: |
+            User registered. Returns the new user's stable MotifPath identity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        "400":
+          description: |
+            The request body is invalid. The role field is missing or contains an
+            unrecognised value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: |
+            Missing or invalid Bearer token. The caller must be authenticated via
+            Clerk before registering.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "409":
+          description: |
+            A user record already exists for this Clerk identity. Each Clerk
+            account can be registered only once.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+
+  /users/me:
+    get:
+      operationId: getMyProfile
+      summary: Get the authenticated user's profile
+      description: |
+        Returns the MotifPath user record associated with the authenticated Clerk
+        identity. Returns 404 if the identity has not yet been registered via
+        POST /users.
+      tags:
+        - Identity
+      responses:
+        "200":
+          description: The authenticated user's profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        "401":
+          description: |
+            Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: |
+            No user record exists for this Clerk identity. The caller must
+            complete registration via POST /users first.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Clerk-issued JWT validated locally by the service on every request.
+        See ADR-007 for the full validation contract.
+
+  schemas:
+    RegisterUserRequest:
+      type: object
+      description: Payload for registering a new MotifPath user.
+      properties:
+        role:
+          type: string
+          enum:
+            - student
+            - teacher
+          description: |
+            The role this Clerk identity will hold in the platform. A student
+            consumes content and emits tracking events. A teacher creates content
+            and manages learning paths. Cannot be changed after registration.
+
+            The admin role is not self-registrable. Admin accounts are provisioned
+            directly in the database at deploy time and are reserved for internal
+            platform operations.
+      required:
+        - role
+
+    UserProfile:
+      type: object
+      description: |
+        The stable MotifPath identity for a registered user. The user_id is the
+        value that other services (e.g. Event Ingestion Service) use to identify
+        this user in payloads and JWT claim validation.
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: |
+            Stable MotifPath identifier for this user. Students must supply this
+            value as student_id in all tracking events.
+        role:
+          type: string
+          enum:
+            - student
+            - teacher
+            - admin
+          description: |
+            The role assigned at registration. Immutable after creation. The admin
+            role is provisioned directly in the database and is never returned from
+            a self-registration flow.
+        registered_at:
+          type: string
+          format: date-time
+          description: Timestamp at which the user record was created.
+      required:
+        - user_id
+        - role
+        - registered_at
+
+    ValidationError:
+      type: object
+      description: Returned when the request body fails schema validation.
+      properties:
+        message:
+          type: string
+          description: Human-readable summary of the validation failure.
+        errors:
+          type: array
+          description: One entry per failing field.
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: JSON pointer to the failing field.
+              reason:
+                type: string
+                description: Description of the constraint that was violated.
+            required:
+              - field
+              - reason
+      required:
+        - message
+        - errors
+
+    UnauthorizedError:
+      type: object
+      description: Returned when the Bearer token is missing or invalid.
+      properties:
+        message:
+          type: string
+          description: Human-readable reason for the rejection.
+      required:
+        - message
+
+    ConflictError:
+      type: object
+      description: Returned when a resource already exists and cannot be created again.
+      properties:
+        message:
+          type: string
+          description: Human-readable reason for the conflict.
+      required:
+        - message
+
+    NotFoundError:
+      type: object
+      description: Returned when the requested resource does not exist.
+      properties:
+        message:
+          type: string
+          description: Human-readable description of what was not found.
+      required:
+        - message
