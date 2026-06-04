@@ -53,6 +53,12 @@ Feature: Register a MotifPath user
 
   Scenario: Registration with an unrecognised role is rejected
     Given a Clerk identity "alice" has not yet been registered
+    When "alice" submits a registration request with role "moderator"
+    Then the request is rejected as invalid
+    And the rejection identifies "role" as the source of the error
+
+  Scenario: Attempting to self-register as admin is rejected
+    Given a Clerk identity "alice" has not yet been registered
     When "alice" submits a registration request with role "admin"
     Then the request is rejected as invalid
     And the rejection identifies "role" as the source of the error

@@ -145,6 +145,10 @@ components:
             The role this Clerk identity will hold in the platform. A student
             consumes content and emits tracking events. A teacher creates content
             and manages learning paths. Cannot be changed after registration.
+
+            The admin role is not self-registrable. Admin accounts are provisioned
+            directly in the database at deploy time and are reserved for internal
+            platform operations.
       required:
         - role
 
@@ -166,7 +170,11 @@ components:
           enum:
             - student
             - teacher
-          description: The role assigned at registration. Immutable after creation.
+            - admin
+          description: |
+            The role assigned at registration. Immutable after creation. The admin
+            role is provisioned directly in the database and is never returned from
+            a self-registration flow.
         registered_at:
           type: string
           format: date-time
