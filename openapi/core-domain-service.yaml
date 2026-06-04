@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.1.0
+  version: 0.2.0
   description: |
     Manages the MotifPath core domain: user identity, content (nodes, challenges,
     exercises), learning paths, and student progress state.
@@ -88,6 +88,311 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConflictError'
 
+  /content-nodes:
+    post:
+      operationId: createContentNode
+      summary: Create a content node
+      description: |
+        Creates a new content node owned by the authenticated teacher or admin.
+        A content node is the base unit of a class — a video or article that a
+        student consumes on their learning path.
+
+        Classification (skill, concept, difficulty level) must be supplied at
+        creation time. The review_state is always set to pending on creation
+        regardless of the value supplied; an admin must explicitly confirm it.
+        Classification is the minimum semantic layer required for gap detection
+        to function.
+      tags:
+        - Content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContentNodeRequest'
+            examples:
+              video_lesson:
+                summary: A teacher publishes a video lesson on triad shapes
+                value:
+                  title: "Introduction to Triad Shapes"
+                  content_type: video
+                  classification:
+                    skill: "triad-shapes"
+                    concept: "chord-theory"
+                    difficulty_level: beginner
+      responses:
+        "201":
+          description: Content node created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentNode'
+        "400":
+          description: The request body failed schema validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to create content.
+            Only teachers and admins may create content nodes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /content-nodes/{content_node_id}:
+    get:
+      operationId: getContentNode
+      summary: Get a content node by ID
+      description: |
+        Returns the content node with the given ID. Any authenticated user
+        (student, teacher, or admin) may retrieve a content node.
+      tags:
+        - Content
+      parameters:
+        - name: content_node_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the content node to retrieve.
+      responses:
+        "200":
+          description: The requested content node.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentNode'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No content node exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /content-nodes/{content_node_id}/challenges:
+    post:
+      operationId: createChallenge
+      summary: Create a challenge for a content node
+      description: |
+        Creates a new challenge attached to the specified content node. A challenge
+        is the assessment unit for a class — it groups exercises and carries the
+        subject tag, pass threshold, and optional remediation target used by the
+        rules-based recommendation engine.
+
+        Subject tag is mandatory. Without it, right/wrong outcomes on exercises are
+        analytically meaningless and gap detection cannot function.
+      tags:
+        - Content
+      parameters:
+        - name: content_node_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the content node this challenge belongs to.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChallengeRequest'
+            examples:
+              chord_recognition:
+                summary: A challenge for chord recognition with a remediation target
+                value:
+                  subject_tag: "triad-shapes"
+                  pass_threshold: 70
+                  remediation_target_content_node_id: "c9d1e2f3-0000-0000-0000-000000000002"
+      responses:
+        "201":
+          description: Challenge created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+        "400":
+          description: The request body failed schema validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to create challenges.
+            Only teachers and admins may create challenges.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No content node exists with the given content_node_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /challenges/{challenge_id}:
+    get:
+      operationId: getChallenge
+      summary: Get a challenge by ID
+      description: |
+        Returns the challenge with the given ID. Any authenticated user may
+        retrieve a challenge.
+      tags:
+        - Content
+      parameters:
+        - name: challenge_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the challenge to retrieve.
+      responses:
+        "200":
+          description: The requested challenge.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No challenge exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /challenges/{challenge_id}/exercises:
+    post:
+      operationId: createExercise
+      summary: Create an exercise within a challenge
+      description: |
+        Creates a pre-defined exercise within the specified challenge. An exercise
+        is a single practice item — for MVP this is a fretboard region interaction
+        with a binary correct/incorrect outcome. The exercise_id returned is the
+        value the SPA must supply in exercise-family tracking events.
+      tags:
+        - Content
+      parameters:
+        - name: challenge_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the challenge this exercise belongs to.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExerciseRequest'
+            examples:
+              fretboard_region:
+                summary: A fretboard region identification exercise
+                value:
+                  exercise_type: fretboard_region
+                  prompt: "Identify the root position of a C major triad"
+      responses:
+        "201":
+          description: Exercise created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+        "400":
+          description: The request body failed schema validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to create exercises.
+            Only teachers and admins may create exercises.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No challenge exists with the given challenge_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /exercises/{exercise_id}:
+    get:
+      operationId: getExercise
+      summary: Get an exercise by ID
+      description: |
+        Returns the exercise with the given ID. Any authenticated user may
+        retrieve an exercise.
+      tags:
+        - Content
+      parameters:
+        - name: exercise_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the exercise to retrieve.
+      responses:
+        "200":
+          description: The requested exercise.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No exercise exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /users/me:
     get:
       operationId: getMyProfile
@@ -132,6 +437,254 @@ components:
         See ADR-007 for the full validation contract.
 
   schemas:
+    CreateContentNodeRequest:
+      type: object
+      description: Payload for creating a new content node.
+      properties:
+        title:
+          type: string
+          description: Human-readable title of the content node, displayed to students.
+        content_type:
+          type: string
+          enum:
+            - video
+            - article
+          description: The media format of this content node.
+        classification:
+          $ref: '#/components/schemas/ClassificationInput'
+      required:
+        - title
+        - content_type
+        - classification
+
+    ClassificationInput:
+      type: object
+      description: |
+        The three mandatory classification dimensions for a content node. These
+        dimensions are the minimum semantic layer required for gap detection and
+        the rules-based recommendation engine to function.
+      properties:
+        skill:
+          type: string
+          description: |
+            The observable, practicable skill this content teaches. Must be a
+            short kebab-case tag (e.g. triad-shapes, chord-transitions,
+            sweep-picking).
+        concept:
+          type: string
+          description: |
+            The intellectual concept this content addresses. Must be a short
+            kebab-case tag (e.g. chord-theory, interval-recognition,
+            scale-construction).
+        difficulty_level:
+          type: string
+          enum:
+            - beginner
+            - intermediate
+            - advanced
+          description: The difficulty level of this content node.
+      required:
+        - skill
+        - concept
+        - difficulty_level
+
+    Classification:
+      allOf:
+        - $ref: '#/components/schemas/ClassificationInput'
+        - type: object
+          description: |
+            The classification of a content node including its review state.
+            All classifications start as pending and must be confirmed by an
+            admin before the content node is considered fully ready.
+          properties:
+            review_state:
+              type: string
+              enum:
+                - pending
+                - confirmed
+                - overridden
+              description: |
+                The review state of this classification. pending — awaiting
+                admin review. confirmed — approved as ground truth.
+                overridden — a previous classification was corrected by a
+                human reviewer.
+          required:
+            - review_state
+
+    ContentNode:
+      type: object
+      description: |
+        A content node is the base unit of a class — a video or article published
+        by a teacher. Its ID is carried in lesson-family tracking events as
+        content_node_id.
+      properties:
+        content_node_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this content node. Used as content_node_id in tracking events.
+        teacher_id:
+          type: string
+          format: uuid
+          description: The user_id of the teacher who created this content node.
+        title:
+          type: string
+          description: Human-readable title of the content node.
+        content_type:
+          type: string
+          enum:
+            - video
+            - article
+          description: The media format of this content node.
+        classification:
+          $ref: '#/components/schemas/Classification'
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp at which the content node was created.
+      required:
+        - content_node_id
+        - teacher_id
+        - title
+        - content_type
+        - classification
+        - created_at
+
+    CreateChallengeRequest:
+      type: object
+      description: Payload for creating a challenge within a content node.
+      properties:
+        subject_tag:
+          type: string
+          description: |
+            The subject this challenge assesses. Must match a skill or concept
+            tag on the parent content node's classification. This tag is the
+            minimum required for gap detection — a challenge without a subject
+            tag produces analytically meaningless outcomes.
+        pass_threshold:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: |
+            The minimum score (as a percentage of exercises answered correctly)
+            required to pass this challenge. Scores below this value trigger
+            the remediation recommendation if a target is configured.
+        remediation_target_content_node_id:
+          type: string
+          format: uuid
+          description: |
+            The content node to recommend when a student's score falls below
+            pass_threshold. If omitted, no automatic recommendation is made on
+            failure.
+      required:
+        - subject_tag
+        - pass_threshold
+
+    Challenge:
+      type: object
+      description: |
+        A challenge is the assessment unit for a content node. It groups exercises
+        and carries the subject tag and threshold rules used by the recommendation
+        engine. Its ID is carried in exercise-family tracking events as challenge_id
+        inside trigger_context.
+      properties:
+        challenge_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this challenge. Carried as challenge_id in tracking events.
+        content_node_id:
+          type: string
+          format: uuid
+          description: The content node this challenge belongs to.
+        subject_tag:
+          type: string
+          description: The subject this challenge assesses.
+        pass_threshold:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Minimum score percentage required to pass.
+        remediation_target_content_node_id:
+          type: string
+          format: uuid
+          description: Content node recommended when the student fails this challenge. Absent if not configured.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp at which the challenge was created.
+      required:
+        - challenge_id
+        - content_node_id
+        - subject_tag
+        - pass_threshold
+        - created_at
+
+    CreateExerciseRequest:
+      type: object
+      description: Payload for creating a pre-defined exercise within a challenge.
+      properties:
+        exercise_type:
+          type: string
+          enum:
+            - fretboard_region
+          description: |
+            The type of practice interaction. For MVP the only supported type is
+            fretboard_region — a fretboard image with clickable regions where
+            the student taps to identify the correct position. Additional types
+            may be added in future without breaking this contract.
+        prompt:
+          type: string
+          description: |
+            The instruction displayed to the student for this exercise
+            (e.g. "Identify the root position of a C major triad").
+      required:
+        - exercise_type
+        - prompt
+
+    Exercise:
+      type: object
+      description: |
+        A pre-defined practice item within a challenge. The exercise_id is the
+        value the SPA supplies in exercise-family tracking events. For MVP all
+        exercises are fretboard region interactions with a binary correct/incorrect
+        outcome.
+      properties:
+        exercise_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this exercise. Used as exercise_id in tracking events.
+        challenge_id:
+          type: string
+          format: uuid
+          description: The challenge this exercise belongs to.
+        exercise_type:
+          type: string
+          enum:
+            - fretboard_region
+          description: The type of practice interaction.
+        prompt:
+          type: string
+          description: The instruction displayed to the student for this exercise.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp at which the exercise was created.
+      required:
+        - exercise_id
+        - challenge_id
+        - exercise_type
+        - prompt
+        - created_at
+
+    ForbiddenError:
+      type: object
+      description: Returned when the authenticated user lacks permission for the requested operation.
+      properties:
+        message:
+          type: string
+          description: Human-readable reason for the denial.
+      required:
+        - message
+
     RegisterUserRequest:
       type: object
       description: Payload for registering a new MotifPath user.
