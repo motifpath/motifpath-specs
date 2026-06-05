@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.3.0
+  version: 0.4.0
   description: |
     Manages the MotifPath core domain: user identity, content (nodes, challenges,
     exercises), learning paths, and student progress state.
@@ -571,6 +571,215 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+  /learning-paths:
+    post:
+      operationId: createLearningPath
+      summary: Create a learning path
+      description: |
+        Creates an ordered sequence of content nodes that a student will follow.
+        Items are specified in the desired order; the service assigns each a
+        1-based position. All content_node_ids must exist in the system before
+        the path can be created. A path must contain at least one item.
+      tags:
+        - Learning Paths
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLearningPathRequest'
+            examples:
+              beginner_guitar_path:
+                summary: A three-node beginner path
+                value:
+                  title: "Beginner Guitar — Week 1"
+                  items:
+                    - content_node_id: "c9d1e2f3-0000-0000-0000-000000000001"
+                    - content_node_id: "c9d1e2f3-0000-0000-0000-000000000002"
+                    - content_node_id: "c9d1e2f3-0000-0000-0000-000000000003"
+      responses:
+        "201":
+          description: Learning path created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningPath'
+        "400":
+          description: |
+            The request body failed schema validation — missing title, empty items
+            array, or a content_node_id that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            Only teachers and admins may create learning paths.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /learning-paths/{learning_path_id}:
+    get:
+      operationId: getLearningPath
+      summary: Get a learning path by ID
+      description: |
+        Returns the learning path with its ordered items. Teachers and admins
+        may retrieve any path. Students may not browse paths directly — their
+        view is through GET /students/me/path.
+      tags:
+        - Learning Paths
+      parameters:
+        - name: learning_path_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the learning path to retrieve.
+      responses:
+        "200":
+          description: The requested learning path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningPath'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Students may not retrieve learning paths directly.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No learning path exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /students/{student_id}/path-assignments:
+    post:
+      operationId: assignLearningPath
+      summary: Assign a learning path to a student
+      description: |
+        Assigns a learning path to the specified student. The student must have
+        role student. If the student already has an active path assignment, the
+        existing assignment is replaced by this one and the student's progress
+        is reset to the first item. Only one active assignment per student is
+        supported for MVP.
+      tags:
+        - Learning Paths
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The user_id of the student to assign the path to.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignLearningPathRequest'
+            examples:
+              assign_path:
+                summary: Assign a path to a student
+                value:
+                  learning_path_id: "d4e5f6a7-0000-0000-0000-000000000001"
+      responses:
+        "201":
+          description: Path assigned. Returns the new assignment record.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PathAssignment'
+        "400":
+          description: The request body failed schema validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only teachers and admins may assign learning paths.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: |
+            The student_id does not exist, the student's role is not student,
+            or the learning_path_id does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /students/me/path:
+    get:
+      operationId: getMyPath
+      summary: Get the authenticated student's current learning path and progress
+      description: |
+        Returns the student's active learning path assignment together with the
+        progress state of each item. This is the primary endpoint for the SPA's
+        main screen.
+
+        Item status values:
+        - completed — the student has finished this content node.
+        - in_progress — the student has started but not finished this content node.
+        - not_started — the student has not yet reached this content node.
+        - locked — the student must complete an earlier node before accessing this one.
+
+        Only accessible by authenticated users with role student. Returns 404 if
+        the student has no active path assignment.
+      tags:
+        - Learning Paths
+      responses:
+        "200":
+          description: The student's current learning path with per-item progress state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentPathView'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only students may access this endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: The authenticated student has no active path assignment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /users/me:
     get:
       operationId: getMyProfile
@@ -726,6 +935,207 @@ components:
         - content_type
         - classification
         - created_at
+
+    CreateLearningPathRequest:
+      type: object
+      description: Payload for creating a learning path.
+      properties:
+        title:
+          type: string
+          description: Human-readable name for this learning path, displayed to teachers and admins.
+        items:
+          type: array
+          minItems: 1
+          description: Ordered list of content nodes that make up this path. At least one item is required.
+          items:
+            type: object
+            properties:
+              content_node_id:
+                type: string
+                format: uuid
+                description: The ID of the content node at this position. Must exist in the system.
+            required:
+              - content_node_id
+      required:
+        - title
+        - items
+
+    LearningPathItem:
+      type: object
+      description: A single content node within a learning path at a given position.
+      properties:
+        position:
+          type: integer
+          minimum: 1
+          description: 1-based position of this item within the learning path.
+        content_node_id:
+          type: string
+          format: uuid
+          description: The ID of the content node at this position.
+        title:
+          type: string
+          description: Title of the content node, denormalised for display.
+        content_type:
+          type: string
+          enum:
+            - video
+            - article
+          description: Media format of the content node, denormalised for display.
+      required:
+        - position
+        - content_node_id
+        - title
+        - content_type
+
+    LearningPath:
+      type: object
+      description: An ordered sequence of content nodes assigned to students as a structured curriculum.
+      properties:
+        learning_path_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this learning path.
+        teacher_id:
+          type: string
+          format: uuid
+          description: The user_id of the teacher or admin who created this path.
+        title:
+          type: string
+          description: Human-readable name for this learning path.
+        items:
+          type: array
+          description: Ordered content nodes, sorted by position ascending.
+          items:
+            $ref: '#/components/schemas/LearningPathItem'
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp at which this learning path was created.
+      required:
+        - learning_path_id
+        - teacher_id
+        - title
+        - items
+        - created_at
+
+    AssignLearningPathRequest:
+      type: object
+      description: Payload for assigning a learning path to a student.
+      properties:
+        learning_path_id:
+          type: string
+          format: uuid
+          description: The ID of the learning path to assign. Must exist in the system.
+      required:
+        - learning_path_id
+
+    PathAssignment:
+      type: object
+      description: |
+        A record of a learning path being assigned to a student. One active
+        assignment exists per student at any time for MVP.
+      properties:
+        assignment_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this assignment record.
+        student_id:
+          type: string
+          format: uuid
+          description: The user_id of the student this path is assigned to.
+        learning_path_id:
+          type: string
+          format: uuid
+          description: The learning path assigned to the student.
+        assigned_by:
+          type: string
+          format: uuid
+          description: The user_id of the teacher or admin who created this assignment.
+        assigned_at:
+          type: string
+          format: date-time
+          description: Timestamp at which the assignment was created.
+      required:
+        - assignment_id
+        - student_id
+        - learning_path_id
+        - assigned_by
+        - assigned_at
+
+    StudentPathItem:
+      type: object
+      description: A content node in the student's learning path with their current progress state.
+      properties:
+        position:
+          type: integer
+          minimum: 1
+          description: 1-based position of this item within the learning path.
+        content_node_id:
+          type: string
+          format: uuid
+          description: The ID of the content node at this position.
+        title:
+          type: string
+          description: Title of the content node.
+        content_type:
+          type: string
+          enum:
+            - video
+            - article
+          description: Media format of the content node.
+        status:
+          type: string
+          enum:
+            - completed
+            - in_progress
+            - not_started
+            - locked
+          description: |
+            The student's current progress state for this item. completed — finished.
+            in_progress — started but not finished. not_started — not yet reached.
+            locked — a preceding item must be completed first.
+      required:
+        - position
+        - content_node_id
+        - title
+        - content_type
+        - status
+
+    StudentPathView:
+      type: object
+      description: |
+        The student's active learning path with per-item progress state.
+        Returned by GET /students/me/path and used by the SPA to render
+        the main learning screen.
+      properties:
+        assignment_id:
+          type: string
+          format: uuid
+          description: The active assignment record ID.
+        learning_path_id:
+          type: string
+          format: uuid
+          description: The assigned learning path ID.
+        title:
+          type: string
+          description: Title of the assigned learning path.
+        current_position:
+          type: integer
+          minimum: 1
+          description: |
+            The position of the item the student should work on next. Points to
+            the first item that is not completed.
+        items:
+          type: array
+          description: All path items with progress state, sorted by position ascending.
+          items:
+            $ref: '#/components/schemas/StudentPathItem'
+      required:
+        - assignment_id
+        - learning_path_id
+        - title
+        - current_position
+        - items
 
     CreateExpandedContentRequest:
       type: object
