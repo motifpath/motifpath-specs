@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.2.0
+  version: 0.3.0
   description: |
     Manages the MotifPath core domain: user identity, content (nodes, challenges,
     exercises), learning paths, and student progress state.
@@ -356,6 +356,184 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+  /content-nodes/{content_node_id}/expanded-content:
+    post:
+      operationId: createExpandedContent
+      summary: Add an expanded content item to a content node
+      description: |
+        Attaches an expositive media item (image or GIF) to a content node. The
+        item is shown to the student at a specific point during consumption —
+        at a video timestamp for video nodes, or at a paragraph position for
+        article nodes.
+
+        **Trigger and hide rules by content node type:**
+
+        - **video**: `trigger_at_seconds` is required. `hide_at_seconds` must be
+          provided and must be greater than `trigger_at_seconds`. `trigger_at_paragraph`
+          and `duration_ms` must be absent.
+        - **article**: `trigger_at_paragraph` is required (1-based index). `duration_ms`
+          must be provided (minimum 1 ms). `trigger_at_seconds` and `hide_at_seconds`
+          must be absent.
+
+        These constraints are enforced at write time. A request that mixes fields
+        from both groups is rejected with 400.
+      tags:
+        - Content
+      parameters:
+        - name: content_node_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the content node to attach the expanded content to.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExpandedContentRequest'
+            examples:
+              video_chord_diagram:
+                summary: A chord diagram shown at a specific moment in a video lesson
+                value:
+                  content_type: image
+                  media_url: "https://cdn.example.com/diagrams/c-major-triad.png"
+                  trigger_at_seconds: 150
+                  hide_at_seconds: 165
+                  caption: "C major triad — root position"
+              article_gif:
+                summary: An animated GIF shown when the student reaches paragraph 3 of an article
+                value:
+                  content_type: gif
+                  media_url: "https://cdn.example.com/animations/finger-placement.gif"
+                  trigger_at_paragraph: 3
+                  duration_ms: 8000
+                  caption: "Correct finger placement for the first chord"
+      responses:
+        "201":
+          description: Expanded content item created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpandedContent'
+        "400":
+          description: |
+            The request body failed schema validation, or the trigger/hide field
+            combination is inconsistent with the parent content node type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to add expanded content.
+            Only teachers and admins may add expanded content to a content node.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No content node exists with the given content_node_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+    get:
+      operationId: listExpandedContent
+      summary: List all expanded content items for a content node
+      description: |
+        Returns all expanded content items attached to the specified content node,
+        ordered by trigger position (trigger_at_seconds ascending for video,
+        trigger_at_paragraph ascending for article). Any authenticated user may
+        retrieve this list.
+      tags:
+        - Content
+      parameters:
+        - name: content_node_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the content node whose expanded content to list.
+      responses:
+        "200":
+          description: Ordered list of expanded content items for the content node.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Paginated list of expanded content items.
+                properties:
+                  items:
+                    type: array
+                    description: Expanded content items ordered by trigger position.
+                    items:
+                      $ref: '#/components/schemas/ExpandedContent'
+                  total:
+                    type: integer
+                    description: Total number of expanded content items for this content node.
+                required:
+                  - items
+                  - total
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No content node exists with the given content_node_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /expanded-content/{expanded_content_id}:
+    get:
+      operationId: getExpandedContent
+      summary: Get an expanded content item by ID
+      description: |
+        Returns the expanded content item with the given ID. Any authenticated
+        user may retrieve an expanded content item.
+      tags:
+        - Content
+      parameters:
+        - name: expanded_content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the expanded content item to retrieve.
+      responses:
+        "200":
+          description: The requested expanded content item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpandedContent'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No expanded content item exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /exercises/{exercise_id}:
     get:
       operationId: getExercise
@@ -547,6 +725,112 @@ components:
         - title
         - content_type
         - classification
+        - created_at
+
+    CreateExpandedContentRequest:
+      type: object
+      description: |
+        Payload for attaching an expositive media item to a content node.
+        The trigger and hide fields used depend on the parent content node type:
+        video nodes use trigger_at_seconds + hide_at_seconds; article nodes use
+        trigger_at_paragraph + duration_ms. Mixing fields across groups is invalid.
+      properties:
+        content_type:
+          type: string
+          enum:
+            - image
+            - gif
+          description: The media format of the expanded content item.
+        media_url:
+          type: string
+          format: uri
+          description: External URL of the image or GIF to display.
+        trigger_at_seconds:
+          type: integer
+          minimum: 0
+          description: |
+            Video nodes only. The video timestamp (in seconds) at which to show
+            this item. Must be absent for article nodes.
+        hide_at_seconds:
+          type: integer
+          minimum: 0
+          description: |
+            Video nodes only. The video timestamp (in seconds) at which to hide
+            this item. Must be greater than trigger_at_seconds. Must be absent
+            for article nodes.
+        trigger_at_paragraph:
+          type: integer
+          minimum: 1
+          description: |
+            Article nodes only. The 1-based paragraph index at which to show
+            this item. Must be absent for video nodes.
+        duration_ms:
+          type: integer
+          minimum: 1
+          description: |
+            Article nodes only. How long to display this item in milliseconds
+            after it is triggered. Must be absent for video nodes.
+        caption:
+          type: string
+          description: Optional caption displayed alongside the media item.
+      required:
+        - content_type
+        - media_url
+
+    ExpandedContent:
+      type: object
+      description: |
+        An expositive media item (image or GIF) attached to a content node and
+        shown to the student at a specific point during content consumption.
+        For video nodes the item is synced to the video timeline; for article
+        nodes it is triggered by paragraph position.
+      properties:
+        expanded_content_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this expanded content item.
+        content_node_id:
+          type: string
+          format: uuid
+          description: The content node this item is attached to.
+        content_type:
+          type: string
+          enum:
+            - image
+            - gif
+          description: The media format of this item.
+        media_url:
+          type: string
+          format: uri
+          description: External URL of the image or GIF.
+        trigger_at_seconds:
+          type: integer
+          minimum: 0
+          description: Video nodes only. Video timestamp (seconds) at which this item is shown.
+        hide_at_seconds:
+          type: integer
+          minimum: 0
+          description: Video nodes only. Video timestamp (seconds) at which this item is hidden.
+        trigger_at_paragraph:
+          type: integer
+          minimum: 1
+          description: Article nodes only. 1-based paragraph index at which this item is shown.
+        duration_ms:
+          type: integer
+          minimum: 1
+          description: Article nodes only. Display duration in milliseconds.
+        caption:
+          type: string
+          description: Optional caption displayed alongside the media item.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp at which this expanded content item was created.
+      required:
+        - expanded_content_id
+        - content_node_id
+        - content_type
+        - media_url
         - created_at
 
     CreateChallengeRequest:
