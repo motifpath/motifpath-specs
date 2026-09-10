@@ -1,6 +1,6 @@
 # ADR-018: Frontend UI Architecture — Headless Primitives, a Token Layer, and an Owned Component Library on Vue 3 + Tailwind
 
-**Status:** Proposed
+**Status:** Proposed — pending a de-risking spike (see Validation)
 **Date:** 2026-09-10
 **Deciders:** Gilson Yamada (solo engineering at MVP)
 
@@ -154,6 +154,34 @@ restyled with everything else.
 - `lucide-vue-next` lets text labels such as "Completed" be replaced by icons; the `Icon`
   wrapper keeps the icon set swappable.
 
+## Validation
+
+This ADR is argued, not yet proven in the codebase. It moves to **Accepted** only after a
+time-boxed **architecture spike** (PB-34, phase 1) validates the four decision points against
+`motifpath-web`'s actual toolchain. The spike does **not** need the brand tokens — it uses
+placeholder values — and is separate from the visual restyle (PB-34 phase 2), which is gated on
+`motifpath-brand`.
+
+The spike must answer, on a throwaway branch:
+
+1. **Token pipeline.** A machine-readable token file (`tokens.json`) feeds `tailwind.config.ts`
+   cleanly, survives `vue-tsc` strict, and the utilities it generates work with opacity
+   modifiers and arbitrary-value escapes. Colour, one type scale, one spacing scale.
+2. **Reka UI fit.** Add the dependency; build one real primitive end to end (Dialog or Tabs)
+   styled only through tokens; confirm it works under Vite + TS-strict + the existing Vitest /
+   `@vue/test-utils` setup, that keyboard and focus behaviour is correct, and that a component
+   can be ejected to hand-rolled without touching callers. Record the bundle-size delta.
+3. **Icon set.** Add `lucide-vue-next`; confirm per-icon tree-shaking (no full-set bundle);
+   replace the `PathStep` "Completed" / "Locked" text labels with icons behind an `Icon`
+   wrapper.
+4. **Interactive island.** Mount a trivial `<canvas>` engine (plain TS class, `requestAnimation
+   Frame` loop, non-reactive state) behind a ~20-line Vue wrapper; confirm it neither imports
+   nor is broken by the component library, and that HMR and teardown are clean.
+
+Deliverable: a short findings note (as PB-28 produced) and a recommendation — accept ADR-018 as
+written, accept with amendments, or reject a decision point. A rejected point is amended here
+before the status flips.
+
 ## Related ADRs
 
 - **ADR-007** (Clerk authentication and JWT local validation) — the SPA this layer sits on;
@@ -168,5 +196,6 @@ restyled with everything else.
 
 ---
 
-*This ADR is Proposed as of 2026-09-10. A reviewer sets it to Accepted. To revise once accepted,
-create a new ADR with Status: Supersedes ADR-018.*
+*This ADR is Proposed as of 2026-09-10, pending the Validation spike (PB-34 phase 1). A reviewer
+sets it to Accepted after the spike findings land. To revise once accepted, create a new ADR
+with Status: Supersedes ADR-018.*
