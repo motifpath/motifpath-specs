@@ -1,7 +1,7 @@
 # ADR-018: Frontend UI Architecture — Headless Primitives, a Token Layer, and an Owned Component Library on Vue 3 + Tailwind
 
-**Status:** Proposed — pending a de-risking spike (see Validation)
-**Date:** 2026-09-10
+**Status:** Accepted
+**Date:** 2026-09-10 (Proposed) · 2026-09-10 (Accepted, after the PB-34 phase-1 spike)
 **Deciders:** Gilson Yamada (solo engineering at MVP)
 
 ---
@@ -182,6 +182,29 @@ Deliverable: a short findings note (as PB-28 produced) and a recommendation — 
 written, accept with amendments, or reject a decision point. A rejected point is amended here
 before the status flips.
 
+### Spike outcome (2026-09-10)
+
+The spike ran on `motifpath-web@spike/PB-34/frontend-architecture` (throwaway). Findings note:
+`spikes/PB-34-phase-1-findings.md`. **All four decision points validated** against the real
+toolchain (Vue 3.5 · Vite 6 · TypeScript strict · Tailwind **v3.4** · Vitest 3); the gate ran
+clean (159 tests, `vue-tsc --build`, `eslint --max-warnings 0`, `vite build`). Highlights:
+
+1. **Token pipeline** — `tokens.json` → `tailwind.config.ts` works; opacity and arbitrary-value
+   utilities resolve. Needs `"resolveJsonModule": true` in `tsconfig.node.json` and a small
+   tuple-narrowing helper for the type scale.
+2. **Reka UI** — `reka-ui@2.10.4` Dialog works with zero extra config; a hand-rolled eject
+   (~55 lines) passes the same behavioural test suite. With per-route code splitting the
+   primitive lands in its lazy chunk (~10.5 kB gzip), not the entry bundle.
+3. **Icons** — `lucide-vue-next` tree-shakes per icon (4 icons ship, not the 38 MB set);
+   `PathStep`'s status word became an `Icon` + visually-hidden text. Needs a
+   `vue/multi-word-component-names` ignore for the single-word `Icon` primitive.
+4. **Interactive island** — a plain-TS `<canvas>` engine with zero imports mounts behind a
+   19-line Vue wrapper; teardown is clean.
+
+**Recommendation accepted as written.** The three config adjustments above are folded into
+PB-34 phase 2; none changes a decision. Phase 2 (visual restyle) remains gated on the
+`motifpath-brand` token decision.
+
 ## Related ADRs
 
 - **ADR-007** (Clerk authentication and JWT local validation) — the SPA this layer sits on;
@@ -196,6 +219,6 @@ before the status flips.
 
 ---
 
-*This ADR is Proposed as of 2026-09-10, pending the Validation spike (PB-34 phase 1). A reviewer
-sets it to Accepted after the spike findings land. To revise once accepted, create a new ADR
-with Status: Supersedes ADR-018.*
+*This ADR was Proposed on 2026-09-10 and Accepted the same day after the PB-34 phase-1 spike
+validated all four decision points (`spikes/PB-34-phase-1-findings.md`). To revise, create a new
+ADR with Status: Supersedes ADR-018.*
