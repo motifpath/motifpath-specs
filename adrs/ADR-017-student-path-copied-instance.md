@@ -1,6 +1,6 @@
 # ADR-017: Student Path as a Copied Instance of a Reusable Template
 
-**Status:** Proposed
+**Status:** Accepted — 2026-09-10
 **Date:** 2026-09-08
 **Deciders:** Gilson Yamada (solo engineering at MVP)
 
@@ -32,6 +32,11 @@ Two forces make this model wrong, not just limited:
    student. Students will also hold several paths — parallel tracks now, a next path after
    finishing one — with one being the path they are actively working. "Paths as courses" (a
    catalog with teacher-mediated multi-enrollment) is a live direction, deferred past the alpha.
+
+A third force is where the per-student state lives. "Student" is a role on `User`, not a
+subtype — teachers and admins share the table. Path state hung directly off `User` would be
+columns that are always null for non-students: an invalid state the schema would be able to
+represent. This ADR resolves it here rather than deferring it.
 
 The database has **no production data**. There is no migration cost and no reason to model
 minimally — the model can be designed correctly now.
@@ -68,9 +73,16 @@ and point the student's current path at it (see below).
 `archived_at IS NULL` is *active* and visible to the student; a non-null value hides it (a
 concierge/admin action — distinct from "not the one I'm working on right now").
 
-**The "current" path is a pointer on the student.** A new `StudentLearningState` row
-(`student_id` primary key, `current_student_path_id` nullable FK) records which of the
-student's active paths is the one the app opens by default. It may be null (a student between
+**The "current" path is a pointer in a student-scoped table, never a column on `User`.** A
+student is a `User` with role `student`; teachers and admins are the same table. Path state —
+the current-path pointer, and anything student-only that follows it — lives in a new
+`StudentLearningState` table (`student_id` primary key referencing `User`,
+`current_student_path_id` nullable FK), which has a row only for users who are students. Adding
+`current_student_path_id` directly to `User` would let a teacher or admin row carry path state
+that is meaningless for them — an invalid state the schema should not be able to represent.
+`StudentLearningState` is the standing pattern for role-scoped state: a per-role extension
+table keyed by `user_id`, not a class hierarchy (ent has no inheritance) and not nullable
+columns on the shared identity row. `current_student_path_id` may be null (a student between
 paths, or with everything set aside). Invariant, enforced in the application layer:
 `current_student_path_id`, when set, references a `StudentPath` that belongs to that student and
 is not archived. Assigning a path sets it as the student's current path. Archiving the current
@@ -126,6 +138,12 @@ This ADR **supersedes the earlier (never-accepted) draft of ADR-017** that propo
 - **Deriving `StudentPathItem` status at read time** rather than storing it keeps a single
   source of truth (the completion facts) and means the copy operation only copies structure,
   never state.
+- **Student path state in a role-scoped table, not on `User`.** "Student" is a role, not a
+  subtype, so any state that only students have (starting with the current-path pointer) would
+  be a nullable, always-null-for-non-students column if placed on `User` — a representable
+  invalid state. A `StudentLearningState` extension table keyed by `user_id` makes the invalid
+  state unrepresentable and sets the pattern for later per-role state (a `TeacherProfile`, say)
+  without reaching for inheritance ent does not support.
 
 ## Consequences
 
@@ -138,6 +156,8 @@ This ADR **supersedes the earlier (never-accepted) draft of ADR-017** that propo
 - `LearningPath` templates can be edited or deleted without touching any student's path.
 - ADR-011 and the Aggregation Worker are unchanged; completion stays `(student, node)`.
 - The MVP read surface and the derived-status logic are essentially as they are today.
+- The `User` row stays role-agnostic; `StudentLearningState` cannot exist for a non-student, so
+  the schema cannot represent a teacher or admin "holding a path".
 
 ### Negative / Trade-offs
 - A substantial `motifpath-core` change: new `StudentPath` / `StudentPathItem` /
@@ -161,9 +181,6 @@ This ADR **supersedes the earlier (never-accepted) draft of ADR-017** that propo
 ### Neutral
 - `student_path_id` changes on every reassignment (a new copy), preserving today's contract
   that reassignment yields a fresh identifier.
-- Whether `StudentLearningState` is its own table or a nullable column on `User` is an
-  implementation detail; a dedicated table is preferred to keep student-only state off the
-  shared identity row.
 - "Paused" / "not started" / "completed" for a `StudentPath` are derivable from item completion
   and need not be stored; only `archived_at` is stored state on the accessibility axis.
 
