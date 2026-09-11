@@ -9,10 +9,47 @@
 
 ## Goal
 
-Land the ADR-018 design layer for real in `motifpath-web`: consume the now-resolved
-`motifpath-brand/tokens.json` through `tailwind.config.ts`, build the six-component owned
-library plus `Icon` and one real Reka UI primitive, and restyle `PathStep`/`PathContent` —
-the first migration target ADR-018 names — off the placeholder `motif-*` tokens.
+Land the ADR-018 design layer for real in `motifpath-web`, in both light and dark theme: consume
+the now-resolved `motifpath-brand/tokens.json` through `tailwind.config.ts`, build the
+six-component owned library plus `Icon` and one real Reka UI primitive, restyle
+`PathStep`/`PathContent` — the first migration target ADR-018 names — off the placeholder
+`motif-*` tokens, and define the SPA's basic composition structure so every phase below has an
+agreed place to live.
+
+## App Structure
+
+The design layer needs an agreed shape to slot into. `motifpath-web` is a single-page app with
+this composition hierarchy (mostly already true today; this section makes it explicit and is
+the frame the rest of the plan builds against):
+
+```
+main.ts
+ └─ App.vue                        mounts <RouterView/>, nothing else
+     └─ router (src/router/)       selects a layout per route meta (public vs authenticated)
+         ├─ PublicLayout.vue       unauthenticated routes: sign-in
+         └─ AuthenticatedLayout.vue authenticated routes: home, path, node
+             (Phase 3: both become thin wrappers around the shared `AppShell.vue`)
+                 └─ AppShell.vue   header (wordmark, nav slot, ThemeToggle, SignOutLink) + <main>
+                     └─ feature views (src/features/<domain>/views/)
+                         └─ feature components (e.g. PathContent → PathStep)
+                             └─ shared component library (src/shared/components/)
+```
+
+**State layers**, orthogonal to the view tree, reached via composables/stores rather than
+props-drilling: Pinia stores (`currentUser`, and this plan's new `theme` store) and composables
+(`useAuth`, `useStudentPath`, `useTheme`).
+
+**Component ownership convention** (new, stated here so Phase 3's library additions have a
+home):
+- `src/design/` — tokens only (`tokens.json`); no Vue, no logic.
+- `src/shared/components/` — the owned cross-feature library: `AppShell`, `StepRow`, `Icon`,
+  `ProgressMeter`, `PrimaryButton`, `ThemeToggle`, the `State*` set. Never imports from
+  `src/features/*`.
+- `src/features/<domain>/components/` — domain composition of the shared library (e.g.
+  `PathStep` composes `StepRow` + `Icon`). Never imported by another feature directly.
+
+This is a naming/foldering convention, not a new build boundary — no lint rule enforces the
+import direction in this plan; that's a follow-up if violations show up in review.
 
 ## Scope
 
@@ -22,7 +59,7 @@ the first migration target ADR-018 names — off the placeholder `motif-*` token
 - The three config deltas the PB-34 phase-1 spike proved are needed (`resolveJsonModule`, the
   `Icon` eslint ignore, the font-size tuple-narrowing helper)
 - `Icon.vue` (role → `lucide-vue-next` glyph) promoted from the spike to a real shared component
-- New owned components: `StepRow`, `AppShell`, `ProgressMeter`, `PrimaryButton`,
+- New owned components: `StepRow`, `AppShell`, `ProgressMeter`, `PrimaryButton`, `ThemeToggle`,
   `StateLoading`, `StateEmpty`, `StateError`, `StateLocked`
 - Restyling `PathStep.vue` / `PathContent.vue` onto tokens + the new components
 - Migrating `HomeView`, `PathView`, `AuthenticatedLayout`, `PublicLayout` onto `AppShell` /
@@ -30,13 +67,17 @@ the first migration target ADR-018 names — off the placeholder `motif-*` token
 - One real Reka UI primitive: a confirm-before-sign-out `Dialog` wrapping `SignOutLink` — a
   genuine caller, not a throwaway (`SpikeDialog`/`SpikeDialogEjected` are not promoted; the
   spike branch stays throwaway and gets deleted per its own follow-up)
+- **Dark-mode switching, from Phase 1 on.** Every semantic colour/elevation role in
+  `motifpath-brand/tokens.json` ships as a `{ light, dark }` pair; the app consumes both from
+  the start via Tailwind's `class`-strategy dark mode, so every component built or restyled in
+  this plan is verified in both themes before its phase is called done, not retrofitted later.
+  A small `theme` Pinia store + `useTheme` composable resolve the active theme (explicit
+  user choice, persisted to `localStorage`; falling back to `prefers-color-scheme` when unset)
+  and toggle a `dark` class on `<html>`. A minimal `ThemeToggle.vue` ships in Phase 1 so both
+  modes are reachable immediately; Phase 3 relocates it into `AppShell` without changing its
+  contract.
 
 **Out of scope:**
-- **Dark-mode switching.** `tokens.json`'s colour and elevation roles carry `{ light, dark }`
-  pairs, but nothing in the product today requires a dark theme or an OS-preference toggle.
-  This plan consumes the **light value only** for every role, flattened to a single hex per
-  token. The `dark` values stay in `tokens.json` unused — cheap to wire up later (see Open
-  Questions), expensive to invent a CSS-custom-property theming layer for now with no caller.
 - The canvas-island pattern (ADR-018 decision 4) — already validated by the spike
   (`PulseEngine.ts` / `SpikeIsland.vue`); no real interactive module needs it until PB-8f.
 - Consolidating `RegisteringNotice` / `RegistrationFailedNotice` / `ErrorRetryNotice` into the
@@ -62,22 +103,38 @@ All phases are in `motifpath-web`, branched from `dev`. No `motifpath-specs` or
 `motifpath-core` changes are needed. TDD applies throughout: for every new component or util,
 write the failing `@vue/test-utils` / Vitest test first, then implement.
 
-### Phase 1 — Token pipeline & config deltas
+### Phase 1 — Token pipeline, dark-mode wiring & config deltas
 
 **Branch:** `feat/PB-34/phase-2-design-tokens`
 
-- [ ] Replace `src/design/tokens.json` with the real values from
-  `motifpath-brand/tokens.json`, flattened to light-only: each `color`/`elevation` role's
-  `$value.light` becomes the token's value (drop the `light`/`dark` wrapper); `brand`, `font`,
-  `space`, `radius` copy across as-is (already theme-independent)
+- [ ] Copy `motifpath-brand/tokens.json` into `src/design/tokens.json` as-is (keep the
+  `{ light, dark }` pairs — do not flatten); `brand`, `font`, `space`, `radius` are already
+  theme-independent
+- [ ] `src/assets/main.css`: for every `color`/`elevation` token role, emit a CSS custom
+  property under `:root` with the `light` value (as an `R G B` channel triplet, e.g.
+  `--color-ink: 26 22 51`, so Tailwind's opacity modifiers keep working) and redefine it under
+  `:root.dark` with the `dark` value
+- [ ] `tailwind.config.ts`: add `darkMode: 'class'`; map each Tailwind colour/`boxShadow` token
+  to `rgb(var(--color-x) / <alpha-value>)` (colours) or `var(--elevation-x)` (shadows) instead
+  of a static hex, so both themes resolve from the same utility classes; keep `fontSize` via the
+  tuple-narrowing helper, `spacing`, `borderRadius` as direct token values (theme-independent);
+  keep the `motif-*` aliases pointed at the new roles for now (removed in Phase 4)
 - [ ] `tsconfig.node.json`: add `"resolveJsonModule": true`
-- [ ] `tailwind.config.ts`: spread the flattened tokens onto `theme.extend` (`colors`, `fontSize`
-  via the tuple-narrowing helper the spike wrote, `spacing`, `borderRadius`, `boxShadow` for
-  elevation); keep the `motif-*` aliases pointed at the new values for now (removed in Phase 4)
 - [ ] `eslint.config.js`: add `'vue/multi-word-component-names': ['error', { ignores: ['Icon'] }]`
+- [ ] `src/stores/theme.ts` — Pinia store holding `'light' | 'dark'`, initialised from
+  `localStorage` and falling back to `window.matchMedia('(prefers-color-scheme: dark)')` when
+  unset; a `toggle()` action persists the choice and flips the `dark` class on
+  `document.documentElement`. Write its test first (initial resolution from each source,
+  `toggle()` persists and updates the DOM class).
+- [ ] `ThemeToggle.vue` — a minimal button bound to the `theme` store, mounted temporarily in
+  `AuthenticatedLayout.vue`/`PublicLayout.vue` headers (Phase 3 relocates it into `AppShell`
+  with no behaviour change)
 - [ ] Test: a Vitest assertion that `tailwind.config.ts`'s resolved `theme.extend.colors.accent`
-  equals the token file's value (catches drift if either file changes without the other)
-- [ ] Gate: `vue-tsc --build`, `eslint --max-warnings 0`, `vitest run`, `vite build` all clean
+  utility references the `--color-accent` custom property (catches drift if either file changes
+  without the other)
+- [ ] Gate: `vue-tsc --build`, `eslint --max-warnings 0`, `vitest run`, `vite build` all clean;
+  manual check that toggling `ThemeToggle` swaps every existing screen's background/text/border
+  colours with no unstyled flash
 
 ### Phase 2 — `Icon` + `PathStep`/`PathContent` restyle
 
@@ -92,9 +149,10 @@ write the failing `@vue/test-utils` / Vitest test first, then implement.
   existing `[data-test="step-status"]` text assertions keep passing unchanged
 - [ ] `PathContent.vue`: token classes for the heading/section/progress-line markup
 - [ ] Gate: existing `PathStep.spec.ts` / `PathContent.spec.ts` pass unmodified (behaviour is
-  identical; only classes/markup for the marker change)
+  identical; only classes/markup for the marker change); manual check via `ThemeToggle` that
+  every status (locked/current/completed/not-started) is legible in both themes
 
-### Phase 3 — Owned component library: `StepRow`, `AppShell`, `ProgressMeter`, `PrimaryButton`
+### Phase 3 — Owned component library: `StepRow`, `AppShell`, `ProgressMeter`, `PrimaryButton`, `ThemeToggle` relocation
 
 **Branch:** `feat/PB-34/phase-2-component-library`
 
@@ -110,9 +168,11 @@ write the failing `@vue/test-utils` / Vitest test first, then implement.
   progress line with it
 - [ ] `AppShell.vue` — extracts the shared header/nav/main scaffold out of
   `AuthenticatedLayout.vue` and `PublicLayout.vue`; nav links passed as a prop/slot so the
-  public shell renders none
+  public shell renders none; hosts `ThemeToggle` (moved in from the layouts, same component,
+  same store binding — no new behaviour)
 - [ ] Gate: `AuthenticatedLayout.spec.ts` (existing) still passes against the `AppShell`-based
-  implementation; new component specs for each of the four
+  implementation; new component specs for each of the five (including `ThemeToggle`'s new
+  location); manual check in both themes
 
 ### Phase 4 — `State*` set + view migration + retire `motif-*`
 
@@ -130,7 +190,8 @@ write the failing `@vue/test-utils` / Vitest test first, then implement.
 - [ ] Remove the `motif-*` alias block from `tailwind.config.ts`; grep the codebase for any
   remaining `motif-` class reference and replace it — CI should fail the build if none remain
   but the grep is a manual gate step here, not an automated check
-- [ ] Gate: full `vitest run` (all existing + new specs), `vue-tsc --build`, `eslint`, `vite build`
+- [ ] Gate: full `vitest run` (all existing + new specs), `vue-tsc --build`, `eslint`,
+  `vite build`; manual pass over every migrated screen in both themes
 
 ### Phase 5 — First real Reka UI primitive: confirm-before-sign-out `Dialog`
 
@@ -143,7 +204,8 @@ write the failing `@vue/test-utils` / Vitest test first, then implement.
   styled only with token utilities; confirm action calls the existing sign-out logic unchanged
 - [ ] Confirm route-level code splitting keeps this out of the entry bundle per the spike's
   bundle-delta finding (check `vite build` chunk report)
-- [ ] Gate: full test suite, `vue-tsc --build`, `eslint`, `vite build`
+- [ ] Gate: full test suite, `vue-tsc --build`, `eslint`, `vite build`; manual check that the
+  dialog overlay/content contrast holds in both themes
 
 ---
 
@@ -169,13 +231,16 @@ Phases 1–4.
   the spike
 - [ ] Reka `Dialog` chunk lands in `SignOutLink`'s route/component chunk, not `index.js`
 - [ ] Manual smoke via `devbox services up ... web`: sign-in → home → path → a locked, a
-  current, and a completed step render correctly; sign-out shows the confirm dialog
+  current, and a completed step render correctly; sign-out shows the confirm dialog — repeated
+  once in light and once in dark via `ThemeToggle`
+- [ ] Toggling theme persists across a page reload (`localStorage`) and, when no explicit choice
+  has been made, follows `prefers-color-scheme`
 
 ## Open Questions
 
 | Question | Owner | Resolution |
 |---|---|---|
-| When (if ever) does the student alpha need dark-mode switching, given tokens already carry dark values? | Gilson | Deferred — revisit if a concrete request appears; no CSS-var theming layer built speculatively |
+| Should theme preference sync server-side (per-user), or stay client-only for the alpha? | Gilson | Client-only (`localStorage`) for this plan — no backend field exists for it; revisit if cross-device continuity is requested |
 | Should `RegisteringNotice`/`RegistrationFailedNotice`/`ErrorRetryNotice` be consolidated into the `State*` set? | Gilson | Deferred to a follow-up plan — out of scope here |
 | Does PB-8e (lesson consumption) introduce a second real Reka primitive (e.g. `Tabs` for lesson media types)? | Gilson | Decide when PB-8e discovery starts; not blocking this plan |
 
