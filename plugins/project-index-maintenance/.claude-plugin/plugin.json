@@ -1,7 +1,7 @@
 {
   "name": "project-index-maintenance",
   "displayName": "Project Index Maintenance",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Reconcile the MotifPath Project Index page in Notion at session close.",
   "author": { "name": "MotifPath Team" },
   "repository": "https://github.com/motifpath/motifpath-specs",
