@@ -3,7 +3,7 @@
 **Task:** PB-40
 **Date:** 2026-09-13
 **Author:** Gilson (with Claude)
-**Status:** On hold (2026-09-13) — pending PB-45 (content media storage strategy)
+**Status:** Ready — hold lifted 2026-09-13 (PB-45 resolved via ADR-021)
 
 ---
 
@@ -15,17 +15,18 @@ tags, 4-type enum incl. `image_choice` per the 2026-09-13 amendment, unified opt
 answer-checking) into a real, working exercise-authoring tool: `motifpath-specs` contract →
 `motifpath-core` backend → `motifpath-web` authoring UI.
 
-## Hold (2026-09-13)
+## Hold lifted (2026-09-13)
 
-This plan is on hold pending **PB-45** (content media storage strategy — dev & production).
-Scoping this plan surfaced that nobody has actually decided where exercise/prompt images,
-audio stimuli, or the predefined image-picker library are stored, in either environment —
-this plan's own "Out of scope" section below papers over that gap by deferring to the
-existing `media_url`-as-string pattern, but that pattern itself was never a deliberate
-decision for content-authoring assets specifically. Resume this plan once PB-45 lands (likely
-as an ADR); its outcome may change how `image_url`/`audio_url` are populated in Phase 3's
-authoring UI (URL-paste vs. a real upload flow) without necessarily changing the OpenAPI
-schema shape from Phase 1.
+This plan was on hold pending **PB-45** (content media storage strategy — dev & production).
+Scoping it originally surfaced that nobody had decided where exercise/prompt images, audio
+stimuli, or the predefined image-picker library are stored, in either environment. PB-45
+resolved this via **ADR-021**: S3 + CloudFront in production, MinIO locally, a presigned-PUT
+upload flow (`POST /media/upload-url`, added to `core-domain-service.yaml` and
+`features/content-management/media-upload.feature` ahead of this plan's Phase 1), and
+`image_url`/`audio_url` populated from the resulting `object_url` rather than pasted by hand.
+As ADR-021 anticipated, this changed nothing about the OpenAPI schema shape drafted below
+(`Exercise`/`Option` still carry plain `image_url`/`audio_url` strings) — only how Phase 3's
+authoring UI populates those fields.
 
 ## Scope
 
@@ -40,17 +41,19 @@ schema shape from Phase 1.
   (table-driven + godog + testcontainers per this repo's testing discipline).
 - `motifpath-web` authoring UI implementing the merged prototype: exercise type picker, prompt/
   title fields, per-type option editors (text/audio/image_choice lists, image_recognition's
-  region canvas), the shared image picker (predefined library or a URL — see Open Questions on
-  upload), skill tags input, a reuse indicator (challenge count), and the student-preview modal.
+  region canvas), the shared image picker (predefined library, or upload a new image via
+  `POST /media/upload-url` per ADR-021), skill tags input, a reuse indicator (challenge count),
+  and the student-preview modal.
 
 **Out of scope:**
-- File upload / media hosting infrastructure. Every existing content schema in
-  `core-domain-service.yaml` references media by a plain `media_url` string (an
-  already-hosted URL), with no upload endpoint anywhere in this spec. This plan follows that
-  precedent: `image_url` / `audio_url` are URL strings, not uploaded files. The prototype's
-  "custom upload" interaction becomes "paste a URL" in the real tool, or is deferred entirely
-  to whatever eventually implements PB-8i's concierge tooling. Building actual file storage is
-  a separate decision, not part of this plan.
+- The presigned upload URL endpoint itself and its underlying S3/MinIO infrastructure. This
+  was resolved by **PB-45 / ADR-021** and shipped as a standalone spec change
+  (`POST /media/upload-url` in `core-domain-service.yaml`, `MediaUploadUrl` /
+  `CreateMediaUploadUrlRequest` schemas, `features/content-management/media-upload.feature`) —
+  Phase 3's authoring UI *consumes* that endpoint (request an upload URL, PUT the file, store
+  the returned `object_url`), it does not build it. `image_url` / `audio_url` on
+  `Exercise`/`Option` remain plain URL strings, per ADR-021's confirmation that this required
+  no schema shape change.
 - PB-41 (Practice / exercises view, S7) — the student-facing runtime that consumes exercises.
   This plan only builds the authoring side and the data model; PB-41 is a separate backlog item
   and plan, unblocked by this one but not implemented here.
@@ -61,7 +64,9 @@ schema shape from Phase 1.
 ## Prerequisites
 
 - [x] ADR-019 Accepted & merged (`motifpath-specs#40`)
-- [ ] ADR-019 amendment (`image_choice` 4th type) merged (`motifpath-specs#47`, open)
+- [x] ADR-019 amendment (`image_choice` 4th type) merged (`motifpath-specs#47`)
+- [x] ADR-021 (content media storage strategy) Accepted & merged (`motifpath-specs#49`);
+      `POST /media/upload-url` merged ahead of Phase 1
 - [x] Open Questions below resolved with Gilson
 
 ---
@@ -167,8 +172,8 @@ began — not inferred):
         interaction genuinely has no existing primitive (the region canvas is a strong
         candidate for ADR-018's "framework-agnostic island" pattern, like the fretboard
         renderer — decide during implementation, not pre-committed here).
-      - A shared image picker component (predefined library or URL entry, per the Open
-        Questions' upload-scope resolution) reused identically by `image_recognition` and
+      - A shared image picker component (predefined library, or upload a new image via
+        `POST /media/upload-url` per ADR-021) reused identically by `image_recognition` and
         `image_choice`, matching the prototype's explicit design goal.
       - Skill tags input (add/remove, matching the prototype's `tags`/`tagInput` state shape).
       - A reuse indicator showing `challenge_ids.length` from the API response.
@@ -211,7 +216,9 @@ without affecting Phase 1/2's contract or backend.
   amendment, `motifpath-specs#47`)
 - **Design:** [`design/PB-40-exercise-authoring-builder/`](../design/PB-40-exercise-authoring-builder/)
   — the merged prototype this plan implements for real
+- **ADR:** [ADR-021](../adrs/ADR-021-content-media-storage-strategy.md) (content media storage
+  strategy) — resolves PB-45, unblocking this plan's Phase 3 upload flow (see "Hold lifted"
+  above)
 - **Backlog item:** PB-40 (Exercise-authoring builder)
-- **Blocked on:** PB-45 (content media storage strategy — dev & production) — see Hold above
 - **Downstream:** PB-41 (Practice / exercises view) — consumes this plan's data model but is a
   separate plan
