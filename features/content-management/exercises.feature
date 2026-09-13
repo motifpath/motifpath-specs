@@ -118,6 +118,15 @@ Feature: Manage exercises
     When "bob" unlinks exercise "triad-exercise-01" from "triad-challenge"
     Then the exercise no longer records "triad-challenge" among its linked challenges
 
+  # ── Conflict — linking ───────────────────────────────────────────────────────
+
+  Scenario: Linking an exercise that is already linked to the challenge is rejected
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "triad-exercise-01" to "triad-challenge"
+    When "bob" links exercise "triad-exercise-01" to "triad-challenge"
+    Then the request is refused with a conflict error
+
   # ── Not found — linking and unlinking ────────────────────────────────────────
 
   Scenario: Linking a non-existent exercise to a challenge returns not found
