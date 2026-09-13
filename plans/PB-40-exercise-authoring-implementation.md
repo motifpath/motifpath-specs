@@ -81,7 +81,7 @@ began — not inferred):
 | **Standalone creation vs. challenge-scoped creation.** | **Split.** `POST /exercises` creates an exercise standalone; `POST /challenges/{challenge_id}/exercises/{exercise_id}` links an existing exercise; `DELETE` on the same path unlinks. The old combined `POST /challenges/{challenge_id}/exercises` is replaced. |
 | **`title` field**, distinct from `prompt`. | **Add it.** Required, authoring-only name (e.g. "Alternate picking — descending run"), separate from the student-facing `prompt`. |
 | **Per-type option modeling** (region geometry vs. text vs. image). | **One flat `Option` schema** — `option_id`, `is_correct`, plus optional `label` / `image_url` / `region {x, y, width, height, shape}` — validated per-`exercise_type` in the Go domain constructor. No `oneOf`. |
-| **`GET /content-nodes/{id}/challenges` response shape.** | **Unchanged — IDs only.** Full exercise bodies (options, tags, media) are fetched per-exercise via `GET /exercises/{id}`, not embedded in the challenge listing. |
+| **Challenge → exercise listing shape.** | **No listing endpoint exists yet (checked: only `POST /content-nodes/{id}/challenges` and `GET /challenges/{challenge_id}` exist; there is no `GET` that lists a content node's challenges or a challenge's linked exercises). Not added by this plan — deferred until a real caller needs it. When it is added, it stays IDs only: full exercise bodies (options, tags, media) are fetched per-exercise via `GET /exercises/{id}`, never embedded in a listing.** In the meantime, `Exercise.challenge_ids` (added in Phase 1) is the only way to query the exercise↔challenge link, from the exercise side. |
 
 ---
 
@@ -92,29 +92,29 @@ began — not inferred):
 **Branch:** `feat/PB-40/spec-exercise-authoring`
 
 - [x] Step 1 — Open Questions resolved with Gilson (see above).
-- [ ] Step 2 — Delete `openapi/components/schemas/challenge.yaml` and
+- [x] Step 2 — Delete `openapi/components/schemas/challenge.yaml` and
       `challenge_classification.yaml` (confirmed unreferenced by `$ref` anywhere in `openapi/`).
       The real, accurate `Challenge` schema already lives inline in
       `openapi/core-domain-service.yaml` and needs no revision — ADR-019 §6's "stale
       `challenge.yaml`" concern was about these orphaned files, not the inline schema actually
       backing the live endpoints.
-- [ ] Step 3 — Rewrite `CreateExerciseRequest` / `Exercise` inline in
+- [x] Step 3 — Rewrite `CreateExerciseRequest` / `Exercise` inline in
       `core-domain-service.yaml`: `title`, `prompt`, `exercise_type` (4-value enum), `skill_tags`
       (array of strings), `image_url` / `audio_url` (optional, per-type), `options` (array of the
       new flat `Option` schema: `option_id`, `is_correct`, optional `label`, `image_url`,
       `region {x, y, width, height, shape}`), `challenge_ids` (array, many-to-many).
-- [ ] Step 4 — Add/modify paths per the Open Questions' resolution: `POST /exercises` (standalone
+- [x] Step 4 — Add/modify paths per the Open Questions' resolution: `POST /exercises` (standalone
       create), `GET /exercises/{exercise_id}` (existing, response shape updated),
       `POST /challenges/{challenge_id}/exercises/{exercise_id}` (link),
       `DELETE /challenges/{challenge_id}/exercises/{exercise_id}` (unlink). Update or remove the
       old combined `POST /challenges/{challenge_id}/exercises` per the resolved question.
-- [ ] Step 5 — Update `features/content-management/exercises.feature`: rewrite existing
+- [x] Step 5 — Update `features/content-management/exercises.feature`: rewrite existing
       scenarios for the new create/link split and 4-type enum; add scenarios for skill tags
       (create with tags, reject empty-string tag), options (create with correct-option marking,
       reject an exercise with zero correct options — the prototype's own guardrail: "Mark at
       least one option correct"), and the many-to-many link/unlink endpoints (link an existing
       exercise into a second challenge, unlink, link a non-existent exercise → not found).
-- [ ] Step 6 — Definition of Ready check: OpenAPI endpoints defined, Gherkin covers happy path +
+- [x] Step 6 — Definition of Ready check: OpenAPI endpoints defined, Gherkin covers happy path +
       edge cases + failure cases, no HTTP/SQL/framework language in scenarios (per this repo's
       Gherkin standards).
 - [ ] Step 7 — `redocly lint` clean; Gherkin syntax valid. Open PR, get it merged before Phase 2.

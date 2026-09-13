@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.5.0
+  version: 0.6.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -294,25 +294,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
-  /challenges/{challenge_id}/exercises:
+  /exercises:
     post:
       operationId: createExercise
-      summary: Create an exercise within a challenge
+      summary: Create a standalone exercise
       description: |
-        Creates a pre-defined exercise within the specified challenge. An exercise
-        is a single practice item — for MVP this is a fretboard region interaction
-        with a binary correct/incorrect outcome. The exercise_id returned is the
-        value the SPA must supply in exercise-family tracking events.
+        Creates a reusable exercise, independent of any challenge. An exercise
+        is a single practice item, checked by option selection: the student's
+        selected option ID(s) must match the option(s) marked is_correct. The
+        exercise_id returned is the value the SPA must supply in
+        exercise-family tracking events. Link the exercise into one or more
+        challenges afterward with
+        POST /challenges/{challenge_id}/exercises/{exercise_id}.
       tags:
         - Content
-      parameters:
-        - name: challenge_id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: The ID of the challenge this exercise belongs to.
       requestBody:
         required: true
         content:
@@ -320,11 +315,32 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateExerciseRequest'
             examples:
-              fretboard_region:
+              image_recognition:
                 summary: A fretboard region identification exercise
                 value:
-                  exercise_type: fretboard_region
+                  title: "Root position of a C major triad"
                   prompt: "Identify the root position of a C major triad"
+                  exercise_type: image_recognition
+                  skill_tags:
+                    - triad-shapes
+                  image_url: "https://cdn.example.com/fretboard/c-major-triad.png"
+                  options:
+                    - option_id: "e1a1a1a1-0000-0000-0000-000000000001"
+                      is_correct: true
+                      region:
+                        x: 0.2
+                        y: 0.3
+                        width: 0.1
+                        height: 0.1
+                        shape: rectangle
+                    - option_id: "e1a1a1a1-0000-0000-0000-000000000002"
+                      is_correct: false
+                      region:
+                        x: 0.5
+                        y: 0.3
+                        width: 0.1
+                        height: 0.1
+                        shape: rectangle
       responses:
         "201":
           description: Exercise created.
@@ -333,7 +349,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Exercise'
         "400":
-          description: The request body failed schema validation.
+          description: |
+            The request body failed schema validation, or no option has
+            is_correct set to true.
           content:
             application/json:
               schema:
@@ -352,8 +370,113 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForbiddenError'
+
+  /challenges/{challenge_id}/exercises/{exercise_id}:
+    post:
+      operationId: linkExerciseToChallenge
+      summary: Link an existing exercise to a challenge
+      description: |
+        Links an existing, standalone exercise into the specified challenge.
+        The same exercise may be linked to any number of challenges — linking
+        it into a second challenge does not duplicate the exercise or affect
+        its other links.
+      tags:
+        - Content
+      parameters:
+        - name: challenge_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the challenge to link the exercise into.
+        - name: exercise_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the exercise to link.
+      responses:
+        "201":
+          description: Exercise linked. Returns the updated exercise.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to link exercises.
+            Only teachers and admins may link exercises to challenges.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
         "404":
-          description: No challenge exists with the given challenge_id.
+          description: No challenge exists with challenge_id, or no exercise exists with exercise_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: The exercise is already linked to this challenge.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+
+    delete:
+      operationId: unlinkExerciseFromChallenge
+      summary: Unlink an exercise from a challenge
+      description: |
+        Removes the link between the specified exercise and challenge. The
+        exercise itself is not deleted and remains linked to any other
+        challenges it is part of.
+      tags:
+        - Content
+      parameters:
+        - name: challenge_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the challenge to unlink the exercise from.
+        - name: exercise_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the exercise to unlink.
+      responses:
+        "204":
+          description: Exercise unlinked.
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to unlink exercises.
+            Only teachers and admins may unlink exercises from challenges.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: |
+            No challenge exists with challenge_id, no exercise exists with
+            exercise_id, or the exercise is not currently linked to this
+            challenge.
           content:
             application/json:
               schema:
@@ -542,7 +665,8 @@ paths:
       operationId: getExercise
       summary: Get an exercise by ID
       description: |
-        Returns the exercise with the given ID. Any authenticated user may
+        Returns the exercise with the given ID, including its options and
+        the challenges it is currently linked to. Any authenticated user may
         retrieve an exercise.
       tags:
         - Content
@@ -1479,60 +1603,200 @@ components:
 
     CreateExerciseRequest:
       type: object
-      description: Payload for creating a pre-defined exercise within a challenge.
+      description: Payload for creating a standalone, reusable exercise.
       properties:
-        exercise_type:
+        title:
           type: string
-          enum:
-            - fretboard_region
           description: |
-            The type of practice interaction. For MVP the only supported type is
-            fretboard_region — a fretboard image with clickable regions where
-            the student taps to identify the correct position. Additional types
-            may be added in future without breaking this contract.
+            A short, authoring-only name for this exercise (e.g. "Alternate
+            picking — descending run"), used to identify it in authoring
+            tools. Not shown to students.
         prompt:
           type: string
           description: |
             The instruction displayed to the student for this exercise
             (e.g. "Identify the root position of a C major triad").
+        exercise_type:
+          type: string
+          enum:
+            - text_response
+            - audio_recognition
+            - image_recognition
+            - image_choice
+          description: |
+            The type of practice interaction, which determines how its
+            options are authored and rendered. text_response and
+            audio_recognition options carry a text label; image_recognition
+            options carry a region on image_url; image_choice options each
+            carry their own image_url.
+        skill_tags:
+          type: array
+          items:
+            type: string
+          description: |
+            Freeform tags naming the skill(s) or technique(s) this exercise
+            targets (e.g. "alternate_picking"), used to classify and discover
+            the exercise independent of any challenge. Each tag must be a
+            non-empty string.
+        image_url:
+          type: string
+          format: uri
+          description: |
+            The stimulus image for this exercise. Required when exercise_type
+            is image_recognition; absent otherwise.
+        audio_url:
+          type: string
+          format: uri
+          description: |
+            The stimulus audio for this exercise. Required when exercise_type
+            is audio_recognition; absent otherwise.
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+          minItems: 1
+          description: |
+            The exercise's selectable answer choices. At least one option
+            must have is_correct set to true — an exercise with no correct
+            option cannot be graded.
       required:
-        - exercise_type
+        - title
         - prompt
+        - exercise_type
+        - options
 
     Exercise:
       type: object
       description: |
-        A pre-defined practice item within a challenge. The exercise_id is the
-        value the SPA supplies in exercise-family tracking events. For MVP all
-        exercises are fretboard region interactions with a binary correct/incorrect
-        outcome.
+        A reusable, standalone practice item classified by skill tags and
+        independent of any single challenge. The exercise_id is the value
+        the SPA supplies in exercise-family tracking events. An exercise is
+        checked by option selection: the student's selected option ID(s)
+        must match the option(s) marked is_correct.
       properties:
         exercise_id:
           type: string
           format: uuid
           description: Stable identifier for this exercise. Used as exercise_id in tracking events.
-        challenge_id:
+        title:
           type: string
-          format: uuid
-          description: The challenge this exercise belongs to.
-        exercise_type:
-          type: string
-          enum:
-            - fretboard_region
-          description: The type of practice interaction.
+          description: Short, authoring-only name for this exercise. Not shown to students.
         prompt:
           type: string
           description: The instruction displayed to the student for this exercise.
+        exercise_type:
+          type: string
+          enum:
+            - text_response
+            - audio_recognition
+            - image_recognition
+            - image_choice
+          description: The type of practice interaction.
+        skill_tags:
+          type: array
+          items:
+            type: string
+          description: Freeform tags naming the skill(s) this exercise targets.
+        image_url:
+          type: string
+          format: uri
+          description: The stimulus image for this exercise, present when exercise_type is image_recognition.
+        audio_url:
+          type: string
+          format: uri
+          description: The stimulus audio for this exercise, present when exercise_type is audio_recognition.
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+          description: The exercise's selectable answer choices.
+        challenge_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: |
+            The challenges this exercise is currently linked to. May be
+            empty — an exercise can exist without being linked to any
+            challenge.
         created_at:
           type: string
           format: date-time
           description: Timestamp at which the exercise was created.
       required:
         - exercise_id
-        - challenge_id
-        - exercise_type
+        - title
         - prompt
+        - exercise_type
+        - options
+        - challenge_ids
         - created_at
+
+    Option:
+      type: object
+      description: |
+        One selectable answer choice within an exercise. An exercise's
+        correct answer is expressed by marking one or more options as
+        is_correct. The fields expected beyond option_id and is_correct
+        depend on the parent exercise's exercise_type: image_recognition
+        options carry region, image_choice options carry image_url, and
+        text_response / audio_recognition options carry label.
+      properties:
+        option_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this option.
+        is_correct:
+          type: boolean
+          description: Whether selecting this option counts as a correct answer.
+        label:
+          type: string
+          description: |
+            The text shown for this option. Required for text_response and
+            audio_recognition options; absent otherwise.
+        image_url:
+          type: string
+          format: uri
+          description: |
+            The image shown for this option. Required for image_choice
+            options; absent otherwise.
+        region:
+          $ref: '#/components/schemas/OptionRegion'
+      required:
+        - option_id
+        - is_correct
+
+    OptionRegion:
+      type: object
+      description: |
+        A rectangular or circular region on the parent exercise's image_url,
+        used by image_recognition options — selecting the region is
+        selecting the option.
+      properties:
+        x:
+          type: number
+          description: Horizontal position of the region's top-left corner, as a fraction (0-1) of the image width.
+        y:
+          type: number
+          description: Vertical position of the region's top-left corner, as a fraction (0-1) of the image height.
+        width:
+          type: number
+          description: Region width, as a fraction (0-1) of the image width.
+        height:
+          type: number
+          description: Region height, as a fraction (0-1) of the image height.
+        shape:
+          type: string
+          enum:
+            - rectangle
+            - circle
+          description: The rendered shape of the region.
+      required:
+        - x
+        - y
+        - width
+        - height
+        - shape
 
     CreateMediaUploadUrlRequest:
       type: object
