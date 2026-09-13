@@ -22,6 +22,8 @@ https://claude.ai/code/artifact/7d019ff3-c305-49cd-b694-5995fccfd98c
 
 ## Status
 
-Phase 1 sketches only — **the Phase 2 decision checkpoint (pick one direction; confirm whether
-it needs a 7th shared primitive) was still open as of 2026-09-13.** Plan file:
-`plans/PB-35-path-view-redesign.md` (still under its pre-epic-split name).
+**Phase 2 decision made 2026-09-13: Direction D chosen.** Collapsed steps are exactly
+Direction B's card; the current step gets Direction C's focus card, promoted to a 7th owned
+component (`FocusCard`) rather than kept as local markup — see `adrs/ADR-018-frontend-ui-architecture-design-system.md`'s
+2026-09-13 amendment. Phase 3 (real implementation in `motifpath-web`, TDD) has not started.
+Plan file: `plans/PB-35-path-view-redesign.md`.

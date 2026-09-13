@@ -205,6 +205,28 @@ clean (159 tests, `vue-tsc --build`, `eslint --max-warnings 0`, `vite build`). H
 PB-34 phase 2; none changes a decision. Phase 2 (visual restyle) remains gated on the
 `motifpath-brand` token decision.
 
+### Amendment (2026-09-13) — a 7th owned component: `FocusCard`
+
+PB-35/PB-36 (path view visual redesign) sketched four layout directions for `PathStep`/
+`PathContent` (`design/PB-36-path-view-directions/`). Gilson chose **Direction D — Cards +
+focus**: collapsed steps reuse Direction B's card exactly (no new markup), but the current,
+actionable step gets a larger **focus card** with a real call to action — a piece the existing
+six components (`AppShell`, `StepRow`, the `State*` set, `ProgressMeter`, `PrimaryButton`,
+`Icon`) do not cover.
+
+Per this ADR's decision point 3 ("a small, hand-owned component library") and PB-35's plan gate
+("if a sketch seems to need [a new component beyond the six], that's an open question for
+Gilson, not something to build unilaterally"), this was raised as an explicit decision rather
+than added silently. **Decision: promote it — add `FocusCard` as a 7th owned component**,
+anticipating reuse beyond `PathContent` (e.g. PB-8e lesson consumption, PB-38), rather than
+leaving it as one-off markup inside `PathContent.vue` and re-deriving the same pattern later.
+
+This amends decision point 3's component list from six to seven: `AppShell`, `StepRow`, the
+`State*` set, `ProgressMeter`, `PrimaryButton`, `Icon`, and now **`FocusCard`**. No other
+decision point changes. `FocusCard`'s API surface, composition (does it wrap `StepRow` or
+stand alone?), and implementation are PB-35 Phase 3's concern (TDD, per the plan), not this
+ADR's — this amendment only records that a 7th primitive was approved and why.
+
 ## Related ADRs
 
 - **ADR-007** (Clerk authentication and JWT local validation) — the SPA this layer sits on;
