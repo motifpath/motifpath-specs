@@ -1,0 +1,922 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Path View Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --surface: #FBFAFF;
+    --surface-raised: #FFFFFF;
+    --surface-sunken: #F3F0FB;
+    --border: #E4DEF3;
+    --ink: #1A1633;
+    --ink-muted: #5B5470;
+    --ink-subtle: #9A94AE;
+    --accent: #6D28E0;
+    --accent-fg: #FFFFFF;
+    --accent-muted: #F0E9FF;
+    --accent-text: #6D28E0;
+    --success: #1E7A4C;
+    --success-fg: #FFFFFF;
+    --success-muted: #E2F3E9;
+    --elevation-1: 0 1px 2px rgba(26,22,51,.06), 0 1px 1px rgba(26,22,51,.04);
+    --elevation-2: 0 4px 12px rgba(26,22,51,.10);
+    --elevation-3: 0 12px 32px rgba(26,22,51,.16);
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.875rem;
+    --radius-xl: 1.25rem;
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --surface: #0B0D2E;
+      --surface-raised: #161942;
+      --surface-sunken: #080927;
+      --border: #2C2E58;
+      --ink: #ECEAFF;
+      --ink-muted: #A7A2C8;
+      --ink-subtle: #6E698C;
+      --accent: #7C3CFF;
+      --accent-fg: #FFFFFF;
+      --accent-muted: #241C4D;
+      --accent-text: #B79BFF;
+      --success: #3FB985;
+      --success-fg: #04120B;
+      --success-muted: #12301F;
+      --elevation-1: 0 1px 2px rgba(3,4,20,.5);
+      --elevation-2: 0 6px 18px rgba(3,4,20,.55);
+      --elevation-3: 0 14px 36px rgba(3,4,20,.65);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --surface: #0B0D2E;
+    --surface-raised: #161942;
+    --surface-sunken: #080927;
+    --border: #2C2E58;
+    --ink: #ECEAFF;
+    --ink-muted: #A7A2C8;
+    --ink-subtle: #6E698C;
+    --accent: #7C3CFF;
+    --accent-fg: #FFFFFF;
+    --accent-muted: #241C4D;
+    --accent-text: #B79BFF;
+    --success: #3FB985;
+    --success-fg: #04120B;
+    --success-muted: #12301F;
+    --elevation-1: 0 1px 2px rgba(3,4,20,.5);
+    --elevation-2: 0 6px 18px rgba(3,4,20,.55);
+    --elevation-3: 0 14px 36px rgba(3,4,20,.65);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    padding: 28px 16px 64px;
+  }
+
+  .page { max-width: 1180px; margin: 0 auto; }
+
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 20px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .kicker {
+    font: 700 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin: 0 0 6px;
+  }
+
+  h1 {
+    font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 800;
+    font-size: clamp(22px, 3vw, 30px);
+    line-height: 1.15;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+
+  .lede {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink-muted);
+    max-width: 68ch;
+    margin: 0;
+  }
+
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    font: 600 11.5px/1 "Inter", sans-serif;
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: var(--elevation-1);
+    flex: none;
+  }
+  .theme-toggle:hover { border-color: var(--accent); }
+  .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    font-size: 11.5px;
+    color: var(--ink-muted);
+    padding: 10px 0 26px;
+  }
+  .legend .swatch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend .fade-chip {
+    width: 26px; height: 12px;
+    border-radius: 3px;
+    background: linear-gradient(to bottom, transparent, var(--ink-subtle) 140%);
+    border: 1px solid var(--border);
+  }
+
+  .direction {
+    padding-block: 40px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .direction:last-of-type { border-bottom: none; }
+
+  .dir-id {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font: 700 11px/1 ui-monospace, Menlo, monospace;
+    letter-spacing: .04em;
+    color: var(--accent-text);
+    background: var(--accent-muted);
+    border-radius: var(--radius-sm);
+    padding: 4px 8px;
+    margin-bottom: 10px;
+  }
+
+  .dir-name {
+    font-family: "Manrope", sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    margin: 0 0 8px;
+  }
+
+  .dir-desc {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-muted);
+    margin: 0 0 4px;
+    max-width: 72ch;
+  }
+
+  .dir-meta {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink-muted);
+    background: var(--surface-sunken);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    margin: 14px 0 28px;
+    max-width: 72ch;
+  }
+  .dir-meta strong { color: var(--ink); }
+
+  /* --- viewport rows --- */
+  .vp-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 30px;
+  }
+  .vp-row:last-child { margin-bottom: 0; }
+
+  .vp-caption {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font: 700 10.5px/1 ui-monospace, Menlo, monospace;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--ink-subtle);
+  }
+  .vp-caption .dims { font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--ink-muted); }
+  .vp-caption .note { font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--accent-text); }
+
+  .frame {
+    position: relative;
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--elevation-2);
+    background: var(--surface-raised);
+  }
+  .frame.crop::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 58px;
+    background: linear-gradient(to bottom, transparent, var(--surface-raised) 82%);
+    pointer-events: none;
+  }
+
+  .frame-mobile { width: 100%; max-width: 375px; aspect-ratio: 375 / 812; }
+  .frame-landscape { width: 100%; max-width: 812px; aspect-ratio: 812 / 375; }
+  .frame-desktop { width: 100%; max-width: 1140px; aspect-ratio: 1140 / 712; }
+
+  /* --- phone-style chrome (mobile + landscape) --- */
+  .app-hdr {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .app-hdr .brand { display: flex; align-items: center; gap: 6px; font-weight: 700; font-family: "Manrope", sans-serif; }
+  .app-hdr .brand svg { stroke: var(--ink); }
+  .app-hdr .nav { color: var(--ink-muted); }
+  .app-hdr .out { margin-left: auto; color: var(--ink-muted); font-size: 11.5px; }
+
+  .app-body { padding: 16px 14px 20px; }
+  .app-body.wide { padding: 14px 44px 20px; }
+
+  .app-body h2.screen-title {
+    font-family: "Manrope", sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0 0 14px;
+  }
+  .app-body.compact h2.screen-title { margin-bottom: 8px; }
+
+  .progress-track { height: 6px; border-radius: var(--radius-sm); background: var(--surface-sunken); overflow: hidden; margin-bottom: 4px; }
+  .progress-fill { height: 100%; border-radius: var(--radius-sm); background: var(--accent); }
+  .progress-label { font-size: 11px; color: var(--ink-muted); margin: 0 0 18px; }
+
+  .section-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font: 700 10.5px/1.4 ui-monospace, Menlo, monospace;
+    letter-spacing: .05em; text-transform: uppercase; color: var(--ink-subtle);
+    margin: 0 0 6px;
+  }
+  .section-head + .section-head { margin-top: 20px; }
+  .section-head .cnt { font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+  /* --- desktop browser chrome --- */
+  .browser-bar {
+    display: flex; align-items: center; gap: 6px;
+    padding: 9px 14px;
+    background: var(--surface-sunken);
+    border-bottom: 1px solid var(--border);
+  }
+  .browser-bar .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); }
+  .browser-bar .url {
+    margin-left: 12px;
+    font: 500 11.5px/1 ui-monospace, Menlo, monospace;
+    color: var(--ink-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 14px;
+    flex: 1;
+    max-width: 320px;
+  }
+
+  .desktop-hdr {
+    display: flex; align-items: center; gap: 28px;
+    padding: 16px 36px;
+    border-bottom: 1px solid var(--border);
+  }
+  .desktop-hdr .brand { font: 800 16px "Manrope", sans-serif; color: var(--accent-text); }
+  .desktop-hdr nav { display: flex; gap: 22px; font-size: 13.5px; color: var(--ink-muted); }
+  .desktop-hdr nav a { color: inherit; }
+  .desktop-hdr .spacer { flex: 1; }
+  .desktop-hdr .theme-chip {
+    width: 30px; height: 30px; border-radius: 999px;
+    background: var(--surface-sunken); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+  }
+  .desktop-hdr .signout { font-size: 12.5px; color: var(--ink-muted); }
+
+  .desktop-main { padding: 36px 36px 44px; }
+  .desktop-col { max-width: 780px; margin: 0 auto; }
+  .desktop-col h2.screen-title { font-size: 19px; margin-bottom: 18px; }
+  .desktop-col .progress-label { font-size: 12px; }
+  .desktop-col .section-head { font-size: 11px; }
+
+  /* Direction A: refined list */
+  .a-list { display: flex; flex-direction: column; }
+  .a-row { display: flex; align-items: center; gap: 11px; padding: 12px 4px; border-top: 1px solid var(--border); position: relative; }
+  .a-row:first-child { border-top: none; }
+  .a-row.is-current {
+    background: var(--accent-muted); margin: 0 -10px; padding: 12px 10px;
+    border-radius: var(--radius-md); border-top: none; box-shadow: inset 3px 0 0 var(--accent);
+  }
+  .a-pos { flex: none; width: 16px; text-align: center; font: 600 11px/1 ui-monospace, Menlo, monospace; color: var(--ink-subtle); font-variant-numeric: tabular-nums; }
+  .a-row.is-current .a-pos { color: var(--accent-text); }
+  .a-icon { flex: none; display: flex; }
+  .a-icon svg { display: block; }
+  .a-txt { flex: 1; min-width: 0; }
+  .a-title { font-size: 13px; font-weight: 600; line-height: 1.35; }
+  .a-title.locked { color: var(--ink-subtle); font-weight: 500; }
+  .a-status { display: block; font-size: 10.5px; color: var(--ink-muted); margin-top: 1px; }
+  .a-cta { flex: none; font-size: 11.5px; font-weight: 700; color: var(--accent-fg); background: var(--accent); border-radius: 9999px; padding: 5px 12px; }
+  .desktop-col .a-title { font-size: 14px; }
+  .desktop-col .a-row { padding: 15px 4px; }
+
+  /* Direction B: step cards */
+  .b-stack { display: flex; flex-direction: column; gap: 10px; }
+  .b-card { display: flex; align-items: center; gap: 12px; padding: 13px; background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--elevation-1); }
+  .b-card.current { border-color: var(--accent); box-shadow: var(--elevation-2); }
+  .b-card.locked { background: var(--surface-sunken); box-shadow: none; }
+  .b-badge { flex: none; width: 34px; height: 34px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; background: var(--surface-sunken); color: var(--ink-subtle); }
+  .b-badge.completed { background: var(--success-muted); color: var(--success); }
+  .b-badge.current { background: var(--accent); color: var(--accent-fg); }
+  .b-txt { flex: 1; min-width: 0; }
+  .b-title { font-size: 13px; font-weight: 700; line-height: 1.3; }
+  .b-title.locked { color: var(--ink-subtle); font-weight: 600; }
+  .b-pill { display: inline-block; margin-top: 4px; font: 700 9.5px/1.4 ui-monospace, Menlo, monospace; letter-spacing: .04em; text-transform: uppercase; padding: 2px 6px; border-radius: var(--radius-sm); color: var(--ink-muted); background: var(--surface-sunken); }
+  .b-pill.completed { color: var(--success); background: var(--success-muted); }
+  .b-pill.current { color: var(--accent-text); background: var(--accent-muted); }
+  .b-cta { flex: none; font-size: 11px; font-weight: 700; color: var(--accent-fg); background: var(--accent); border-radius: var(--radius-md); padding: 6px 10px; }
+  .desktop-col .b-card { padding: 17px 18px; }
+  .desktop-col .b-badge { width: 38px; height: 38px; }
+  .desktop-col .b-title { font-size: 14px; }
+
+  /* Direction C: focused timeline */
+  .c-rail { position: relative; padding-left: 20px; }
+  .c-rail::before { content: ""; position: absolute; left: 5px; top: 4px; bottom: 4px; width: 1.5px; background: var(--border); }
+  .c-node { position: relative; padding: 9px 0; }
+  .c-node::before { content: ""; position: absolute; left: -20px; top: 15px; width: 9px; height: 9px; border-radius: 50%; background: var(--surface-sunken); border: 1.5px solid var(--ink-subtle); }
+  .c-node.completed::before { background: var(--success); border-color: var(--success); }
+  .c-node.current::before { background: var(--accent); border-color: var(--accent); width: 11px; height: 11px; left: -21px; top: 14px; box-shadow: 0 0 0 3px var(--accent-muted); }
+  .c-row { display: flex; align-items: center; gap: 8px; }
+  .c-title { font-size: 12.5px; font-weight: 600; color: var(--ink-muted); }
+  .c-title.locked { color: var(--ink-subtle); font-weight: 500; }
+  .c-check { font-size: 11px; color: var(--success); }
+
+  .c-focus { margin: 4px 0 4px -20px; padding: 16px 16px 16px 20px; background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--elevation-2); }
+  .c-focus .c-eyebrow { font: 700 10px/1.4 ui-monospace, Menlo, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-text); margin: 0 0 6px; }
+  .c-focus .c-big-title { font-family: "Manrope", sans-serif; font-weight: 800; font-size: 15px; margin: 0 0 4px; color: var(--ink); }
+  .c-focus .c-sub { font-size: 11.5px; color: var(--ink-muted); margin: 0 0 14px; }
+  .c-focus .c-cta { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--accent-fg); background: var(--accent); border-radius: var(--radius-md); padding: 8px 14px; }
+
+  /* Direction C split (landscape / desktop master-detail) */
+  .c-split { display: flex; gap: 28px; align-items: flex-start; }
+  .c-split .c-rail-col { flex: 0 0 180px; min-width: 0; }
+  .c-split .c-rail-col .section-head { font-size: 9.5px; }
+  .c-split .c-rail-col .c-title { font-size: 11.5px; }
+  .c-split .c-focus-col { flex: 1; min-width: 0; padding-top: 2px; }
+  .c-split .c-focus { margin: 0; padding: 22px 24px; }
+  .c-split .c-focus .c-big-title { font-size: 18px; }
+  .c-split .c-focus .c-sub { font-size: 12.5px; margin-bottom: 20px; }
+  .c-split .c-focus .c-cta { font-size: 13px; padding: 10px 18px; }
+  .desktop-col.c-desktop { max-width: 940px; }
+  .desktop-col.c-desktop .c-split .c-rail-col { flex-basis: 230px; }
+
+  /* Direction D: blend — B's step cards for collapsed steps, C's focus card for the current one */
+  .d-stack { display: flex; flex-direction: column; gap: 10px; }
+  .d-stack .c-focus { margin: 0; }
+  .c-split .c-rail-col .b-card { padding: 8px 10px; gap: 8px; }
+  .c-split .c-rail-col .b-badge { width: 24px; height: 24px; }
+  .c-split .c-rail-col .b-title { font-size: 11px; }
+  .c-split .c-rail-col .b-pill { font-size: 8.5px; padding: 1px 5px; margin-top: 2px; }
+  .c-split .c-rail-col .d-stack { gap: 7px; }
+
+  footer.notes {
+    margin-top: 8px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ink-muted);
+  }
+  footer.notes code { font-family: ui-monospace, Menlo, monospace; background: var(--surface-sunken); padding: 1px 5px; border-radius: var(--radius-sm); font-size: 11px; }
+</style>
+
+<div class="page">
+  <div class="masthead">
+    <div>
+      <p class="kicker">PB-36 &middot; Path View Redesign &middot; Phase 1 sketches</p>
+      <h1>Three directions for &ldquo;My Path&rdquo;</h1>
+      <p class="lede">
+        Same data, same six owned components (StepRow, Icon, ProgressMeter, PrimaryButton,
+        AppShell, State*) &mdash; four compositions, each shown at mobile portrait, mobile
+        landscape, and desktop. Content matches the PB-8j wireframe (<code>Main.dc.html</code> /
+        <code>MyPath.dc.html</code>, S5): Fretting-hand fundamentals (3 steps, 1 complete) then
+        Your first songs (2 locked steps). Direction D was added after review feedback on C.
+      </p>
+    </div>
+    <button class="theme-toggle" id="themeToggle" type="button">
+      <span id="themeIcon">&#9728;</span>
+      <span id="themeLabel">Light</span>
+    </button>
+  </div>
+
+  <div class="legend">
+    <span class="swatch"><span class="fade-chip"></span> fade = content continues, scrolls below the fold</span>
+    <span class="swatch">Frames are true device aspect ratios (375&times;812 &middot; 812&times;375 &middot; ~1140&times;712), not stretched</span>
+  </div>
+
+  <!-- DIRECTION A -->
+  <section class="direction">
+    <span class="dir-id">Direction A</span>
+    <h2 class="dir-name">Refined list</h2>
+    <p class="dir-desc">
+      Closest to what ships today &mdash; the honest, low-risk option. The only structural
+      change is the current step: an accent-tinted row, a left accent bar, and a pill CTA, so
+      the one actionable item is unmistakable instead of looking identical to a locked row
+      except for one word of status text. Layout never changes shape across breakpoints &mdash;
+      it just gets more side whitespace as the viewport widens, exactly how <code>AppShell</code>'s
+      centered content column already behaves.
+    </p>
+    <div class="dir-meta">
+      <strong>Composition:</strong> <code>StepRow</code> unchanged in structure &mdash; position,
+      title, status slot, action slot. The current-row treatment is a conditional
+      background/shadow, expressible as a Tailwind variant, not a new component.
+    </div>
+
+    <div class="vp-row">
+      <div class="vp-caption">Mobile portrait <span class="dims">375 &times; 812</span></div>
+      <div class="frame frame-mobile">
+        <div class="app-hdr">
+          <span class="brand"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-width="1.6"><path d="M1 10 L5 4 L8 8 L13 2"/></svg>MotifPath</span>
+          <span class="nav">My path</span><span class="out">Sign out</span>
+        </div>
+        <div class="app-body">
+          <h2 class="screen-title">My path</h2>
+          <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+          <p class="progress-label">1 of 5 steps complete</p>
+          <div class="section-head"><span>Fretting-hand fundamentals</span><span class="cnt">3 steps</span></div>
+          <div class="a-list">
+            <div class="a-row"><span class="a-pos">1</span><span class="a-icon"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="var(--success)" stroke-width="1.7"><circle cx="9" cy="9" r="7"/><path d="M6 9.2 L8 11 L12 6.5"/></svg></span><span class="a-txt"><span class="a-title">Tuning and posture</span><span class="a-status">Completed</span></span></div>
+            <div class="a-row is-current"><span class="a-pos">2</span><span class="a-icon"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="var(--accent)" stroke-width="1.7"><circle cx="9" cy="9" r="7"/><circle cx="9" cy="9" r="2.6" fill="var(--accent)"/></svg></span><span class="a-txt"><span class="a-title">Your first chord: E minor</span><span class="a-status">In progress</span></span><span class="a-cta">Open</span></div>
+            <div class="a-row"><span class="a-pos">3</span><span class="a-icon"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="var(--ink-subtle)" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="a-txt"><span class="a-title locked">Switching between chords</span><span class="a-status">Locked</span></span></div>
+          </div>
+          <div class="section-head"><span>Your first songs</span><span class="cnt">2 steps</span></div>
+          <div class="a-list">
+            <div class="a-row"><span class="a-pos">4</span><span class="a-icon"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="var(--ink-subtle)" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="a-txt"><span class="a-title locked">Two-chord song</span><span class="a-status">Locked</span></span></div>
+            <div class="a-row"><span class="a-pos">5</span><span class="a-icon"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="var(--ink-subtle)" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="a-txt"><span class="a-title locked">Strumming in time</span><span class="a-status">Locked</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vp-row">
+      <div class="vp-caption">Landscape (phone rotated) <span class="dims">812 &times; 375</span> <span class="note">— single column stays; height-constrained, so it scrolls</span></div>
+      <div class="frame frame-landscape crop">
+        <div class="app-hdr">
+          <span class="brand"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-width="1.6"><path d="M1 10 L5 4 L8 8 L13 2"/></svg>MotifPath</span>
+          <span class="nav">My path</span><span class="out">Sign out</span>
+        </div>
+        <div class="app-body wide">
+          <h2 class="screen-title">My path</h2>
+          <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+          <p class="progress-label">1 of 5 steps complete</p>
+          <div class="section-head"><span>Fretting-hand fundamentals</span><span class="cnt">3 steps</span></div>
+          <div class="a-list">
+            <div class="a-row"><span class="a-pos">1</span><span class="a-icon"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="var(--success)" stroke-width="1.7"><circle cx="9" cy="9" r="7"/><path d="M6 9.2 L8 11 L12 6.5"/></svg></span><span class="a-txt"><span class="a-title">Tuning and posture</span><span class="a-status">Completed</span></span></div>
+            <div class="a-row is-current"><span class="a-pos">2</span><span class="a-icon"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="var(--accent)" stroke-width="1.7"><circle cx="9" cy="9" r="7"/><circle cx="9" cy="9" r="2.6" fill="var(--accent)"/></svg></span><span class="a-txt"><span class="a-title">Your first chord: E minor</span><span class="a-status">In progress</span></span><span class="a-cta">Open</span></div>
+            <div class="a-row"><span class="a-pos">3</span><span class="a-icon"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="var(--ink-subtle)" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="a-txt"><span class="a-title locked">Switching between chords</span><span class="a-status">Locked</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vp-row">
+      <div class="vp-caption">Desktop browser <span class="dims">~1280 &times; 800</span></div>
+      <div class="frame frame-desktop">
+        <div class="browser-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">motifpath.app/path</span></div>
+        <div class="desktop-hdr">
+          <span class="brand">MotifPath</span>
+          <nav><a>My path</a></nav>
+          <span class="spacer"></span>
+          <span class="theme-chip">&#9789;</span>
+          <span class="signout">Sign out</span>
+        </div>
+        <div class="desktop-main">
+          <div class="desktop-col">
+            <h2 class="screen-title">My path</h2>
+            <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+            <p class="progress-label">1 of 5 steps complete</p>
+            <div class="section-head"><span>Fretting-hand fundamentals</span><span class="cnt">3 steps</span></div>
+            <div class="a-list">
+              <div class="a-row"><span class="a-pos">1</span><span class="a-icon"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="var(--success)" stroke-width="1.7"><circle cx="9" cy="9" r="7"/><path d="M6 9.2 L8 11 L12 6.5"/></svg></span><span class="a-txt"><span class="a-title">Tuning and posture</span><span class="a-status">Completed</span></span></div>
+              <div class="a-row is-current"><span class="a-pos">2</span><span class="a-icon"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="var(--accent)" stroke-width="1.7"><circle cx="9" cy="9" r="7"/><circle cx="9" cy="9" r="2.6" fill="var(--accent)"/></svg></span><span class="a-txt"><span class="a-title">Your first chord: E minor</span><span class="a-status">In progress</span></span><span class="a-cta">Open</span></div>
+              <div class="a-row"><span class="a-pos">3</span><span class="a-icon"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="var(--ink-subtle)" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="a-txt"><span class="a-title locked">Switching between chords</span><span class="a-status">Locked</span></span></div>
+            </div>
+            <div class="section-head"><span>Your first songs</span><span class="cnt">2 steps</span></div>
+            <div class="a-list">
+              <div class="a-row"><span class="a-pos">4</span><span class="a-icon"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="var(--ink-subtle)" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="a-txt"><span class="a-title locked">Two-chord song</span><span class="a-status">Locked</span></span></div>
+              <div class="a-row"><span class="a-pos">5</span><span class="a-icon"><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="var(--ink-subtle)" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="a-txt"><span class="a-title locked">Strumming in time</span><span class="a-status">Locked</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIRECTION B -->
+  <section class="direction">
+    <span class="dir-id">Direction B</span>
+    <h2 class="dir-name">Step cards</h2>
+    <p class="dir-desc">
+      Every step becomes its own bordered card with a round status badge and a small uppercase
+      pill. Reads more like a checklist app than a document list &mdash; more visual weight per
+      step, better for scanning quickly between practice sessions. Like Direction A, it stays a
+      single column at every width; wider viewports just add padding and a slightly larger badge.
+    </p>
+    <div class="dir-meta">
+      <strong>Composition:</strong> still <code>StepRow</code> underneath, but the icon becomes a
+      filled circular badge (accent/success/subtle by role) and the status slot renders a pill
+      instead of an icon+label pair &mdash; no new component, just token-driven utility classes.
+      A 2-column grid was considered for wide viewports and rejected: it would imply steps are
+      choosable out of order, which they're not.
+    </div>
+
+    <div class="vp-row">
+      <div class="vp-caption">Mobile portrait <span class="dims">375 &times; 812</span></div>
+      <div class="frame frame-mobile">
+        <div class="app-hdr">
+          <span class="brand"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-width="1.6"><path d="M1 10 L5 4 L8 8 L13 2"/></svg>MotifPath</span>
+          <span class="nav">My path</span><span class="out">Sign out</span>
+        </div>
+        <div class="app-body">
+          <h2 class="screen-title">My path</h2>
+          <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+          <p class="progress-label">1 of 5 steps complete</p>
+          <div class="section-head"><span>Fretting-hand fundamentals</span><span class="cnt">3 steps</span></div>
+          <div class="b-stack">
+            <div class="b-card"><span class="b-badge completed"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4.5 9.5 L7.5 12.5 L13.5 5.5"/></svg></span><span class="b-txt"><span class="b-title">Tuning and posture</span><span class="b-pill completed">Completed</span></span></div>
+            <div class="b-card current"><span class="b-badge current"><svg width="14" height="14" viewBox="0 0 18 18" fill="currentColor"><path d="M6.5 5 L13.5 9 L6.5 13 Z"/></svg></span><span class="b-txt"><span class="b-title">Your first chord: E minor</span><span class="b-pill current">In progress</span></span><span class="b-cta">Open</span></div>
+            <div class="b-card locked"><span class="b-badge"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Switching between chords</span><span class="b-pill">Locked</span></span></div>
+          </div>
+          <div class="section-head"><span>Your first songs</span><span class="cnt">2 steps</span></div>
+          <div class="b-stack">
+            <div class="b-card locked"><span class="b-badge"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Two-chord song</span><span class="b-pill">Locked</span></span></div>
+            <div class="b-card locked"><span class="b-badge"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Strumming in time</span><span class="b-pill">Locked</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vp-row">
+      <div class="vp-caption">Landscape (phone rotated) <span class="dims">812 &times; 375</span> <span class="note">— single column stays; height-constrained, so it scrolls</span></div>
+      <div class="frame frame-landscape crop">
+        <div class="app-hdr">
+          <span class="brand"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-width="1.6"><path d="M1 10 L5 4 L8 8 L13 2"/></svg>MotifPath</span>
+          <span class="nav">My path</span><span class="out">Sign out</span>
+        </div>
+        <div class="app-body wide">
+          <h2 class="screen-title">My path</h2>
+          <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+          <p class="progress-label">1 of 5 steps complete</p>
+          <div class="section-head"><span>Fretting-hand fundamentals</span><span class="cnt">3 steps</span></div>
+          <div class="b-stack">
+            <div class="b-card"><span class="b-badge completed"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4.5 9.5 L7.5 12.5 L13.5 5.5"/></svg></span><span class="b-txt"><span class="b-title">Tuning and posture</span><span class="b-pill completed">Completed</span></span></div>
+            <div class="b-card current"><span class="b-badge current"><svg width="14" height="14" viewBox="0 0 18 18" fill="currentColor"><path d="M6.5 5 L13.5 9 L6.5 13 Z"/></svg></span><span class="b-txt"><span class="b-title">Your first chord: E minor</span><span class="b-pill current">In progress</span></span><span class="b-cta">Open</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vp-row">
+      <div class="vp-caption">Desktop browser <span class="dims">~1280 &times; 800</span></div>
+      <div class="frame frame-desktop">
+        <div class="browser-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">motifpath.app/path</span></div>
+        <div class="desktop-hdr">
+          <span class="brand">MotifPath</span>
+          <nav><a>My path</a></nav>
+          <span class="spacer"></span>
+          <span class="theme-chip">&#9789;</span>
+          <span class="signout">Sign out</span>
+        </div>
+        <div class="desktop-main">
+          <div class="desktop-col">
+            <h2 class="screen-title">My path</h2>
+            <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+            <p class="progress-label">1 of 5 steps complete</p>
+            <div class="section-head"><span>Fretting-hand fundamentals</span><span class="cnt">3 steps</span></div>
+            <div class="b-stack">
+              <div class="b-card"><span class="b-badge completed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4.5 9.5 L7.5 12.5 L13.5 5.5"/></svg></span><span class="b-txt"><span class="b-title">Tuning and posture</span><span class="b-pill completed">Completed</span></span></div>
+              <div class="b-card current"><span class="b-badge current"><svg width="16" height="16" viewBox="0 0 18 18" fill="currentColor"><path d="M6.5 5 L13.5 9 L6.5 13 Z"/></svg></span><span class="b-txt"><span class="b-title">Your first chord: E minor</span><span class="b-pill current">In progress</span></span><span class="b-cta">Open</span></div>
+              <div class="b-card locked"><span class="b-badge"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Switching between chords</span><span class="b-pill">Locked</span></span></div>
+            </div>
+            <div class="section-head"><span>Your first songs</span><span class="cnt">2 steps</span></div>
+            <div class="b-stack">
+              <div class="b-card locked"><span class="b-badge"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Two-chord song</span><span class="b-pill">Locked</span></span></div>
+              <div class="b-card locked"><span class="b-badge"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Strumming in time</span><span class="b-pill">Locked</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIRECTION C -->
+  <section class="direction">
+    <span class="dir-id">Direction C</span>
+    <h2 class="dir-name">Focused timeline</h2>
+    <p class="dir-desc">
+      A connecting rail turns the path into a visible thread, and the current step breaks out
+      into a larger focus card with a real call to action. This is the one direction whose shape
+      genuinely changes at wider viewports: landscape and desktop have enough width to show the
+      rail and the focus card side by side (master&ndash;detail) instead of stacked, so &mdash;
+      unlike A and B &mdash; it never needs to scroll to show the current step.
+    </p>
+    <div class="dir-meta">
+      <strong>Composition:</strong> the rail/node dot and the expanded focus card are <em>not</em>
+      one of the six existing components &mdash; <strong>this is the direction most likely to
+      need a 7th primitive</strong>, per the plan's Phase 2 gate. The mobile→landscape/desktop
+      reflow (stacked → side-by-side) is also a genuinely new layout behavior, not just added
+      whitespace.
+    </div>
+
+    <div class="vp-row">
+      <div class="vp-caption">Mobile portrait <span class="dims">375 &times; 812</span></div>
+      <div class="frame frame-mobile">
+        <div class="app-hdr">
+          <span class="brand"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-width="1.6"><path d="M1 10 L5 4 L8 8 L13 2"/></svg>MotifPath</span>
+          <span class="nav">My path</span><span class="out">Sign out</span>
+        </div>
+        <div class="app-body">
+          <h2 class="screen-title">My path</h2>
+          <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+          <p class="progress-label">1 of 5 steps complete</p>
+          <div class="section-head"><span>Fretting-hand fundamentals</span><span class="cnt">3 steps</span></div>
+          <div class="c-rail">
+            <div class="c-node completed"><div class="c-row"><span class="c-title">Tuning and posture</span><span class="c-check">&#10003;</span></div></div>
+            <div class="c-node current"><div class="c-focus"><p class="c-eyebrow">Continue</p><p class="c-big-title">Your first chord: E minor</p><p class="c-sub">In progress &middot; pick up where you left off</p><span class="c-cta">Open lesson &rarr;</span></div></div>
+            <div class="c-node"><div class="c-row"><span class="c-title locked">Switching between chords</span></div></div>
+          </div>
+          <div class="section-head"><span>Your first songs</span><span class="cnt">2 steps</span></div>
+          <div class="c-rail">
+            <div class="c-node"><div class="c-row"><span class="c-title locked">Two-chord song</span></div></div>
+            <div class="c-node"><div class="c-row"><span class="c-title locked">Strumming in time</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vp-row">
+      <div class="vp-caption">Landscape (phone rotated) <span class="dims">812 &times; 375</span> <span class="note">— reflows to rail + focus side-by-side, no scroll needed</span></div>
+      <div class="frame frame-landscape">
+        <div class="app-hdr">
+          <span class="brand"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-width="1.6"><path d="M1 10 L5 4 L8 8 L13 2"/></svg>MotifPath</span>
+          <span class="nav">My path</span><span class="out">Sign out</span>
+        </div>
+        <div class="app-body wide compact">
+          <h2 class="screen-title">My path</h2>
+          <div class="progress-track" style="max-width:220px;"><div class="progress-fill" style="width:20%"></div></div>
+          <p class="progress-label" style="margin-bottom:10px;">1 of 5 steps complete</p>
+          <div class="c-split">
+            <div class="c-rail-col">
+              <div class="section-head"><span>Fretting-hand</span><span class="cnt">3</span></div>
+              <div class="c-rail">
+                <div class="c-node completed"><div class="c-row"><span class="c-title">Tuning and posture</span><span class="c-check">&#10003;</span></div></div>
+                <div class="c-node current"><div class="c-row"><span class="c-title" style="color:var(--accent-text);font-weight:700;">Your first chord: E minor</span></div></div>
+                <div class="c-node"><div class="c-row"><span class="c-title locked">Switching between chords</span></div></div>
+              </div>
+              <div class="section-head"><span>Your first songs</span><span class="cnt">2</span></div>
+              <div class="c-rail">
+                <div class="c-node"><div class="c-row"><span class="c-title locked">Two-chord song</span></div></div>
+                <div class="c-node"><div class="c-row"><span class="c-title locked">Strumming in time</span></div></div>
+              </div>
+            </div>
+            <div class="c-focus-col">
+              <div class="c-focus"><p class="c-eyebrow">Continue</p><p class="c-big-title">Your first chord: E minor</p><p class="c-sub">In progress &middot; pick up where you left off</p><span class="c-cta">Open lesson &rarr;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vp-row">
+      <div class="vp-caption">Desktop browser <span class="dims">~1280 &times; 800</span></div>
+      <div class="frame frame-desktop">
+        <div class="browser-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">motifpath.app/path</span></div>
+        <div class="desktop-hdr">
+          <span class="brand">MotifPath</span>
+          <nav><a>My path</a></nav>
+          <span class="spacer"></span>
+          <span class="theme-chip">&#9789;</span>
+          <span class="signout">Sign out</span>
+        </div>
+        <div class="desktop-main">
+          <div class="desktop-col c-desktop">
+            <h2 class="screen-title">My path</h2>
+            <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+            <p class="progress-label">1 of 5 steps complete</p>
+            <div class="c-split">
+              <div class="c-rail-col">
+                <div class="section-head"><span>Fretting-hand fundamentals</span><span class="cnt">3 steps</span></div>
+                <div class="c-rail">
+                  <div class="c-node completed"><div class="c-row"><span class="c-title">Tuning and posture</span><span class="c-check">&#10003;</span></div></div>
+                  <div class="c-node current"><div class="c-row"><span class="c-title" style="color:var(--accent-text);font-weight:700;">Your first chord: E minor</span></div></div>
+                  <div class="c-node"><div class="c-row"><span class="c-title locked">Switching between chords</span></div></div>
+                </div>
+                <div class="section-head"><span>Your first songs</span><span class="cnt">2 steps</span></div>
+                <div class="c-rail">
+                  <div class="c-node"><div class="c-row"><span class="c-title locked">Two-chord song</span></div></div>
+                  <div class="c-node"><div class="c-row"><span class="c-title locked">Strumming in time</span></div></div>
+                </div>
+              </div>
+              <div class="c-focus-col">
+                <div class="c-focus"><p class="c-eyebrow">Continue</p><p class="c-big-title">Your first chord: E minor</p><p class="c-sub">In progress &middot; pick up where you left off</p><span class="c-cta">Open lesson &rarr;</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIRECTION D -->
+  <section class="direction">
+    <span class="dir-id">Direction D &middot; blend</span>
+    <h2 class="dir-name">Cards + focus</h2>
+    <p class="dir-desc">
+      Added after review feedback on C: a pure timeline made collapsed steps too thin on
+      information, and always auto-expanding the current step's card next to a bare checkmark
+      row read oddly. This blends B's step cards for every collapsed step (completed and locked
+      keep a badge, title, and status pill &mdash; scannable on their own, no rail needed) with
+      C's larger focus card, still reserved only for the current, actionable step.
+    </p>
+    <div class="dir-meta">
+      <strong>Composition:</strong> collapsed steps are exactly Direction B's card (no new
+      markup). The current step's focus card is Direction C's, unchanged. No connecting rail
+      &mdash; the cards' own order and the one enlarged card carry the sequence, so this drops
+      C's new rail/node-dot element while keeping its one genuinely new piece, the focus card.
+      Still a candidate for the "7th primitive" conversation, just a smaller one than C's.
+    </div>
+
+    <div class="vp-row">
+      <div class="vp-caption">Mobile portrait <span class="dims">375 &times; 812</span></div>
+      <div class="frame frame-mobile">
+        <div class="app-hdr">
+          <span class="brand"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-width="1.6"><path d="M1 10 L5 4 L8 8 L13 2"/></svg>MotifPath</span>
+          <span class="nav">My path</span><span class="out">Sign out</span>
+        </div>
+        <div class="app-body">
+          <h2 class="screen-title">My path</h2>
+          <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+          <p class="progress-label">1 of 5 steps complete</p>
+          <div class="section-head"><span>Fretting-hand fundamentals</span><span class="cnt">3 steps</span></div>
+          <div class="d-stack">
+            <div class="b-card"><span class="b-badge completed"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4.5 9.5 L7.5 12.5 L13.5 5.5"/></svg></span><span class="b-txt"><span class="b-title">Tuning and posture</span><span class="b-pill completed">Completed</span></span></div>
+            <div class="c-focus"><p class="c-eyebrow">Continue</p><p class="c-big-title">Your first chord: E minor</p><p class="c-sub">In progress &middot; pick up where you left off</p><span class="c-cta">Open lesson &rarr;</span></div>
+            <div class="b-card locked"><span class="b-badge"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Switching between chords</span><span class="b-pill">Locked</span></span></div>
+          </div>
+          <div class="section-head"><span>Your first songs</span><span class="cnt">2 steps</span></div>
+          <div class="d-stack">
+            <div class="b-card locked"><span class="b-badge"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Two-chord song</span><span class="b-pill">Locked</span></span></div>
+            <div class="b-card locked"><span class="b-badge"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Strumming in time</span><span class="b-pill">Locked</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vp-row">
+      <div class="vp-caption">Landscape (phone rotated) <span class="dims">812 &times; 375</span> <span class="note">— reflows to card-rail + focus side-by-side, no scroll needed</span></div>
+      <div class="frame frame-landscape">
+        <div class="app-hdr">
+          <span class="brand"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-width="1.6"><path d="M1 10 L5 4 L8 8 L13 2"/></svg>MotifPath</span>
+          <span class="nav">My path</span><span class="out">Sign out</span>
+        </div>
+        <div class="app-body wide compact">
+          <h2 class="screen-title">My path</h2>
+          <div class="progress-track" style="max-width:220px;"><div class="progress-fill" style="width:20%"></div></div>
+          <p class="progress-label" style="margin-bottom:10px;">1 of 5 steps complete</p>
+          <div class="c-split">
+            <div class="c-rail-col">
+              <div class="section-head"><span>Fretting-hand</span><span class="cnt">3</span></div>
+              <div class="d-stack">
+                <div class="b-card"><span class="b-badge completed"><svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4.5 9.5 L7.5 12.5 L13.5 5.5"/></svg></span><span class="b-txt"><span class="b-title">Tuning and posture</span><span class="b-pill completed">Completed</span></span></div>
+                <div class="b-card current"><span class="b-badge current"><svg width="12" height="12" viewBox="0 0 18 18" fill="currentColor"><path d="M6.5 5 L13.5 9 L6.5 13 Z"/></svg></span><span class="b-txt"><span class="b-title">Your first chord: E minor</span><span class="b-pill current">In progress</span></span></div>
+                <div class="b-card locked"><span class="b-badge"><svg width="13" height="13" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Switching between chords</span><span class="b-pill">Locked</span></span></div>
+              </div>
+              <div class="section-head"><span>Your first songs</span><span class="cnt">2</span></div>
+              <div class="d-stack">
+                <div class="b-card locked"><span class="b-badge"><svg width="13" height="13" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Two-chord song</span><span class="b-pill">Locked</span></span></div>
+                <div class="b-card locked"><span class="b-badge"><svg width="13" height="13" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Strumming in time</span><span class="b-pill">Locked</span></span></div>
+              </div>
+            </div>
+            <div class="c-focus-col">
+              <div class="c-focus"><p class="c-eyebrow">Continue</p><p class="c-big-title">Your first chord: E minor</p><p class="c-sub">In progress &middot; pick up where you left off</p><span class="c-cta">Open lesson &rarr;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vp-row">
+      <div class="vp-caption">Desktop browser <span class="dims">~1280 &times; 800</span></div>
+      <div class="frame frame-desktop">
+        <div class="browser-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">motifpath.app/path</span></div>
+        <div class="desktop-hdr">
+          <span class="brand">MotifPath</span>
+          <nav><a>My path</a></nav>
+          <span class="spacer"></span>
+          <span class="theme-chip">&#9789;</span>
+          <span class="signout">Sign out</span>
+        </div>
+        <div class="desktop-main">
+          <div class="desktop-col c-desktop">
+            <h2 class="screen-title">My path</h2>
+            <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+            <p class="progress-label">1 of 5 steps complete</p>
+            <div class="c-split">
+              <div class="c-rail-col">
+                <div class="section-head"><span>Fretting-hand fundamentals</span><span class="cnt">3 steps</span></div>
+                <div class="d-stack">
+                  <div class="b-card"><span class="b-badge completed"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4.5 9.5 L7.5 12.5 L13.5 5.5"/></svg></span><span class="b-txt"><span class="b-title">Tuning and posture</span><span class="b-pill completed">Completed</span></span></div>
+                  <div class="b-card current"><span class="b-badge current"><svg width="13" height="13" viewBox="0 0 18 18" fill="currentColor"><path d="M6.5 5 L13.5 9 L6.5 13 Z"/></svg></span><span class="b-txt"><span class="b-title">Your first chord: E minor</span><span class="b-pill current">In progress</span></span></div>
+                  <div class="b-card locked"><span class="b-badge"><svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Switching between chords</span><span class="b-pill">Locked</span></span></div>
+                </div>
+                <div class="section-head"><span>Your first songs</span><span class="cnt">2 steps</span></div>
+                <div class="d-stack">
+                  <div class="b-card locked"><span class="b-badge"><svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Two-chord song</span><span class="b-pill">Locked</span></span></div>
+                  <div class="b-card locked"><span class="b-badge"><svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8 V6 a2.5 2.5 0 0 1 5 0 V8"/></svg></span><span class="b-txt"><span class="b-title locked">Strumming in time</span><span class="b-pill">Locked</span></span></div>
+                </div>
+              </div>
+              <div class="c-focus-col">
+                <div class="c-focus"><p class="c-eyebrow">Continue</p><p class="c-big-title">Your first chord: E minor</p><p class="c-sub">In progress &middot; pick up where you left off</p><span class="c-cta">Open lesson &rarr;</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="notes">
+    <p>
+      Rendered content matches <code>motifpath-specs/design/PB-8j-wireframes/MyPath.dc.html</code>
+      (S5) and the route/state map in <code>Main.dc.html</code>; the desktop header layout
+      matches the real <code>AppShell.vue</code> (full-width bar, centered content column).
+      Plan file: <code>motifpath-specs/plans/PB-35-path-view-redesign.md</code> (Phase 1 &mdash;
+      still named PB-35, predates the epic split into PB-36&ndash;42). Per that plan's Phase 2
+      gate: pick one direction, confirm whether it needs anything beyond the existing six owned
+      components (C and D both introduce the focus card; C additionally needs a rail/node-dot,
+      D does not), then Phase 3 implements it for real with tests written first. Direction D
+      added 2026-09-13 in response to review feedback: a pure timeline left collapsed steps too
+      thin on information, and always-expanding the current step next to a bare completed row
+      read oddly.
+    </p>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    var icon = document.getElementById('themeIcon');
+    var label = document.getElementById('themeLabel');
+
+    function systemPrefersDark() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    function currentIsDark() {
+      var forced = root.getAttribute('data-theme');
+      if (forced === 'dark') return true;
+      if (forced === 'light') return false;
+      return systemPrefersDark();
+    }
+    function sync() {
+      var dark = currentIsDark();
+      icon.textContent = dark ? '☀' : '☽';
+      label.textContent = dark ? 'Dark' : 'Light';
+    }
+    btn.addEventListener('click', function () {
+      root.setAttribute('data-theme', currentIsDark() ? 'light' : 'dark');
+      sync();
+    });
+    sync();
+  })();
+</script>
+
+</body></html>
