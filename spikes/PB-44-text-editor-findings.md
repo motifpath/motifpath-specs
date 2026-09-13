@@ -12,15 +12,21 @@
 
 Built a throwaway Tiptap (`@tiptap/vue-3`) prototype against `motifpath-web`'s real toolchain
 (Vue 3.5 · Vite 6 · TypeScript strict · Tailwind 3.4 · Vitest 3): rich text, a custom
-`callout` node, `audio`/`video`/`image` media nodes, and drag-handle block reordering. All
-four prototype steps validated; the gate ran clean (**217 tests**, `vue-tsc --build`,
-`eslint --max-warnings 0`, `vite build`). The one substantial finding is bundle cost: the
-editor's route chunk is **534 kB raw / 170 kB gzip**, of which **~283 kB raw / ~87 kB gzip is
-an irreducible ProseMirror-core floor** (present even with zero formatting extensions), not
-something Tiptap-specific trimming can remove.
+`callout` node, `audio`/`video`/`image` media nodes, drag-handle block reordering, a toolbar,
+paste-to-insert for clipboard images, and tables. All prototype steps validated; the gate ran
+clean (**219 tests**, `vue-tsc --build`, `eslint --max-warnings 0`, `vite build`). The one
+substantial finding is bundle cost: the editor's route chunk is **583 kB raw / 185 kB gzip**,
+of which **~283 kB raw / ~87 kB gzip is an irreducible ProseMirror-core floor** (present even
+with zero formatting extensions), not something Tiptap-specific trimming can remove.
 
-**Recommendation: accept Tiptap**, gated on confirming the 170 kB gzip lazy-chunk cost is
+**Recommendation: accept Tiptap**, gated on confirming the 185 kB gzip lazy-chunk cost is
 acceptable for an internal concierge tool (not a student-facing chunk) — see Decision point 5.
+
+**Manual round-trip note (2026-09-13, post-initial-note):** Gilson tried the first prototype
+by hand and found three gaps the initial four decision points didn't cover: no visible
+formatting menu, pasting an image from the clipboard did nothing, and no way to add a table.
+None were Tiptap dealbreakers — they were simply not built into the first prototype pass, which
+only wired the editor engine and drag-handle. Decision points 6–8 below close those gaps.
 
 ---
 
@@ -131,13 +137,94 @@ content authors is a materially different cost than the same weight on a student
 path route. If this editor were ever needed on a student-facing surface, the ProseMirror
 floor would be worth re-litigating against Editor.js's lighter, non-ProseMirror architecture.
 
+## Decision point 6 — Formatting menu (toolbar)
+
+**Result: validated — but Tiptap ships zero UI, by design.**
+
+- Tiptap is headless: there is no built-in toolbar, bubble menu, or button of any kind. The
+  first prototype pass exposed the editor engine only, which is why nothing was visible to
+  click.
+- `SpikeToolbar.vue` (~50 lines) demonstrates the minimum: six buttons (Bold, Italic, H2,
+  Bullet list, Callout, Table) each calling `editor.chain().focus().<command>().run()`
+  directly, with active-state styling via `editor.isActive(...)` and only token utility
+  classes (`bg-accent-muted`, `text-accent-text`) per ADR-018.
+- **This is genuine assembly cost, not a bug.** Every button, icon, and active/inactive state
+  has to be hand-built — there's no toolbar extension to install. A real implementation needs
+  a fuller toolbar (more marks/nodes, keyboard shortcuts surfaced, a bubble menu for
+  selection-based formatting) — budget for it as real UI work, not configuration.
+
+**No amendment needed** — this is expected headless-library behavior (consistent with
+ADR-018's chosen direction generally), just worth stating plainly: "no toolbar" was correct
+per the architecture, but it means a toolbar is *build*, not *install*.
+
+## Decision point 7 — Paste-to-insert images from the clipboard
+
+**Result: validated (with one caveat) after adding a ~30-line extension.**
+
+- `@tiptap/extension-image` renders `<img>` nodes but does **not** intercept paste/drop of
+  image *files* — that's the browser Clipboard API, and every editor (headless or not) has to
+  wire it up itself. `src/spike/imagePasteHandler.ts` adds a ProseMirror plugin
+  (`handlePaste`) that reads any image files off the paste event, converts each to a data URL
+  via `FileReader`, and calls `editor.chain().focus().setImage({ src }).run()`.
+- Verified by test (`SpikeEditor.spec.ts` — *"inserts an image from a pasted clipboard
+  file"*): dispatching a `paste` event carrying an `image/png` `File` results in an `image`
+  node in `getJSON()`.
+- **Caveat — production readiness.** The spike inserts a base64 data URL directly, which is
+  fine for a throwaway prototype but not for real lesson content (bloats the stored JSON
+  document with embedded binary data). A real implementation needs to intercept the same
+  paste event, **upload** the file to storage, and insert the resulting URL instead —
+  `imagePasteHandler.ts`'s `reader.onload` callback is exactly where that upload call would
+  go. Drag-and-drop of image files would need the equivalent `handleDrop` prop on the same
+  plugin (not built in this spike — same pattern, not spiked separately since it's
+  mechanically identical to paste).
+
+**Amendment:** the follow-up ADR/implementation should note that paste-to-insert requires a
+custom handler either way (spiked or not) and that it must upload rather than inline
+base64-encode in a real implementation.
+
+## Decision point 8 — Tables
+
+**Result: validated (with one caveat).**
+
+- `@tiptap/extension-table` v3 bundles `Table`, `TableRow`, `TableHeader`, and `TableCell` as
+  named exports from a **single package** — the separately-published
+  `@tiptap/extension-table-row`/`-cell`/`-header` packages exist but are redundant with the
+  bundle; installing them separately was a false start, corrected during the spike (removed
+  again via `npm uninstall`).
+- `editor.chain().focus().insertTable({ rows, cols, withHeaderRow }).run()` inserts a table
+  whose JSON serializes as `table > tableRow[] > (tableHeader | tableCell)[]` — verified by
+  test (*"inserts a table with a header row via insertTable()"*).
+- **Caveat — zero built-in visual style.** Like the toolbar, the table extension renders bare
+  `<table>`/`<td>`/`<th>` elements with no borders or spacing; Tailwind's `preflight` reset
+  strips default browser table borders same as any element. `SpikeEditor.vue`'s `<style
+  scoped>` block (border-collapse, cell borders/padding, header background) is the minimum
+  hand-written CSS any real implementation needs — about 12 lines, not a blocker, but another
+  data point that Tiptap gives you the document model and interaction logic, never visual
+  presentation.
+
+**No amendment needed** beyond noting the same "you own all the CSS" pattern already true of
+callout/media nodes.
+
+---
+
+## Updated bundle cost (toolbar + paste handler + tables added)
+
+| Chunk | First pass (rich text + media + drag-handle only) | With toolbar + paste + tables | Delta |
+|---|---|---|---|
+| Entry (`index.js`) | 147.40 kB raw / 53.18 kB gzip | 147.49 kB raw / 53.23 kB gzip | +0.09 kB raw / +0.05 kB gzip — noise |
+| `SpikeEditor` chunk | 533.66 kB raw / 169.93 kB gzip | **583.00 kB raw / 184.99 kB gzip** | +49.34 kB raw / +15.06 kB gzip for the table extension + toolbar + paste handler combined |
+
+Isolation still holds — the additional feature surface cost stays entirely inside the lazy
+chunk. The table extension is the bulk of that +15 kB gzip; the toolbar and paste handler are
+hand-written app code and add negligible weight themselves.
+
 ---
 
 ## Gate on the spike branch
 
 | Check | Result |
 |---|---|
-| `vitest run` | **217 passed** (39 files) — +4 spike tests over the `dev` baseline of 213 |
+| `vitest run` | **219 passed** (39 files) — +6 spike tests over the `dev` baseline of 213 |
 | `vue-tsc --build` | clean |
 | `eslint . --max-warnings 0` | clean |
 | `vite build` | clean; numbers above |
@@ -146,8 +233,11 @@ floor would be worth re-litigating against Editor.js's lighter, non-ProseMirror 
 
 **Accept Tiptap** as the content-authoring editor for PB-8i, subject to the bundle-cost
 trade-off in decision point 5 being acceptable for an internal, non-student-facing tool
-(recommend: yes, accept). No need to spike the Editor.js fallback — none of the four
-prototype steps failed or revealed a Tiptap-specific dealbreaker.
+(recommend: yes, accept). No need to spike the Editor.js fallback — none of the eight
+prototype steps failed or revealed a Tiptap-specific dealbreaker. Every gap found (toolbar,
+paste-to-insert, tables) was closed with focused, small additions (~50, ~30, and ~12 lines
+respectively) — consistent with "headless, ejectable, you build the UI" being Tiptap's actual
+model rather than a limitation specific to this use case.
 
 **Amendment for whoever writes the follow-up ADR:**
 1. Hand-pick Tiptap extensions instead of `@tiptap/starter-kit` wholesale, to shave the
@@ -157,6 +247,13 @@ prototype steps failed or revealed a Tiptap-specific dealbreaker.
 3. If this editor is ever considered for a student-facing surface (not currently planned),
    re-open the Editor.js comparison — the ProseMirror floor is a real, non-negotiable cost
    class Editor.js's architecture avoids.
+4. Budget real UI design/build time for the toolbar (and likely a bubble menu) — it is not
+   "configure a toolbar extension," it is "build a toolbar component" (decision point 6).
+5. The paste-to-insert image handler must upload to storage, not inline a base64 data URL as
+   the spike does — extend the same handler with a `handleDrop` prop for drag-and-drop of
+   image files (decision point 7).
+6. Table (and callout, and media node) visual styling is entirely hand-written CSS — budget a
+   small design pass for it, it does not come from the extension (decision points 2 and 8).
 
 ## Follow-up
 
