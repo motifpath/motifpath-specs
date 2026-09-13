@@ -3,7 +3,7 @@
 **Task:** PB-40
 **Date:** 2026-09-13
 **Author:** Gilson (with Claude)
-**Status:** Ready
+**Status:** On hold (2026-09-13) — pending PB-45 (content media storage strategy)
 
 ---
 
@@ -14,6 +14,18 @@ ADR-019's practice content model (Exercise first-class, many-to-many with Challe
 tags, 4-type enum incl. `image_choice` per the 2026-09-13 amendment, unified option-selection
 answer-checking) into a real, working exercise-authoring tool: `motifpath-specs` contract →
 `motifpath-core` backend → `motifpath-web` authoring UI.
+
+## Hold (2026-09-13)
+
+This plan is on hold pending **PB-45** (content media storage strategy — dev & production).
+Scoping this plan surfaced that nobody has actually decided where exercise/prompt images,
+audio stimuli, or the predefined image-picker library are stored, in either environment —
+this plan's own "Out of scope" section below papers over that gap by deferring to the
+existing `media_url`-as-string pattern, but that pattern itself was never a deliberate
+decision for content-authoring assets specifically. Resume this plan once PB-45 lands (likely
+as an ADR); its outcome may change how `image_url`/`audio_url` are populated in Phase 3's
+authoring UI (URL-paste vs. a real upload flow) without necessarily changing the OpenAPI
+schema shape from Phase 1.
 
 ## Scope
 
@@ -200,5 +212,6 @@ without affecting Phase 1/2's contract or backend.
 - **Design:** [`design/PB-40-exercise-authoring-builder/`](../design/PB-40-exercise-authoring-builder/)
   — the merged prototype this plan implements for real
 - **Backlog item:** PB-40 (Exercise-authoring builder)
+- **Blocked on:** PB-45 (content media storage strategy — dev & production) — see Hold above
 - **Downstream:** PB-41 (Practice / exercises view) — consumes this plan's data model but is a
   separate plan
