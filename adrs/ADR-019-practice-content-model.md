@@ -84,18 +84,33 @@ any challenge or path.**
    - `audio_recognition` — audio-based recognition
    - `image_recognition` — image-based recognition, of which clickable-region-on-image (today's
      `fretboard_region`) is one interaction pattern, not a separate type
-   - Rhythmic exercises are explicitly deferred — not part of this ADR's committed typology,
-     revisited only once feasibility is assessed.
+   - Rhythmic exercises are explicitly deferred from this ADR's committed typology. A feasibility
+     spike is tracked as its own backlog item, **PB-43**, since capture and scoring difficulty
+     (real-time timing accuracy) is unknown and needs its own investigation before a type is
+     committed.
 
-   Per-type answer-checking / grading schema is explicitly out of scope for this ADR and is
-   decided incrementally as each type beyond `image_recognition` is implemented.
+4. **Every exercise, regardless of type, is checked the same way: option selection.** An
+   exercise offers a set of options and marks one or more of them correct; checking is always
+   "does the student's selected option ID (or set of IDs) match the correct option ID(s)" — never
+   free-text matching or signal analysis. This generalizes the pattern `image_recognition`
+   already uses (a region is one kind of option):
+   - `image_recognition` — options are regions on the image; selecting a region is selecting an
+     option. This is exactly the existing `fretboard_region` behavior, unchanged.
+   - `text_response` — options are a fixed set of textual choices; the student picks one (or
+     more, for select-all-that-apply), not free-form input.
+   - `audio_recognition` — audio is the stimulus (what's played), and options are a fixed set of
+     labeled choices (e.g. note/chord/interval names) the student selects from after listening.
+     No audio signal analysis is performed.
 
-4. **Cross-path suggestion of a standalone exercise is not decided here.** This ADR makes
+   An exercise's options and correct-option marking are authored data, not computed — the same
+   shape PB-40's authoring UI needs to expose regardless of type.
+
+5. **Cross-path suggestion of a standalone exercise is not decided here.** This ADR makes
    exercises classifiable and queryable by skill tag; the decision of when and to whom a
    standalone exercise is surfaced outside its authored context belongs to PB-8g (remediation
    recommendation).
 
-5. **The OpenAPI/Go discrepancy on Challenge is not addressed by this ADR.** `challenge.yaml`
+6. **The OpenAPI/Go discrepancy on Challenge is not addressed by this ADR.** `challenge.yaml`
    will need a follow-up spec revision to match implementation reality, tracked separately.
 
 ## Rationale
@@ -115,12 +130,22 @@ without any implemented consumer.
 Generalizing the exercise typology now, even though only `image_recognition` (as
 `fretboard_region`'s successor) is implemented, prevents PB-40's authoring UI from being
 designed against a single-type model that would need a rework the moment a second type ships.
-Naming all four types (three committed, one explicitly deferred) lets PB-40 scope its authoring
-forms honestly instead of guessing.
+Naming all three committed types, plus a dedicated spike (PB-43) for the deferred rhythmic case,
+lets PB-40 scope its authoring forms honestly instead of guessing.
 
-Deferring per-type grading logic and the OpenAPI/Go reconciliation keeps this ADR to the
-structural decision PB-41/PB-40 actually need, rather than growing into a full content-authoring
-spec that isn't ready yet.
+An exercise that can't be checked has no product value — a practice item the platform can't
+grade isn't practice, it's just content. Unifying every type onto the same option-selection
+checking model, rather than deferring grading per type, means this ADR actually settles what
+PB-40's authoring UI must capture (options + correct-option marking) and what PB-41's runtime
+must submit and score, for all three committed types at once — not a partial model that still
+blocks implementation on type-by-type follow-up decisions. Option selection was chosen over
+free-text or signal-based matching because it is gradable deterministically with no NLP or audio
+analysis investment, which MVP scope doesn't have room for, and because `image_recognition`
+already proves the pattern works for a real exercise type today.
+
+Deferring the OpenAPI/Go reconciliation (but not answer-checking) keeps this ADR to the content
+model PB-41/PB-40 actually need; the spec-vs-code discrepancy on Challenge is a separate,
+unrelated cleanup with no bearing on the Exercise decisions above.
 
 ## Consequences
 
@@ -130,10 +155,13 @@ spec that isn't ready yet.
   real content-authoring intent.
 - PB-41 and PB-40 are unblocked: both now have a settled shape (Exercise entity, its
   classification, its typology) to design against.
-- The exercise typology is honest about what's committed (three types) versus deferred (rhythm),
-  so PB-40's authoring UI scope is not built against a single-type assumption.
+- The exercise typology is honest about what's committed (three types) versus deferred (rhythm,
+  tracked as PB-43), so PB-40's authoring UI scope is not built against a single-type assumption.
 - The classification mechanism is minimal now and has a clear upgrade path into PB-33 once that
   epic delivers, informed by real tags instead of speculative ones.
+- Every committed type is checkable the same way (option selection), so no exercise ships
+  without a defined way to grade it — PB-40 and PB-41 both have a complete model to build
+  against for all three types, not just `image_recognition`.
 
 ### Negative / Trade-offs
 
@@ -147,9 +175,10 @@ spec that isn't ready yet.
 - `openapi/components/schemas/challenge.yaml` remains stale relative to implementation after
   this ADR — a second, separate spec PR is required before PB-40 can be built against an
   accurate contract.
-- Per-type answer-checking schema is still undefined for `text_response` and
-  `audio_recognition`; PB-40's authoring UI cannot yet cover those types end-to-end until that
-  follow-up work lands.
+- Constraining every type to option selection is a real scope limit: `text_response` cannot
+  express genuinely open-ended free-text questions, and `audio_recognition` cannot do fine-
+  grained pitch/timing evaluation — both would need a different (and more expensive) checking
+  model than this ADR commits to. Revisit as a superseding ADR if the product needs that later.
 
 ### Neutral
 
@@ -172,10 +201,11 @@ spec that isn't ready yet.
 - Revise `openapi/components/schemas/challenge.yaml` to match the implemented Go model
   (`content_node_id`, `subject_tag`, `pass_threshold` directly on Challenge) — separate spec PR.
 - Add OpenAPI schema and Gherkin scenarios for the Exercise entity: many-to-many
-  challenge linkage, skill tags, and the generalized `exercise_type` enum.
-- Define per-type answer-checking / grading schema for `text_response` and `audio_recognition`
-  as each is implemented; `image_recognition` inherits the existing `fretboard_region` checking
-  logic.
+  challenge linkage, skill tags, the generalized `exercise_type` enum, and the options /
+  correct-option-id answer-checking shape committed in this ADR.
+- **PB-43** — rhythmic exercises feasibility spike: capture mechanism (mic/MIDI input timing
+  accuracy), scoring tolerance, and whether it fits this ADR's option-selection checking model
+  or needs its own.
 - PB-33: use this ADR's skill tags as real input when designing the Skill/Concept knowledge
   graph.
 - PB-8g: design how standalone/cross-path exercise suggestion queries exercises by skill tag.
