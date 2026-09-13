@@ -81,7 +81,7 @@ began — not inferred):
 | **Standalone creation vs. challenge-scoped creation.** | **Split.** `POST /exercises` creates an exercise standalone; `POST /challenges/{challenge_id}/exercises/{exercise_id}` links an existing exercise; `DELETE` on the same path unlinks. The old combined `POST /challenges/{challenge_id}/exercises` is replaced. |
 | **`title` field**, distinct from `prompt`. | **Add it.** Required, authoring-only name (e.g. "Alternate picking — descending run"), separate from the student-facing `prompt`. |
 | **Per-type option modeling** (region geometry vs. text vs. image). | **One flat `Option` schema** — `option_id`, `is_correct`, plus optional `label` / `image_url` / `region {x, y, width, height, shape}` — validated per-`exercise_type` in the Go domain constructor. No `oneOf`. |
-| **`GET /content-nodes/{id}/challenges` response shape.** | **Unchanged — IDs only.** Full exercise bodies (options, tags, media) are fetched per-exercise via `GET /exercises/{id}`, not embedded in the challenge listing. |
+| **Challenge → exercise listing shape.** | **No listing endpoint exists yet (checked: only `POST /content-nodes/{id}/challenges` and `GET /challenges/{challenge_id}` exist; there is no `GET` that lists a content node's challenges or a challenge's linked exercises). Not added by this plan — deferred until a real caller needs it. When it is added, it stays IDs only: full exercise bodies (options, tags, media) are fetched per-exercise via `GET /exercises/{id}`, never embedded in a listing.** In the meantime, `Exercise.challenge_ids` (added in Phase 1) is the only way to query the exercise↔challenge link, from the exercise side. |
 
 ---
 
