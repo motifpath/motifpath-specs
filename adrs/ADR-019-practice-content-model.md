@@ -1,6 +1,6 @@
 # ADR-019: Exercise is a first-class, reusable entity classified by skill, independent of Challenge
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-13
 **Deciders:** Gilson (Product Owner)
 
