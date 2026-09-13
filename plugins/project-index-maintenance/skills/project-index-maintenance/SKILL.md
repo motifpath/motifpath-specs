@@ -1,6 +1,6 @@
 ---
 name: project-index-maintenance
-version: 1.0.0
+version: 1.1.0
 description: >
   Use this skill when Gilson explicitly asks to update the MotifPath Project Index
   page in Notion. Trigger on phrases like "update the project index", "log this
@@ -17,7 +17,7 @@ description: >
 
 ## Purpose
 
-The MotifPath Project Index page is the canonical pointer to current focus, decided ADRs, and backlog state. Without active maintenance it drifts out of sync with reality, making the next session's bootstrap slow and error-prone. This skill performs the reconciliation: read the page, compare it against what happened this session, propose changes, get confirmation, write them.
+The MotifPath Project Index page is the canonical pointer to current focus, decided ADRs, and backlog state. Without active maintenance it drifts out of sync with reality, making the next session's bootstrap slow and error-prone. This skill performs the reconciliation: read the page, compare it against what happened this session, reconcile the differences, write them, and report.
 
 ## When to Trigger
 
@@ -37,7 +37,9 @@ If nothing has changed this session, still acknowledge the invocation — but re
 
 ## Workflow
 
-The workflow is six steps. Do not skip any of them. The confirm step is non-negotiable: nothing gets written to Notion before Gilson sees the plan and approves it.
+The workflow is five steps. Do not skip any of them.
+
+Invoking this skill is the go-ahead to write. Gilson has already decided the index should be updated; the skill's job is to reconcile accurately and write directly — no separate "present the plan and wait for approval" gate. State the writes as you make them (Step 5 reports them), and if Gilson wants something different they will say so.
 
 ### Step 1: Fetch the current Project Index
 
@@ -72,39 +74,21 @@ Run these five lenses against `(inventory ∩ current page state)` to determine 
 4. **Backlog snapshot check**: Do all rows in the snapshot match the current statuses from the inventory?
 5. **Timestamp check**: If any of checks 1–4 will result in a write, the "Last updated" date should be updated to today.
 
-If all five checks pass (page already matches reality), there's nothing to do. Report this and stop.
+If all five checks pass (page already matches reality), there's nothing to write — skip to Step 5 and report "Project Index unchanged".
 
-### Step 4: Present the plan and request confirmation
+If Step 2 surfaced an ambiguity a write depends on (see Edge Cases — e.g. two backlog items became active), resolve it with Gilson before writing that specific change. Everything unambiguous still gets written.
 
-Format the plan as a clear, structured proposal. Example:
+### Step 4: Execute writes
 
-```
-Here's what I plan to update on the Project Index:
-
-1. Latest session note → [new session note URL from today]
-2. Active item: PB-8 (Ready to Build) → PB-9 (In Progress)
-3. Decided ADRs: add row | ADR-006 | Content versioning strategy | Decided |
-4. Backlog Snapshot: PB-8 status "Ready to Build" → "In Progress"
-5. Last updated → 2026-05-21
-
-Confirm to proceed, or tell me what to adjust.
-```
-
-Wait for explicit confirmation. Do not write anything to Notion before Gilson responds.
-
-If Gilson asks for adjustments ("skip #3", or "the active item should be PB-7, not PB-9"), update the plan and re-present it for confirmation. Do not write partial sets without seeing the full plan re-confirmed.
-
-### Step 5: Execute writes
-
-Once confirmed, execute the writes using `notion-update-page`. Describe each write by intent — the right tool-call shape depends on the structure of the blocks returned by `notion-fetch` in Step 1. For example:
+Execute the writes using `notion-update-page`. Describe each write by intent — the right tool-call shape depends on the structure of the blocks returned by `notion-fetch` in Step 1. For example:
 
 - "Update the 'Latest session note' line to point to the new URL"
 - "Add a new row to the Decided ADRs table with ADR-006"
 - "Update the 'Last updated' value to today's date"
 
-Use the block IDs and structures observed in Step 1 to construct correct update calls. If a particular write fails, do not abort the whole sequence — continue with the rest, then report failures in Step 6.
+Use the block IDs and structures observed in Step 1 to construct correct update calls. If a particular write fails, do not abort the whole sequence — continue with the rest, then report failures in Step 5.
 
-### Step 6: Report results
+### Step 5: Report results
 
 After all writes are attempted, report concisely.
 
@@ -151,13 +135,13 @@ If you find yourself wanting to "tidy up" any of these sections, stop. That's sc
 
 ## Coordination with english-fluency-coach
 
-Both this skill and `english-fluency-coach` are part of the session-close ritual. Gilson invokes them separately and controls the order. There is no shared state and no required sequencing — but if Gilson asks to run both, do them sequentially (one fully completes, including its confirm-write cycle, before the next starts). Do not interleave.
+Both this skill and `english-fluency-coach` are part of the session-close ritual. Gilson invokes them separately and controls the order. There is no shared state and no required sequencing — but if Gilson asks to run both, do them sequentially (one fully completes, including its write-and-report cycle, before the next starts). Do not interleave.
 
 ---
 
 ## Edge Cases
 
-**Two backlog items became active in one session.** Ask Gilson which one should be the "Active item" going forward. Don't guess.
+**Two backlog items became active in one session.** Ask Gilson which one should be the "Active item" going forward. Don't guess. Write every other unambiguous change in the meantime.
 
 **An ADR was discussed but Gilson said "let me think about it more."** It's not decided. Do not add it to the Decided ADRs table.
 
@@ -167,7 +151,7 @@ Both this skill and `english-fluency-coach` are part of the session-close ritual
 
 **The session was entirely discussion, no concrete changes.** Step 3 will show all five checks passing. Report "Project Index unchanged" and stop. This is a feature, not a failure mode.
 
-**Gilson declines to confirm at Step 4.** Don't write anything. Acknowledge and stop. The page stays as it was.
+**A write turns out larger or more sweeping than the inventory justifies.** Don't force it through just because the skill is running. Pause, say what looks off, and let Gilson steer.
 
 ---
 
