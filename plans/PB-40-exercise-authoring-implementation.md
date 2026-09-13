@@ -117,7 +117,10 @@ began — not inferred):
 - [x] Step 6 — Definition of Ready check: OpenAPI endpoints defined, Gherkin covers happy path +
       edge cases + failure cases, no HTTP/SQL/framework language in scenarios (per this repo's
       Gherkin standards).
-- [ ] Step 7 — `redocly lint` clean; Gherkin syntax valid. Open PR, get it merged before Phase 2.
+- [x] Step 7 — `redocly lint` clean; Gherkin syntax valid. Open PR, get it merged before Phase 2.
+      PR `motifpath-specs#50` merged 2026-09-13 (after a `/pr-review` round: version bump to
+      0.6.0 for the breaking change, a duplicate-link Gherkin scenario, and an Open Questions
+      table correction). **Phase 1 is Done.**
 
 ### Phase 2 — Backend (motifpath-core)
 
