@@ -188,6 +188,28 @@ unrelated cleanup with no bearing on the Exercise decisions above.
 - ADR-015's node/challenge/S7-route structure is unchanged; only the Exercise-Challenge
   cardinality and Exercise's own classification change.
 
+## Amendment (2026-09-13) — a 4th committed type: `image_choice`
+
+PB-40's exercise-authoring prototype (`design/PB-40-exercise-authoring-builder/`) added a
+fourth type live, from review feedback: **`image_choice`** — an exercise whose options are
+images rather than text (e.g. "which of these four chord-shape diagrams is E minor?"), sharing
+one image picker (predefined library or custom upload) with `image_recognition`'s canvas so
+authors have a single, consistent way to attach images across both types.
+
+This is not a new checking model — it is decision point 4's option-selection pattern with the
+option's rendered content being an image instead of text or a region:
+
+- `image_recognition` — options are regions on one image.
+- `image_choice` — options are a fixed set of separate images; the student selects one (or
+  more, for select-all-that-apply), exactly like `text_response`'s fixed-choice options except
+  each option renders as an image instead of a text label.
+
+**Decision: commit `image_choice` as the 4th exercise type**, extending decision point 3's
+typology to `text_response` / `audio_recognition` / `image_recognition` / `image_choice`. No
+other decision point changes — the many-to-many Challenge relationship, skill tags, and
+option-selection checking model apply identically to this type. Rhythmic exercises remain
+deferred to PB-43, unaffected by this amendment.
+
 ## Related ADRs
 
 - **ADR-015** — Challenge belongs to the path node; this ADR narrows ADR-015's implicit
