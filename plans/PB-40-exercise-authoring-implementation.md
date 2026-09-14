@@ -3,11 +3,13 @@
 **Task:** PB-40
 **Date:** 2026-09-13
 **Author:** Gilson (with Claude)
-**Status:** In progress — Phase 1 & 2 Done (specs#50, core#17 merged). Phase 3 restarting on a
-fresh branch: the first `feat/PB-40/exercise-authoring-ui` attempt (web#16) was closed unmerged
-2026-09-14, superseded by the PB-48 app-shell work (specs#54) which extracted shared `AppBar`
-and `ExerciseView` components after web#16 had already started — Phase 3 now composes from
-those instead of one-off markup.
+**Status:** In progress — Phase 1 & 2 Done (specs#50, core#17 merged). Phase 3 restarting, now
+split into **3a** (port `AppBar`/`ExerciseView` from the PB-48 prototype into real Vue
+components, swap them into the existing student layout) and **3b** (the teacher
+exercise-authoring feature, depends on 3a). The original single-phase attempt
+(`feat/PB-40/exercise-authoring-ui`, web#16) was closed unmerged 2026-09-14 — it duplicated
+what became `ExerciseView` and had no `AppBar` integration, since it was opened the same day as,
+but before, the PB-48 app-shell work (specs#54) that extracted those components.
 
 ---
 
@@ -43,11 +45,14 @@ authoring UI populates those fields.
 - `motifpath-core` rebuild: ent schema (Exercise ↔ Challenge M2M, `skill_tags`, 4-type enum,
   options), domain layer, application services, repository, generated HTTP handlers, tests
   (table-driven + godog + testcontainers per this repo's testing discipline).
+- Porting the shared `AppBar` and `ExerciseView` components from the PB-48 design prototype
+  (`design/PB-48-app-shell/`) into real, tested Vue components, and swapping the existing
+  `AppShell.vue` for `AppBar.vue` in `motifpath-web`'s student-facing layout.
 - `motifpath-web` authoring UI implementing the merged prototype: exercise type picker, prompt/
   title fields, per-type option editors (text/audio/image_choice lists, image_recognition's
   region canvas), the shared image picker (predefined library, or upload a new image via
   `POST /media/upload-url` per ADR-021), skill tags input, a reuse indicator (challenge count),
-  and the student-preview modal.
+  and a preview built on the shared `ExerciseView` component (not a standalone preview modal).
 
 **Out of scope:**
 - The presigned upload URL endpoint itself and its underlying S3/MinIO infrastructure. This
@@ -64,6 +69,24 @@ authoring UI populates those fields.
 - PB-33 (knowledge graph) — skill tags stay freeform strings, per ADR-019 point 2.
 - PB-43 (rhythmic exercises) — explicitly deferred, not part of the 4-type enum this plan ships.
 - Any change to `StudentPath`, `LearningPath`, or the tracking-event schemas.
+
+## Design Fidelity Requirement
+
+The implementation **must match the PB-48 canvas** (`design/PB-48-app-shell/AppBar.dc.html`,
+`ExerciseView.dc.html`, `Authoring.dc.html` — published at
+https://claude.ai/code/artifact/5b9dc838-8206-4820-a9fd-5f8e349dad54) — layout, spacing,
+states, and interaction behavior, at both the desktop and mobile widths the canvas already
+covers. This is not a rough guide to build from memory or improve on; it is the approved UI,
+already decided (Direction B raised bar, the unified AppBar, the ExerciseView answer-leak fix).
+
+- No component in Phase 3a or 3b may ship a visual or structural deviation from its canvas
+  counterpart without going back to Gilson first, per the ADR-018 2026-09-14 amendment's rule 3
+  (a new feature doesn't get to silently touch previously-approved UI, even as an improvement).
+- If implementation surfaces a genuine reason the canvas can't be built as-is (a Vue/browser
+  constraint the prototype didn't hit), that's a decision to raise explicitly — pause and ask —
+  not a silent substitution.
+- This applies to the `AppShell` → `AppBar` swap too: the *existing* student routes must come
+  out looking like the canvas's `Main.dc.html`/`MobileMain.dc.html`, not merely "close enough."
 
 ## Prerequisites
 
@@ -173,33 +196,77 @@ MinIO in local dev via the same client, differing only in construction), MinIO a
 round-trip), not just the unit-test fakes. PR `motifpath-core#17` merged 2026-09-14 (dev).
 **Phase 2 is Done.**
 
-### Phase 3 — Frontend (motifpath-web)
+### Phase 3a — Shared components: AppBar + ExerciseView (motifpath-web)
 
-**Branch:** `feat/PB-40/exercise-authoring-ui`
+**Branch:** `feat/PB-48/shared-app-shell-components`
+
+Added 2026-09-14. Neither component exists as real Vue code yet — only as the
+`design/PB-48-app-shell/AppBar.dc.html` / `ExerciseView.dc.html` prototype markup — and
+`AppBar` replaces the existing `AppShell.vue` used by the live student layout, not just adds
+new teacher-facing UI. Phase 3b depends on this phase merging first.
+
+- [ ] Step 1 — TDD: port `AppBar.dc.html` into `src/shared/components/AppBar.vue`. Two props —
+      `context` (`'student' | 'teacher'`), `compact` (mobile hamburger + nav-only drawer vs.
+      desktop inline nav) — cover every combination per the prototype's own design goal. One
+      visible theme-toggle icon, same spot at both widths; no account-menu detour (tried and
+      explicitly walked back during the PB-48 canvas session — don't reintroduce it here).
+      Component test first, then implementation.
+- [ ] Step 2 — TDD: port `ExerciseView.dc.html` into `src/shared/components/ExerciseView.vue`.
+      Renders one exercise (prompt + type-specific answer surface) for all 4 exercise types.
+      Structurally cannot receive or expose which option is correct — enforce via the
+      component's prop types (never accept an `is_correct` flag on the options it renders),
+      not by convention.
+- [ ] Step 3 — Swap `AppShell.vue` for `AppBar.vue` inside `AuthenticatedLayout.vue` and
+      `PublicLayout.vue` (`context="student"`, `compact` bound to the existing responsive
+      breakpoint). A swap, not a redesign — don't touch layout markup this step doesn't need to.
+- [ ] Step 4 — Delete `AppShell.vue` and its spec once nothing references it.
+- [ ] Step 5 — Gate: `npm run test`, `npm run typecheck`, `npm run lint`, `npm run build` clean.
+- [ ] Step 6 — Design fidelity check: `AppBar.vue` and `ExerciseView.vue` side-by-side against
+      `AppBar.dc.html` / `ExerciseView.dc.html` at desktop and mobile widths — same spacing,
+      same states, same interaction behavior. Any deviation is a stop-and-ask, per the Design
+      Fidelity Requirement above, not a judgment call to implement around.
+- [ ] Step 7 — Manual browser smoke: sign in as a student, confirm every existing student route
+      (home, path, lesson/node views) still renders correctly with the new `AppBar` at desktop
+      and mobile widths. This step exists to catch a regression in already-shipped student
+      flows, not just to validate the new component.
+
+### Phase 3b — Teacher exercise-authoring feature (motifpath-web)
+
+**Branch:** `feat/PB-40/exercise-authoring-ui` (fresh branch — the original PR under this name,
+web#16, was closed unmerged 2026-09-14; see this plan's Status line)
+
+**Depends on:** Phase 3a merged (needs the real `AppBar`/`ExerciseView` components, not the
+`.dc.html` prototypes).
 
 - [ ] Step 1 — `npm run generate:api` against the merged Phase 1 spec.
 - [ ] Step 2 — TDD: write failing component tests first (per this repo's TDD-mandatory rule)
       for each new piece, then implement:
-      - `ExerciseAuthoringView.vue` (or similar — a route under a teacher/admin area; this repo
-        has no existing teacher-facing route yet, so this plan also adds the first one) with
-        title/prompt fields and an exercise-type picker.
-      - Per-type option editors: `TextOptionsEditor.vue`, `AudioOptionsEditor.vue`,
-        `ImageChoiceOptionsEditor.vue`, `ImageRegionEditor.vue` (canvas-based region
-        draw/resize/drag, matching the prototype) — composed from the owned component library
-        (`PrimaryButton`, `Icon`, tokens) per ADR-018, new components only where the prototype's
-        interaction genuinely has no existing primitive (the region canvas is a strong
-        candidate for ADR-018's "framework-agnostic island" pattern, like the fretboard
-        renderer — decide during implementation, not pre-committed here).
-      - A shared image picker component (predefined library, or upload a new image via
-        `POST /media/upload-url` per ADR-021) reused identically by `image_recognition` and
-        `image_choice`, matching the prototype's explicit design goal.
-      - Skill tags input (add/remove, matching the prototype's `tags`/`tagInput` state shape).
+      - `ExerciseAuthoringView.vue` — the first teacher-facing route, mounted inside
+        `AuthenticatedLayout` with `AppBar context="teacher"`. Title/prompt fields and an
+        exercise-type picker.
+      - Per-type option editors: `TextOptionsEditor.vue` (shared by `text_response` and
+        `audio_recognition`), `ImageChoiceOptionsEditor.vue`, `ImageRegionEditor.vue`
+        (click-to-add/drag/resize regions, matching the prototype) — composed from the owned
+        component library (`PrimaryButton`, `Icon`, tokens) per ADR-018.
+      - `ImagePickerModal.vue` + a `useMediaUpload` composable: presigned-upload flow via
+        `POST /media/upload-url` per ADR-021, direct-to-storage PUT, reused identically by
+        `image_recognition` and `image_choice`.
+      - `SkillTagsInput.vue` (add/remove, matching the prototype's `tags`/`tagInput` state
+        shape).
       - A reuse indicator showing `challenge_ids.length` from the API response.
-      - A student-preview modal with the Portrait/Landscape toggle matching ADR-015's S7 spec,
-        reusing the prototype's `previewOrientation` state pattern.
+      - Preview: mount the real `ExerciseView.vue` from Phase 3a inside a modal with the
+        Portrait/Landscape toggle matching ADR-015's S7 spec. No separate preview-rendering
+        component — a standalone `StudentPreviewModal` duplicating `ExerciseView` is exactly
+        what closed the original web#16 PR.
+      - `useExerciseForm` composable: holds authoring state for all 4 exercise types, maps it
+        to `CreateExerciseRequest`.
 - [ ] Step 3 — Gate: `npm run test`, `npm run typecheck`, `npm run lint`, `npm run build` clean.
-- [ ] Step 4 — Manual browser smoke against a real `devbox services up ... web` stack, creating
-      one exercise of each of the 4 types end to end.
+- [ ] Step 4 — Design fidelity check: `ExerciseAuthoringView` and every editor/modal side-by-side
+      against `Authoring.dc.html` at desktop and mobile widths, per the Design Fidelity
+      Requirement above — same layout, same states, same interactions, no unreviewed deviation.
+- [ ] Step 5 — Manual browser smoke against a real `devbox services up ... web` stack: sign in,
+      create one exercise of each of the 4 types end to end, and confirm the `ExerciseView`
+      preview never reveals which option is correct.
 
 ### Phase 4 — Infrastructure (motifpath-infra)
 
@@ -211,9 +278,11 @@ Not applicable — no infra change.
 
 Phase 1 (spec) and Phase 2 (backend) ship together — a bad Phase 2 merge reverts via
 `git revert` on `motifpath-core`'s merge commit; no production data exists yet, so no
-migration rollback/backfill is needed (same reasoning ADR-019 already relies on). Phase 3
-(frontend) is additive (a new route + new components) and can be reverted independently
-without affecting Phase 1/2's contract or backend.
+migration rollback/backfill is needed (same reasoning ADR-019 already relies on). Phase 3a
+(`AppBar`/`ExerciseView` + the `AppShell` swap) touches the live student layout, so it reverts
+independently via `git revert` if it regresses an existing student route; Phase 3b (the teacher
+authoring feature) is purely additive (a new route + new components) and can be reverted
+independently of both Phase 3a and Phase 1/2's contract or backend.
 
 ## Validation
 
@@ -223,8 +292,14 @@ without affecting Phase 1/2's contract or backend.
       requirement: "an exercise that can't be checked can't be practiced").
 - [ ] The same exercise can be linked to two different challenges without duplication —
       the concrete reuse case ADR-019's Context section describes.
-- [ ] `motifpath-web`'s authoring UI produces exercises visually and structurally matching the
-      merged prototype (`design/PB-40-exercise-authoring-builder/Main.dc.html`) for all 4 types.
+- [ ] `motifpath-web`'s authoring UI matches the PB-48 canvas (`design/PB-48-app-shell/
+      Authoring.dc.html`) visually and structurally for all 4 exercise types — the Design
+      Fidelity Requirement above, checked, not assumed.
+- [ ] Every existing student-facing route still renders correctly after the `AppShell` → `AppBar`
+      swap, at both desktop and mobile widths, matching `Main.dc.html`/`MobileMain.dc.html` — no
+      regression in already-shipped flows and no undocumented visual drift from the canvas.
+- [ ] The authoring preview and any future real Practice screen (PB-41) render the same exercise
+      identically, because both mount the same `ExerciseView` component.
 - [ ] Full gate green in all three repos (godog + testify + testcontainers in core; Vitest +
       typecheck + lint + build in web; Redocly + Gherkin lint in specs).
 
@@ -237,6 +312,12 @@ without affecting Phase 1/2's contract or backend.
 - **ADR:** [ADR-021](../adrs/ADR-021-content-media-storage-strategy.md) (content media storage
   strategy) — resolves PB-45, unblocking this plan's Phase 3 upload flow (see "Hold lifted"
   above)
+- **ADR:** [ADR-018](../adrs/ADR-018-frontend-ui-architecture-design-system.md) (2026-09-14
+  amendment) — the compose-from-components discipline Phase 3a/3b follow, written after PB-48
+  hit the exact duplication (`AppShell`, then a standalone preview modal) this split now avoids
+- **Design:** [`design/PB-48-app-shell/`](../design/PB-48-app-shell/) — source for the `AppBar`
+  and `ExerciseView` components Phase 3a ports
 - **Backlog item:** PB-40 (Exercise-authoring builder)
+- **Backlog item:** PB-48 (App shell prototype) — Phase 3a is this plan's real implementation
 - **Downstream:** PB-41 (Practice / exercises view) — consumes this plan's data model but is a
   separate plan
