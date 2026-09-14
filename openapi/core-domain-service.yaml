@@ -962,13 +962,14 @@ paths:
         - not_started — the student has not yet reached this content node.
         - locked — the student must complete an earlier node before accessing this one.
 
-        Only accessible by authenticated users with role student. Returns 404 if
-        the student has no active path assignment.
+        Accessible by authenticated users with role student, teacher, or admin,
+        returning the caller's own active assignment in every case. Returns 404
+        if the caller has no active path assignment.
       tags:
         - Learning Paths
       responses:
         "200":
-          description: The student's current learning path with per-item progress state.
+          description: The caller's current learning path with per-item progress state.
           content:
             application/json:
               schema:
@@ -979,14 +980,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
-        "403":
-          description: Only students may access this endpoint.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForbiddenError'
         "404":
-          description: The authenticated student has no active path assignment.
+          description: The authenticated caller has no active path assignment.
           content:
             application/json:
               schema:
