@@ -1,7 +1,7 @@
 Feature: Student path view
   As the MotifPath platform
-  I want students to retrieve their active learning path with progress state
-  So that the SPA can display what to do next and how far the student has come
+  I want students, teachers, and admins to retrieve their own active learning path with progress state
+  So that the SPA can display what to do next and how far the caller has come
 
   Background:
     Given the Core Domain Service is operational and ready to accept requests
@@ -80,17 +80,21 @@ Feature: Student path view
     When "alice" retrieves her current path
     Then the request is refused with a not-found error
 
-  # ── Authorisation failures ─────────────────────────────────────────────────
+  # ── Access by other roles ────────────────────────────────────────────────
 
-  Scenario: A teacher cannot access the student path view endpoint
+  Scenario: A teacher with no active path assignment gets not found, not forbidden
     Given "bob" is authenticated as a teacher
+    And "bob" has no active path assignment
     When "bob" requests GET /students/me/path
-    Then the request is refused with a forbidden error
+    Then the request is refused with a not-found error
 
-  Scenario: An admin cannot access the student path view endpoint
+  Scenario: An admin with no active path assignment gets not found, not forbidden
     Given "admin" is authenticated as an admin
+    And "admin" has no active path assignment
     When "admin" requests GET /students/me/path
-    Then the request is refused with a forbidden error
+    Then the request is refused with a not-found error
+
+  # ── Authorisation failures ─────────────────────────────────────────────────
 
   Scenario: Retrieving the student path view without an authentication token is refused
     Given no authentication token is provided
