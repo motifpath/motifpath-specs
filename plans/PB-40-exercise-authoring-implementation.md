@@ -70,6 +70,24 @@ authoring UI populates those fields.
 - PB-43 (rhythmic exercises) — explicitly deferred, not part of the 4-type enum this plan ships.
 - Any change to `StudentPath`, `LearningPath`, or the tracking-event schemas.
 
+## Design Fidelity Requirement
+
+The implementation **must match the PB-48 canvas** (`design/PB-48-app-shell/AppBar.dc.html`,
+`ExerciseView.dc.html`, `Authoring.dc.html` — published at
+https://claude.ai/code/artifact/5b9dc838-8206-4820-a9fd-5f8e349dad54) — layout, spacing,
+states, and interaction behavior, at both the desktop and mobile widths the canvas already
+covers. This is not a rough guide to build from memory or improve on; it is the approved UI,
+already decided (Direction B raised bar, the unified AppBar, the ExerciseView answer-leak fix).
+
+- No component in Phase 3a or 3b may ship a visual or structural deviation from its canvas
+  counterpart without going back to Gilson first, per the ADR-018 2026-09-14 amendment's rule 3
+  (a new feature doesn't get to silently touch previously-approved UI, even as an improvement).
+- If implementation surfaces a genuine reason the canvas can't be built as-is (a Vue/browser
+  constraint the prototype didn't hit), that's a decision to raise explicitly — pause and ask —
+  not a silent substitution.
+- This applies to the `AppShell` → `AppBar` swap too: the *existing* student routes must come
+  out looking like the canvas's `Main.dc.html`/`MobileMain.dc.html`, not merely "close enough."
+
 ## Prerequisites
 
 - [x] ADR-019 Accepted & merged (`motifpath-specs#40`)
@@ -203,7 +221,11 @@ new teacher-facing UI. Phase 3b depends on this phase merging first.
       breakpoint). A swap, not a redesign — don't touch layout markup this step doesn't need to.
 - [ ] Step 4 — Delete `AppShell.vue` and its spec once nothing references it.
 - [ ] Step 5 — Gate: `npm run test`, `npm run typecheck`, `npm run lint`, `npm run build` clean.
-- [ ] Step 6 — Manual browser smoke: sign in as a student, confirm every existing student route
+- [ ] Step 6 — Design fidelity check: `AppBar.vue` and `ExerciseView.vue` side-by-side against
+      `AppBar.dc.html` / `ExerciseView.dc.html` at desktop and mobile widths — same spacing,
+      same states, same interaction behavior. Any deviation is a stop-and-ask, per the Design
+      Fidelity Requirement above, not a judgment call to implement around.
+- [ ] Step 7 — Manual browser smoke: sign in as a student, confirm every existing student route
       (home, path, lesson/node views) still renders correctly with the new `AppBar` at desktop
       and mobile widths. This step exists to catch a regression in already-shipped student
       flows, not just to validate the new component.
@@ -239,7 +261,10 @@ web#16, was closed unmerged 2026-09-14; see this plan's Status line)
       - `useExerciseForm` composable: holds authoring state for all 4 exercise types, maps it
         to `CreateExerciseRequest`.
 - [ ] Step 3 — Gate: `npm run test`, `npm run typecheck`, `npm run lint`, `npm run build` clean.
-- [ ] Step 4 — Manual browser smoke against a real `devbox services up ... web` stack: sign in,
+- [ ] Step 4 — Design fidelity check: `ExerciseAuthoringView` and every editor/modal side-by-side
+      against `Authoring.dc.html` at desktop and mobile widths, per the Design Fidelity
+      Requirement above — same layout, same states, same interactions, no unreviewed deviation.
+- [ ] Step 5 — Manual browser smoke against a real `devbox services up ... web` stack: sign in,
       create one exercise of each of the 4 types end to end, and confirm the `ExerciseView`
       preview never reveals which option is correct.
 
@@ -267,10 +292,12 @@ independently of both Phase 3a and Phase 1/2's contract or backend.
       requirement: "an exercise that can't be checked can't be practiced").
 - [ ] The same exercise can be linked to two different challenges without duplication —
       the concrete reuse case ADR-019's Context section describes.
-- [ ] `motifpath-web`'s authoring UI produces exercises visually and structurally matching the
-      merged prototype (`design/PB-40-exercise-authoring-builder/Main.dc.html`) for all 4 types.
+- [ ] `motifpath-web`'s authoring UI matches the PB-48 canvas (`design/PB-48-app-shell/
+      Authoring.dc.html`) visually and structurally for all 4 exercise types — the Design
+      Fidelity Requirement above, checked, not assumed.
 - [ ] Every existing student-facing route still renders correctly after the `AppShell` → `AppBar`
-      swap, at both desktop and mobile widths — no regression in already-shipped flows.
+      swap, at both desktop and mobile widths, matching `Main.dc.html`/`MobileMain.dc.html` — no
+      regression in already-shipped flows and no undocumented visual drift from the canvas.
 - [ ] The authoring preview and any future real Practice screen (PB-41) render the same exercise
       identically, because both mount the same `ExerciseView` component.
 - [ ] Full gate green in all three repos (godog + testify + testcontainers in core; Vitest +
