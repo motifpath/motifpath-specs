@@ -3,13 +3,12 @@
 **Task:** PB-40
 **Date:** 2026-09-13
 **Author:** Gilson (with Claude)
-**Status:** In progress — Phase 1 & 2 Done (specs#50, core#17 merged). Phase 3 restarting, now
-split into **3a** (port `AppBar`/`ExerciseView` from the PB-48 prototype into real Vue
-components, swap them into the existing student layout) and **3b** (the teacher
-exercise-authoring feature, depends on 3a). The original single-phase attempt
-(`feat/PB-40/exercise-authoring-ui`, web#16) was closed unmerged 2026-09-14 — it duplicated
-what became `ExerciseView` and had no `AppBar` integration, since it was opened the same day as,
-but before, the PB-48 app-shell work (specs#54) that extracted those components.
+**Status:** In progress — Phase 1, 2 & 3a Done (specs#50, core#17, web#17 merged). Phase 3b (the
+teacher exercise-authoring feature) starts next, now that the real `AppBar`/`ExerciseView`
+components exist. The original single-phase Phase 3 attempt (`feat/PB-40/exercise-authoring-ui`,
+web#16) was closed unmerged 2026-09-14 — it duplicated what became `ExerciseView` and had no
+`AppBar` integration, since it was opened the same day as, but before, the PB-48 app-shell work
+(specs#54) that extracted those components.
 
 ---
 
@@ -205,13 +204,13 @@ Added 2026-09-14. Neither component exists as real Vue code yet — only as the
 `AppBar` replaces the existing `AppShell.vue` used by the live student layout, not just adds
 new teacher-facing UI. Phase 3b depends on this phase merging first.
 
-- [ ] Step 1 — TDD: port `AppBar.dc.html` into `src/shared/components/AppBar.vue`. Two props —
+- [x] Step 1 — TDD: port `AppBar.dc.html` into `src/shared/components/AppBar.vue`. Two props —
       `context` (`'student' | 'teacher'`), `compact` (mobile hamburger + nav-only drawer vs.
       desktop inline nav) — cover every combination per the prototype's own design goal. One
       visible theme-toggle icon, same spot at both widths; no account-menu detour (tried and
       explicitly walked back during the PB-48 canvas session — don't reintroduce it here).
       Component test first, then implementation.
-- [ ] Step 2 — TDD: port `ExerciseView.dc.html` into `src/shared/components/ExerciseView.vue`.
+- [x] Step 2 — TDD: port `ExerciseView.dc.html` into `src/shared/components/ExerciseView.vue`.
       Renders one exercise (prompt + type-specific answer surface) for all 4 exercise types.
       Structurally cannot receive or expose which option is correct — enforce via the
       component's prop types (never accept an `is_correct` flag on the options it renders),
@@ -233,10 +232,10 @@ new teacher-facing UI. Phase 3b depends on this phase merging first.
       `AppBar.dc.html` / `ExerciseView.dc.html` — found and fixed several px-level mismatches
       (option-row padding, several border-radii, region-shape-aware rounding, the drawer's
       theme-independent scrim color) before calling this done.
-- [ ] Step 7 — Manual browser smoke: sign in as a student, confirm every existing student route
+- [x] Step 7 — Manual browser smoke: sign in as a student, confirm every existing student route
       (home, path, lesson/node views) still renders correctly with the new `AppBar` at desktop
-      and mobile widths. Still needs a human pass — no way to drive a real browser against a
-      signed-in Clerk session from this environment.
+      and mobile widths. Done by Gilson 2026-09-14 — found and fixed two more issues live
+      (below), not caught by the earlier design-fidelity code review.
 
 **Also found during implementation, resolved with Gilson before proceeding (Design Fidelity
 Requirement's "pause and ask"):** the canvas's `AppBar` has no sign-out control at all. Rather
@@ -245,16 +244,30 @@ than silently drop the feature (breaking every signed-in user) or silently keep 
 avatar opens a one-item menu, "Sign out" only — not the account-menu sprawl this same PB-48
 session had already tried and explicitly rejected once.
 
-PR `motifpath-web#17` (open) covers Steps 1-6. **Phase 3a is functionally complete, pending
-merge and the manual smoke.**
+**Found during the manual smoke itself:**
+- `tailwind.config.ts` extends the default Tailwind spacing scale with this project's design
+  tokens, and token keys `5`/`6` (24px/32px) differ from Tailwind's own defaults for those same
+  numeric keys — `AppBar`'s theme toggle, avatar, and bar padding silently resolved to the wrong
+  (larger) size. Fixed by using the correctly-indexed token keys instead of guessing.
+- The landing page (`PublicLayout` → `AppShell` → `ThemeToggle`) still showed the old plain-text
+  toggle button, visibly inconsistent next to `AppBar`'s icon toggle. Restyled `ThemeToggle` to
+  match (`motifpath-web#19`, merged) — `PublicLayout` itself is still on `AppShell` per the Step
+  3 correction above, but at least its one interactive control now matches the new visual
+  language.
+
+Also produced a proper favicon along the way (`motifpath-brand#2`, `motifpath-web#18`, both
+merged): the simplified two-path mark `AppBar` itself uses, not the full-detail brand mark
+(glow/edge-stroke/quaver flourishes were illegible at favicon size), with matching light
+(`#F0E9FF`) and dark (`#241C4D`) background variants sourced from `accent-muted`.
+
+PR `motifpath-web#17` **merged** 2026-09-14. **Phase 3a is Done.**
 
 ### Phase 3b — Teacher exercise-authoring feature (motifpath-web)
 
 **Branch:** `feat/PB-40/exercise-authoring-ui` (fresh branch — the original PR under this name,
 web#16, was closed unmerged 2026-09-14; see this plan's Status line)
 
-**Depends on:** Phase 3a merged (needs the real `AppBar`/`ExerciseView` components, not the
-`.dc.html` prototypes).
+**Depends on:** Phase 3a — **merged** 2026-09-14 (`motifpath-web#17`).
 
 - [ ] Step 1 — `npm run generate:api` against the merged Phase 1 spec.
 - [ ] Step 2 — TDD: write failing component tests first (per this repo's TDD-mandatory rule)
