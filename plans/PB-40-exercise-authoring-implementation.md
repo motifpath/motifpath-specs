@@ -216,19 +216,37 @@ new teacher-facing UI. Phase 3b depends on this phase merging first.
       Structurally cannot receive or expose which option is correct — enforce via the
       component's prop types (never accept an `is_correct` flag on the options it renders),
       not by convention.
-- [ ] Step 3 — Swap `AppShell.vue` for `AppBar.vue` inside `AuthenticatedLayout.vue` and
-      `PublicLayout.vue` (`context="student"`, `compact` bound to the existing responsive
-      breakpoint). A swap, not a redesign — don't touch layout markup this step doesn't need to.
-- [ ] Step 4 — Delete `AppShell.vue` and its spec once nothing references it.
-- [ ] Step 5 — Gate: `npm run test`, `npm run typecheck`, `npm run lint`, `npm run build` clean.
-- [ ] Step 6 — Design fidelity check: `AppBar.vue` and `ExerciseView.vue` side-by-side against
-      `AppBar.dc.html` / `ExerciseView.dc.html` at desktop and mobile widths — same spacing,
-      same states, same interaction behavior. Any deviation is a stop-and-ask, per the Design
-      Fidelity Requirement above, not a judgment call to implement around.
+- [x] Step 3 — Swap `AppShell.vue` for `AppBar.vue` inside `AuthenticatedLayout.vue`
+      (`context="student"`, `compact` bound to a new `useIsCompact` breakpoint composable). A
+      swap, not a redesign — don't touch layout markup this step doesn't need to.
+      **Correction (made during implementation, 2026-09-14):** this step originally also said
+      `PublicLayout.vue`. That was wrong — `AppBar` doesn't apply there. `Main.dc.html`'s
+      landing/sign-in screens (`isLanding`/`isSignIn`, exactly what `PublicLayout` renders) have
+      their own separate, bare header — logo + wordmark only, no nav/theme/avatar — never
+      `AppBar`, which only appears in the canvas's signed-in shell (`showShell`). `PublicLayout`
+      stays on `AppShell`.
+- [x] Step 4 — ~~Delete `AppShell.vue` and its spec once nothing references it.~~ Not done, and
+      not applicable until `PublicLayout` gets its own bare header ported (new, unscoped work) —
+      `AppShell` still backs `PublicLayout`.
+- [x] Step 5 — Gate: `npm run test`, `npm run typecheck`, `npm run lint`, `npm run build` clean.
+- [x] Step 6 — Design fidelity check: `AppBar.vue` and `ExerciseView.vue` side-by-side against
+      `AppBar.dc.html` / `ExerciseView.dc.html` — found and fixed several px-level mismatches
+      (option-row padding, several border-radii, region-shape-aware rounding, the drawer's
+      theme-independent scrim color) before calling this done.
 - [ ] Step 7 — Manual browser smoke: sign in as a student, confirm every existing student route
       (home, path, lesson/node views) still renders correctly with the new `AppBar` at desktop
-      and mobile widths. This step exists to catch a regression in already-shipped student
-      flows, not just to validate the new component.
+      and mobile widths. Still needs a human pass — no way to drive a real browser against a
+      signed-in Clerk session from this environment.
+
+**Also found during implementation, resolved with Gilson before proceeding (Design Fidelity
+Requirement's "pause and ask"):** the canvas's `AppBar` has no sign-out control at all. Rather
+than silently drop the feature (breaking every signed-in user) or silently keep the old
+`SignOutLink` workaround (a fidelity violation), added the smallest possible addition — the
+avatar opens a one-item menu, "Sign out" only — not the account-menu sprawl this same PB-48
+session had already tried and explicitly rejected once.
+
+PR `motifpath-web#17` (open) covers Steps 1-6. **Phase 3a is functionally complete, pending
+merge and the manual smoke.**
 
 ### Phase 3b — Teacher exercise-authoring feature (motifpath-web)
 
