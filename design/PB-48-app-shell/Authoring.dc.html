@@ -1,0 +1,959 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    [data-theme="light"] {
+      --color-surface: #FBFAFF;
+      --color-surface-raised: #FFFFFF;
+      --color-surface-sunken: #F3F0FB;
+      --color-border: #E4DEF3;
+      --color-ink: #1A1633;
+      --color-ink-muted: #5B5470;
+      --color-ink-subtle: #9A94AE;
+      --color-accent: #6D28E0;
+      --color-accent-fg: #FFFFFF;
+      --color-accent-muted: #F0E9FF;
+      --color-accent-text: #6D28E0;
+      --color-success: #1E7A4C;
+      --color-success-fg: #FFFFFF;
+      --color-success-muted: #E2F3E9;
+      --color-danger: #C4362F;
+      --color-danger-muted: #FBE8E7;
+      --color-danger-ink: #7A231E;
+      --color-danger-border: #F0C6C4;
+      --fret-bg: #EFE9FA;
+      --fret-string: #B7AED4;
+      --fret-fret: #D8CFEE;
+      --fret-dot: #C9BEE6;
+    }
+    [data-theme="dark"] {
+      --color-surface: #0B0D2E;
+      --color-surface-raised: #161942;
+      --color-surface-sunken: #080927;
+      --color-border: #2C2E58;
+      --color-ink: #ECEAFF;
+      --color-ink-muted: #A7A2C8;
+      --color-ink-subtle: #6E698C;
+      --color-accent: #7C3CFF;
+      --color-accent-fg: #FFFFFF;
+      --color-accent-muted: #241C4D;
+      --color-accent-text: #B79BFF;
+      --color-success: #3FB985;
+      --color-success-fg: #04120B;
+      --color-success-muted: #12301F;
+      --color-danger: #FF7B7C;
+      --color-danger-muted: #3A1414;
+      --color-danger-ink: #FFB4B4;
+      --color-danger-border: #5A2323;
+      --fret-bg: #161233;
+      --fret-string: #4A4380;
+      --fret-fret: #322C5C;
+      --fret-dot: #5B5299;
+    }
+    :root {
+      --radius-sm: 0.25rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.875rem;
+      --radius-xl: 1.25rem;
+      --shadow-1: 0 1px 2px rgba(26,22,51,.06), 0 1px 1px rgba(26,22,51,.04);
+      --shadow-2: 0 4px 12px rgba(26,22,51,.10);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Manrope', system-ui, sans-serif; color: var(--color-ink); background: var(--color-surface); }
+    a { color: var(--color-accent-text); }
+    a:hover { color: var(--color-accent); }
+    button { font-family: inherit; cursor: pointer; }
+    input, textarea { font-family: inherit; }
+    input:focus, textarea:focus, button:focus { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+    ::placeholder { color: var(--color-ink-subtle); }
+    .scroll { overflow-y: auto; }
+    .scroll::-webkit-scrollbar { width: 10px; }
+    .scroll::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 9999px; }
+
+    /* Responsive: same component, mounted at any width — stacks the sidebar
+       below the form, drops the fixed 360px column, narrows padding, and
+       lets grids/tabs go single- or double-column instead of overflowing. */
+    @media (max-width: 760px) {
+      .ac-body { flex-direction: column !important; }
+      .ac-main { padding: 20px 16px 32px !important; }
+      .ac-title { font-size: 1.375rem !important; line-height: 1.75rem !important; }
+      .ac-sidebar { flex: 0 0 auto !important; width: 100% !important; border-left: none !important; border-top: 1px solid var(--color-border); padding: 24px 16px !important; }
+      .ac-type-tabs { flex-wrap: wrap; }
+      .ac-imgchoice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+      .ac-modal { width: min(94vw, 480px) !important; max-height: 82vh !important; }
+      .ac-modal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    }
+  </style>
+</helmet>
+
+<!--
+  PB-48: this component no longer owns a top bar — it mounts inside Main.dc.html
+  below the shared AppBar component, which supplies the brand mark, breadcrumb,
+  theme toggle, and the single "Save" action for every context (student or
+  teacher), not just this one. Everything below is otherwise the untouched
+  PB-40 exercise-authoring builder: full region editor (drag/resize, click to
+  place), all four exercise types, the image picker and student-preview
+  modals, skill tags, and the "used in challenges" reuse card.
+-->
+<div data-theme="{{theme}}" style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; background: var(--color-surface); transition: background .15s ease;">
+
+  <!-- Body -->
+  <div class="ac-body" style="flex: 1 1 auto; display: flex; min-height: 0;">
+
+    <!-- Main column -->
+    <div class="scroll ac-main" style="flex: 1 1 auto; min-width: 0; padding: 40px 48px 80px; display: flex; flex-direction: column; gap: 32px;">
+
+      <!-- Title -->
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <input value="{{title}}" onChange="{{onTitleChange}}" class="ac-title" style="border: none; background: transparent; font-size: 1.75rem; line-height: 2.125rem; font-weight: 700; color: var(--color-ink); padding: 0; width: 100%;" placeholder="Untitled exercise" />
+        <span style="font-size: 0.8125rem; color: var(--color-ink-subtle);">Internal title — for the content library, not shown to students</span>
+      </div>
+
+      <!-- Prompt -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <label style="font-size: 0.875rem; font-weight: 600;">Prompt shown to the student</label>
+          <span style="font-size: 0.75rem; color: var(--color-ink-subtle); font-style: italic;">Rich text toolbar — proposed, not yet built</span>
+        </div>
+        <div style="border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-raised); overflow: hidden;">
+          <div style="display: flex; align-items: center; gap: 2px; padding: 6px 8px; border-bottom: 1px solid var(--color-border); background: var(--color-surface-sunken);">
+            <button style="width: 28px; height: 28px; border: none; background: transparent; border-radius: var(--radius-sm); color: var(--color-ink-muted); font-weight: 700; font-size: 0.8125rem;">B</button>
+            <button style="width: 28px; height: 28px; border: none; background: transparent; border-radius: var(--radius-sm); color: var(--color-ink-muted); font-style: italic; font-size: 0.8125rem;">I</button>
+            <div style="width: 1px; height: 16px; background: var(--color-border); margin: 0 4px;"></div>
+            <button style="width: 28px; height: 28px; border: none; background: transparent; border-radius: var(--radius-sm); color: var(--color-ink-muted); display: flex; align-items: center; justify-content: center;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="6" r="1.4" fill="currentColor"/><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="5" cy="18" r="1.4" fill="currentColor"/><path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+            <div style="width: 1px; height: 16px; background: var(--color-border); margin: 0 4px;"></div>
+            <button style="width: 28px; height: 28px; border: none; background: transparent; border-radius: var(--radius-sm); color: var(--color-ink-muted); display: flex; align-items: center; justify-content: center;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="9.5" r="1.4" fill="currentColor"/><path d="M4 16l4.5-4 3.5 3 4-4.5 5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button style="width: 28px; height: 28px; border: none; background: transparent; border-radius: var(--radius-sm); color: var(--color-ink-muted); display: flex; align-items: center; justify-content: center;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="1" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18M3 16h18M9 4v16" stroke="currentColor" stroke-width="1.8"/></svg>
+            </button>
+          </div>
+          <textarea onChange="{{onPromptChange}}" rows="2" style="width: 100%; resize: vertical; border: none; padding: 12px 14px; font-size: 1rem; line-height: 1.5rem; color: var(--color-ink); background: transparent;">{{prompt}}</textarea>
+        </div>
+      </div>
+
+      <!-- Exercise type -->
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <label style="font-size: 0.875rem; font-weight: 600;">Exercise type</label>
+        <div class="ac-type-tabs" style="display: flex; gap: 8px; padding: 4px; background: var(--color-surface-sunken); border-radius: var(--radius-lg); width: fit-content;">
+          <button onClick="{{selectImage}}" style="display: flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: var(--radius-md); border: none; font-size: 0.875rem; font-weight: 600; background: {{imageTabBg}}; color: {{imageTabFg}};">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10" r="1.6" fill="currentColor"/><path d="M4 16l5-4 4 3 4-5 5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Image recognition
+          </button>
+          <button onClick="{{selectText}}" style="display: flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: var(--radius-md); border: none; font-size: 0.875rem; font-weight: 600; background: {{textTabBg}}; color: {{textTabFg}};">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Text response
+          </button>
+          <button onClick="{{selectAudio}}" style="display: flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: var(--radius-md); border: none; font-size: 0.875rem; font-weight: 600; background: {{audioTabBg}}; color: {{audioTabFg}};">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12v0M8 9v6M12 5v14M16 8v8M20 11v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Audio recognition
+          </button>
+          <button onClick="{{selectImageChoice}}" style="display: flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: var(--radius-md); border: none; font-size: 0.875rem; font-weight: 600; background: {{imageChoiceTabBg}}; color: {{imageChoiceTabFg}};">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13.5" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="2.5" y="15" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="2"/><path d="M16 20.5l2.2-2.8 1.6 2 2.2-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="13.5" y="15" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>
+            Image choice
+          </button>
+        </div>
+        <span style="font-size: 0.8125rem; color: var(--color-ink-subtle);">All types are checked the same way — mark one or more options correct below (ADR-019).</span>
+      </div>
+
+      <!-- Validation banner -->
+      <sc-if value="{{noCorrect}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--color-danger-muted); border: 1px solid var(--color-danger-border);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0;"><circle cx="12" cy="12" r="9" stroke="var(--color-danger)" stroke-width="2"/><path d="M12 8v5" stroke="var(--color-danger)" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="var(--color-danger)"/></svg>
+          <span style="font-size: 0.875rem; color: var(--color-danger-ink); font-weight: 600;">Mark at least one option correct — an exercise that can't be checked can't be practiced.</span>
+        </div>
+      </sc-if>
+
+      <!-- IMAGE RECOGNITION -->
+      <sc-if value="{{isImage}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <label style="font-size: 0.875rem; font-weight: 600;">Options — click the image to place an answer region</label>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <button onClick="{{openImageModal}}" style="display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 10px; border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-surface-raised);">
+              <div style="width: 44px; height: 32px; border-radius: var(--radius-sm); background: var(--fret-bg); border: 1px solid var(--fret-fret); flex-shrink: 0;"></div>
+              <div style="text-align: left;">
+                <div style="font-size: 0.8125rem; font-weight: 600; color: var(--color-ink);">{{canvasImageLabel}}</div>
+                <div style="font-size: 0.75rem; color: var(--color-ink-subtle);">Choose image</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="margin-left: 6px; flex-shrink: 0;"><path d="M9 6l6 6-6 6" stroke="var(--color-ink-subtle)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 0.8125rem; color: var(--color-ink-subtle);">New region:</span>
+              <div style="display: flex; gap: 4px; padding: 3px; background: var(--color-surface-sunken); border-radius: var(--radius-md);">
+                <button onClick="{{selectCircleShape}}" style="width: 30px; height: 26px; border-radius: var(--radius-sm); border: none; background: {{circleShapeBg}}; color: {{circleShapeFg}}; display: flex; align-items: center; justify-content: center;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/></svg>
+                </button>
+                <button onClick="{{selectRectangleShape}}" style="width: 30px; height: 26px; border-radius: var(--radius-sm); border: none; background: {{rectangleShapeBg}}; color: {{rectangleShapeFg}}; display: flex; align-items: center; justify-content: center;">
+                  <svg width="14" height="10" viewBox="0 0 28 20" fill="none"><rect x="1.5" y="1.5" width="25" height="17" rx="2" stroke="currentColor" stroke-width="2.2"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div onClick="{{onImageClick}}" style="position: relative; border-radius: var(--radius-lg); border: 1px solid var(--color-border); overflow: hidden; background: var(--color-surface-sunken); cursor: crosshair; box-shadow: var(--shadow-1);">
+            <sc-if value="{{isPredefinedSource}}" hint-placeholder-val="{{true}}">
+              <svg width="100%" height="240" viewBox="0 0 760 240" preserveAspectRatio="none" style="display: block;">
+                <rect width="760" height="240" fill="var(--fret-bg)"/>
+                <line x1="20" y1="30" x2="740" y2="30" stroke="var(--fret-string)" stroke-width="2"/>
+                <line x1="20" y1="70" x2="740" y2="70" stroke="var(--fret-string)" stroke-width="2"/>
+                <line x1="20" y1="110" x2="740" y2="110" stroke="var(--fret-string)" stroke-width="2"/>
+                <line x1="20" y1="150" x2="740" y2="150" stroke="var(--fret-string)" stroke-width="2"/>
+                <line x1="20" y1="190" x2="740" y2="190" stroke="var(--fret-string)" stroke-width="2"/>
+                <line x1="20" y1="210" x2="740" y2="210" stroke="var(--fret-string)" stroke-width="2"/>
+                <line x1="140" y1="20" x2="140" y2="220" stroke="var(--fret-fret)" stroke-width="3"/>
+                <line x1="260" y1="20" x2="260" y2="220" stroke="var(--fret-fret)" stroke-width="3"/>
+                <line x1="380" y1="20" x2="380" y2="220" stroke="var(--fret-fret)" stroke-width="3"/>
+                <line x1="500" y1="20" x2="500" y2="220" stroke="var(--fret-fret)" stroke-width="3"/>
+                <line x1="620" y1="20" x2="620" y2="220" stroke="var(--fret-fret)" stroke-width="3"/>
+                <line x1="740" y1="20" x2="740" y2="220" stroke="var(--fret-fret)" stroke-width="3"/>
+                <circle cx="200" cy="120" r="5" fill="var(--fret-dot)"/>
+                <circle cx="440" cy="120" r="5" fill="var(--fret-dot)"/>
+                <circle cx="560" cy="100" r="5" fill="var(--fret-dot)"/>
+                <circle cx="560" cy="140" r="5" fill="var(--fret-dot)"/>
+              </svg>
+            </sc-if>
+            <sc-if value="{{isCustomSource}}" hint-placeholder-val="{{false}}">
+              <div style="height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: repeating-linear-gradient(45deg, var(--fret-bg), var(--fret-bg) 10px, var(--color-surface-sunken) 10px, var(--color-surface-sunken) 20px);">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="var(--color-ink-subtle)" stroke-width="2"/><circle cx="9" cy="10" r="1.6" fill="var(--color-ink-subtle)"/><path d="M4 16l5-4 4 3 4-5 5 6" stroke="var(--color-ink-subtle)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span style="font-size: 0.8125rem; color: var(--color-ink-muted); background: var(--color-surface-raised); padding: 4px 10px; border-radius: var(--radius-sm);">your-image.png — click anywhere to place regions</span>
+              </div>
+            </sc-if>
+
+            <sc-for list="{{regions}}" as="r" hint-placeholder-count="3">
+              <div onMouseDown="{{r.startDrag}}" onClick="{{r.stopClick}}" style="position: absolute; left: {{r.leftPct}}; top: {{r.topPct}}; transform: translate(-50%, -50%); width: {{r.wPx}}; height: {{r.hPx}}; border-radius: {{r.radius}}; background: {{r.fillColor}}; border: 2px solid {{r.ringColor}}; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: {{r.textColor}}; box-shadow: var(--shadow-2); cursor: grab; user-select: none;">
+                {{r.index}}
+              </div>
+            </sc-for>
+
+            <div style="position: absolute; bottom: 10px; right: 12px; font-size: 0.75rem; color: var(--color-ink-muted); background: var(--color-surface-raised); padding: 3px 8px; border-radius: var(--radius-sm);">click to add · drag to reposition</div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <sc-for list="{{regions}}" as="r" hint-placeholder-count="3">
+              <div style="display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-raised);">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div style="width: {{r.badgeW}}; height: {{r.badgeH}}; border-radius: {{r.badgeRadius}}; background: {{r.fillColor}}; border: 2px solid {{r.ringColor}}; display: flex; align-items: center; justify-content: center; font-size: 0.625rem; font-weight: 700; color: {{r.textColor}}; flex-shrink: 0;">{{r.index}}</div>
+                  <span style="flex: 1 1 auto; font-size: 0.875rem; color: var(--color-ink-muted);">Region {{r.index}} · drag on the image to reposition</span>
+                  <button onClick="{{r.toggle}}" style="display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: var(--radius-sm); border: 1px solid {{r.checkBorder}}; background: {{r.checkBg}}; font-size: 0.8125rem; font-weight: 600; color: {{r.checkFg}};">
+                    <sc-if value="{{r.correct}}" hint-placeholder-val="{{false}}">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </sc-if>
+                    Correct answer
+                  </button>
+                  <button onClick="{{r.remove}}" style="width: 26px; height: 26px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--color-ink-subtle); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+                <sc-if value="{{r.isCircle}}" hint-placeholder-val="{{true}}">
+                  <div style="display: flex; align-items: center; gap: 8px; padding-left: 42px;">
+                    <span style="font-size: 0.75rem; color: var(--color-ink-subtle); width: 44px;">Size</span>
+                    <div style="display: flex; align-items: center; gap: 2px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); overflow: hidden;">
+                      <button onClick="{{r.shrink}}" style="width: 24px; height: 24px; border: none; background: var(--color-surface-sunken); color: var(--color-ink-muted); font-size: 0.9375rem; font-weight: 700;">−</button>
+                      <button onClick="{{r.grow}}" style="width: 24px; height: 24px; border: none; background: var(--color-surface-sunken); color: var(--color-ink-muted); font-size: 0.9375rem; font-weight: 700;">+</button>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{r.isRectangle}}" hint-placeholder-val="{{false}}">
+                  <div style="display: flex; align-items: center; gap: 16px; padding-left: 42px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 0.75rem; color: var(--color-ink-subtle); width: 44px;">Width</span>
+                      <div style="display: flex; align-items: center; gap: 2px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); overflow: hidden;">
+                        <button onClick="{{r.shrinkW}}" style="width: 24px; height: 24px; border: none; background: var(--color-surface-sunken); color: var(--color-ink-muted); font-size: 0.9375rem; font-weight: 700;">−</button>
+                        <button onClick="{{r.growW}}" style="width: 24px; height: 24px; border: none; background: var(--color-surface-sunken); color: var(--color-ink-muted); font-size: 0.9375rem; font-weight: 700;">+</button>
+                      </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 0.75rem; color: var(--color-ink-subtle);">Height</span>
+                      <div style="display: flex; align-items: center; gap: 2px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); overflow: hidden;">
+                        <button onClick="{{r.shrinkH}}" style="width: 24px; height: 24px; border: none; background: var(--color-surface-sunken); color: var(--color-ink-muted); font-size: 0.9375rem; font-weight: 700;">−</button>
+                        <button onClick="{{r.growH}}" style="width: 24px; height: 24px; border: none; background: var(--color-surface-sunken); color: var(--color-ink-muted); font-size: 0.9375rem; font-weight: 700;">+</button>
+                      </div>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- TEXT RESPONSE -->
+      <sc-if value="{{isText}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <label style="font-size: 0.875rem; font-weight: 600;">Options — the student picks from these choices</label>
+          <sc-for list="{{textOptions}}" as="o" hint-placeholder-count="3">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button onClick="{{o.toggle}}" style="width: 24px; height: 24px; border-radius: var(--radius-sm); border: 2px solid {{o.checkBorder}}; background: {{o.checkBg}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <sc-if value="{{o.correct}}" hint-placeholder-val="{{false}}">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="var(--color-success-fg)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </sc-if>
+              </button>
+              <input value="{{o.text}}" onChange="{{o.onEdit}}" placeholder="Option text" style="flex: 1 1 auto; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 10px 12px; font-size: 0.9375rem; background: var(--color-surface-raised); color: var(--color-ink);" />
+              <button onClick="{{o.remove}}" style="width: 30px; height: 30px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--color-ink-subtle); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </sc-for>
+          <button onClick="{{addTextOption}}" style="align-self: flex-start; display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-md); border: 1px dashed var(--color-border); background: transparent; font-size: 0.8125rem; font-weight: 600; color: var(--color-accent-text); margin-top: 4px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Add option
+          </button>
+        </div>
+      </sc-if>
+
+      <!-- AUDIO RECOGNITION -->
+      <sc-if value="{{isAudio}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 18px;">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <label style="font-size: 0.875rem; font-weight: 600;">Audio stimulus — what the student listens to</label>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface-raised);">
+              <div style="width: 40px; height: 40px; border-radius: 9999px; background: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--color-accent-fg)"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              <div style="flex: 1 1 auto; display: flex; align-items: flex-end; gap: 2px; height: 32px;">
+                <div style="width: 3px; height: 40%; background: var(--color-border); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 70%; background: var(--color-border); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 30%; background: var(--color-border); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 90%; background: var(--color-accent); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 60%; background: var(--color-accent); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 45%; background: var(--color-border); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 80%; background: var(--color-border); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 25%; background: var(--color-border); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 65%; background: var(--color-accent); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 50%; background: var(--color-border); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 35%; background: var(--color-border); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 75%; background: var(--color-border); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 55%; background: var(--color-border); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 20%; background: var(--color-border); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 85%; background: var(--color-border); border-radius: 2px;"></div>
+                <div style="width: 3px; height: 40%; background: var(--color-border); border-radius: 2px;"></div>
+              </div>
+              <span style="font-size: 0.8125rem; color: var(--color-ink-subtle); flex-shrink: 0;">0:07</span>
+              <button style="padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid var(--color-border); background: transparent; font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-muted); flex-shrink: 0;">Replace</button>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <label style="font-size: 0.875rem; font-weight: 600;">Options — what the student picks after listening</label>
+            <sc-for list="{{audioOptions}}" as="o" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <button onClick="{{o.toggle}}" style="width: 24px; height: 24px; border-radius: var(--radius-sm); border: 2px solid {{o.checkBorder}}; background: {{o.checkBg}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <sc-if value="{{o.correct}}" hint-placeholder-val="{{false}}">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="var(--color-success-fg)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </sc-if>
+                </button>
+                <input value="{{o.text}}" onChange="{{o.onEdit}}" placeholder="Option text" style="flex: 1 1 auto; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 10px 12px; font-size: 0.9375rem; background: var(--color-surface-raised); color: var(--color-ink);" />
+                <button onClick="{{o.remove}}" style="width: 30px; height: 30px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--color-ink-subtle); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+            </sc-for>
+            <button onClick="{{addAudioOption}}" style="align-self: flex-start; display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-md); border: 1px dashed var(--color-border); background: transparent; font-size: 0.8125rem; font-weight: 600; color: var(--color-accent-text); margin-top: 4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Add option
+            </button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- IMAGE CHOICE -->
+      <sc-if value="{{isImageChoice}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <label style="font-size: 0.875rem; font-weight: 600;">Options — the student picks the correct image</label>
+          <div class="ac-imgchoice-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">
+            <sc-for list="{{imageOptions}}" as="o" hint-placeholder-count="3">
+              <div style="display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: var(--radius-md); border: 1px solid {{o.checkBorder}}; background: var(--color-surface-raised);">
+                <div style="position: relative; height: 84px; border-radius: var(--radius-sm); overflow: hidden;">
+                  <button onClick="{{o.pick}}" style="position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 0; border: 1px solid var(--fret-fret); border-radius: var(--radius-sm); background: var(--fret-bg);">
+                    <span style="width: 100%; padding: 4px 6px; font-size: 0.6875rem; color: var(--color-ink-muted); background: var(--color-surface-raised); text-align: left;">{{o.imageLabel}}</span>
+                  </button>
+                  <button onClick="{{o.remove}}" style="position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: var(--radius-sm); border: none; background: var(--color-surface-raised); color: var(--color-ink-subtle); display: flex; align-items: center; justify-content: center;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+                <input value="{{o.text}}" onChange="{{o.onEdit}}" placeholder="Caption (authoring only)" style="border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 6px 8px; font-size: 0.8125rem; background: var(--color-surface); color: var(--color-ink);" />
+                <button onClick="{{o.toggle}}" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 5px 10px; border-radius: var(--radius-sm); border: 1px solid {{o.checkBorder}}; background: {{o.checkBg}}; font-size: 0.75rem; font-weight: 600; color: {{o.checkFg}};">
+                  <sc-if value="{{o.correct}}" hint-placeholder-val="{{false}}">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </sc-if>
+                  Correct answer
+                </button>
+              </div>
+            </sc-for>
+            <button onClick="{{addImageOption}}" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: var(--radius-md); border: 1px dashed var(--color-border); background: transparent; color: var(--color-accent-text); min-height: 150px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <span style="font-size: 0.8125rem; font-weight: 600;">Add image option</span>
+            </button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- Skill tags -->
+      <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 8px; border-top: 1px solid var(--color-border);">
+        <label style="font-size: 0.875rem; font-weight: 600;">Skill tags</label>
+        <span style="font-size: 0.8125rem; color: var(--color-ink-subtle); margin-top: -4px;">Makes this exercise findable outside its original path — e.g. as a remediation suggestion (ADR-019 · PB-8g).</span>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-raised);">
+          <sc-for list="{{tags}}" as="t" hint-placeholder-count="2">
+            <div style="display: flex; align-items: center; gap: 6px; padding: 5px 6px 5px 12px; border-radius: 9999px; background: var(--color-accent-muted); color: var(--color-accent-text); font-size: 0.8125rem; font-weight: 600;">
+              {{t.label}}
+              <button onClick="{{t.remove}}" style="width: 18px; height: 18px; border-radius: 9999px; border: none; background: transparent; color: var(--color-accent-text); display: flex; align-items: center; justify-content: center;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </sc-for>
+          <input value="{{tagInput}}" onChange="{{onTagInputChange}}" onKeyDown="{{onTagInputKeyDown}}" placeholder="Type a skill and press Enter" style="flex: 1 1 140px; min-width: 140px; border: none; background: transparent; font-size: 0.875rem; padding: 6px 4px; color: var(--color-ink);" />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right sidebar -->
+    <div class="scroll ac-sidebar" style="flex: 0 0 360px; border-left: 1px solid var(--color-border); background: var(--color-surface-raised); padding: 32px 28px; display: flex; flex-direction: column; gap: 24px;">
+
+      <!-- Reuse card -->
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-ink-muted);">Used in challenges</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-sunken);">
+            <div style="width: 8px; height: 8px; border-radius: 9999px; background: var(--color-accent); flex-shrink: 0;"></div>
+            <div style="min-width: 0;">
+              <div style="font-size: 0.8125rem; font-weight: 600; color: var(--color-ink);">Technical Improvements</div>
+              <div style="font-size: 0.75rem; color: var(--color-ink-subtle);">Challenge · Picking accuracy</div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-sunken);">
+            <div style="width: 8px; height: 8px; border-radius: 9999px; background: var(--color-accent); flex-shrink: 0;"></div>
+            <div style="min-width: 0;">
+              <div style="font-size: 0.8125rem; font-weight: 600; color: var(--color-ink);">Beginner Guitar — Fretting Hand</div>
+              <div style="font-size: 0.75rem; color: var(--color-ink-subtle);">Challenge · Remediation suggestion</div>
+            </div>
+          </div>
+        </div>
+        <button style="align-self: flex-start; display: flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: var(--radius-md); border: 1px dashed var(--color-border); background: transparent; font-size: 0.8125rem; font-weight: 600; color: var(--color-accent-text);">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Attach to a challenge
+        </button>
+      </div>
+
+      <div style="height: 1px; background: var(--color-border);"></div>
+
+      <!-- Preview trigger -->
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-ink-muted);">Student preview</span>
+        <button onClick="{{openPreviewModal}}" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px; border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-surface-raised); font-size: 0.8125rem; font-weight: 600; color: var(--color-ink);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+          Preview as student
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{previewModalOpen}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closePreviewModal}}" style="position: absolute; inset: 0; background: rgba(10,8,30,.45); display: flex; align-items: center; justify-content: center; z-index: 20;">
+      <div onClick="{{stopModalClick}}" class="ac-modal" style="width: 640px; max-height: 720px; background: var(--color-surface-raised); border-radius: var(--radius-xl); box-shadow: var(--shadow-2); display: flex; flex-direction: column; overflow: hidden;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--color-border);">
+          <span style="font-size: 1rem; font-weight: 700; color: var(--color-ink);">Student preview</span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="display: flex; gap: 4px; padding: 3px; background: var(--color-surface-sunken); border-radius: var(--radius-md);">
+              <button onClick="{{selectPortrait}}" style="padding: 4px 9px; border-radius: var(--radius-sm); border: none; font-size: 0.6875rem; font-weight: 600; background: {{portraitBg}}; color: {{portraitFg}};">Portrait</button>
+              <button onClick="{{selectLandscape}}" style="padding: 4px 9px; border-radius: var(--radius-sm); border: none; font-size: 0.6875rem; font-weight: 600; background: {{landscapeBg}}; color: {{landscapeFg}};">Landscape</button>
+            </div>
+            <button onClick="{{closePreviewModal}}" style="width: 30px; height: 30px; border-radius: var(--radius-sm); border: none; background: var(--color-surface-sunken); color: var(--color-ink-muted); display: flex; align-items: center; justify-content: center;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="scroll" style="padding: 20px; overflow-y: auto;">
+          <span style="font-size: 0.75rem; color: var(--color-ink-subtle);">S7 is responsive — portrait stacks, landscape puts the prompt beside the answer (ADR-015). This is the exact same component the student's Practice screen mounts — not a redrawn copy — so what you see here is what they see, ungraded (it never receives which option is marked correct).</span>
+          <div style="margin-top: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-xl); background: var(--color-surface); padding: 18px; height: 260px;">
+            <dc-import name="ExerciseView"
+              dark="{{isDark}}"
+              exercise-type="{{exerciseType}}"
+              prompt="{{prompt}}"
+              direction="{{previewDirection}}"
+              regions="{{previewRegions}}"
+              text-options="{{previewTextOptions}}"
+              audio-options="{{previewAudioOptions}}"
+              image-options="{{previewImageOptions}}"
+              hint-size="580,260">
+            </dc-import>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{imageModalOpen}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closeImageModal}}" style="position: absolute; inset: 0; background: rgba(10,8,30,.45); display: flex; align-items: center; justify-content: center; z-index: 20;">
+      <div onClick="{{stopModalClick}}" class="ac-modal" style="width: 620px; max-height: 640px; background: var(--color-surface-raised); border-radius: var(--radius-xl); box-shadow: var(--shadow-2); display: flex; flex-direction: column; overflow: hidden;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--color-border);">
+          <span style="font-size: 1rem; font-weight: 700; color: var(--color-ink);">Choose an image</span>
+          <button onClick="{{closeImageModal}}" style="width: 30px; height: 30px; border-radius: var(--radius-sm); border: none; background: var(--color-surface-sunken); color: var(--color-ink-muted); display: flex; align-items: center; justify-content: center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div style="padding: 16px 20px 0;">
+          <div style="display: flex; gap: 6px; padding: 3px; background: var(--color-surface-sunken); border-radius: var(--radius-md); width: fit-content;">
+            <button onClick="{{selectModalPredefinedTab}}" style="padding: 6px 14px; border-radius: var(--radius-sm); border: none; font-size: 0.8125rem; font-weight: 600; background: {{modalPredefinedTabBg}}; color: {{modalPredefinedTabFg}};">Predefined</button>
+            <button onClick="{{selectModalCustomTab}}" style="padding: 6px 14px; border-radius: var(--radius-sm); border: none; font-size: 0.8125rem; font-weight: 600; background: {{modalCustomTabBg}}; color: {{modalCustomTabFg}};">Upload custom</button>
+          </div>
+        </div>
+        <sc-if value="{{isModalPredefinedTab}}" hint-placeholder-val="{{true}}">
+          <div class="scroll ac-modal-grid" style="padding: 20px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; overflow-y: auto;">
+            <sc-for list="{{predefinedImages}}" as="img" hint-placeholder-count="6">
+              <button onClick="{{img.select}}" style="display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: var(--radius-md); border: 2px solid {{img.ring}}; background: var(--color-surface); cursor: pointer;">
+                <div style="width: 100%; height: 70px; border-radius: var(--radius-sm); background: var(--fret-bg); border: 1px solid var(--fret-fret);"></div>
+                <span style="font-size: 0.8125rem; font-weight: 600; color: var(--color-ink); text-align: left;">{{img.label}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{isModalCustomTab}}" hint-placeholder-val="{{false}}">
+          <div style="padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+            <div style="width: 100%; height: 160px; border-radius: var(--radius-md); border: 1px dashed var(--color-border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: var(--color-surface-sunken);">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="var(--color-ink-subtle)" stroke-width="2"/><circle cx="9" cy="10" r="1.6" fill="var(--color-ink-subtle)"/><path d="M4 16l5-4 4 3 4-5 5 6" stroke="var(--color-ink-subtle)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-size: 0.8125rem; color: var(--color-ink-muted);">Drag an image here, or browse your files</span>
+            </div>
+            <button onClick="{{applyCustomPick}}" style="align-self: flex-end; padding: 9px 16px; border-radius: var(--radius-md); border: none; background: var(--color-accent); color: var(--color-accent-fg); font-size: 0.8125rem; font-weight: 600;">Use this image</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+
+<script data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: 'Alternate picking — descending run',
+      prompt: 'Tap the fret where this descending alternate-picking pattern begins.',
+      exerciseType: 'image_recognition',
+      tags: ['alternate_picking', 'technique'],
+      tagInput: '',
+      imageSource: 'predefined',
+      predefinedImageId: 'fretboard-full',
+      imageModalOpen: false,
+      imageModalTarget: { kind: 'canvas' },
+      imageModalTab: 'predefined',
+      previewModalOpen: false,
+      newRegionShape: 'circle',
+      previewOrientation: 'portrait',
+      regions: [
+        { id: 1, x: 18, y: 55, correct: true, shape: 'circle', w: 30, h: 30 },
+        { id: 2, x: 50, y: 30, correct: false, shape: 'circle', w: 30, h: 30 },
+        { id: 3, x: 74, y: 68, correct: false, shape: 'rectangle', w: 70, h: 38 }
+      ],
+      nextRegionId: 4,
+      textOptions: [
+        { id: 1, text: 'G major', correct: true },
+        { id: 2, text: 'E minor', correct: false },
+        { id: 3, text: 'C major', correct: false }
+      ],
+      audioOptions: [
+        { id: 1, text: 'Major third', correct: true },
+        { id: 2, text: 'Perfect fourth', correct: false },
+        { id: 3, text: 'Minor third', correct: false }
+      ],
+      imageOptions: [
+        { id: 1, text: 'Open position', correct: true, imageId: 'chord-blank', isCustom: false },
+        { id: 2, text: 'Barre chord', correct: false, imageId: 'chord-labeled', isCustom: false },
+        { id: 3, text: 'Partial voicing', correct: false, imageId: null, isCustom: false }
+      ]
+    };
+  }
+
+  setNewRegionShape(shape) {
+    this.setState({ newRegionShape: shape });
+  }
+  setPredefinedImage(id) {
+    this.setState({ predefinedImageId: id, imageSource: 'predefined' });
+  }
+  setPreviewOrientation(o) {
+    this.setState({ previewOrientation: o });
+  }
+  openImageModal(target) {
+    this.setState({ imageModalOpen: true, imageModalTarget: target, imageModalTab: 'predefined' });
+  }
+  closeImageModal() {
+    this.setState({ imageModalOpen: false });
+  }
+  setImageModalTab(tab) {
+    this.setState({ imageModalTab: tab });
+  }
+  applyPredefinedPick(imageId) {
+    var target = this.state.imageModalTarget;
+    if (target.kind === 'option') {
+      this.setState({
+        imageOptions: this.state.imageOptions.map(function (o) {
+          return o.id === target.id ? Object.assign({}, o, { imageId: imageId, isCustom: false }) : o;
+        }),
+        imageModalOpen: false
+      });
+      return;
+    }
+    this.setState({ predefinedImageId: imageId, imageSource: 'predefined', imageModalOpen: false });
+  }
+  applyCustomPick() {
+    var target = this.state.imageModalTarget;
+    if (target.kind === 'option') {
+      this.setState({
+        imageOptions: this.state.imageOptions.map(function (o) {
+          return o.id === target.id ? Object.assign({}, o, { imageId: null, isCustom: true }) : o;
+        }),
+        imageModalOpen: false
+      });
+      return;
+    }
+    this.setState({ imageSource: 'custom', imageModalOpen: false });
+  }
+  openPreviewModal() {
+    this.setState({ previewModalOpen: true });
+  }
+  closePreviewModal() {
+    this.setState({ previewModalOpen: false });
+  }
+  toggleRegion(id) {
+    this.setState({ regions: this.state.regions.map(function (r) { return r.id === id ? Object.assign({}, r, { correct: !r.correct }) : r; }) });
+  }
+  removeRegion(id) {
+    this.setState({ regions: this.state.regions.filter(function (r) { return r.id !== id; }) });
+  }
+  resizeRegion(id, dim, delta) {
+    this.setState({
+      regions: this.state.regions.map(function (r) {
+        if (r.id !== id) return r;
+        if (r.shape === 'circle') {
+          var s = Math.max(18, Math.min(160, r.w + delta));
+          return Object.assign({}, r, { w: s, h: s });
+        }
+        if (dim === 'w') {
+          return Object.assign({}, r, { w: Math.max(18, Math.min(160, r.w + delta)) });
+        }
+        return Object.assign({}, r, { h: Math.max(16, Math.min(110, r.h + delta)) });
+      })
+    });
+  }
+  startRegionDrag(id, e) {
+    e.stopPropagation();
+    e.preventDefault();
+    var self = this;
+    // Cache the container's rect once at drag start rather than holding a live DOM
+    // reference for the whole drag — this component may re-render (replace nodes)
+    // on every setState below, which would leave a held node reference detached.
+    var rect = e.currentTarget.parentElement.getBoundingClientRect();
+    function onMove(ev) {
+      var x = Math.max(0, Math.min(100, ((ev.clientX - rect.left) / rect.width) * 100));
+      var y = Math.max(0, Math.min(100, ((ev.clientY - rect.top) / rect.height) * 100));
+      self.setState({
+        regions: self.state.regions.map(function (r) { return r.id === id ? Object.assign({}, r, { x: x, y: y }) : r; })
+      });
+    }
+    function onUp() {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }
+  addRegion(e) {
+    var rect = e.currentTarget.getBoundingClientRect();
+    var x = ((e.clientX - rect.left) / rect.width) * 100;
+    var y = ((e.clientY - rect.top) / rect.height) * 100;
+    var id = this.state.nextRegionId;
+    var shape = this.state.newRegionShape;
+    var size = shape === 'circle' ? { w: 30, h: 30 } : { w: 70, h: 38 };
+    this.setState({
+      regions: this.state.regions.concat([{ id: id, x: x, y: y, correct: false, shape: shape, w: size.w, h: size.h }]),
+      nextRegionId: id + 1
+    });
+  }
+  toggleOption(listName, id) {
+    var upd = {};
+    upd[listName] = this.state[listName].map(function (o) { return o.id === id ? Object.assign({}, o, { correct: !o.correct }) : o; });
+    this.setState(upd);
+  }
+  removeOption(listName, id) {
+    var upd = {};
+    upd[listName] = this.state[listName].filter(function (o) { return o.id !== id; });
+    this.setState(upd);
+  }
+  editOptionText(listName, id, text) {
+    var upd = {};
+    upd[listName] = this.state[listName].map(function (o) { return o.id === id ? Object.assign({}, o, { text: text }) : o; });
+    this.setState(upd);
+  }
+  addOption(listName) {
+    var list = this.state[listName];
+    var maxId = 0;
+    for (var i = 0; i < list.length; i++) { if (list[i].id > maxId) maxId = list[i].id; }
+    var upd = {};
+    upd[listName] = list.concat([{ id: maxId + 1, text: '', correct: false }]);
+    this.setState(upd);
+  }
+  removeTag(tag) {
+    this.setState({ tags: this.state.tags.filter(function (t) { return t !== tag; }) });
+  }
+
+  renderVals() {
+    var self = this;
+    var type = this.state.exerciseType;
+    var isImage = type === 'image_recognition';
+    var isText = type === 'text_response';
+    var isAudio = type === 'audio_recognition';
+    var isImageChoice = type === 'image_choice';
+
+    var accent = 'var(--color-accent)';
+    var accentMuted = 'var(--color-accent-muted)';
+    var accentText = 'var(--color-accent-text)';
+    var accentFg = 'var(--color-accent-fg)';
+    var success = 'var(--color-success)';
+    var successMuted = 'var(--color-success-muted)';
+    var border = 'var(--color-border)';
+    var raised = 'var(--color-surface-raised)';
+    var inkMuted = 'var(--color-ink-muted)';
+
+    var regions = this.state.regions.map(function (r, i) {
+      var radius = r.shape === 'circle' ? '9999px' : 'var(--radius-sm)';
+      return Object.assign({}, r, {
+        index: i + 1,
+        leftPct: r.x + '%',
+        topPct: r.y + '%',
+        wPx: r.w + 'px',
+        hPx: r.h + 'px',
+        previewWPx: Math.max(12, Math.round(r.w * 0.5)) + 'px',
+        previewHPx: Math.max(12, Math.round(r.h * 0.5)) + 'px',
+        radius: radius,
+        badgeW: (r.shape === 'circle' ? 24 : 30) + 'px',
+        badgeH: (r.shape === 'circle' ? 24 : 18) + 'px',
+        badgeRadius: radius,
+        ringColor: r.correct ? success : accent,
+        fillColor: r.correct ? successMuted : accentMuted,
+        textColor: r.correct ? success : accentText,
+        checkBorder: r.correct ? success : border,
+        checkBg: r.correct ? successMuted : raised,
+        checkFg: r.correct ? success : inkMuted,
+        isCircle: r.shape === 'circle',
+        isRectangle: r.shape !== 'circle',
+        toggle: function () { self.toggleRegion(r.id); },
+        remove: function (e) { e.stopPropagation(); self.removeRegion(r.id); },
+        grow: function (e) { e.stopPropagation(); self.resizeRegion(r.id, 'w', 8); },
+        shrink: function (e) { e.stopPropagation(); self.resizeRegion(r.id, 'w', -8); },
+        growW: function (e) { e.stopPropagation(); self.resizeRegion(r.id, 'w', 8); },
+        shrinkW: function (e) { e.stopPropagation(); self.resizeRegion(r.id, 'w', -8); },
+        growH: function (e) { e.stopPropagation(); self.resizeRegion(r.id, 'h', 8); },
+        shrinkH: function (e) { e.stopPropagation(); self.resizeRegion(r.id, 'h', -8); },
+        startDrag: function (e) { self.startRegionDrag(r.id, e); },
+        stopClick: function (e) { e.stopPropagation(); }
+      });
+    });
+
+    function decorateOption(o) {
+      return Object.assign({}, o, {
+        checkBorder: o.correct ? success : border,
+        checkBg: o.correct ? success : raised,
+        previewBorder: o.correct ? success : border,
+        previewBg: o.correct ? successMuted : raised,
+        previewDot: o.correct ? success : border
+      });
+    }
+
+    var textOptions = this.state.textOptions.map(function (o) {
+      var d = decorateOption(o);
+      d.toggle = function () { self.toggleOption('textOptions', o.id); };
+      d.remove = function () { self.removeOption('textOptions', o.id); };
+      d.onEdit = function (e) { self.editOptionText('textOptions', o.id, e.target.value); };
+      return d;
+    });
+
+    var audioOptions = this.state.audioOptions.map(function (o) {
+      var d = decorateOption(o);
+      d.toggle = function () { self.toggleOption('audioOptions', o.id); };
+      d.remove = function () { self.removeOption('audioOptions', o.id); };
+      d.onEdit = function (e) { self.editOptionText('audioOptions', o.id, e.target.value); };
+      return d;
+    });
+
+    var predefinedCatalog = [
+      { id: 'fretboard-full', label: 'Full neck' },
+      { id: 'fretboard-five', label: 'First 5 frets' },
+      { id: 'fretboard-three', label: 'First 3 frets' },
+      { id: 'chord-blank', label: 'Chord diagram (blank)' },
+      { id: 'chord-labeled', label: 'Chord diagram (labeled)' },
+      { id: 'scale-diagram', label: 'Scale diagram' }
+    ];
+
+    var imageOptions = this.state.imageOptions.map(function (o) {
+      var d = decorateOption(o);
+      d.toggle = function () { self.toggleOption('imageOptions', o.id); };
+      d.remove = function () { self.removeOption('imageOptions', o.id); };
+      d.onEdit = function (e) { self.editOptionText('imageOptions', o.id, e.target.value); };
+      d.pick = function () { self.openImageModal({ kind: 'option', id: o.id }); };
+      if (o.isCustom) {
+        d.imageLabel = 'Custom image';
+      } else if (o.imageId) {
+        var matched = predefinedCatalog.filter(function (c) { return c.id === o.imageId; })[0];
+        d.imageLabel = matched ? matched.label : 'Choose an image';
+      } else {
+        d.imageLabel = 'Choose an image';
+      }
+      return d;
+    });
+
+    var tags = this.state.tags.map(function (t) {
+      return { label: t, remove: function () { self.removeTag(t); } };
+    });
+
+    var hasCorrect = false;
+    if (isImage) hasCorrect = this.state.regions.some(function (r) { return r.correct; });
+    if (isText) hasCorrect = this.state.textOptions.some(function (o) { return o.correct; });
+    if (isAudio) hasCorrect = this.state.audioOptions.some(function (o) { return o.correct; });
+    if (isImageChoice) hasCorrect = this.state.imageOptions.some(function (o) { return o.correct; });
+
+    var isDark = !!this.props.dark;
+    var isPredefinedSource = this.state.imageSource === 'predefined';
+    var isCircleShape = this.state.newRegionShape === 'circle';
+    var isLandscape = this.state.previewOrientation === 'landscape';
+
+    var modalTarget = this.state.imageModalTarget;
+    var currentPickedImageId = null;
+    if (modalTarget.kind === 'canvas') {
+      currentPickedImageId = this.state.predefinedImageId;
+    } else if (modalTarget.kind === 'option') {
+      var targetOption = this.state.imageOptions.filter(function (o) { return o.id === modalTarget.id; })[0];
+      currentPickedImageId = targetOption ? targetOption.imageId : null;
+    }
+
+    var previewRegions = regions.map(function (r) {
+      return { leftPct: r.leftPct, topPct: r.topPct, wPx: r.previewWPx, hPx: r.previewHPx, radius: r.radius };
+    });
+    var previewTextOptions = this.state.textOptions.map(function (o) { return { text: o.text }; });
+    var previewAudioOptions = this.state.audioOptions.map(function (o) { return { text: o.text }; });
+    var previewImageOptions = this.state.imageOptions.map(function (o) { return { text: o.text }; });
+
+    return {
+      theme: isDark ? 'dark' : 'light',
+      isDark: isDark,
+      exerciseType: type,
+      previewRegions: previewRegions,
+      previewTextOptions: previewTextOptions,
+      previewAudioOptions: previewAudioOptions,
+      previewImageOptions: previewImageOptions,
+
+      isPredefinedSource: isPredefinedSource,
+      isCustomSource: !isPredefinedSource,
+
+      circleShapeBg: isCircleShape ? accent : 'transparent',
+      circleShapeFg: isCircleShape ? accentFg : inkMuted,
+      rectangleShapeBg: !isCircleShape ? accent : 'transparent',
+      rectangleShapeFg: !isCircleShape ? accentFg : inkMuted,
+      selectCircleShape: function () { self.setNewRegionShape('circle'); },
+      selectRectangleShape: function () { self.setNewRegionShape('rectangle'); },
+
+      canvasImageLabel: isPredefinedSource
+        ? (predefinedCatalog.filter(function (c) { return c.id === self.state.predefinedImageId; }).map(function (c) { return c.label; })[0] || 'Choose an image')
+        : 'Custom image',
+      predefinedImages: predefinedCatalog.map(function (c) {
+        return {
+          id: c.id,
+          label: c.label,
+          ring: currentPickedImageId === c.id ? accent : border,
+          select: function () { self.applyPredefinedPick(c.id); }
+        };
+      }),
+      imageModalOpen: this.state.imageModalOpen,
+      openImageModal: function () { self.openImageModal({ kind: 'canvas' }); },
+      closeImageModal: function () { self.closeImageModal(); },
+      stopModalClick: function (e) { e.stopPropagation(); },
+      applyCustomPick: function () { self.applyCustomPick(); },
+
+      isModalPredefinedTab: this.state.imageModalTab === 'predefined',
+      isModalCustomTab: this.state.imageModalTab === 'custom',
+      selectModalPredefinedTab: function () { self.setImageModalTab('predefined'); },
+      selectModalCustomTab: function () { self.setImageModalTab('custom'); },
+      modalPredefinedTabBg: this.state.imageModalTab === 'predefined' ? accent : 'transparent',
+      modalPredefinedTabFg: this.state.imageModalTab === 'predefined' ? accentFg : inkMuted,
+      modalCustomTabBg: this.state.imageModalTab === 'custom' ? accent : 'transparent',
+      modalCustomTabFg: this.state.imageModalTab === 'custom' ? accentFg : inkMuted,
+
+      previewModalOpen: this.state.previewModalOpen,
+      openPreviewModal: function () { self.openPreviewModal(); },
+      closePreviewModal: function () { self.closePreviewModal(); },
+
+      portraitBg: !isLandscape ? accent : 'transparent',
+      portraitFg: !isLandscape ? accentFg : inkMuted,
+      landscapeBg: isLandscape ? accent : 'transparent',
+      landscapeFg: isLandscape ? accentFg : inkMuted,
+      selectPortrait: function () { self.setPreviewOrientation('portrait'); },
+      selectLandscape: function () { self.setPreviewOrientation('landscape'); },
+      previewDirection: isLandscape ? 'row' : 'column',
+
+      title: this.state.title,
+      onTitleChange: function (e) { self.setState({ title: e.target.value }); },
+      prompt: this.state.prompt,
+      onPromptChange: function (e) { self.setState({ prompt: e.target.value }); },
+
+      isImage: isImage,
+      isText: isText,
+      isAudio: isAudio,
+      isImageChoice: isImageChoice,
+
+      selectImage: function () { self.setState({ exerciseType: 'image_recognition' }); },
+      selectText: function () { self.setState({ exerciseType: 'text_response' }); },
+      selectAudio: function () { self.setState({ exerciseType: 'audio_recognition' }); },
+      selectImageChoice: function () { self.setState({ exerciseType: 'image_choice' }); },
+
+      imageTabBg: isImage ? accent : 'transparent',
+      imageTabFg: isImage ? accentFg : inkMuted,
+      textTabBg: isText ? accent : 'transparent',
+      textTabFg: isText ? accentFg : inkMuted,
+      audioTabBg: isAudio ? accent : 'transparent',
+      audioTabFg: isAudio ? accentFg : inkMuted,
+      imageChoiceTabBg: isImageChoice ? accent : 'transparent',
+      imageChoiceTabFg: isImageChoice ? accentFg : inkMuted,
+
+      noCorrect: !hasCorrect,
+
+      regions: regions,
+      onImageClick: function (e) { self.addRegion(e); },
+
+      textOptions: textOptions,
+      audioOptions: audioOptions,
+      imageOptions: imageOptions,
+      addTextOption: function () { self.addOption('textOptions'); },
+      addAudioOption: function () { self.addOption('audioOptions'); },
+      addImageOption: function () { self.addOption('imageOptions'); },
+
+      tags: tags,
+      tagInput: this.state.tagInput,
+      onTagInputChange: function (e) { self.setState({ tagInput: e.target.value }); },
+      onTagInputKeyDown: function (e) {
+        if (e.key === 'Enter' && self.state.tagInput.trim()) {
+          e.preventDefault();
+          self.setState({ tags: self.state.tags.concat([self.state.tagInput.trim()]), tagInput: '' });
+        }
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

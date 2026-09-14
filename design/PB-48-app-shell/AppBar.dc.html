@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: 'Manrope', system-ui, sans-serif; }
+    a { color: inherit; text-decoration: none; } a:hover { opacity: .85; }
+    button { font-family: inherit; cursor: pointer; }
+  </style>
+</helmet>
+
+<!--
+  Shared shell bar (PB-48). One component, two contexts (context="student" /
+  "teacher") and two widths (compact="{{true}}" for mobile). Everything lives
+  in a single top bar on both — mobile matches desktop's layout, just with
+  the inline nav swapped for a hamburger + nav-only drawer (no bottom bar).
+  The theme toggle is one button, one place, on both widths — no duplicate
+  copy in the drawer anymore, but it's still a plain visible icon, not
+  tucked behind another menu.
+-->
+<div style="width:100%; height:64px; box-sizing:border-box; background:{{t.surfaceRaised}}; box-shadow:{{t.shadow1}}; display:flex; align-items:center; gap:16px; padding:0 24px; position:relative;">
+
+  <sc-if value="{{compact}}" hint-placeholder-val="{{false}}">
+    <button onClick="{{toggleDrawer}}" style="width:40px; height:40px; margin-left:-8px; border-radius:10px; border:none; background:transparent; display:flex; align-items:center; justify-content:center; color:{{t.ink}};">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </button>
+  </sc-if>
+
+  <div style="display:flex; align-items:center; gap:10px;">
+    <div style="width:30px; height:30px; border-radius:8px; background:{{t.accentMuted}}; display:flex; align-items:center; justify-content:center;">
+      <svg width="16" height="16" viewBox="200 100 860 860" role="img" aria-hidden="true">
+        <defs><linearGradient id="rBar" x1="309" y1="190" x2="938" y2="890" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#a14cff"/><stop offset=".27" stop-color="#8134ff"/><stop offset=".62" stop-color="#6421fa"/><stop offset="1" stop-color="#4714df"/></linearGradient></defs>
+        <path d="M346 203C314 203 290 218 279 243c-4 9-6 19-6 30v526c0 41 32 74 73 74h85c40 0 80-11 108-33 20-16 19-38 8-57-8-16-23-32-41-49l-53-50c-32-31-47-58-40-84 8-30 38-58 81-82l46-27c36-21 49-45 41-71-3-13-10-23-21-34L397 225c-14-14-32-22-51-22Z" fill="url(#rBar)"/>
+        <path d="M689 873c38-24 49-54 35-85-13-30-42-55-83-80l-71-44c-50-31-77-58-73-86 4-29 29-55 69-84 34-24 63-50 89-77l191-193c18-18 41-25 64-25 42 0 76 33 76 77v522c0 42-33 75-75 75H689Z" fill="url(#rBar)"/>
+      </svg>
+    </div>
+    <span style="font-size:15px; font-weight:700; color:{{t.ink}};">MotifPath</span>
+  </div>
+
+  <!-- Full nav/breadcrumb inline — desktop only -->
+  <sc-if value="{{expanded}}" hint-placeholder-val="{{true}}">
+    <div style="width:1px; height:22px; background:{{t.border}};"></div>
+
+    <sc-if value="{{isStudent}}" hint-placeholder-val="{{true}}">
+      <a onClick="{{onNavMyPath}}" style="font-size:14px; font-weight:600; color:{{t.accentText}}; background:{{t.accentMuted}}; padding:6px 14px; border-radius:9999px; cursor:pointer;">My path</a>
+    </sc-if>
+
+    <sc-if value="{{isTeacher}}" hint-placeholder-val="{{false}}">
+      <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
+        <sc-if value="{{hasCrumb}}" hint-placeholder-val="{{false}}">
+          <a onClick="{{onNavExercises}}" style="color:{{t.inkMuted}}; cursor:pointer;">Exercises</a>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="{{t.inkSubtle}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="font-size:14px; font-weight:600; color:{{t.accentText}}; background:{{t.accentMuted}}; padding:6px 14px; border-radius:9999px;">{{breadcrumbLabel}}</span>
+        </sc-if>
+        <sc-if value="{{hasNoCrumb}}" hint-placeholder-val="{{true}}">
+          <a onClick="{{onNavExercises}}" style="font-size:14px; font-weight:600; color:{{t.accentText}}; background:{{t.accentMuted}}; padding:6px 14px; border-radius:9999px; cursor:pointer;">Exercises</a>
+        </sc-if>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <div style="flex:1;"></div>
+
+  <sc-if value="{{justSaved}}" hint-placeholder-val="{{false}}">
+    <span style="font-size:12px; font-weight:600; color:{{t.accentText}}; background:{{t.accentMuted}}; padding:5px 12px; border-radius:9999px;">Saved</span>
+  </sc-if>
+
+  <sc-if value="{{showSave}}" hint-placeholder-val="{{false}}">
+    <button onClick="{{onSave}}" style="padding:8px 18px; border-radius:9999px; border:none; background:{{t.accent}}; color:{{t.accentFg}}; font-size:13px; font-weight:700;">Save</button>
+  </sc-if>
+
+  <button onClick="{{onToggleDark}}" style="width:32px; height:32px; border-radius:9999px; border:1px solid {{t.border}}; background:transparent; display:flex; align-items:center; justify-content:center; color:{{t.inkMuted}}; flex-shrink:0;">
+    <sc-if value="{{dark}}" hint-placeholder-val="{{false}}">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    </sc-if>
+    <sc-if value="{{light}}" hint-placeholder-val="{{true}}">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </sc-if>
+  </button>
+
+  <div style="width:32px; height:32px; border-radius:9999px; background:{{t.accent}}; color:{{t.accentFg}}; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;">G</div>
+
+  <!-- Nav drawer — compact only, navigation alone. Theme/account items live in the bar itself, not duplicated in here. -->
+  <sc-if value="{{drawerOpen}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closeDrawer}}" style="position:fixed; top:64px; left:0; right:0; bottom:0; background:rgba(10,8,30,.45); z-index:30;"></div>
+    <div style="position:fixed; top:64px; left:0; bottom:0; width:260px; background:{{t.surfaceRaised}}; box-shadow:{{t.shadow1}}; z-index:31; display:flex; flex-direction:column; padding:16px 0;">
+      <sc-if value="{{isStudent}}" hint-placeholder-val="{{true}}">
+        <a onClick="{{navMyPathAndClose}}" style="font-size:14px; font-weight:600; color:{{t.accentText}}; background:{{t.accentMuted}}; margin:0 12px; padding:12px 14px; border-radius:10px; cursor:pointer;">My path</a>
+      </sc-if>
+      <sc-if value="{{isTeacher}}" hint-placeholder-val="{{false}}">
+        <a onClick="{{navExercisesAndClose}}" style="font-size:14px; font-weight:600; color:{{t.accentText}}; background:{{t.accentMuted}}; margin:0 12px; padding:12px 14px; border-radius:10px; cursor:pointer;">Exercises</a>
+        <sc-if value="{{hasCrumb}}" hint-placeholder-val="{{false}}">
+          <div style="padding:8px 26px 0; font-size:12px; color:{{t.inkSubtle}};">— editing {{breadcrumbLabel}}</div>
+        </sc-if>
+      </sc-if>
+    </div>
+  </sc-if>
+</div>
+
+<script data-dc-script data-props='{"context":{"editor":null},"dark":{"editor":null},"compact":{"editor":null},"breadcrumbLabel":{"editor":null},"showSave":{"editor":null},"justSaved":{"editor":null},"onToggleDark":{"editor":null},"onSave":{"editor":null},"onNavMyPath":{"editor":null},"onNavExercises":{"editor":null}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { drawerOpen: false };
+  }
+
+  toggleDrawer = () => this.setState({ drawerOpen: !this.state.drawerOpen });
+  closeDrawer = () => this.setState({ drawerOpen: false });
+
+  renderVals() {
+    const dark = !!this.props.dark;
+    const t = dark ? {
+      surfaceRaised: "#161942", border: "#2C2E58",
+      ink: "#ECEAFF", inkMuted: "#A7A2C8", inkSubtle: "#6E698C",
+      accent: "#7C3CFF", accentFg: "#FFFFFF", accentMuted: "#241C4D", accentText: "#B79BFF",
+      shadow1: "0 1px 2px rgba(3,4,20,.5)"
+    } : {
+      surfaceRaised: "#FFFFFF", border: "#E4DEF3",
+      ink: "#1A1633", inkMuted: "#5B5470", inkSubtle: "#9A94AE",
+      accent: "#6D28E0", accentFg: "#FFFFFF", accentMuted: "#F0E9FF", accentText: "#6D28E0",
+      shadow1: "0 1px 2px rgba(26,22,51,.06), 0 1px 1px rgba(26,22,51,.04)"
+    };
+    const noop = () => {};
+    const onNavMyPath = this.props.onNavMyPath || noop;
+    const onNavExercises = this.props.onNavExercises || noop;
+    const self = this;
+    return {
+      t, dark, light: !dark,
+      compact: !!this.props.compact,
+      expanded: !this.props.compact,
+      drawerOpen: this.state.drawerOpen,
+      toggleDrawer: this.toggleDrawer,
+      closeDrawer: this.closeDrawer,
+      isStudent: this.props.context === 'student',
+      isTeacher: this.props.context === 'teacher',
+      breadcrumbLabel: this.props.breadcrumbLabel || '',
+      hasCrumb: !!this.props.breadcrumbLabel,
+      hasNoCrumb: !this.props.breadcrumbLabel,
+      showSave: !!this.props.showSave,
+      justSaved: !!this.props.justSaved,
+      onToggleDark: this.props.onToggleDark || noop,
+      onSave: this.props.onSave || noop,
+      onNavMyPath,
+      onNavExercises,
+      navMyPathAndClose: () => { self.closeDrawer(); onNavMyPath(); },
+      navExercisesAndClose: () => { self.closeDrawer(); onNavExercises(); },
+    };
+  }
+}
+</script>
+</x-dc>
+</body>
+</html>

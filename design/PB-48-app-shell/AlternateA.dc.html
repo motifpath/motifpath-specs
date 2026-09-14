@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: 'Manrope', system-ui, sans-serif; }
+    a { color: inherit; text-decoration: none; } a:hover { opacity: .8; }
+    .crumb-sep { display: flex; align-items: center; }
+  </style>
+</helmet>
+
+<div style="width: 1320px; box-sizing: border-box; padding: 48px; background: {{t.surface}}; display: flex; flex-direction: column; gap: 40px; transition: background .15s ease;">
+
+  <div style="display:flex; flex-direction:column; gap:6px;">
+    <div style="font-size:20px; font-weight:800; color:{{t.ink}};">Direction A — Quiet line</div>
+    <div style="font-size:14px; color:{{t.inkMuted}}; max-width:760px; line-height:1.5;">Closest evolution of the shipped AppShell: thin bottom border, no elevation, text-only nav and a plain sign-out link. Lowest risk to build — mostly a token/mark fix on what already exists.</div>
+  </div>
+
+  <!-- Student context -->
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <div style="font-size:11px; font-weight:700; letter-spacing:.08em; color:{{t.inkSubtle}}; text-transform:uppercase;">Student — primary nav</div>
+
+    <div style="border-radius: 10px; overflow:hidden; border:1px solid {{t.border}};">
+      <div style="height:34px; background:{{t.surfaceSunken}}; display:flex; align-items:center; gap:8px; padding:0 14px; border-bottom:1px solid {{t.border}};">
+        <div style="width:9px;height:9px;border-radius:9999px;background:{{t.inkSubtle}};opacity:.5;"></div>
+        <div style="width:9px;height:9px;border-radius:9999px;background:{{t.inkSubtle}};opacity:.5;"></div>
+        <div style="width:9px;height:9px;border-radius:9999px;background:{{t.inkSubtle}};opacity:.5;"></div>
+        <div style="font-size:11px; color:{{t.inkSubtle}}; margin-left:8px;">motifpath.app/path</div>
+      </div>
+
+      <div style="height:56px; background:{{t.surface}}; border-bottom:1px solid {{t.border}}; display:flex; align-items:center; gap:24px; padding:0 24px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="200 100 860 860" role="img" aria-hidden="true">
+            <defs>
+              <linearGradient id="ribbonA1" x1="309" y1="190" x2="938" y2="890" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#a14cff"/><stop offset=".27" stop-color="#8134ff"/><stop offset=".62" stop-color="#6421fa"/><stop offset="1" stop-color="#4714df"/></linearGradient>
+              <linearGradient id="edgeA1" x1="300" y1="205" x2="956" y2="866" gradientUnits="userSpaceOnUse"><stop stop-color="#f0b2ff"/><stop offset=".36" stop-color="#c274ff"/><stop offset=".72" stop-color="#7d3cff"/><stop offset="1" stop-color="#5724ef"/></linearGradient>
+            </defs>
+            <path d="M346 203C314 203 290 218 279 243c-4 9-6 19-6 30v526c0 41 32 74 73 74h85c40 0 80-11 108-33 20-16 19-38 8-57-8-16-23-32-41-49l-53-50c-32-31-47-58-40-84 8-30 38-58 81-82l46-27c36-21 49-45 41-71-3-13-10-23-21-34L397 225c-14-14-32-22-51-22Z" fill="url(#ribbonA1)" stroke="url(#edgeA1)" stroke-width="3"/>
+            <path d="M689 873c38-24 49-54 35-85-13-30-42-55-83-80l-71-44c-50-31-77-58-73-86 4-29 29-55 69-84 34-24 63-50 89-77l191-193c18-18 41-25 64-25 42 0 76 33 76 77v522c0 42-33 75-75 75H689Z" fill="url(#ribbonA1)" stroke="url(#edgeA1)" stroke-width="3"/>
+          </svg>
+          <span style="font-size:15px; font-weight:700; color:{{t.ink}};">MotifPath</span>
+        </div>
+
+        <a style="font-size:14px; font-weight:600; color:{{t.accentText}}; border-bottom:2px solid {{t.accentText}}; padding-bottom:2px;">My path</a>
+
+        <div style="flex:1;"></div>
+
+        <button style="width:32px; height:32px; border-radius:8px; border:1px solid {{t.border}}; background:transparent; display:flex; align-items:center; justify-content:center; color:{{t.inkMuted}};">
+          <sc-if value="{{dark}}" hint-placeholder-val="{{false}}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          </sc-if>
+          <sc-if value="{{light}}" hint-placeholder-val="{{true}}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </sc-if>
+        </button>
+
+        <a style="font-size:14px; font-weight:600; color:{{t.inkMuted}};">Sign out</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Teacher / tool context -->
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <div style="font-size:11px; font-weight:700; letter-spacing:.08em; color:{{t.inkSubtle}}; text-transform:uppercase;">Teacher — content studio</div>
+
+    <div style="border-radius: 10px; overflow:hidden; border:1px solid {{t.border}};">
+      <div style="height:34px; background:{{t.surfaceSunken}}; display:flex; align-items:center; gap:8px; padding:0 14px; border-bottom:1px solid {{t.border}};">
+        <div style="width:9px;height:9px;border-radius:9999px;background:{{t.inkSubtle}};opacity:.5;"></div>
+        <div style="width:9px;height:9px;border-radius:9999px;background:{{t.inkSubtle}};opacity:.5;"></div>
+        <div style="width:9px;height:9px;border-radius:9999px;background:{{t.inkSubtle}};opacity:.5;"></div>
+        <div style="font-size:11px; color:{{t.inkSubtle}}; margin-left:8px;">motifpath.app/teacher/exercises/new</div>
+      </div>
+
+      <div style="height:56px; background:{{t.surface}}; border-bottom:1px solid {{t.border}}; display:flex; align-items:center; gap:16px; padding:0 24px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="200 100 860 860" role="img" aria-hidden="true">
+            <defs>
+              <linearGradient id="ribbonA2" x1="309" y1="190" x2="938" y2="890" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#a14cff"/><stop offset=".27" stop-color="#8134ff"/><stop offset=".62" stop-color="#6421fa"/><stop offset="1" stop-color="#4714df"/></linearGradient>
+              <linearGradient id="edgeA2" x1="300" y1="205" x2="956" y2="866" gradientUnits="userSpaceOnUse"><stop stop-color="#f0b2ff"/><stop offset=".36" stop-color="#c274ff"/><stop offset=".72" stop-color="#7d3cff"/><stop offset="1" stop-color="#5724ef"/></linearGradient>
+            </defs>
+            <path d="M346 203C314 203 290 218 279 243c-4 9-6 19-6 30v526c0 41 32 74 73 74h85c40 0 80-11 108-33 20-16 19-38 8-57-8-16-23-32-41-49l-53-50c-32-31-47-58-40-84 8-30 38-58 81-82l46-27c36-21 49-45 41-71-3-13-10-23-21-34L397 225c-14-14-32-22-51-22Z" fill="url(#ribbonA2)" stroke="url(#edgeA2)" stroke-width="3"/>
+            <path d="M689 873c38-24 49-54 35-85-13-30-42-55-83-80l-71-44c-50-31-77-58-73-86 4-29 29-55 69-84 34-24 63-50 89-77l191-193c18-18 41-25 64-25 42 0 76 33 76 77v522c0 42-33 75-75 75H689Z" fill="url(#ribbonA2)" stroke="url(#edgeA2)" stroke-width="3"/>
+          </svg>
+          <span style="font-size:15px; font-weight:700; color:{{t.ink}};">MotifPath</span>
+        </div>
+
+        <div style="width:1px; height:18px; background:{{t.border}};"></div>
+
+        <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
+          <span style="color:{{t.inkMuted}};">Exercises</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="{{t.inkSubtle}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="color:{{t.ink}}; font-weight:600;">New exercise</span>
+        </div>
+
+        <div style="flex:1;"></div>
+
+        <span style="font-size:12px; color:{{t.inkSubtle}};">Draft saved automatically</span>
+
+        <button style="width:32px; height:32px; border-radius:8px; border:1px solid {{t.border}}; background:transparent; display:flex; align-items:center; justify-content:center; color:{{t.inkMuted}};">
+          <sc-if value="{{dark}}" hint-placeholder-val="{{false}}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          </sc-if>
+          <sc-if value="{{light}}" hint-placeholder-val="{{true}}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </sc-if>
+        </button>
+
+        <button style="padding:7px 14px; border-radius:8px; border:1px solid {{t.border}}; background:transparent; color:{{t.inkMuted}}; font-size:13px; font-weight:600;">Cancel</button>
+        <button style="padding:7px 16px; border-radius:8px; border:none; background:{{t.accent}}; color:{{t.accentFg}}; font-size:13px; font-weight:600;">Save exercise</button>
+
+        <a style="font-size:14px; font-weight:600; color:{{t.inkMuted}};">Sign out</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script data-dc-script data-props='{"dark":{"editor":"boolean","default":false,"section":"Theme"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dark = !!this.props.dark;
+    const t = dark ? {
+      surface: "#0B0D2E", surfaceRaised: "#161942", surfaceSunken: "#080927", border: "#2C2E58",
+      ink: "#ECEAFF", inkMuted: "#A7A2C8", inkSubtle: "#6E698C",
+      accent: "#7C3CFF", accentFg: "#FFFFFF", accentMuted: "#241C4D", accentText: "#B79BFF",
+      shadow1: "0 1px 2px rgba(3,4,20,.5)", shadow2: "0 6px 18px rgba(3,4,20,.55)"
+    } : {
+      surface: "#FBFAFF", surfaceRaised: "#FFFFFF", surfaceSunken: "#F3F0FB", border: "#E4DEF3",
+      ink: "#1A1633", inkMuted: "#5B5470", inkSubtle: "#9A94AE",
+      accent: "#6D28E0", accentFg: "#FFFFFF", accentMuted: "#F0E9FF", accentText: "#6D28E0",
+      shadow1: "0 1px 2px rgba(26,22,51,.06), 0 1px 1px rgba(26,22,51,.04)", shadow2: "0 4px 12px rgba(26,22,51,.10)"
+    };
+    return { t, dark, light: !dark };
+  }
+}
+</script>
+</x-dc>
+</body>
+</html>

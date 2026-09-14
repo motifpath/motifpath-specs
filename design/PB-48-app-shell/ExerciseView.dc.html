@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Manrope', system-ui, sans-serif; }
+    button { font-family: inherit; cursor: pointer; }
+  </style>
+</helmet>
+
+<!--
+  PB-48: the one place an exercise actually gets drawn — prompt + the
+  type-specific answer surface (fretboard regions / text options / audio
+  options / image choices). Authoring's "Preview as student" modal and the
+  real student Practice screen both mount this exact component, so a
+  preview can no longer show something the student doesn't actually get:
+  same markup, same neutral (ungraded) state, same tap-to-select behavior.
+  It never reads or reveals which option is "correct" — that data isn't
+  even passed in — because a real student hasn't answered yet either.
+-->
+<div style="width:100%; height:100%; display:flex; flex-direction:{{direction}}; gap:14px; font-family:'Manrope', system-ui, sans-serif;">
+
+  <div style="font-size:15px; font-weight:600; line-height:1.375rem; color:{{t.ink}}; flex:{{promptFlex}};">{{prompt}}</div>
+
+  <div style="flex:{{contentFlex}}; min-width:0;">
+
+    <!-- IMAGE RECOGNITION -->
+    <sc-if value="{{isImage}}" hint-placeholder-val="{{true}}">
+      <div style="position:relative; border-radius:10px; overflow:hidden; border:1px solid {{t.border}};">
+        <svg width="100%" height="150" viewBox="0 0 760 240" preserveAspectRatio="none" style="display:block;">
+          <rect width="760" height="240" fill="{{t.fretBg}}"/>
+          <line x1="20" y1="30" x2="740" y2="30" stroke="{{t.fretString}}" stroke-width="2"/>
+          <line x1="20" y1="70" x2="740" y2="70" stroke="{{t.fretString}}" stroke-width="2"/>
+          <line x1="20" y1="110" x2="740" y2="110" stroke="{{t.fretString}}" stroke-width="2"/>
+          <line x1="20" y1="150" x2="740" y2="150" stroke="{{t.fretString}}" stroke-width="2"/>
+          <line x1="20" y1="190" x2="740" y2="190" stroke="{{t.fretString}}" stroke-width="2"/>
+          <line x1="140" y1="20" x2="140" y2="220" stroke="{{t.fretFret}}" stroke-width="3"/>
+          <line x1="260" y1="20" x2="260" y2="220" stroke="{{t.fretFret}}" stroke-width="3"/>
+          <line x1="380" y1="20" x2="380" y2="220" stroke="{{t.fretFret}}" stroke-width="3"/>
+          <line x1="500" y1="20" x2="500" y2="220" stroke="{{t.fretFret}}" stroke-width="3"/>
+          <line x1="620" y1="20" x2="620" y2="220" stroke="{{t.fretFret}}" stroke-width="3"/>
+        </svg>
+        <sc-for list="{{regions}}" as="r" hint-placeholder-count="3">
+          <div onClick="{{r.pick}}" style="position:absolute; left:{{r.leftPct}}; top:{{r.topPct}}; transform:translate(-50%, -50%); width:{{r.wPx}}; height:{{r.hPx}}; border-radius:{{r.radius}}; border:2px solid {{r.borderColor}}; background:{{r.fillColor}}; cursor:pointer;"></div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- TEXT RESPONSE -->
+    <sc-if value="{{isText}}" hint-placeholder-val="{{false}}">
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <sc-for list="{{textOptions}}" as="o" hint-placeholder-count="3">
+          <div onClick="{{o.pick}}" style="display:flex; align-items:center; gap:8px; padding:9px 11px; border-radius:8px; border:1px solid {{o.borderColor}}; background:{{o.bgColor}}; cursor:pointer;">
+            <div style="width:16px; height:16px; border-radius:9999px; border:2px solid {{o.dotColor}}; flex-shrink:0;"></div>
+            <span style="font-size:13px; color:{{t.ink}};">{{o.text}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- AUDIO RECOGNITION -->
+    <sc-if value="{{isAudio}}" hint-placeholder-val="{{false}}">
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; align-items:center; gap:8px; padding:9px 11px; border-radius:8px; background:{{t.surfaceSunken}};">
+          <div style="width:24px; height:24px; border-radius:9999px; background:{{t.accent}}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="{{t.accentFg}}"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+          <span style="font-size:12px; color:{{t.inkMuted}};">Listen · 0:07</span>
+        </div>
+        <sc-for list="{{audioOptions}}" as="o" hint-placeholder-count="3">
+          <div onClick="{{o.pick}}" style="display:flex; align-items:center; gap:8px; padding:9px 11px; border-radius:8px; border:1px solid {{o.borderColor}}; background:{{o.bgColor}}; cursor:pointer;">
+            <div style="width:16px; height:16px; border-radius:9999px; border:2px solid {{o.dotColor}}; flex-shrink:0;"></div>
+            <span style="font-size:13px; color:{{t.ink}};">{{o.text}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- IMAGE CHOICE -->
+    <sc-if value="{{isImageChoice}}" hint-placeholder-val="{{false}}">
+      <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px;">
+        <sc-for list="{{imageOptions}}" as="o" hint-placeholder-count="3">
+          <div onClick="{{o.pick}}" style="border-radius:8px; border:2px solid {{o.borderColor}}; overflow:hidden; cursor:pointer;">
+            <div style="height:64px; background:{{t.fretBg}}; border-bottom:1px solid {{t.fretFret}};"></div>
+            <div style="padding:6px 8px; background:{{o.bgColor}};">
+              <span style="font-size:12px; color:{{t.ink}};">{{o.text}}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+
+<script data-dc-script data-props='{"dark":{"editor":null},"exerciseType":{"editor":null},"prompt":{"editor":null},"direction":{"editor":null},"regions":{"editor":null},"textOptions":{"editor":null},"audioOptions":{"editor":null},"imageOptions":{"editor":null}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { selected: null };
+  }
+
+  pick = (key) => () => this.setState({ selected: key });
+
+  renderVals() {
+    const dark = !!this.props.dark;
+    const t = dark ? {
+      ink: "#ECEAFF", inkMuted: "#A7A2C8", border: "#2C2E58",
+      surfaceSunken: "#080927", accent: "#7C3CFF", accentFg: "#FFFFFF", accentMuted: "#241C4D",
+      fretBg: "#161233", fretString: "#4A4380", fretFret: "#322C5C"
+    } : {
+      ink: "#1A1633", inkMuted: "#5B5470", border: "#E4DEF3",
+      surfaceSunken: "#F3F0FB", accent: "#6D28E0", accentFg: "#FFFFFF", accentMuted: "#F0E9FF",
+      fretBg: "#EFE9FA", fretString: "#B7AED4", fretFret: "#D8CFEE"
+    };
+    const type = this.props.exerciseType;
+    const selected = this.state.selected;
+
+    const decorate = (key) => selected === key
+      ? { borderColor: t.accent, bgColor: t.accentMuted, dotColor: t.accent, fillColor: t.accentMuted }
+      : { borderColor: t.border, bgColor: "transparent", dotColor: t.border, fillColor: "transparent" };
+
+    const regions = (this.props.regions || []).map((r, i) => Object.assign({}, r, decorate('r' + i), { pick: this.pick('r' + i) }));
+    const textOptions = (this.props.textOptions || []).map((o, i) => Object.assign({}, o, decorate('t' + i), { pick: this.pick('t' + i) }));
+    const audioOptions = (this.props.audioOptions || []).map((o, i) => Object.assign({}, o, decorate('a' + i), { pick: this.pick('a' + i) }));
+    const imageOptions = (this.props.imageOptions || []).map((o, i) => Object.assign({}, o, decorate('i' + i), { pick: this.pick('i' + i) }));
+
+    const direction = this.props.direction || 'column';
+    const isLandscape = direction === 'row';
+
+    return {
+      t, direction,
+      promptFlex: isLandscape ? '0 0 40%' : '0 0 auto',
+      contentFlex: isLandscape ? '1 1 60%' : '1 1 auto',
+      prompt: this.props.prompt || '',
+      isImage: type === 'image_recognition',
+      isText: type === 'text_response',
+      isAudio: type === 'audio_recognition',
+      isImageChoice: type === 'image_choice',
+      regions, textOptions, audioOptions, imageOptions,
+    };
+  }
+}
+</script>
+</x-dc>
+</body>
+</html>

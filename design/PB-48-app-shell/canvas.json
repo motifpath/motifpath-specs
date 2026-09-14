@@ -1,0 +1,23 @@
+{
+  "pages": [
+    { "id": "final", "name": "MotifPath Shell" },
+    { "id": "alternates", "name": "Alternates (not chosen)" }
+  ],
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1480, "h": 1020, "page": "final", "is_interactive": true },
+    { "file": "MobileMain.dc.html", "x": 1560, "y": 0, "w": 460, "h": 880, "page": "final", "is_interactive": true },
+    { "file": "Mobile.dc.html", "x": 2080, "y": 0, "w": 1000, "h": 760, "page": "final" },
+    { "file": "StickyBehavior.dc.html", "x": 3160, "y": 0, "w": 1160, "h": 660, "page": "final" },
+    { "file": "AppBar.dc.html", "x": 0, "y": 1100, "w": 700, "h": 140, "page": "final", "title": "AppBar (component)" },
+    { "file": "Authoring.dc.html", "x": 760, "y": 1100, "w": 700, "h": 140, "page": "final", "title": "Authoring (component)" },
+    { "file": "ExerciseView.dc.html", "x": 1520, "y": 1100, "w": 700, "h": 140, "page": "final", "title": "ExerciseView (component)" },
+    { "file": "AlternateA.dc.html", "x": 0, "y": 0, "w": 1320, "h": 760, "page": "alternates" },
+    { "file": "AlternateC.dc.html", "x": 1440, "y": 0, "w": 1320, "h": 800, "page": "alternates" }
+  ],
+  "annotations": [
+    { "id": "pb48-brief", "x": 0, "y": -190, "w": 1000, "page": "final", "text": "PB-48 — MotifPath app shell, componentized + mobile.\nMain (desktop) and MobileMain (phone) run the same click-driven flow through the same AppBar and Authoring components — AppBar takes a compact prop that swaps inline nav for a hamburger + nav-only drawer, everything else (theme toggle, Save, avatar) stays in one top bar on both widths, matching desktop. Theme toggle is one plain visible icon, one place — no account-menu detour. Authoring is the same component on desktop and mobile; it adapts via CSS media queries (stacked layout, single top bar, no fixed sidebar) rather than a separate mobile build or a scroll-sideways hack. My path / Lesson / Practice / Exercises content is centered (max-width 760, margin auto) rather than pinned left on the wide desktop frame. The old static Mobile/StickyBehavior artboards stay as isolated reference for the hamburger + sticky concepts in Direction B before this rebuild." },
+    { "id": "components-label", "x": 0, "y": 1060, "w": 700, "page": "final", "text": "These three are components, not standalone screens — Main and MobileMain both import them. Listed here because the canvas format requires every imported file to have its own spot." },
+    { "id": "exerciseview-label", "x": 1520, "y": 1060, "w": 700, "page": "final", "text": "ExerciseView renders one exercise (prompt + answer surface) with no idea which option is \"correct\" — that data is never passed in. Authoring's preview modal and the real Practice screen both mount it, so a preview can't show something the student won't actually see." }
+  ],
+  "launch": { "view": "focused", "file": "Main.dc.html" }
+}
