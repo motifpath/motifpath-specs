@@ -117,43 +117,57 @@ began — not inferred):
 - [x] Step 6 — Definition of Ready check: OpenAPI endpoints defined, Gherkin covers happy path +
       edge cases + failure cases, no HTTP/SQL/framework language in scenarios (per this repo's
       Gherkin standards).
-- [ ] Step 7 — `redocly lint` clean; Gherkin syntax valid. Open PR, get it merged before Phase 2.
+- [x] Step 7 — `redocly lint` clean; Gherkin syntax valid. Open PR, get it merged before Phase 2.
+      PR `motifpath-specs#50` merged 2026-09-13. **Phase 1 is Done.**
 
 ### Phase 2 — Backend (motifpath-core)
 
 **Branch:** `feat/PB-40/exercise-authoring-backend`
 
-- [ ] Step 1 — `make generate` against the merged Phase 1 spec to regenerate `oapi-codegen`
+- [x] Step 1 — `make generate` against the merged Phase 1 spec to regenerate `oapi-codegen`
       stubs; confirm the new types compile.
-- [ ] Step 2 — Ent schema: rewrite `services/core-domain/internal/adapters/repo/ent/schema/exercise.go`
+- [x] Step 2 — Ent schema: rewrite `services/core-domain/internal/adapters/repo/ent/schema/exercise.go`
       — drop `challenge_id` FK, add an `ent.Edge` M2M to `Challenge`, add `title`,
       `skill_tags` ([]string via a JSON field per ent convention), `image_url`/`audio_url`
       (optional strings), expand `exercise_type` enum to 4 values. Add a new `ExerciseOption`
       ent schema (own entity, not embedded JSON, so options are queryable/updatable
       individually): `exercise_id` FK, `is_correct`, optional `label`, `image_url`, and region
       fields (`region_x`, `region_y`, `region_width`, `region_height`, `region_shape`
-      nullable). No production data exists yet (ADR-019's own consequence), so this is a clean
-      schema replacement, not a migration/backfill.
-- [ ] Step 3 — `make migrate:diff` for the Atlas migration.
-- [ ] Step 4 — Domain layer (`internal/domain/exercise.go`): rewrite `Exercise` struct and
+      nullable). No production data exists yet, so this was a clean schema replacement, not a
+      migration/backfill.
+- [x] Step 3 — `make migrate:diff` for the Atlas migration.
+- [x] Step 4 — Domain layer (`internal/domain/exercise.go`): rewrite `Exercise` struct and
       `NewExercise` — validate `title`/`prompt` non-empty, `exercise_type` against the 4-value
       enum, at least one option with `is_correct: true`, and per-type option shape (e.g.
       `image_recognition` options must carry `region`, `text_response`/`audio_recognition`
-      options must carry `label`, `image_choice` options must carry `image_url`). Add an
+      options must carry `label`, `image_choice` options must carry `image_url`). Added an
       `ExerciseOption` domain type.
-- [ ] Step 5 — Ports/repository: update `internal/ports/exercise_repository.go` and
+- [x] Step 5 — Ports/repository: update `internal/ports/exercise_repository.go` and
       `internal/adapters/repo/ent_exercise_repository.go` for the M2M edge and the new
       `ExerciseOption` child entity (create/query exercise with its options in one round trip).
-      Add `LinkChallenge` / `UnlinkChallenge` repository methods.
-- [ ] Step 6 — Application service: split `CreateExercise` (standalone) from `LinkExerciseToChallenge`
+      Added `LinkChallenge` / `UnlinkChallenge` repository methods.
+- [x] Step 6 — Application service: split `CreateExercise` (standalone) from `LinkExerciseToChallenge`
       / `UnlinkExerciseFromChallenge`, per the Open Questions' resolved endpoint split.
-- [ ] Step 7 — HTTP handlers wired to the new application methods (handlers call services only,
+- [x] Step 7 — HTTP handlers wired to the new application methods (handlers call services only,
       no business logic per this repo's layering rule).
-- [ ] Step 8 — Tests: table-driven testify tests in `internal/application/` (80% coverage gate),
-      godog step definitions for the rewritten `exercises.feature` (`make test:bdd`),
-      testcontainers integration tests for the new ent schema (`make test:int`) — real
-      Postgres, never a mocked repository per this repo's testing discipline.
-- [ ] Step 9 — `make lint` clean; no `//nolint` without an inline reason; no bare `interface{}`/`any`.
+- [x] Step 8 — Tests: table-driven testify tests in `internal/application/` (92.2% coverage,
+      above the 80% gate), godog step definitions for the rewritten `exercises.feature`
+      (`make test:bdd`), testcontainers integration tests for the new ent schema (`make
+      test:int`) — real Postgres, no mocked repository.
+- [x] Step 9 — `make lint` clean; no `//nolint` without an inline reason; no bare `interface{}`/`any`.
+
+**Also landed in Phase 2** (unplanned, but required to unblock BDD CI — see below): the
+`POST /media/upload-url` endpoint itself. It was left unimplemented at the start of Phase 2 (out
+of this plan's original scope, per ADR-021's own note that its implementation was tracked
+separately), but the specs merge that shipped its contract ahead of this plan meant every
+`motifpath-core` PR's BDD job started failing on undefined `media-upload.feature` steps,
+regardless of whether that PR touched exercises at all. Implemented for real: `MediaService`,
+domain validation, an S3-compatible storage adapter (works against real S3 in production and
+MinIO in local dev via the same client, differing only in construction), MinIO added to
+`docker-compose.yml`/`process-compose.yaml` for local dev, and BDD steps for all 7
+`media-upload.feature` scenarios. Verified against a real MinIO instance (presign → PUT → GET
+round-trip), not just the unit-test fakes. PR `motifpath-core#17` merged 2026-09-14 (dev).
+**Phase 2 is Done.**
 
 ### Phase 3 — Frontend (motifpath-web)
 
