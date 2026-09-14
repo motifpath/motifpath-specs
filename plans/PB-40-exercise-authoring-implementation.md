@@ -3,7 +3,11 @@
 **Task:** PB-40
 **Date:** 2026-09-13
 **Author:** Gilson (with Claude)
-**Status:** Ready — hold lifted 2026-09-13 (PB-45 resolved via ADR-021)
+**Status:** In progress — Phase 1 & 2 Done (specs#50, core#17 merged). Phase 3 restarting on a
+fresh branch: the first `feat/PB-40/exercise-authoring-ui` attempt (web#16) was closed unmerged
+2026-09-14, superseded by the PB-48 app-shell work (specs#54) which extracted shared `AppBar`
+and `ExerciseView` components after web#16 had already started — Phase 3 now composes from
+those instead of one-off markup.
 
 ---
 
