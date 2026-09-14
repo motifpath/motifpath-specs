@@ -227,6 +227,43 @@ decision point changes. `FocusCard`'s API surface, composition (does it wrap `St
 stand alone?), and implementation are PB-35 Phase 3's concern (TDD, per the plan), not this
 ADR's — this amendment only records that a 7th primitive was approved and why.
 
+### Amendment (2026-09-14) — prototyping discipline: component reuse, one converged canvas, no silent redesign
+
+PB-48 (unify the page shell / top bar across prototypes and built screens) started from a
+concrete symptom: three different, hand-drawn headers existed across `AppShell.vue`, the PB-8j
+wireframes, and the PB-40 authoring prototype, none referencing the real brand mark, because
+each was built independently rather than as a shared piece. Fixing the header led to the same
+question surfacing again for the exercise-authoring preview vs. the real student Practice
+screen — a second, unrelated instance of the identical failure mode: two surfaces rendering
+"the same thing" from two independent implementations, free to drift.
+
+Decision point 3 already commits the **built app** to composing an owned component library
+rather than hand-writing screens. This amendment extends that discipline to the **prototyping
+stage** that precedes it, in Claude Design canvases specifically, since that is where PB-48's
+drift was actually introduced and caught:
+
+1. **Prototype screens are built by composing components (`<dc-import>`), never by duplicating
+   markup a component could serve.** When the same UI appears in more than one place in a
+   canvas — a header, an exercise's answer surface, a status pill — it is extracted into its
+   own `.dc.html` component and imported everywhere it's needed, the same rule decision point 3
+   applies to `motifpath-web`. A prototype that copy-pastes a block into a second screen is
+   already in the state PB-48 was written to fix.
+2. **New feature work concentrates in the one converged, unified prototype** (`design/PB-48-app-shell/`, the canvas covering the full interactive flow — student and teacher, desktop and
+   mobile), not in a fresh, disconnected canvas per feature. A new screen or flow is added to
+   this canvas as new artboards/components, reusing its existing `AppBar`, `ExerciseView`, and
+   token/theme plumbing, rather than starting a parallel prototype that has to be reconciled
+   with it later.
+3. **Conceiving a new feature does not change previously-approved UI**, except where the change
+   is explicitly asked for. A feature branch inside the canvas may need a new component or a new
+   screen; it does not get to silently restyle an unrelated, already-decided screen along the
+   way. If a new feature genuinely requires revisiting approved UI, that's raised as its own
+   explicit decision — the same posture decision point 3 already takes toward adding a component
+   ("an open question for Gilson, not something to build unilaterally"), applied here to
+   *changing* one instead of adding one.
+
+This amendment adds no new decision point and changes no prior one; it records how points 1–3
+are meant to apply before implementation, not only during it.
+
 ## Related ADRs
 
 - **ADR-007** (Clerk authentication and JWT local validation) — the SPA this layer sits on;
