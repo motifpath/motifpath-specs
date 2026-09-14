@@ -10,8 +10,8 @@ reprocessing — not just steady-state).
 
 ## Activation
 
-21 items is too many for every review. Classify the change and walk only the activated subset —
-plus the four always-on items.
+22 items is too many for every review. Classify the change and walk only the activated subset —
+plus the five always-on items.
 
 | If the change… | activates |
 |---|---|
@@ -24,7 +24,7 @@ plus the four always-on items.
 | carries external content into render/query/exec | 15, 16, 2 |
 | touches configuration, migration, or rollout | 7, 14, 2 |
 | is user-facing (motifpath-web) | 12, 18, 14 |
-| **always** | **17, 19, 20, 21** |
+| **always** | **17, 19, 20, 21, 22** |
 
 ---
 
@@ -119,6 +119,17 @@ plus the four always-on items.
 21. **Does the description describe the current state?** After a mid-review pivot, does the text
     still describe the earlier version? Is an instruction for reviewers in the description, where
     it's looked for, or lost in a thread? — *Smell:* description contradicting the diff.
+
+## Axis F — Comment hygiene
+
+22. **Does a comment explain the code, or point away from it?** A code comment names an ADR, PBI/
+    backlog item, ticket, or spec file instead of stating the invariant, constraint, or reason in
+    its own words. The rationale belongs in the code; the document is where that rationale was
+    decided, not where a future reader should have to go to find it. — *Smell:* "per ADR-NNN," "see
+    PB-NNN," or a bare doc-name reference standing in for an explanation — it goes stale the moment
+    that document is archived, renamed, or renumbered, and it costs every future reader (human or
+    AI) an external lookup to understand code sitting in front of them. Doc references belong in
+    commit messages and PR descriptions, which are allowed to age — never in the comment itself.
 
 ---
 

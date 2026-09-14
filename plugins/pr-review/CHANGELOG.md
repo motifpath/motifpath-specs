@@ -1,5 +1,14 @@
 # PR Review — Changelog
 
+## [1.3.0] — 2026-09-13
+
+### Added
+- New Axis F / item 22 in `HEURISTICS.md`: flags code comments that name an ADR, PBI/backlog
+  item, ticket, or spec file instead of explaining the code's own invariant or reason. Added to
+  the always-on activation set. Doc references still belong in commit messages and PR
+  descriptions — this only applies to the comment text itself, which should read correctly even
+  after the referenced document is archived or renumbered.
+
 ## [1.2.0] — 2026-09-07
 
 ### Changed
