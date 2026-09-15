@@ -1,6 +1,6 @@
 ---
 name: project-index-maintenance
-version: 1.2.0
+version: 1.4.0
 description: >
   Use this skill when Gilson explicitly asks to update the MotifPath Project Index
   page in Notion. Trigger on phrases like "update the project index", "log this
@@ -8,19 +8,25 @@ description: >
   or similar invocations referring to the Project Index, the session log, or
   end-of-session bookkeeping. This skill reconciles the Project Index page
   (Notion ID 3679ccc1-102f-8184-83a7-e328e0d8cbfc) against what actually happened
-  in the session — updating the Current Focus section, Decided ADRs table,
-  Backlog Snapshot table, and Last-updated timestamp — while keeping the page
-  short (trimming stale narrative, not just appending to it) and keeping every
-  backlog row's status normalized to the five-value vocabulary (Ready, In
-  Progress, Blocked, Done, Archived). Do NOT auto-trigger from conversation cues
-  alone — wait for an explicit user invocation.
+  in the session — updating the Current Focus section, Decided ADRs table (kept
+  filtered to relevant ADRs only, per a cross-cutting/still-open-work rule — see
+  "Decided ADRs Relevance"), and Last-updated timestamp — while keeping the page
+  short (trimming stale narrative, not just appending to it). Backlog Snapshot on
+  the index is a live linked view of the real Product Backlog database (Notion ID
+  93826617-2504-4976-9769-d3841dffcafd), so this skill instead reconciles
+  backlog *item* pages directly — normalizing every item's status to the
+  five-value vocabulary (Ready, In Progress, Blocked, Done, Archived) and
+  creating a database item when session work has none. Do NOT auto-trigger from
+  conversation cues alone — wait for an explicit user invocation.
 ---
 
 # Project Index Maintenance
 
 ## Purpose
 
-The MotifPath Project Index page is the canonical pointer to current focus, decided ADRs, and backlog state. Without active maintenance it drifts two ways: it grows a chronological narrative nobody trims, and its backlog statuses accumulate ad hoc values that stop meaning anything consistent. Both make the next session's bootstrap slow and error-prone — a bloated page is expensive to read, and a confused status is worse than no status. This skill performs the reconciliation: read the page, compare it against what happened this session, reconcile the differences (including normalizing statuses and trimming stale bulk), write them, and report.
+The MotifPath Project Index page is the canonical pointer to current focus, decided ADRs, and backlog state. Without active maintenance it drifts two ways: it grows a chronological narrative nobody trims, and backlog statuses accumulate ad hoc values that stop meaning anything consistent. Both make the next session's bootstrap slow and error-prone — a bloated page is expensive to read, and a confused status is worse than no status. This skill performs the reconciliation: read the index page and the real Product Backlog database, compare them against what happened this session, reconcile the differences (including normalizing statuses and trimming stale bulk), write them, and report.
+
+As of 2026-09-15, the Backlog Snapshot section of the index is a **live linked view** of the Product Backlog database, not a manually copied table — it cannot drift out of sync with itself the way the old markdown table could. But the two things it used to hide — a real item's status going stale, and a real item never getting created at all — can still happen at the database level, so reconciliation now targets the database directly instead of index-page table rows.
 
 ## When to Trigger
 
@@ -40,7 +46,7 @@ If nothing has changed this session, still acknowledge the invocation — but re
 
 ## Backlog Status Vocabulary
 
-Every row in the Backlog Snapshot table carries exactly one of five statuses. No other value is ever written, and no row is ever left without one of these five:
+Every item in the Product Backlog database (`collection://93826617-2504-4976-9769-d3841dffcafd`) carries exactly one of five `Status` values. No other value is ever written, and no item is ever left without one of these five:
 
 | Status | Meaning |
 |---|---|
@@ -54,17 +60,38 @@ There is no "Discovery" status. A discovery/spike item is either **Ready** (not 
 
 ### Normalizing legacy values
 
-Older rows on the page may still carry retired statuses. Whenever the reconciliation in Step 3 touches a row (or, opportunistically, whenever you notice one while reading the page), normalize it using this mapping — this is a self-healing cleanup, not a one-time migration to schedule separately:
+The database's `Status` select property only offers these five options (the legacy `Discovery`, `Validated`, and `Ready to Build` options were removed 2026-09-15 via `notion-update-data-source`, so they can't be picked again). But an item's *actual* status can still drift stale — e.g. an item sits at `Ready` for months after the work that finished it, because nobody went back and flipped it. Whenever the reconciliation in Step 3 touches an item (or, opportunistically, whenever you notice a mismatch while reading), correct it using this mapping — this is a self-healing cleanup, not a one-time migration to schedule separately:
 
-| Legacy value seen | Normalize to |
+| What you find | Normalize to |
 |---|---|
-| `Discovery` | `Ready` if not yet started this session or last; `In Progress` if actively being worked |
-| `Validated` | `Done` |
-| `Ready to Build` | `Ready` |
-| `On hold` | `Blocked` (add the blocker to the row's description if not already there) |
-| any other free-text status | Map to the closest of the five by meaning; ask Gilson only if genuinely ambiguous |
+| Status says `Ready` or `In Progress`, but the session/index history shows the work is actually merged/accepted | `Done` |
+| Status says anything, but the item is superseded or split into child items | `Archived` |
+| An item discussed this session has no corresponding database row at all | Create one (see Edge Cases) with the correct `Status` |
+| Genuinely unclear which of the five an item should be | Ask Gilson; don't guess-write it |
 
-A normalization write counts as a real update for Step 5's report even if nothing else about that row changed.
+A normalization write counts as a real update for Step 5's report even if nothing else about that item changed.
+
+---
+
+## Decided ADRs Relevance
+
+The Decided ADRs table is filtered, not exhaustive. As of 2026-09-15 it holds 16 of the 21 ADRs decided so far — the other 5 are real, accepted decisions that stay permanently in `motifpath-specs/adrs/` (never delete an ADR, per repo policy) but don't earn a row on a "read this first" bootstrap page.
+
+**Keep a row for an ADR when either is true:**
+- It's cross-cutting — something nearly every session might touch (data layer, auth, event pipeline, frontend architecture, local dev workflow, deployment).
+- It's tied to backlog work that isn't `Done`/`Archived` yet.
+
+**Fold an ADR out of the table when neither is true and it's specifically:**
+- A narrow SDK/tooling footnote to a broader decision that's already kept (e.g. "which Go package implements the already-decided auth approach").
+- A closed deferral note — an ADR whose whole content is "this resolves a follow-up flagged in ADR-N" and nothing more.
+
+When you fold one out, don't just delete the row silently:
+1. If another kept ADR's row would lose useful context without it (e.g. ADR-007 covers auth, but ADR-014 amends exactly how identity gets resolved), add a short parenthetical pointer to that kept row: "(amended by ADR-014: ...)".
+2. If no kept row is a natural home for the pointer, it's fine to just drop the row — the table's trailing note already says every ADR lives permanently in `motifpath-specs/adrs/`.
+
+This is a judgment call each time a new ADR is decided, not a one-time sweep — apply it in Step 3's ADR check (below) whenever a new ADR is added, and revisit an existing row only if Step 2's inventory specifically surfaced it (e.g. an amendment was just decided). Don't run a full audit of all 16 kept rows on every invocation, the same way Step 3 check 5 doesn't re-audit every backlog item.
+
+If it's genuinely unclear whether an ADR is cross-cutting enough to keep, ask Gilson rather than guessing — this table is small enough that a wrong call is expensive to notice later.
 
 ---
 
@@ -74,17 +101,18 @@ The workflow is six steps. Do not skip any of them.
 
 Invoking this skill is the go-ahead to write. Gilson has already decided the index should be updated; the skill's job is to reconcile accurately and write directly — no separate "present the plan and wait for approval" gate. State the writes as you make them (Step 6 reports them), and if Gilson wants something different they will say so.
 
-### Step 1: Fetch the current Project Index
+### Step 1: Fetch the current state
 
-Use `notion-fetch` against page ID `3679ccc1-102f-8184-83a7-e328e0d8cbfc` to retrieve the current state of the page. Read it carefully. Note especially:
+Use `notion-fetch` against page ID `3679ccc1-102f-8184-83a7-e328e0d8cbfc` to retrieve the current state of the index page. Read it carefully. Note especially:
 
 - The current "Latest session note" link and date
 - The current "Active item" and its status
 - The current "Last updated" timestamp
 - The rows currently in the Decided ADRs table
-- The rows currently in the Backlog Snapshot table and their statuses
 
-Without this step, you are operating blind. The entire reconciliation depends on knowing what the page actually says right now.
+Then use `notion-query-data-sources` (SQL mode) against `collection://93826617-2504-4976-9769-d3841dffcafd` to pull every backlog item touched by this session's inventory (Step 2) — `Name`, `Status`, `Priority`, `ID`, `url`. The index page's Backlog Snapshot section is a live linked view now; it needs no fetch of its own, but the database behind it does.
+
+Without this step, you are operating blind. The entire reconciliation depends on knowing what the page and the database actually say right now.
 
 ### Step 2: Inventory what changed this session
 
@@ -93,7 +121,7 @@ Look back over the conversation history of the current session. Build a concrete
 - **Session note**: Was a new session note page created in Notion (typically as a subpage under a backlog item like PB-8)? If so, capture its URL.
 - **Active backlog item**: Did work focus shift from one backlog item to another? Did the active item's status change (e.g., "Ready" → "In Progress")?
 - **ADRs**: Were any ADRs decided or finalized? Capture the ADR number and topic.
-- **Backlog snapshot changes**: Did any backlog item change status, priority, or get added/removed?
+- **Backlog changes**: Did any backlog item change status or priority, get created, or get renamed/rescoped?
 
 Reference specific PB-X IDs and ADR-X numbers from the conversation. Do not infer changes that weren't explicitly discussed.
 
@@ -103,12 +131,12 @@ Run these six lenses against `(inventory ∩ current page state)` to determine w
 
 1. **Session note check**: Does "Latest session note" on the page point to the most recent session note from the inventory?
 2. **Active item check**: Does "Active item" on the page match the focus of this session? Does its status match?
-3. **ADR check**: Are all newly-decided ADRs from the inventory present as rows in the Decided ADRs table?
-4. **Backlog snapshot check**: Do all rows in the snapshot match the current statuses from the inventory?
-5. **Status vocabulary check**: Does every backlog row (not just the ones the inventory touched) use one of the five statuses defined under "Backlog Status Vocabulary" above? Normalize any that don't, per the mapping table there.
+3. **ADR check**: Are all newly-decided ADRs from the inventory present as rows in the Decided ADRs table, filtered per "Decided ADRs Relevance" above (a new ADR that's a narrow footnote to one already kept gets folded in as a pointer, not its own row)? If the inventory shows an amendment to an already-kept ADR, does that ADR's row reflect it?
+4. **Backlog database check**: Does every backlog item the inventory touched exist in the Product Backlog database with the right `Status` and `Priority`? An item mentioned this session (by a PB-X id or by description) that has no matching database row at all is a divergence too — see Edge Cases for creating it.
+5. **Status vocabulary check**: For the items Step 4 touched, does `Status` reflect where the work actually is (not just whichever of the five values it happens to hold)? Normalize per the mapping table under "Backlog Status Vocabulary" above. This check is scoped to items the inventory surfaced — it is not a full audit of all ~50 backlog items every run.
 6. **Timestamp check**: If any of checks 1–5 will result in a write, the "Last updated" date should be updated to today.
 
-If all six checks pass (page already matches reality and every status is already normalized), there's nothing to write — skip to Step 6 and report "Project Index unchanged".
+If all six checks pass (page and database already match reality), there's nothing to write — skip to Step 6 and report "Project Index unchanged".
 
 If Step 2 surfaced an ambiguity a write depends on (see Edge Cases — e.g. two backlog items became active), resolve it with Gilson before writing that specific change. Everything unambiguous still gets written.
 
@@ -117,22 +145,28 @@ If Step 2 surfaced an ambiguity a write depends on (see Edge Cases — e.g. two 
 The index is a pointer, not an archive — the full narrative already lives in git history, PR descriptions, and linked session-note pages. Every run, check the page for bulk that shouldn't be there and cut it:
 
 - **Current Focus**: This section must read as a short present-tense status, not a session-by-session chronicle. Keep only: the active item and its (normalized) status, one short line of "why/what's next", and the "Latest session note" link. If Current Focus has accumulated dated paragraphs from past sessions (e.g. "**2026-09-13 session...**", "**2026-09-14 session (continued)...**"), delete them — that detail belongs in the session note pages and git/PR history, not inline on the index. Keep at most the current state; do not summarize the deleted history into a longer paragraph as a substitute.
-- **Backlog Snapshot rows**: Each row's title/description column is a short clause identifying the PBI, not a changelog. If a row has grown a multi-sentence merge-by-merge history, compress it to one short clause (what it is, plus a pointer like "see ADR-019" or "see PB-49" if another row/ADR already carries the detail). Do not delete the row itself or lose the ID/priority.
-- Leave the Decided ADRs table, Key Product & Architecture Context, Key Notion IDs, Active English Patterns, Repo Structure, and Methodology sections alone — they are not chronological and are not the source of the bloat (see "What NOT to Update").
+- **Backlog database `Notes` field**: If an item's `Notes` property (not the index page — see Purpose) has grown a multi-sentence merge-by-merge history, compress it to one short clause with a pointer (e.g. "see ADR-019" or "see PB-49") if another item/ADR already carries the detail. This is the database-item equivalent of the old Backlog Snapshot row-trimming and follows the same rule: compress, don't delete the item or lose its `Status`/`Priority`.
+- Leave Key Product & Architecture Context, Key Notion IDs, Active English Patterns, Repo Structure, Methodology sections, and the Backlog Snapshot's live-view pointer paragraph alone — they are not chronological and are not the source of the bloat (see "What NOT to Update"). The Decided ADRs table is the one exception with its own dedicated rule — see "Decided ADRs Relevance" above, applied at Step 3 check 3, not here.
 
 Trimming is part of the same write batch as Step 5 — it is not a separate ask-first pass. If a trim would delete information that isn't preserved anywhere else (no linked session note, no PR, no ADR), keep it rather than lose it, and flag that gap in Step 6's report instead of silently dropping it.
 
 ### Step 5: Execute writes
 
-Execute the writes using `notion-update-page`. Describe each write by intent — the right tool-call shape depends on the structure of the blocks returned by `notion-fetch` in Step 1. For example:
+Two different targets get writes now — keep them straight:
 
+**Index page** (`notion-update-page` with `page_id: 3679ccc1-102f-8184-83a7-e328e0d8cbfc`), for:
 - "Update the 'Latest session note' line to point to the new URL"
-- "Add a new row to the Decided ADRs table with ADR-006"
+- "Add a new row to the Decided ADRs table with ADR-006" (or, if the new ADR is a narrow footnote per "Decided ADRs Relevance", "Add a pointer for ADR-022 to ADR-007's existing row instead of a new row")
 - "Update the 'Last updated' value to today's date"
 - "Replace the Current Focus section with the trimmed version"
-- "Normalize PB-41's status from Discovery to Ready"
 
-Use the block IDs and structures observed in Step 1 to construct correct update calls. If a particular write fails, do not abort the whole sequence — continue with the rest, then report failures in Step 6.
+**Backlog database items** (`notion-update-page` with `command: update_properties`, targeting the individual item's own page ID from Step 1's query — never the index page ID), for:
+- "Set PB-41's `Status` to `Ready`"
+- "Compress PB-49's `Notes` field to one clause"
+
+If an item from Step 3 check 4 has no database row at all, create one with `notion-create-pages` (`parent: {type: data_source_id, data_source_id: 93826617-2504-4976-9769-d3841dffcafd}`), setting `Name`, `Status`, `Priority`, and `Type` — see Edge Cases.
+
+Use the block IDs and structures observed in Step 1 to construct correct index-page update calls. If a particular write fails, do not abort the whole sequence — continue with the rest, then report failures in Step 6.
 
 ### Step 6: Report results
 
@@ -145,7 +179,7 @@ Successful run:
 - Latest session note → [new link]
 - Active item → PB-9 (In Progress)
 - Decided ADRs: +ADR-006
-- Status normalized: PB-41 Discovery → Ready
+- Status normalized (Product Backlog database): PB-41 Ready → Done
 - Current Focus trimmed: removed 4 dated session paragraphs (detail preserved in linked session notes / git history)
 - Last updated → 2026-05-21
 ```
@@ -177,9 +211,12 @@ Even if it looks tempting, leave these alone:
 - **Key Product & Architecture Context / Key Notion IDs** — reference material, not a session log; leave as-is unless it's factually wrong.
 - **Historical session notes as separate Notion pages** — only the "Latest session note" pointer on the index moves; the note pages themselves, and older note links inside them, are untouched.
 - **Speculative future ADRs** — only Decided ADRs go into the table. Drafts and proposals do not.
-- **Priority values in the Backlog Snapshot** (P0–P3) — this skill normalizes *status*, not priority; only touch priority if the inventory explicitly says it changed.
+- **Already-kept ADR rows Step 2's inventory didn't surface** — "Decided ADRs Relevance" is applied when a new ADR is decided, not as a standing audit of the 16 rows already there. Don't re-litigate ADR-018's or ADR-019's place in the table just because you're in the file.
+- **Priority values on backlog items** (P0–P3) — this skill normalizes *status*, not priority; only touch priority if the inventory explicitly says it changed.
+- **Backlog items this session's inventory never touched** — Step 3 check 5 is scoped to items the inventory surfaced. Do not run a full audit of every backlog item's status on every invocation; that's a different, heavier task, not this skill's job.
+- **The Active Backlog linked view itself** (filter/sort/columns) — it's configuration on the view block, not content this skill reconciles. Leave its filter (`Status IN (Ready, In Progress, Blocked)`) alone unless Gilson asks for a different scope.
 
-Note the one deliberate exception to "leave it alone": Step 4 trims dated narrative out of **Current Focus** and compresses changelog-style Backlog Snapshot rows, on every run, as a normal part of this skill's job — that is not scope creep, it is the second half of what "maintenance" means here. The scope creep to avoid is going further than Step 4 describes: rewriting a row's meaning, reordering the table, or restyling sections it doesn't cover.
+Note the one deliberate exception to "leave it alone": Step 4 trims dated narrative out of **Current Focus** and compresses an over-grown `Notes` field on a backlog item, on every run, as a normal part of this skill's job — that is not scope creep, it is the second half of what "maintenance" means here. The scope creep to avoid is going further than Step 4 describes: rewriting an item's meaning, reordering anything, or restyling sections it doesn't cover.
 
 ---
 
@@ -195,21 +232,26 @@ Both this skill and `english-fluency-coach` are part of the session-close ritual
 
 **An ADR was discussed but Gilson said "let me think about it more."** It's not decided. Do not add it to the Decided ADRs table.
 
-**The Notion fetch returns an unexpected page structure** (sections missing, table headers renamed). Stop. Report the discrepancy rather than trying to autocorrect. The skill assumes a stable page structure; if that's broken, a human needs to look.
+**A new ADR is decided and it's unclear whether it deserves its own row or a footnote pointer.** This happened for real on 2026-09-15 when the table was first trimmed from 21 to 16 rows (ADR-001/009/010/013/014 removed, ADR-007 and ADR-012 gained pointers). Apply "Decided ADRs Relevance" above; if it's a close call, ask Gilson rather than guessing — a wrong call here means either a bloated table again or a genuinely useful row missing.
+
+**The Notion fetch returns an unexpected page structure** (sections missing, table headers renamed) or the database query returns an unexpected schema (the `Status` property has options beyond the five, or is missing). Stop. Report the discrepancy rather than trying to autocorrect. The skill assumes a stable page structure and a stable five-option `Status` property; if either is broken, a human needs to look.
+
+**A backlog item discussed this session has no corresponding row in the Product Backlog database at all.** This happened for real on 2026-09-15: PB-40 (exercise-authoring builder) had months of session-note history and multiple merged PRs but no database row — the work had only ever been tracked in the index page's old markdown table, never in the actual database. Create the missing row with `notion-create-pages` (`Name`, `Status`, `Priority`, `Type`, and a short `Notes` summary with PR/ADR pointers), then report it as a creation, not a normalization. If an existing row's *name* looks like it might be the same effort under different wording rather than truly missing, ask Gilson which it is — don't guess and silently rename or merge.
 
 **Gilson invokes the skill mid-session, not at session close.** That's fine — the workflow is the same. Reconcile against whatever has happened so far. Nothing about the workflow actually requires "end of session" to be true.
 
-**The session was entirely discussion, no concrete changes.** Step 3 may still show a status-vocabulary check failing (a stale `Discovery`/`Validated` row sitting there from before this skill's v1.2.0) even though nothing happened this session. Normalize it anyway, report the normalization, and otherwise report "Project Index unchanged".
+**The session was entirely discussion, no concrete changes.** If, while reading, you notice an item's `Status` clearly doesn't match reality (e.g. still `Ready` though the index history shows it shipped), normalize it anyway even though nothing happened this session, report the normalization, and otherwise report "Project Index unchanged".
 
 **A write turns out larger or more sweeping than the inventory justifies.** Don't force it through just because the skill is running. Pause, say what looks off, and let Gilson steer. This includes Step 4 trims: if trimming Current Focus would mean judgment calls about what counts as "still needed" beyond the rule stated there, pause and check rather than guessing.
 
-**A legacy status doesn't map cleanly** (e.g. it's genuinely unclear whether a `Discovery` row is Ready or In Progress). Don't guess-write it. Ask Gilson which of the five it should become, resolve everything else, and report the one pending call.
+**An item's true status doesn't map cleanly** (e.g. it's genuinely unclear whether an item stuck at `Ready` should become `In Progress` or is actually already `Done`). Don't guess-write it. Ask Gilson which of the five it should become, resolve everything else, and report the one pending call.
 
-**A backlog row's whole point was that it's exploratory** (a research task, a spike). Resist the urge to invent a sixth status for it. It's still just Ready, In Progress, Blocked, Done, or Archived — the PBI's title/type already says it's a spike; the status only tracks where it is in that lifecycle.
+**A backlog item's whole point was that it's exploratory** (a research task, a spike). Resist the urge to invent a sixth status for it. It's still just Ready, In Progress, Blocked, Done, or Archived — the item's title/type already says it's a spike; the status only tracks where it is in that lifecycle.
 
 ---
 
 ## Page Reference
 
-- **Project Index page ID**: `3679ccc1-102f-8184-83a7-e328e0d8cbfc`
-- This is the only Notion page this skill writes to. Any other Notion writes are out of scope.
+- **Project Index page ID**: `3679ccc1-102f-8184-83a7-e328e0d8cbfc` — this skill writes to Current Focus, Decided ADRs, and Last-updated on this page.
+- **Product Backlog data source**: `collection://93826617-2504-4976-9769-d3841dffcafd` — this skill writes to individual backlog item pages' `Status`/`Priority`/`Notes` properties, and creates new item pages when Step 3 check 4 finds a gap. It never edits the data source's schema (the five-option `Status` property, its colors, or other properties) — that's a one-time setup, not a per-session maintenance task.
+- These are the only two places this skill writes to. Any other Notion writes are out of scope.

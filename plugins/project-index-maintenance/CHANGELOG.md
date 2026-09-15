@@ -1,5 +1,58 @@
 # Project Index Maintenance — Changelog
 
+## [1.4.0] — 2026-09-15
+
+### Changed
+- Decided ADRs table is now filtered, not exhaustive — added "Decided ADRs
+  Relevance": keep a row only if the ADR is cross-cutting (data layer, auth,
+  event pipeline, frontend architecture, local dev, deployment) or tied to
+  backlog work that isn't Done/Archived; fold out narrow SDK/tooling footnotes
+  and closed deferral notes, adding a pointer to a kept row when one is a
+  natural home for it.
+- Applied this rule for the first time: trimmed the live table from 21 to 16
+  rows (removed ADR-001, 009, 010, 013, 014 — all real, accepted decisions
+  that stay permanently in `motifpath-specs/adrs/` per repo policy, just not
+  worth a row on the bootstrap page). ADR-007 gained a pointer to ADR-014's
+  amendment; ADR-012 gained a pointer noting ADR-013 closed its deferral.
+- Step 3 check 3 (ADR check) now applies this filter to newly-decided ADRs
+  going forward, and updates an already-kept row's pointer when Step 2's
+  inventory shows an amendment to it. It does not re-audit existing rows the
+  inventory didn't surface — same scoping principle as Step 3 check 5 for
+  backlog items.
+- "What NOT to Update" gains a matching entry: don't re-litigate an
+  already-kept ADR's place in the table absent a session-inventory reason to.
+
+## [1.3.0] — 2026-09-15
+
+### Changed
+- Backlog Snapshot on the index page is now a live linked view of the real
+  Product Backlog database (`collection://93826617-2504-4976-9769-d3841dffcafd`),
+  not a manually copied markdown table — that table was removed. This skill's
+  reconciliation target shifts accordingly: Step 3 check 4 ("Backlog snapshot
+  check") is now "Backlog database check" against the real database via
+  `notion-query-data-sources`, and Step 5's backlog writes are
+  `update_properties` calls on individual item pages, not markdown-table edits
+  on the index page.
+- Discovered mid-rollout that the real database's `Status` options were
+  themselves the ad hoc, redundant set this skill was meant to fix on the
+  index page — normalized there too (`Discovery`/`Validated`/`Ready to Build`
+  removed from the select property's option list via `notion-update-data-source`,
+  27 items' stale statuses corrected) as part of the same v1.3.0 rollout.
+- Added an edge case: a backlog item can be discussed for months in session
+  notes and merged PRs while having no corresponding database row at all (this
+  happened for real with PB-40). Step 3 check 4 now catches this; the fix is
+  `notion-create-pages` against the data source, not a status write.
+- "Backlog Snapshot rows" trimming (old Step 4 bullet) is replaced by
+  "Backlog database `Notes` field" trimming — the compression target moved
+  from index-page table cells to the database item's own `Notes` property.
+- "What NOT to Update" gains two entries: don't audit every backlog item's
+  status on every run (only ones the session's inventory touched), and don't
+  touch the Active Backlog linked view's filter/sort configuration.
+- Page Reference now lists two write targets (index page + Product Backlog
+  data source) instead of one, and explicitly excludes the data source's
+  schema (property definitions) from this skill's scope — schema changes are
+  one-time setup, not session-close maintenance.
+
 ## [1.2.0] — 2026-09-15
 
 ### Changed
