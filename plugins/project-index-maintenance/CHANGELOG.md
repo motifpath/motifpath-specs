@@ -1,5 +1,26 @@
 # Project Index Maintenance — Changelog
 
+## [1.2.0] — 2026-09-15
+
+### Changed
+- Collapsed the backlog status vocabulary from an ad hoc, growing set of
+  free-text values down to five: Ready, In Progress, Blocked, Done, Archived.
+  "Discovery" is retired (it's just Ready or In Progress depending on whether
+  work has started); "Validated" is retired (folded into Done, which already
+  implies validation); "Ready to Build" → Ready; "On hold" → Blocked.
+- Reconciliation is now six checks, not five — added a status-vocabulary check
+  that normalizes any row still carrying a retired status, opportunistically,
+  every run, not as a one-time migration.
+- Added a page-trimming step (new Step 4, workflow renumbered 1-6): Current
+  Focus must read as a short present-tense status, not an accumulating
+  session-by-session chronicle, and changelog-style Backlog Snapshot rows get
+  compressed to a short clause. This is now a normal part of every run, not
+  scope creep — the index had grown large enough to make session bootstrap
+  slow, which this directly targets.
+- "What NOT to Update" now calls out this one exception explicitly, and adds
+  priority values (P0-P3) as an explicit no-touch (this skill normalizes
+  status, not priority).
+
 ## [1.1.0] — 2026-09-10
 
 ### Changed
