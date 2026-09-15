@@ -26,11 +26,35 @@ Feature: Manage challenges
     When "admin" creates a challenge for "intro-to-triads" with subject tag "chord-theory" and pass threshold 80
     Then the challenge is created and assigned a stable identifier
 
+  Scenario: A teacher creates a challenge with shuffled exercises and options
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a challenge for "intro-to-triads" with subject tag "triad-shapes", pass threshold 70, shuffled exercises, and shuffled options
+    Then the challenge is created with exercise shuffling and option shuffling both enabled
+
+  Scenario: A teacher creates a challenge without specifying shuffling
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a challenge for "intro-to-triads" with subject tag "triad-shapes" and pass threshold 70
+    Then the challenge is created with exercise shuffling and option shuffling both disabled
+
   Scenario: Any authenticated user retrieves a challenge by ID
     Given a challenge "triad-challenge" exists for content node "intro-to-triads"
     And "alice" is authenticated as a student
     When "alice" retrieves the challenge "triad-challenge"
     Then the response returns the challenge's subject tag, threshold, and parent content node
+
+  # ── Happy path — listing a node's challenges ─────────────────────────────────
+
+  Scenario: A student lists the challenges for a node that has one
+    Given a challenge "triad-challenge" exists for content node "intro-to-triads"
+    And "alice" is authenticated as a student
+    When "alice" lists the challenges for content node "intro-to-triads"
+    Then the response includes "triad-challenge"
+
+  Scenario: A student lists the challenges for a node that has none
+    Given a content node "silent-node" exists in the system
+    And "alice" is authenticated as a student
+    When "alice" lists the challenges for content node "silent-node"
+    Then the response is an empty list
 
   # ── Validation failures ────────────────────────────────────────────────────
 
@@ -64,6 +88,11 @@ Feature: Manage challenges
     When "alice" retrieves a challenge with an ID that does not exist
     Then the request is refused with a not-found error
 
+  Scenario: Listing challenges for a content node that does not exist returns not found
+    Given "alice" is authenticated as a student
+    When "alice" lists the challenges for a content node ID that does not exist
+    Then the request is refused with a not-found error
+
   # ── Authorisation failures ─────────────────────────────────────────────────
 
   Scenario: A student cannot create a challenge
@@ -74,4 +103,10 @@ Feature: Manage challenges
   Scenario: Creating a challenge without an authentication token is refused
     Given no authentication token is provided
     When an unauthenticated request attempts to create a challenge
+    Then the request is refused with an authentication error
+
+  Scenario: Listing a node's challenges without an authentication token is refused
+    Given a content node "intro-to-triads" exists in the system
+    And no authentication token is provided
+    When an unauthenticated request attempts to list the challenges for content node "intro-to-triads"
     Then the request is refused with an authentication error
