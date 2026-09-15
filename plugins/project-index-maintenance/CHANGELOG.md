@@ -1,5 +1,36 @@
 # Project Index Maintenance — Changelog
 
+## [1.3.0] — 2026-09-15
+
+### Changed
+- Backlog Snapshot on the index page is now a live linked view of the real
+  Product Backlog database (`collection://93826617-2504-4976-9769-d3841dffcafd`),
+  not a manually copied markdown table — that table was removed. This skill's
+  reconciliation target shifts accordingly: Step 3 check 4 ("Backlog snapshot
+  check") is now "Backlog database check" against the real database via
+  `notion-query-data-sources`, and Step 5's backlog writes are
+  `update_properties` calls on individual item pages, not markdown-table edits
+  on the index page.
+- Discovered mid-rollout that the real database's `Status` options were
+  themselves the ad hoc, redundant set this skill was meant to fix on the
+  index page — normalized there too (`Discovery`/`Validated`/`Ready to Build`
+  removed from the select property's option list via `notion-update-data-source`,
+  27 items' stale statuses corrected) as part of the same v1.3.0 rollout.
+- Added an edge case: a backlog item can be discussed for months in session
+  notes and merged PRs while having no corresponding database row at all (this
+  happened for real with PB-40). Step 3 check 4 now catches this; the fix is
+  `notion-create-pages` against the data source, not a status write.
+- "Backlog Snapshot rows" trimming (old Step 4 bullet) is replaced by
+  "Backlog database `Notes` field" trimming — the compression target moved
+  from index-page table cells to the database item's own `Notes` property.
+- "What NOT to Update" gains two entries: don't audit every backlog item's
+  status on every run (only ones the session's inventory touched), and don't
+  touch the Active Backlog linked view's filter/sort configuration.
+- Page Reference now lists two write targets (index page + Product Backlog
+  data source) instead of one, and explicitly excludes the data source's
+  schema (property definitions) from this skill's scope — schema changes are
+  one-time setup, not session-close maintenance.
+
 ## [1.2.0] — 2026-09-15
 
 ### Changed
