@@ -26,6 +26,16 @@ Feature: Manage challenges
     When "admin" creates a challenge for "intro-to-triads" with subject tag "chord-theory" and pass threshold 80
     Then the challenge is created and assigned a stable identifier
 
+  Scenario: A teacher creates a challenge with shuffled exercises and options
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a challenge for "intro-to-triads" with subject tag "triad-shapes", pass threshold 70, shuffled exercises, and shuffled options
+    Then the challenge is created with exercise shuffling and option shuffling both enabled
+
+  Scenario: A teacher creates a challenge without specifying shuffling
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a challenge for "intro-to-triads" with subject tag "triad-shapes" and pass threshold 70
+    Then the challenge is created with exercise shuffling and option shuffling both disabled
+
   Scenario: Any authenticated user retrieves a challenge by ID
     Given a challenge "triad-challenge" exists for content node "intro-to-triads"
     And "alice" is authenticated as a student

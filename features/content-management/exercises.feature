@@ -134,6 +134,138 @@ Feature: Manage exercises
     When "alice" lists the exercises for challenge "triad-challenge"
     Then the response is an empty list
 
+  Scenario: A challenge with shuffling disabled always returns exercises in link order
+    Given a challenge "ordered-challenge" exists for content node "intro-to-triads" with exercise shuffling disabled
+    And 3 exercises are linked to "ordered-challenge" in a known order
+    And "alice" is authenticated as a student
+    When "alice" lists the exercises for challenge "ordered-challenge" twice
+    Then both responses return the exercises in the same, link order
+
+  Scenario: A challenge with shuffling enabled may vary exercise and option order across requests
+    Given a challenge "shuffled-challenge" exists for content node "intro-to-triads" with exercise shuffling and option shuffling enabled
+    And 5 exercises are linked to "shuffled-challenge" in a known order
+    And "alice" is authenticated as a student
+    When "alice" lists the exercises for challenge "shuffled-challenge" twice
+    Then both responses return the same set of exercises
+    But the two responses are not required to return them in the same order
+
+  # ── Happy path — path exercises (content node linking) ───────────────────────
+
+  Scenario: A teacher links an existing exercise into a content node as a path exercise
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    When "bob" links exercise "triad-exercise-01" to content node "intro-to-triads" as a path exercise
+    Then the exercise records "intro-to-triads" among its linked content nodes
+
+  Scenario: An exercise can be a path exercise on a node and linked to a challenge at the same time
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "triad-exercise-01" to content node "intro-to-triads" as a path exercise
+    When "bob" links exercise "triad-exercise-01" to "triad-challenge"
+    Then the exercise records "intro-to-triads" among its linked content nodes
+    And the exercise records "triad-challenge" among its linked challenges
+
+  Scenario: A teacher unlinks a path exercise from a content node
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "triad-exercise-01" to content node "intro-to-triads" as a path exercise
+    When "bob" unlinks exercise "triad-exercise-01" from content node "intro-to-triads"
+    Then the exercise no longer records "intro-to-triads" among its linked content nodes
+
+  Scenario: A student lists the path exercises for a node that has some, always in link order
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "triad-exercise-01" to content node "intro-to-triads" as a path exercise
+    And "alice" is authenticated as a student
+    When "alice" lists the path exercises for content node "intro-to-triads" twice
+    Then both responses include "triad-exercise-01"
+    And both responses return the path exercises in the same, link order
+
+  Scenario: A student lists the path exercises for a node that has none
+    Given "alice" is authenticated as a student
+    When "alice" lists the path exercises for content node "intro-to-triads"
+    Then the response is an empty list
+
+  # ── Conflict — path-exercise linking ──────────────────────────────────────────
+
+  Scenario: Linking an exercise that is already a path exercise on the node is rejected
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "triad-exercise-01" to content node "intro-to-triads" as a path exercise
+    When "bob" links exercise "triad-exercise-01" to content node "intro-to-triads" as a path exercise
+    Then the request is refused with a conflict error
+
+  # ── Not found — path-exercise linking and unlinking ───────────────────────────
+
+  Scenario: Linking a non-existent exercise to a content node as a path exercise returns not found
+    Given "bob" is authenticated as a teacher
+    When "bob" links an exercise ID that does not exist to content node "intro-to-triads" as a path exercise
+    Then the request is refused with a not-found error
+
+  Scenario: Linking an exercise as a path exercise to a non-existent content node returns not found
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    When "bob" links exercise "triad-exercise-01" to a content node ID that does not exist as a path exercise
+    Then the request is refused with a not-found error
+
+  Scenario: Unlinking a path exercise that is not linked to the node returns not found
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    When "bob" unlinks exercise "triad-exercise-01" from content node "intro-to-triads"
+    Then the request is refused with a not-found error
+
+  Scenario: Listing path exercises for a content node that does not exist returns not found
+    Given "alice" is authenticated as a student
+    When "alice" lists the path exercises for a content node ID that does not exist
+    Then the request is refused with a not-found error
+
+  # ── Happy path — practice sessions ────────────────────────────────────────────
+
+  Scenario: A student starts a practice session for a skill with enough tagged exercises
+    Given 12 exercises tagged "alternate_picking" exist in the system
+    And "alice" is authenticated as a student
+    When "alice" starts a practice session for skill tag "alternate_picking" with count 10
+    Then the practice session contains 10 exercises
+    And every exercise in the practice session is tagged "alternate_picking"
+    And the practice session is assigned a stable practice_session_id
+
+  Scenario: A practice session returns fewer exercises when the tagged pool is smaller than requested
+    Given 3 exercises tagged "hybrid_picking" exist in the system
+    And "alice" is authenticated as a student
+    When "alice" starts a practice session for skill tag "hybrid_picking" with count 10
+    Then the practice session contains 3 exercises
+
+  Scenario: A practice session defaults its count when none is given
+    Given 12 exercises tagged "alternate_picking" exist in the system
+    And "alice" is authenticated as a student
+    When "alice" starts a practice session for skill tag "alternate_picking" without specifying a count
+    Then the practice session contains 10 exercises
+
+  Scenario: Two practice sessions for the same skill tag may differ in composition and order
+    Given 12 exercises tagged "alternate_picking" exist in the system
+    And "alice" is authenticated as a student
+    When "alice" starts two practice sessions for skill tag "alternate_picking" with count 10
+    Then the two practice sessions are assigned different practice_session_ids
+
+  # ── Validation failures — practice sessions ───────────────────────────────────
+
+  Scenario: Starting a practice session without a skill tag is rejected
+    Given "alice" is authenticated as a student
+    When "alice" submits a start practice session request with the skill_tag field omitted
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_tag" as the source of the error
+
+  Scenario: Starting a practice session with a count above the maximum is rejected
+    Given "alice" is authenticated as a student
+    When "alice" submits a start practice session request with skill_tag "alternate_picking" and count 51
+    Then the request is rejected as invalid
+    And the rejection identifies "count" as the source of the error
+
+  Scenario: Starting a practice session for a skill tag with no matching exercises returns an empty session
+    Given "alice" is authenticated as a student
+    When "alice" starts a practice session for skill tag "nonexistent-skill" with count 10
+    Then the practice session contains 0 exercises
+
   # ── Conflict — linking ───────────────────────────────────────────────────────
 
   Scenario: Linking an exercise that is already linked to the challenge is rejected
@@ -188,6 +320,20 @@ Feature: Manage exercises
     When "alice" attempts to unlink exercise "triad-exercise-01" from "triad-challenge"
     Then the request is refused with a forbidden error
 
+  Scenario: A student cannot link an exercise to a content node as a path exercise
+    Given an exercise "triad-exercise-01" exists
+    And "alice" is authenticated as a student
+    When "alice" attempts to link exercise "triad-exercise-01" to content node "intro-to-triads" as a path exercise
+    Then the request is refused with a forbidden error
+
+  Scenario: A student cannot unlink a path exercise from a content node
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "triad-exercise-01" to content node "intro-to-triads" as a path exercise
+    And "alice" is authenticated as a student
+    When "alice" attempts to unlink exercise "triad-exercise-01" from content node "intro-to-triads"
+    Then the request is refused with a forbidden error
+
   Scenario: Creating an exercise without an authentication token is refused
     Given no authentication token is provided
     When an unauthenticated request attempts to create an exercise
@@ -196,4 +342,21 @@ Feature: Manage exercises
   Scenario: Listing a challenge's exercises without an authentication token is refused
     Given no authentication token is provided
     When an unauthenticated request attempts to list the exercises for challenge "triad-challenge"
+    Then the request is refused with an authentication error
+
+  Scenario: Linking a path exercise without an authentication token is refused
+    Given a content node "intro-to-triads" exists in the system
+    And no authentication token is provided
+    When an unauthenticated request attempts to link an exercise to content node "intro-to-triads" as a path exercise
+    Then the request is refused with an authentication error
+
+  Scenario: Listing a node's path exercises without an authentication token is refused
+    Given a content node "intro-to-triads" exists in the system
+    And no authentication token is provided
+    When an unauthenticated request attempts to list the path exercises for content node "intro-to-triads"
+    Then the request is refused with an authentication error
+
+  Scenario: Starting a practice session without an authentication token is refused
+    Given no authentication token is provided
+    When an unauthenticated request attempts to start a practice session for skill tag "alternate_picking"
     Then the request is refused with an authentication error
