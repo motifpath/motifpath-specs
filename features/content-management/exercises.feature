@@ -118,6 +118,22 @@ Feature: Manage exercises
     When "bob" unlinks exercise "triad-exercise-01" from "triad-challenge"
     Then the exercise no longer records "triad-challenge" among its linked challenges
 
+  # ── Happy path — listing a challenge's exercises ─────────────────────────────
+
+  Scenario: A student lists the exercises linked to a challenge
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "triad-exercise-01" to "triad-challenge"
+    And "alice" is authenticated as a student
+    When "alice" lists the exercises for challenge "triad-challenge"
+    Then the response includes "triad-exercise-01"
+    And each returned exercise's options report whether they are correct
+
+  Scenario: A student lists the exercises for a challenge with none linked
+    Given "alice" is authenticated as a student
+    When "alice" lists the exercises for challenge "triad-challenge"
+    Then the response is an empty list
+
   # ── Conflict — linking ───────────────────────────────────────────────────────
 
   Scenario: Linking an exercise that is already linked to the challenge is rejected
@@ -146,6 +162,11 @@ Feature: Manage exercises
     When "bob" unlinks exercise "triad-exercise-01" from "triad-challenge"
     Then the request is refused with a not-found error
 
+  Scenario: Listing exercises for a challenge that does not exist returns not found
+    Given "alice" is authenticated as a student
+    When "alice" lists the exercises for a challenge ID that does not exist
+    Then the request is refused with a not-found error
+
   # ── Authorisation failures ────────────────────────────────────────────────────
 
   Scenario: A student cannot create an exercise
@@ -170,4 +191,9 @@ Feature: Manage exercises
   Scenario: Creating an exercise without an authentication token is refused
     Given no authentication token is provided
     When an unauthenticated request attempts to create an exercise
+    Then the request is refused with an authentication error
+
+  Scenario: Listing a challenge's exercises without an authentication token is refused
+    Given no authentication token is provided
+    When an unauthenticated request attempts to list the exercises for challenge "triad-challenge"
     Then the request is refused with an authentication error
