@@ -189,6 +189,46 @@ paths:
                 $ref: '#/components/schemas/NotFoundError'
 
   /content-nodes/{content_node_id}/challenges:
+    get:
+      operationId: listContentNodeChallenges
+      summary: List the challenges attached to a content node
+      description: |
+        Returns the challenges attached to the specified content node, so a client
+        can discover whether a node has a practice step before linking into it. A
+        node with no challenge returns an empty array — completion for that node
+        comes from its content alone. Any authenticated user may list a node's
+        challenges.
+      tags:
+        - Content
+      parameters:
+        - name: content_node_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the content node whose challenges are requested.
+      responses:
+        "200":
+          description: The content node's challenges, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Challenge'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No content node exists with the given content_node_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
     post:
       operationId: createChallenge
       summary: Create a challenge for a content node
@@ -370,6 +410,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForbiddenError'
+
+  /challenges/{challenge_id}/exercises:
+    get:
+      operationId: listChallengeExercises
+      summary: List the exercises linked to a challenge
+      description: |
+        Returns the exercises currently linked to the specified challenge, in the
+        shape a client needs to run a practice attempt — each exercise's prompt,
+        type, and options, including which option(s) are correct. Any authenticated
+        user may list a challenge's exercises; the client is responsible for
+        withholding correctness from the student's own view while the attempt is
+        in progress and using it only to score the attempt once submitted.
+      tags:
+        - Content
+      parameters:
+        - name: challenge_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the challenge whose exercises are requested.
+      responses:
+        "200":
+          description: The challenge's linked exercises, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exercise'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No challenge exists with the given challenge_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
 
   /challenges/{challenge_id}/exercises/{exercise_id}:
     post:
