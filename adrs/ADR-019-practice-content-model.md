@@ -210,11 +210,57 @@ other decision point changes — the many-to-many Challenge relationship, skill 
 option-selection checking model apply identically to this type. Rhythmic exercises remain
 deferred to PB-43, unaffected by this amendment.
 
+## Amendment (2026-09-16) — documenting the two other Exercise usage contexts
+
+PB-52 (exercise-authoring page improvements) needed to change the authoring page's "used in
+challenges" display, since an exercise can appear in contexts other than a Challenge. Tracing
+that requirement surfaced that `motifpath-core` already implements two more Exercise linkage
+contexts beyond the Challenge many-to-many this ADR documented — neither was ever written down
+here or anywhere else, a spec-before-code gap this amendment closes without changing behavior.
+
+**What already exists, undocumented until now:**
+
+1. **ContentNode ↔ Exercise ("path exercises"), many-to-many.** A `ContentNodeExercise` join
+   entity (`services/core-domain/internal/adapters/repo/ent/schema/content_node_exercise.go`)
+   lets an exercise be linked directly to a content node as static, teacher-curated introductory
+   practice — separate from, and independent of, any Challenge on that node. It carries no pass
+   threshold and is always returned in authored link order, never shuffled
+   (`GET /content-nodes/{id}/exercises`, `POST/DELETE /content-nodes/{id}/exercises/{exercise_id}`
+   in `openapi/core-domain-service.yaml`). A node may have a Challenge, path exercises, both, or
+   neither — this ADR does not constrain that combination, and no code today enforces one.
+2. **Practice session ↔ Exercise: deliberately not a persisted link.**
+   `POST /practice-sessions` selects up to `count` exercises matching a `skill_tag` from the
+   reusable exercise pool at request time, in random order with shuffled options, and returns
+   them under a generated `practice_session_id`. Nothing is written to storage — the session
+   exists only in the response and the `exercise.*` tracking events the client emits while
+   attempting it. An exercise becomes eligible for practice sessions purely by carrying a
+   matching skill tag (decision point 2 of this ADR); there is no separate join table to
+   maintain, and none is needed.
+
+**Decision: this amendment documents both contexts as-is — no schema, endpoint, or behavior
+changes.** The `ChallengeExercise` join (decision point 1), the `ContentNodeExercise` join, and
+the unpersisted skill-tag-driven practice-session selection are the complete set of ways an
+Exercise is used. A consumer (e.g. an authoring UI's "used in" display) must query all three —
+`GET /challenges/{id}/exercises`-derived linkage, `GET /content-nodes/{id}/exercises`-derived
+linkage, and the exercise's own `skill_tags` (as a proxy for practice-session eligibility, since
+no persisted session list exists to query) — to show where an exercise is actually usable.
+
+This was considered as a candidate for a single polymorphic `exercise_usage(exercise_id,
+context_type, context_id)` table generalizing all contexts uniformly, and rejected: ent has no
+native polymorphic-association support, so `context_id` couldn't carry a real foreign-key
+constraint to more than one table, trading referential integrity for a uniformity the product
+doesn't need — path exercises and challenge exercises already have different shapes (no pass
+threshold vs. pass threshold, authored order vs. possibly-shuffled order) that a shared table
+would just paper over. Two typed join tables, one per genuinely-persisted context, is what the
+existing `ChallengeExercise`/`ContentNodeExercise` implementation already does, and this
+amendment simply confirms that pattern going forward rather than replacing it.
+
 ## Related ADRs
 
 - **ADR-015** — Challenge belongs to the path node; this ADR narrows ADR-015's implicit
   challenge-owns-exercise coupling (as implemented, not as ADR-015's text required) to a
-  many-to-many relationship.
+  many-to-many relationship. The 2026-09-16 amendment further confirms a node's Challenge and its
+  path exercises are independent, both optional, additions to ADR-015's node content model.
 - **PB-33** (not yet an ADR) — Content classification as a knowledge graph. This ADR's skill tags
   are a deliberate precursor, expected to be superseded or absorbed once PB-33 is decided.
 
@@ -231,6 +277,9 @@ deferred to PB-43, unaffected by this amendment.
 - PB-33: use this ADR's skill tags as real input when designing the Skill/Concept knowledge
   graph.
 - PB-8g: design how standalone/cross-path exercise suggestion queries exercises by skill tag.
+- **PB-52**: update the exercise-authoring page's "used in" display to query all three usage
+  contexts confirmed in the 2026-09-16 amendment (challenges, path exercises, skill-tag practice
+  eligibility), not just Challenge.
 
 ---
 
