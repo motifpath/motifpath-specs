@@ -366,6 +366,7 @@ paths:
               - audio_recognition
               - image_recognition
               - image_choice
+              - audio_selection
           description: When given, only exercises of this type are returned.
       responses:
         "200":
@@ -2063,12 +2064,14 @@ components:
             - audio_recognition
             - image_recognition
             - image_choice
+            - audio_selection
           description: |
             The type of practice interaction, which determines how its
             options are authored and rendered. text_response and
             audio_recognition options carry a text label; image_recognition
             options carry a region on image_url; image_choice options each
-            carry their own image_url.
+            carry their own image_url; audio_selection options each carry
+            their own audio_url.
         skill_tags:
           type: array
           items:
@@ -2196,6 +2199,7 @@ components:
             - audio_recognition
             - image_recognition
             - image_choice
+            - audio_selection
           description: The type of practice interaction.
         skill_tags:
           type: array
@@ -2294,8 +2298,9 @@ components:
         correct answer is expressed by marking one or more options as
         is_correct. The fields expected beyond option_id and is_correct
         depend on the parent exercise's exercise_type: image_recognition
-        options carry region, image_choice options carry image_url, and
-        text_response / audio_recognition options carry label.
+        options carry region, image_choice options carry image_url,
+        audio_selection options carry audio_url, and text_response /
+        audio_recognition options carry label.
       properties:
         option_id:
           type: string
@@ -2315,6 +2320,12 @@ components:
           description: |
             The image shown for this option. Required for image_choice
             options; absent otherwise.
+        audio_url:
+          type: string
+          format: uri
+          description: |
+            The audio clip shown for this option. Required for
+            audio_selection options; absent otherwise.
         region:
           $ref: '#/components/schemas/OptionRegion'
       required:
