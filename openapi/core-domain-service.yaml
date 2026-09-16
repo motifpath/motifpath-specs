@@ -335,6 +335,62 @@ paths:
                 $ref: '#/components/schemas/NotFoundError'
 
   /exercises:
+    get:
+      operationId: listExercises
+      summary: List standalone exercises for authoring
+      description: |
+        Returns exercises from the reusable pool, for browsing and picking one
+        to edit in an authoring tool — not the randomized, skill-targeted
+        selection GET /practice-sessions performs for a student's practice
+        attempt. Results are unordered beyond a stable id order and are not
+        paginated. Only teachers and admins may list exercises; the pool is
+        an authoring surface, not a student-facing catalog.
+      tags:
+        - Content
+      parameters:
+        - name: skill_tag
+          in: query
+          required: false
+          schema:
+            type: string
+          description: |
+            When given, only exercises carrying this exact skill tag are
+            returned.
+        - name: exercise_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - text_response
+              - audio_recognition
+              - image_recognition
+              - image_choice
+          description: When given, only exercises of this type are returned.
+      responses:
+        "200":
+          description: The matching exercises, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exercise'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to list exercises.
+            Only teachers and admins may list exercises.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
     post:
       operationId: createExercise
       summary: Create a standalone exercise
@@ -996,6 +1052,70 @@ paths:
                 $ref: '#/components/schemas/UnauthorizedError'
         "404":
           description: No exercise exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+    put:
+      operationId: updateExercise
+      summary: Replace an exercise's authored content
+      description: |
+        Replaces the given exercise's title, prompt, skill tags, stimulus
+        media, options, and estimated duration with the request body.
+        exercise_type cannot be changed — an exercise's type determines its
+        option shape (region vs. text vs. image), so changing it would leave
+        existing options in an inconsistent shape; author a new exercise of
+        the desired type instead. The exercise's links to challenges and
+        content nodes are untouched by this call. Only teachers and admins
+        may update an exercise.
+      tags:
+        - Content
+      parameters:
+        - name: exercise_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the exercise to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExerciseRequest'
+      responses:
+        "200":
+          description: The updated exercise.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+        "400":
+          description: |
+            The request body failed schema validation, or no option has
+            is_correct set to true.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to update exercises.
+            Only teachers and admins may update exercises.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No exercise exists with the given exercise_id.
           content:
             application/json:
               schema:
@@ -1990,6 +2110,64 @@ components:
         - title
         - prompt
         - exercise_type
+        - options
+
+    UpdateExerciseRequest:
+      type: object
+      description: |
+        Payload for replacing an existing exercise's authored content.
+        exercise_type is not present here — it cannot be changed after
+        creation. options fully replaces the exercise's current options, the
+        same way CreateExerciseRequest.options establishes them initially; a
+        caller that only wants to change one option must resend the full set.
+      properties:
+        title:
+          type: string
+          description: |
+            A short, authoring-only name for this exercise, used to identify
+            it in authoring tools. Not shown to students.
+        prompt:
+          type: string
+          description: The instruction displayed to the student for this exercise.
+        skill_tags:
+          type: array
+          items:
+            type: string
+          description: |
+            Freeform tags naming the skill(s) or technique(s) this exercise
+            targets, replacing its current set. Each tag must be a non-empty
+            string.
+        image_url:
+          type: string
+          format: uri
+          description: |
+            The stimulus image for this exercise. Required when the
+            exercise's exercise_type is image_recognition; absent otherwise.
+        audio_url:
+          type: string
+          format: uri
+          description: |
+            The stimulus audio for this exercise. Required when the
+            exercise's exercise_type is audio_recognition; absent otherwise.
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+          minItems: 1
+          description: |
+            The exercise's selectable answer choices, replacing its current
+            set. At least one option must have is_correct set to true — an
+            exercise with no correct option cannot be graded.
+        estimated_duration_seconds:
+          type: integer
+          minimum: 1
+          description: |
+            Authoring estimate of the time a student needs to attempt this
+            exercise once. Optional — used to fit practice sessions and
+            challenges to a student's available time.
+      required:
+        - title
+        - prompt
         - options
 
     Exercise:
