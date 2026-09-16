@@ -73,7 +73,7 @@ Feature: Manage exercises
     And the response does not include "triad-exercise-01"
 
   Scenario: A teacher filters the exercise list by exercise type
-    Given an exercise "triad-exercise-01" exists
+    Given an exercise "triad-exercise-01" exists with type image_recognition
     And an exercise "chord-name-01" exists with type text_response
     And "bob" is authenticated as a teacher
     When "bob" lists exercises filtered by exercise_type "text_response"
