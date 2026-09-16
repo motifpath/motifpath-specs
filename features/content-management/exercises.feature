@@ -49,6 +49,81 @@ Feature: Manage exercises
     When "alice" retrieves the exercise "triad-exercise-01"
     Then the response returns the exercise's title, prompt, type, options, and linked challenges
 
+  # ── Happy path — listing exercises for authoring ─────────────────────────────
+
+  Scenario: A teacher lists all exercises in the reusable pool
+    Given an exercise "triad-exercise-01" exists
+    And an exercise "picking-drill-01" exists
+    And "bob" is authenticated as a teacher
+    When "bob" lists all exercises
+    Then the response includes "triad-exercise-01" and "picking-drill-01"
+
+  Scenario: An admin lists all exercises in the reusable pool
+    Given an exercise "triad-exercise-01" exists
+    And "admin" is authenticated as an admin
+    When "admin" lists all exercises
+    Then the response includes "triad-exercise-01"
+
+  Scenario: A teacher filters the exercise list by skill tag
+    Given an exercise "triad-exercise-01" exists with skill tags "triad-shapes"
+    And an exercise "picking-drill-01" exists with skill tags "alternate_picking"
+    And "bob" is authenticated as a teacher
+    When "bob" lists exercises filtered by skill tag "alternate_picking"
+    Then the response includes "picking-drill-01"
+    And the response does not include "triad-exercise-01"
+
+  Scenario: A teacher filters the exercise list by exercise type
+    Given an exercise "triad-exercise-01" exists
+    And an exercise "chord-name-01" exists with type text_response
+    And "bob" is authenticated as a teacher
+    When "bob" lists exercises filtered by exercise_type "text_response"
+    Then the response includes "chord-name-01"
+    And the response does not include "triad-exercise-01"
+
+  Scenario: Listing exercises when none exist returns an empty list
+    Given "bob" is authenticated as a teacher
+    When "bob" lists all exercises
+    Then the response is an empty list
+
+  # ── Happy path — updating an exercise ─────────────────────────────────────────
+
+  Scenario: A teacher updates an exercise's title, prompt, and options
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    When "bob" updates exercise "triad-exercise-01" with title "Root position, revised" and prompt "Identify the root position, now with a cleaner prompt" and one correct option
+    Then the exercise's title is "Root position, revised"
+    And the exercise's prompt is "Identify the root position, now with a cleaner prompt"
+
+  Scenario: A teacher replaces an exercise's skill tags
+    Given an exercise "picking-drill-01" exists with skill tags "alternate_picking"
+    And "bob" is authenticated as a teacher
+    When "bob" updates exercise "picking-drill-01" with skill tags "hybrid_picking, technique"
+    Then the exercise carries skill tags "hybrid_picking, technique"
+    And the exercise no longer carries skill tag "alternate_picking"
+
+  Scenario: Updating an exercise does not change its links to challenges or content nodes
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "triad-exercise-01" to "triad-challenge"
+    When "bob" updates exercise "triad-exercise-01" with title "Root position, revised"
+    Then the exercise records "triad-challenge" among its linked challenges
+
+  # ── Validation failures — updating ────────────────────────────────────────────
+
+  Scenario: Updating an exercise without a title is rejected
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    When "bob" submits an update exercise request for "triad-exercise-01" with the title field omitted
+    Then the request is rejected as invalid
+    And the rejection identifies "title" as the source of the error
+
+  Scenario: Updating an exercise with zero correct options is rejected
+    Given an exercise "triad-exercise-01" exists
+    And "bob" is authenticated as a teacher
+    When "bob" submits an update exercise request for "triad-exercise-01" whose options have no option marked correct
+    Then the request is rejected as invalid
+    And the rejection identifies "options" as the source of the error
+
   # ── Validation failures — creation ───────────────────────────────────────────
 
   Scenario: Creating an exercise without a title is rejected
@@ -92,6 +167,11 @@ Feature: Manage exercises
   Scenario: Retrieving an exercise that does not exist returns not found
     Given "alice" is authenticated as a student
     When "alice" retrieves an exercise with an ID that does not exist
+    Then the request is refused with a not-found error
+
+  Scenario: Updating an exercise that does not exist returns not found
+    Given "bob" is authenticated as a teacher
+    When "bob" attempts to update an exercise with an ID that does not exist
     Then the request is refused with a not-found error
 
   # ── Happy path — linking and unlinking ───────────────────────────────────────
@@ -306,6 +386,17 @@ Feature: Manage exercises
     When "alice" attempts to create an exercise
     Then the request is refused with a forbidden error
 
+  Scenario: A student cannot list all exercises
+    Given "alice" is authenticated as a student
+    When "alice" attempts to list all exercises
+    Then the request is refused with a forbidden error
+
+  Scenario: A student cannot update an exercise
+    Given an exercise "triad-exercise-01" exists
+    And "alice" is authenticated as a student
+    When "alice" attempts to update exercise "triad-exercise-01" with title "Hijacked title"
+    Then the request is refused with a forbidden error
+
   Scenario: A student cannot link an exercise to a challenge
     Given an exercise "triad-exercise-01" exists
     And "alice" is authenticated as a student
@@ -359,4 +450,15 @@ Feature: Manage exercises
   Scenario: Starting a practice session without an authentication token is refused
     Given no authentication token is provided
     When an unauthenticated request attempts to start a practice session for skill tag "alternate_picking"
+    Then the request is refused with an authentication error
+
+  Scenario: Listing exercises without an authentication token is refused
+    Given no authentication token is provided
+    When an unauthenticated request attempts to list all exercises
+    Then the request is refused with an authentication error
+
+  Scenario: Updating an exercise without an authentication token is refused
+    Given an exercise "triad-exercise-01" exists
+    And no authentication token is provided
+    When an unauthenticated request attempts to update exercise "triad-exercise-01" with title "Hijacked title"
     Then the request is refused with an authentication error
