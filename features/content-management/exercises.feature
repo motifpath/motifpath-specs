@@ -50,6 +50,12 @@ Feature: Manage exercises
     Then the exercise is created and assigned a stable identifier
     And the exercise's prompt preserves its heading, bulleted list, table, and image structure
 
+  Scenario: A teacher creates an exercise with a prompt using a custom font color and background color
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a text_response exercise titled "Circle of fifths" with a prompt whose text has a custom font color and background color, and one correct option
+    Then the exercise is created and assigned a stable identifier
+    And the exercise's prompt preserves its font color and background color
+
   Scenario: A teacher creates an exercise with a plain, unformatted prompt
     Given "bob" is authenticated as a teacher
     When "bob" creates a text_response exercise titled "Name the note" with a prompt containing a single unformatted paragraph and one correct option
