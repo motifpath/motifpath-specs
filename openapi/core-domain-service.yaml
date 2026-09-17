@@ -2078,9 +2078,9 @@ components:
         content; the text node is a leaf that carries the literal string
         under text and any inline marks under marks. attrs holds
         type-specific attributes (e.g. heading's level, paragraph/heading's
-        text alignment, image's src and alt, table cell's colspan and
-        rowspan) and is validated by the authoring editor, not by this
-        schema.
+        text alignment, image's src and alt, table cell's colspan, rowspan,
+        backgroundColor, and borderColor) and is validated by the authoring
+        editor, not by this schema.
       properties:
         type:
           type: string
@@ -2099,6 +2099,7 @@ components:
           description: The kind of node this is.
         attrs:
           type: object
+          additionalProperties: true
           description: |
             Type-specific attributes for this node. Absent when the node
             type has none set.
@@ -2134,11 +2135,18 @@ components:
             - strike
             - highlight
             - link
-          description: The kind of mark this is.
+            - textStyle
+          description: |
+            The kind of mark this is. textStyle carries a chosen font color,
+            background color, or both — never both fixed and absent at
+            once; highlight remains the separate, single-color emphasis
+            mark it already was.
         attrs:
           type: object
+          additionalProperties: true
           description: |
-            Mark-specific attributes (e.g. link's href). Absent when the
+            Mark-specific attributes (e.g. link's href; textStyle's color
+            and/or backgroundColor as CSS color strings). Absent when the
             mark type has none set.
       required:
         - type
