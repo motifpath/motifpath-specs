@@ -416,7 +416,13 @@ paths:
                 summary: A fretboard region identification exercise
                 value:
                   title: "Root position of a C major triad"
-                  prompt: "Identify the root position of a C major triad"
+                  prompt:
+                    type: doc
+                    content:
+                      - type: paragraph
+                        content:
+                          - type: text
+                            text: "Identify the root position of a C major triad"
                   exercise_type: image_recognition
                   skill_tags:
                     - triad-shapes
@@ -2042,6 +2048,101 @@ components:
         - shuffle_options
         - created_at
 
+    PromptDocument:
+      type: object
+      description: |
+        A structured rich-text document for an exercise's prompt, authored
+        with the exercise-prompt rich-text editor and persisted exactly as
+        the editor produces it. Always has type "doc" at the root, with the
+        document's block-level content nested beneath it.
+      properties:
+        type:
+          type: string
+          enum:
+            - doc
+          description: Discriminates this object as a prompt document's root node.
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PromptNode'
+          description: The document's top-level block nodes, in reading order.
+      required:
+        - type
+        - content
+
+    PromptNode:
+      type: object
+      description: |
+        A single node in a prompt document's tree. Container node types
+        (heading, paragraph, list and table nodes) nest further nodes under
+        content; the text node is a leaf that carries the literal string
+        under text and any inline marks under marks. attrs holds
+        type-specific attributes (e.g. heading's level, paragraph/heading's
+        text alignment, image's src and alt, table cell's colspan and
+        rowspan) and is validated by the authoring editor, not by this
+        schema.
+      properties:
+        type:
+          type: string
+          enum:
+            - heading
+            - paragraph
+            - text
+            - bulletList
+            - orderedList
+            - listItem
+            - table
+            - tableRow
+            - tableHeader
+            - tableCell
+            - image
+          description: The kind of node this is.
+        attrs:
+          type: object
+          description: |
+            Type-specific attributes for this node. Absent when the node
+            type has none set.
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PromptNode'
+          description: |
+            Child nodes, present on container node types. Absent on leaf
+            node types (text, image).
+        text:
+          type: string
+          description: The literal text content. Present only when type is text.
+        marks:
+          type: array
+          items:
+            $ref: '#/components/schemas/PromptMark'
+          description: |
+            Inline formatting marks applied to this node. Present only on
+            text nodes that carry at least one mark.
+      required:
+        - type
+
+    PromptMark:
+      type: object
+      description: An inline formatting mark applied to a prompt document's text node.
+      properties:
+        type:
+          type: string
+          enum:
+            - bold
+            - italic
+            - strike
+            - highlight
+            - link
+          description: The kind of mark this is.
+        attrs:
+          type: object
+          description: |
+            Mark-specific attributes (e.g. link's href). Absent when the
+            mark type has none set.
+      required:
+        - type
+
     CreateExerciseRequest:
       type: object
       description: Payload for creating a standalone, reusable exercise.
@@ -2053,10 +2154,7 @@ components:
             picking — descending run"), used to identify it in authoring
             tools. Not shown to students.
         prompt:
-          type: string
-          description: |
-            The instruction displayed to the student for this exercise
-            (e.g. "Identify the root position of a C major triad").
+          $ref: '#/components/schemas/PromptDocument'
         exercise_type:
           type: string
           enum:
@@ -2130,8 +2228,7 @@ components:
             A short, authoring-only name for this exercise, used to identify
             it in authoring tools. Not shown to students.
         prompt:
-          type: string
-          description: The instruction displayed to the student for this exercise.
+          $ref: '#/components/schemas/PromptDocument'
         skill_tags:
           type: array
           items:
@@ -2190,8 +2287,7 @@ components:
           type: string
           description: Short, authoring-only name for this exercise. Not shown to students.
         prompt:
-          type: string
-          description: The instruction displayed to the student for this exercise.
+          $ref: '#/components/schemas/PromptDocument'
         exercise_type:
           type: string
           enum:

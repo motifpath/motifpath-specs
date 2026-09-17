@@ -44,6 +44,17 @@ Feature: Manage exercises
     Then the exercise is created and assigned a stable identifier
     And the exercise carries skill tags "alternate_picking, technique"
 
+  Scenario: A teacher creates an exercise with a richly formatted prompt
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a text_response exercise titled "Circle of fifths" with a prompt formatted as a heading, a bulleted list, a table, and an image, and one correct option
+    Then the exercise is created and assigned a stable identifier
+    And the exercise's prompt preserves its heading, bulleted list, table, and image structure
+
+  Scenario: A teacher creates an exercise with a plain, unformatted prompt
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a text_response exercise titled "Name the note" with a prompt containing a single unformatted paragraph and one correct option
+    Then the exercise is created and assigned a stable identifier
+
   Scenario: Any authenticated user retrieves an exercise by ID
     Given an exercise "triad-exercise-01" exists
     And "alice" is authenticated as a student
@@ -94,6 +105,12 @@ Feature: Manage exercises
     When "bob" updates exercise "triad-exercise-01" with title "Root position, revised" and prompt "Identify the root position, now with a cleaner prompt" and one correct option
     Then the exercise's title is "Root position, revised"
     And the exercise's prompt is "Identify the root position, now with a cleaner prompt"
+
+  Scenario: A teacher updates an exercise's prompt to add formatting it previously lacked
+    Given an exercise "triad-exercise-01" exists with a plain, unformatted prompt
+    And "bob" is authenticated as a teacher
+    When "bob" updates exercise "triad-exercise-01" with a prompt formatted as bold text and a bulleted list, and one correct option
+    Then the exercise's prompt preserves its bold text and bulleted list structure
 
   Scenario: A teacher replaces an exercise's skill tags
     Given an exercise "picking-drill-01" exists with skill tags "alternate_picking"
@@ -162,6 +179,18 @@ Feature: Manage exercises
     When "bob" submits a create exercise request with an empty-string skill tag
     Then the request is rejected as invalid
     And the rejection identifies "skill_tags" as the source of the error
+
+  Scenario: Creating an exercise with an unstructured prompt is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create exercise request whose prompt is a plain string instead of a structured document
+    Then the request is rejected as invalid
+    And the rejection identifies "prompt" as the source of the error
+
+  Scenario: Creating an exercise with a prompt using an unsupported node type is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create exercise request whose prompt document contains a video node
+    Then the request is rejected as invalid
+    And the rejection identifies "prompt" as the source of the error
 
   # ── Not found — creation and retrieval ───────────────────────────────────────
 
