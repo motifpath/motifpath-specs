@@ -157,6 +157,52 @@ ready block/drag UI.
   package; the separately-published single-node table packages exist but should not be
   installed alongside it (redundant, confirmed during the spike).
 
+### Amendment (2026-09-17) — extend scope to exercise-prompt authoring (PB-46)
+
+PB-40's exercise-authoring UI (`ExerciseAuthoringView`, motifpath-web PR #16) shipped with a
+plain `<textarea>` for the exercise prompt field, matching the design prototype's own "Rich
+text toolbar — proposed, not yet built" annotation. PB-46 wires real Tiptap into that field.
+This ADR's original scope line — "not currently intended for any student-facing surface" — no
+longer holds without qualification: exercise prompts, unlike PB-8i's lesson content, are
+authored by a teacher but consumed by a student, through PB-41's Practice view.
+
+**Decision: extend this ADR's scope to `CreateExerciseRequest.prompt`, with the persistence
+model unchanged.** The prompt field is authored with the same hand-picked Tiptap extension set
+this ADR already commits to (decision point 1) and persisted as **ProseMirror JSON**
+(`editor.getJSON()`), exactly as decision point 2 requires — not as an HTML string. No change
+to the JSON-not-HTML decision; this amendment only widens which surfaces may produce and
+consume that JSON.
+
+What changes for this surface specifically:
+
+1. **Editor placement stays internal-only.** The Tiptap editor instance itself is mounted only
+   in the teacher-facing authoring route (`ExerciseAuthoringView`), the same bundle-isolation
+   posture PB-8i's concierge tooling already has — it is a lazy route chunk, not part of any
+   student-facing route's bundle. This ADR's bundle-size trade-off (the ~87 kB gzip
+   ProseMirror-core floor) is paid once, on the authoring route, same as before this amendment.
+2. **The student-facing surface renders JSON, not the editor.** PB-41's Practice view never
+   mounts Tiptap or `@tiptap/pm`. It renders the persisted ProseMirror JSON through a small,
+   hand-written node-walker scoped to the narrow mark/node subset exercise prompts actually
+   use — paragraphs, bold, italic, bullet lists. No callout, table, or media node support is
+   needed for this surface, so the walker is not a general ProseMirror-JSON renderer; it is
+   sized to what the exercise-prompt toolbar (point 3 below) can actually produce. This keeps
+   the "not currently intended for any student-facing surface" trade-off's spirit intact: no
+   student route pays the ProseMirror-core bundle cost, only a small render step over already-
+   structured JSON.
+3. **Toolbar is a reduced subset for this field.** Unlike PB-8i's fuller authoring toolbar
+   (decision point 5), the exercise-prompt toolbar is bold / italic / bullet list only,
+   matching the PB-40 design prototype's annotation. No callout, media, table, or drag-handle
+   reordering — those remain PB-8i-only capabilities this amendment does not extend.
+4. **Existing plain-text prompts** (seeded or authored before this change) are not valid
+   ProseMirror JSON and must be handled at the point they're first loaded into the editor
+   (e.g. wrapped as a single-paragraph text node) rather than assumed to already match the new
+   shape — a migration/compatibility concern for PB-46's implementation, not a further change
+   to this decision.
+
+This amendment adds no new decision point beyond the scope line above and changes no other
+part of this ADR — decision points 1, 2, 4, 6, 7, and 8 apply to the exercise-prompt field
+exactly as already written.
+
 ## Related ADRs
 
 - **ADR-018** (Frontend UI architecture) — this decision follows its headless-primitives,
@@ -164,6 +210,8 @@ ready block/drag UI.
   `reka-ui` already does.
 - **ADR-019** (Practice content model) — a sibling content-model decision for exercises, not
   lesson prose; this ADR does not change or depend on ADR-019's Exercise/Challenge model.
+  PB-41's Practice view (built under ADR-019's model) is the consumer referenced in this ADR's
+  2026-09-17 amendment.
 
 ---
 
