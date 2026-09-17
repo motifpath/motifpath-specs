@@ -255,6 +255,36 @@ would just paper over. Two typed join tables, one per genuinely-persisted contex
 existing `ChallengeExercise`/`ContentNodeExercise` implementation already does, and this
 amendment simply confirms that pattern going forward rather than replacing it.
 
+## Amendment (2026-09-16) — a 5th committed type: `audio_selection`
+
+PB-52 (exercise-authoring page improvements) item 1 needed a new exercise type whose options
+are themselves audio clips — e.g. "which of these four recordings is a minor pentatonic lick?"
+— distinct from the already-committed `audio_recognition`, whose options are text labels
+(note/chord/interval names) selected after listening to a single stimulus clip.
+
+This is not a new checking model — it is decision point 4's option-selection pattern with the
+option's rendered content being an audio clip instead of an image, text label, or region,
+exactly mirroring the 2026-09-13 `image_choice` amendment:
+
+- `audio_recognition` — one audio clip is the stimulus; options are a fixed set of text-labeled
+  choices. Unchanged by this amendment.
+- `audio_selection` — there is no exercise-level stimulus; options are a fixed set of separate
+  audio clips, and the student selects one (or more, for select-all-that-apply) after listening
+  to each — exactly like `image_choice`'s fixed-choice options except each option renders as a
+  playable audio clip instead of an image.
+
+Each option carries an `audio_url` alongside the existing `label`/`image_url`/`region` option
+fields, populated only for `audio_selection` options, same nullable-per-type pattern already
+used for `image_url` and `region`. Options reuse the existing media-upload endpoint unchanged
+(`CreateMediaUploadUrlRequest.content_type` already includes `audio`) — no new upload mechanism
+is introduced.
+
+**Decision: commit `audio_selection` as the 5th exercise type**, extending the typology to
+`text_response` / `audio_recognition` / `image_recognition` / `image_choice` /
+`audio_selection`. No other decision point changes — the many-to-many Challenge relationship,
+skill tags, and option-selection checking model apply identically to this type. Rhythmic
+exercises remain deferred to PB-43, unaffected by this amendment.
+
 ## Related ADRs
 
 - **ADR-015** — Challenge belongs to the path node; this ADR narrows ADR-015's implicit
@@ -277,9 +307,9 @@ amendment simply confirms that pattern going forward rather than replacing it.
 - PB-33: use this ADR's skill tags as real input when designing the Skill/Concept knowledge
   graph.
 - PB-8g: design how standalone/cross-path exercise suggestion queries exercises by skill tag.
-- **PB-52**: update the exercise-authoring page's "used in" display to query all three usage
-  contexts confirmed in the 2026-09-16 amendment (challenges, path exercises, skill-tag practice
-  eligibility), not just Challenge.
+- **PB-52**: `openapi/core-domain-service.yaml`'s `Option` schema and `exercise_type` enum need
+  an `audio_url` field and the `audio_selection` value added to match this amendment, before
+  `motifpath-core`/`motifpath-web` implementation begins.
 
 ---
 

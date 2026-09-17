@@ -36,6 +36,7 @@ Feature: Manage exercises
       | audio_recognition | Identify the interval by ear   | Listen and identify the interval                      |
       | image_recognition | Root position of a C triad     | Identify the root position of a C major triad         |
       | image_choice      | Pick the E minor chord diagram | Which of these chord-shape diagrams is E minor?       |
+      | audio_selection   | Pick the pentatonic lick       | Which of these recordings is a minor pentatonic lick? |
 
   Scenario: A teacher creates an exercise with skill tags
     Given "bob" is authenticated as a teacher
