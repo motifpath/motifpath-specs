@@ -51,12 +51,16 @@ through:
    non-obvious context. Claude reads and updates this directly, at effectively zero token cost,
    with no external API round-trip.
 
-No MotifPath skill reads or writes Notion automatically for project tracking. `project-index-maintenance`
-is deprecated — retained only per this repo's policy against deleting skills (see its
-`CHANGELOG.md`) — and must not be invoked. `product-discovery`'s "Notion Backlog Integration"
-section and workspace IDs are removed; hypothesis and backlog tracking in product-discovery
-conversations now happens through auto-memory, promoting anything durable into an ADR or a
-git-tracked spec, not a live Notion database.
+No MotifPath skill reads or writes Notion automatically for project tracking.
+`project-index-maintenance` is deleted outright — its full definition and history remain
+recoverable from git, so there is no separate "keep it around, unused, forever" step. This also
+retires this repo's blanket "never delete a skill" policy: a skill with no remaining use can be
+removed in the same commit as its `marketplace.json` entry, with the reason captured in the
+commit message (or, as here, an ADR) rather than in a file that's being deleted along with it.
+`product-discovery`'s "Notion Backlog Integration" section and workspace IDs are removed;
+hypothesis and backlog tracking in product-discovery conversations now happens through
+auto-memory, promoting anything durable into an ADR or a git-tracked spec, not a live Notion
+database.
 
 Implementation plans (`plan-writer` output) are written to a local, `.gitignore`d `plans/`
 directory inside whichever repo the work is happening in — never committed, never opened as a
@@ -90,6 +94,8 @@ plus git) was sitting right there.
   MCP availability.
 - Plans no longer trigger a PR-and-review cycle for a short-lived artifact — faster iteration
   from spec to code.
+- No dead, unused skill file sitting in the plugin marketplace description list forever —
+  `plugins/` only lists what's actually in play.
 
 ### Negative / Trade-offs
 - Loses a browser-viewable, shareable project board. If a non-Claude-Code collaborator (a
@@ -102,6 +108,10 @@ plus git) was sitting right there.
   this repo's policy on specs), but new plans won't be discoverable the same way — auditing "what
   was the plan for PB-NNN" after this ADR only works if the plan predates this decision or its
   durable content was promoted into an ADR.
+- Retiring "never delete a skill" removes a safety net, not just for this one skill: a future
+  deletion that turns out to be premature has no automatic soft-landing (a deprecated-but-present
+  file to resurrect) — recovery now depends on someone remembering to check git history. This
+  repo's separate "never delete an ADR" policy is unaffected by this decision.
 
 ### Neutral
 - `motifpath-specs/plans/` stays as a directory with its existing history; it simply stops

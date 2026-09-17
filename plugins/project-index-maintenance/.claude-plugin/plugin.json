@@ -1,9 +1,0 @@
-{
-  "name": "project-index-maintenance",
-  "displayName": "Project Index Maintenance",
-  "version": "2.0.0",
-  "description": "DEPRECATED (ADR-022) — Notion project tracking replaced by git + auto-memory. Do not invoke.",
-  "author": { "name": "MotifPath Team" },
-  "repository": "https://github.com/motifpath/motifpath-specs",
-  "skills": "./skills/"
-}

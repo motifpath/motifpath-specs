@@ -33,11 +33,6 @@
       "description": "Strategic product thinking partner grounded in user pain and evidence."
     },
     {
-      "name": "project-index-maintenance",
-      "source": "./plugins/project-index-maintenance",
-      "description": "DEPRECATED (ADR-022) — Notion project tracking replaced by git + auto-memory. Do not invoke."
-    },
-    {
       "name": "pr-review",
       "source": "./plugins/pr-review",
       "description": "Context-aware pull request review that shares durable guidelines with the team as it finds them."
