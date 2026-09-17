@@ -1,7 +1,7 @@
 {
   "name": "plan-writer",
   "displayName": "Plan Writer",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Write structured technical implementation plans for MotifPath features, services, and infrastructure changes.",
   "author": { "name": "MotifPath Team" },
   "repository": "https://github.com/motifpath/motifpath-specs",

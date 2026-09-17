@@ -1,6 +1,6 @@
 ---
 name: plan-writer
-version: 1.0.0
+version: 2.0.0
 description: >
   Write structured technical implementation plans for MotifPath features, services, and
   infrastructure changes. Trigger whenever a task requires planning before implementation —
@@ -8,8 +8,11 @@ description: >
   module is being designed, or when the implementation path for a spec is unclear. Signals
   include: "how do we implement X?", "what's the plan for Y?", "before we write the code...",
   or any task that crosses multiple files, services, or repos. Plans produced by this skill
-  link directly to OpenAPI specs, ADRs, and Gherkin scenarios in motifpath-specs. Never let
-  a multi-service or cross-repo change proceed without a written plan.
+  link directly to OpenAPI specs, ADRs, and Gherkin scenarios in motifpath-specs, but — per
+  ADR-022 — are written to a local, gitignored `plans/` folder and never committed or opened
+  as a PR: a plan is a short-lived working document for whoever is implementing the feature,
+  not a permanent artifact. Never let a multi-service or cross-repo change proceed without a
+  written plan.
 ---
 
 # Plan Writer — MotifPath
@@ -170,34 +173,38 @@ for service rollbacks. Note any migration steps that cannot be rolled back autom
 
 ## File Location
 
-Plans live in:
+Per [ADR-022](../../../../adrs/ADR-022-drop-notion-project-tracking.md), plans are **not**
+versioned in `motifpath-specs`. They live locally, in a gitignored `plans/` folder inside
+whichever repo the implementation work is actually happening in (the repo Phase 1/2/3/4 below
+is about to touch — most often `motifpath-core` or `motifpath-web`):
 
 ```
-motifpath-specs/
-  plans/
+<repo>/
+  plans/            ← gitignored, local only
     MTP-XXX-short-description.md
 ```
 
 **Naming:** `MTP-XXX-short-description.md` — always prefixed with the task code.
 
+Before writing the first plan in a repo, confirm `plans/` is in that repo's `.gitignore` (add
+it if it's missing — a one-line addition, not a plan-writer task in itself).
+
 ---
 
-## Git Workflow
+## Workflow
 
-Plans are committed to `motifpath-specs` on a feature branch:
+No branch, no PR, no commit — a plan is scratch work, not a spec change:
 
 ```bash
-git checkout dev
-git pull origin dev
-git checkout -b feat/MTP-XXX/plan-short-description
-
-touch motifpath-specs/plans/MTP-XXX-short-description.md
-# Write the plan
-
-git add motifpath-specs/plans/MTP-XXX-short-description.md
-git commit -m "feat(plans): add implementation plan for MTP-XXX [MTP-XXX]"
-git push origin feat/MTP-XXX/plan-short-description
+mkdir -p plans   # if it doesn't exist yet
+# Write the plan to plans/MTP-XXX-short-description.md
 ```
+
+The plan stays on disk for as long as the feature takes to implement, then it's disposable. If
+something in it turns out to matter permanently — an architectural choice, a contract decision —
+write that up properly instead: an ADR via `adr-writer` if it's architectural, or a spec update
+in `motifpath-specs` (OpenAPI/Gherkin) if it changes a contract. Those are the only two places
+plan content should ever end up committed.
 
 ---
 
