@@ -182,17 +182,27 @@ What changes for this surface specifically:
    ProseMirror-core floor) is paid once, on the authoring route, same as before this amendment.
 2. **The student-facing surface renders JSON, not the editor.** PB-41's Practice view never
    mounts Tiptap or `@tiptap/pm`. It renders the persisted ProseMirror JSON through a small,
-   hand-written node-walker scoped to the narrow mark/node subset exercise prompts actually
-   use — paragraphs, bold, italic, bullet lists. No callout, table, or media node support is
-   needed for this surface, so the walker is not a general ProseMirror-JSON renderer; it is
-   sized to what the exercise-prompt toolbar (point 3 below) can actually produce. This keeps
-   the "not currently intended for any student-facing surface" trade-off's spirit intact: no
-   student route pays the ProseMirror-core bundle cost, only a small render step over already-
-   structured JSON.
-3. **Toolbar is a reduced subset for this field.** Unlike PB-8i's fuller authoring toolbar
-   (decision point 5), the exercise-prompt toolbar is bold / italic / bullet list only,
-   matching the PB-40 design prototype's annotation. No callout, media, table, or drag-handle
-   reordering — those remain PB-8i-only capabilities this amendment does not extend.
+   hand-written node-walker scoped to the node/mark set the exercise-prompt toolbar (point 3
+   below) can actually produce — headings, paragraphs, bold, italic, strike, highlight, text
+   alignment, bullet/ordered lists, links, tables, and images. No callout, audio/video, or
+   drag-handle-reorder support is needed for this surface, so the walker is still not a
+   general-purpose ProseMirror-JSON renderer, just a larger scoped one than a minimal-marks
+   field would need. This keeps the "not currently intended for any student-facing surface"
+   trade-off's spirit intact: no student route pulls in Tiptap/`@tiptap/pm` or pays the
+   ProseMirror-core bundle floor — only a hand-written render step over already-structured
+   JSON, same as callout/table/media already work in the authoring editor.
+3. **Toolbar for this field:** H1 / H2 / H3 / Paragraph, Bold / Italic / Strike / Highlight,
+   text alignment (left / center / right / justify), Bullet List / Ordered List, Link, Table,
+   Image. This is smaller than PB-8i's full authoring toolbar in one respect (no callout node,
+   no audio/video embeds, no drag-handle block reordering — those remain PB-8i-only
+   capabilities this amendment does not extend) but adds `Strike`, `Highlight`, `TextAlign`,
+   and `Link`, none of which decision point 1 through 8 previously enumerated. These are
+   standard first-party MIT-licensed Tiptap extensions (`@tiptap/extension-strike`,
+   `@tiptap/extension-highlight`, `@tiptap/extension-text-align`, `@tiptap/extension-link`) —
+   the same kind of hand-picked addition decision point 1 already commits to, not a new class
+   of risk requiring its own spike. `Table` and `Image` reuse the extensions ADR-020 already
+   validated (decision points 6 and 7); paste-to-insert upload handling for images applies
+   here exactly as already decided.
 4. **Existing plain-text prompts** (seeded or authored before this change) are not valid
    ProseMirror JSON and must be handled at the point they're first loaded into the editor
    (e.g. wrapped as a single-paragraph text node) rather than assumed to already match the new
