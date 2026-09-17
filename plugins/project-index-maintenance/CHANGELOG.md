@@ -1,5 +1,22 @@
 # Project Index Maintenance — Changelog
 
+## [2.0.0] — 2026-09-17
+
+### Deprecated
+- This skill is deprecated per [ADR-022](../../adrs/ADR-022-drop-notion-project-tracking.md).
+  MotifPath project tracking (current focus, backlog status, decided ADRs) moved from Notion
+  to git (what shipped) plus Claude Code's session-persistent auto-memory (continuity between
+  sessions) — both free of the per-session Notion fetch/reconcile/write cycle this skill
+  performed, and not dependent on Notion MCP availability.
+- The skill is retained, unused, only because this repo's policy forbids deleting skills. Its
+  frontmatter `description` no longer contains any trigger phrases, so it will not be selected
+  for phrases like "update the project index" or "wrap up the session" going forward — those
+  now mean "update the relevant memory file(s)" instead.
+- The Notion Project Index page (`3679ccc1-102f-8184-83a7-e328e0d8cbfc`) and Product Backlog
+  data source (`93826617-2504-4976-9769-d3841dffcafd`) referenced throughout this skill's body
+  are no longer written to by any MotifPath skill. They are not deleted from Notion itself —
+  that's outside this repo's scope — but nothing in `motifpath-specs` maintains them anymore.
+
 ## [1.4.0] — 2026-09-15
 
 ### Changed

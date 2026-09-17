@@ -1,26 +1,26 @@
 ---
 name: project-index-maintenance
-version: 1.4.0
+version: 2.0.0
 description: >
-  Use this skill when Gilson explicitly asks to update the MotifPath Project Index
-  page in Notion. Trigger on phrases like "update the project index", "log this
-  session", "run the index check", "wrap up the session", "close out the session",
-  or similar invocations referring to the Project Index, the session log, or
-  end-of-session bookkeeping. This skill reconciles the Project Index page
-  (Notion ID 3679ccc1-102f-8184-83a7-e328e0d8cbfc) against what actually happened
-  in the session — updating the Current Focus section, Decided ADRs table (kept
-  filtered to relevant ADRs only, per a cross-cutting/still-open-work rule — see
-  "Decided ADRs Relevance"), and Last-updated timestamp — while keeping the page
-  short (trimming stale narrative, not just appending to it). Backlog Snapshot on
-  the index is a live linked view of the real Product Backlog database (Notion ID
-  93826617-2504-4976-9769-d3841dffcafd), so this skill instead reconciles
-  backlog *item* pages directly — normalizing every item's status to the
-  five-value vocabulary (Ready, In Progress, Blocked, Done, Archived) and
-  creating a database item when session work has none. Do NOT auto-trigger from
-  conversation cues alone — wait for an explicit user invocation.
+  DEPRECATED (ADR-022, 2026-09-17). Do not invoke this skill under any
+  circumstances, including an explicit request to "update the project index" or
+  "wrap up the session" — those phrases now mean "update the relevant memory
+  file(s)", not this skill. MotifPath project tracking (current focus, backlog
+  status, decided ADRs) moved from Notion to git plus Claude Code's auto-memory
+  system. This skill is retained, unused, only because this repo's policy
+  forbids deleting skills — see CHANGELOG.md for the replacement.
 ---
 
-# Project Index Maintenance
+# Project Index Maintenance (DEPRECATED)
+
+**Do not use this skill.** See [ADR-022](../../../../adrs/ADR-022-drop-notion-project-tracking.md)
+and `CHANGELOG.md` in this plugin. MotifPath project state now lives in git (what shipped) and
+Claude Code's auto-memory (session-to-session continuity) — not in Notion. The Notion Project
+Index page and Product Backlog database referenced below are no longer maintained by any skill.
+
+Everything past this point is historical — kept for the record, not for use.
+
+---
 
 ## Purpose
 

@@ -35,7 +35,7 @@
     {
       "name": "project-index-maintenance",
       "source": "./plugins/project-index-maintenance",
-      "description": "Reconcile the Project Index page in Notion at session close."
+      "description": "DEPRECATED (ADR-022) — Notion project tracking replaced by git + auto-memory. Do not invoke."
     },
     {
       "name": "pr-review",
