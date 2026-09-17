@@ -116,10 +116,15 @@ Already done — PR #67 and PR #68, merged to `main` as commits 148e9dc / 0f5ee6
       strict-mode-gap incident this project already hit once — `Strict:true` must stay on,
       undefined steps must fail the build, not silently pass).
 - [ ] Step 8: implement the step bodies, run the full godog suite green.
-- [ ] Step 9: back-compat — decide and implement how a pre-existing plain-string `prompt`
-      (seeded/legacy data) is handled when read via `GetExercise`/`ListExercises` after this
-      migration. See Open Questions — this needs a decision before Step 3 is finalized, since
-      it affects whether the ent field migration needs a data-backfill step.
+- [ ] Step 9: back-compat — **decision (2026-09-17, Gilson): read-time shim only, no backfill
+      migration.** `GetExercise`/`ListExercises` wrap a stored `prompt` that isn't valid
+      `PromptDocument` JSON (i.e. legacy plain text) into a single-paragraph document
+      (`{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":
+      "<legacy value>"}]}]}`) at read time, so every response shape is consistent regardless
+      of when the row was written. No database migration script, no backfill job. Add a
+      dedicated test case for this in Step 5 (service-layer test): seed a row with a
+      plain-string `prompt` (bypassing domain validation, as legacy data would have),
+      `GetExercise` it, assert the shim'd document shape comes back.
 
 **Coverage gate:** 80% on `internal/application/` and `internal/domain/` — CI fails below this
 (existing project gate, unchanged by this plan).
@@ -186,9 +191,9 @@ depends on Phase 2 merging to `dev` first so the regenerated API client is avail
 
 - motifpath-core: the `prompt` field change is an ent schema migration (`field.Text` →
   `field.JSON`). Roll back via a new migration reverting the column type, redeploying the
-  previous service image per ADR-004's blue/green pipeline. If legacy plain-text data was
-  backfilled into `PromptDocument` shape (Phase 2 Step 9), that backfill needs its own reverse
-  migration — decide alongside Step 9, don't defer silently.
+  previous service image per ADR-004's blue/green pipeline. No backfill job exists (Phase 2
+  Step 9 uses a read-time shim, not a data migration), so this rollback carries no data-loss
+  risk beyond the column-type revert itself.
 - motifpath-web: revert to the previous `ExerciseAuthoringView`/`ExerciseView` commit;
   no data migration risk on this side (rendering only).
 
@@ -211,7 +216,6 @@ depends on Phase 2 merging to `dev` first so the regenerated API client is avail
 
 | Question | Owner | Resolution |
 |---|---|---|
-| Does a legacy plain-text `prompt` get backfilled to `PromptDocument` JSON in the database (migration script), or converted on-the-fly at read time (application-layer shim), or both (shim now, backfill later)? Affects Phase 2 Step 9 and the ent migration's reversibility. | Gilson | — |
 | Should `PromptNode`/`PromptMark` be defined as new hand-written Go types in `internal/domain`, or can the `oapi-codegen`-generated OpenAPI types be persisted directly via `field.JSON`? (Generated types may carry OpenAPI-specific tags/pointers that are awkward to persist directly — needs a quick spike during Phase 2 Step 3, not a full research pass.) | Implementer (Phase 2 Step 3) | — |
 | Exact npm versions for the hand-picked Tiptap packages (Phase 3 Step 2) — pin to what ADR-020's PB-44 spike validated, or take latest within the same major? | Implementer (Phase 3 Step 2) | — |
 
