@@ -2099,6 +2099,7 @@ components:
           description: The kind of node this is.
         attrs:
           type: object
+          additionalProperties: true
           description: |
             Type-specific attributes for this node. Absent when the node
             type has none set.
@@ -2137,6 +2138,7 @@ components:
           description: The kind of mark this is.
         attrs:
           type: object
+          additionalProperties: true
           description: |
             Mark-specific attributes (e.g. link's href). Absent when the
             mark type has none set.
