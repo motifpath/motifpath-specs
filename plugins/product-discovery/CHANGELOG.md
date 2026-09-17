@@ -1,5 +1,22 @@
 # Product Discovery — Changelog
 
+## [1.2.0] — 2026-09-17
+
+### Removed
+- "Notion Backlog Integration" section, including the fixed workspace IDs (Product HQ page,
+  Product Backlog database/data source) and all "Claude handles this on request" Notion
+  read/write operations. Per [ADR-022](../../adrs/ADR-022-drop-notion-project-tracking.md),
+  no MotifPath skill automatically integrates with Notion anymore.
+
+### Changed
+- Replaced with a "Backlog Tracking" section: in-session reasoning uses the same schema as
+  before, but persistence across sessions goes through Claude Code's auto-memory (a `project`
+  memory) instead of a live Notion database. Durable decisions (validated hypotheses,
+  architectural commitments) get promoted into an ADR or a spec update instead.
+- "Chat Discipline Model" example and step 8 of the product-topic sequence now say "save to
+  memory" instead of "log to Notion"/"log to the backlog".
+- "Output Formats" → "Backlog proposal" now targets a memory/ADR/spec, not a Notion item.
+
 ## [1.1.0] — 2026-09-08
 
 ### Changed

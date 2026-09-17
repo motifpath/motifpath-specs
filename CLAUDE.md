@@ -78,7 +78,10 @@ root). Each skill is its own plugin under `plugins/<name>/`, with its own
 ALWAYS bump the `version` field in both SKILL.md and plugin.json when modifying a skill
 — the marketplace's update check depends on the plugin.json version moving.
 ALWAYS add a CHANGELOG.md entry for every skill change.
-NEVER delete a skill — deprecate it with a note in CHANGELOG.md.
+A skill that's no longer used can be deleted outright — git history already preserves the
+full definition and its CHANGELOG, so there's no separate "deprecate forever" step. Remove its
+`plugins/<name>/` directory and its `marketplace.json` entry in the same commit, and reference
+the reason (an ADR, a decision) in the commit message rather than in a file that's being deleted.
 Team members run `/plugin marketplace update motifpath-skills` (or rely on
 auto-update, if enabled) then `/reload-plugins` to pick up changes — see the
 repo README for first-time setup.

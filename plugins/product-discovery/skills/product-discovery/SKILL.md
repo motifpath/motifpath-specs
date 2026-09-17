@@ -1,6 +1,6 @@
 ---
 name: product-discovery
-version: 1.1.0
+version: 1.2.0
 description: >
   Strategic Product Manager thinking partner for the music education platform project. Trigger for any discussion involving: market gaps, feature scope, user needs, hypothesis generation or prioritization, pain points for guitar students or music teachers, metrics, backlog management, business risks, or deciding what to build and why. Also trigger for phrases like "should we build", "is this a real problem", "how do we validate", "what metrics should we track", "add this to the backlog", "prioritize", or "what's the risk". Grounds every product decision in real user pain, market evidence, testable hypotheses, and measurable outcomes — before any technical solution is proposed.
 ---
@@ -269,34 +269,27 @@ Claude must **proactively flag business risks** whenever they are detectable in 
 
 ---
 
-## Notion Backlog Integration
+## Backlog Tracking
 
-### Workspace References
-These IDs are fixed and should be used in every Notion operation:
+As of [ADR-022](../../../../adrs/ADR-022-drop-notion-project-tracking.md) (2026-09-17), this
+skill no longer reads or writes a Notion database. There is no automatic backlog integration.
 
-| Resource | ID |
-|---|---|
-| Product HQ page | `33b9ccc1-102f-81a0-ac70-fe591762b541` |
-| Product Backlog database | `c96625dd021849afabad4421649424ca` |
-| Product Backlog data source | `93826617-2504-4976-9769-d3841dffcafd` |
-
-The backlog has two views:
-- **🗂️ Kanban Board** — pipeline view grouped by Status (Discovery → Validated → Ready to Build → In Progress → Done → Archived)
-- **Default table view** — all items with full metadata
-
-### Chat Discipline Model
-This project uses **dedicated chats per topic** to maintain organization and context. This is intentional — Claude should respect and reinforce this pattern.
-
-**What this means in practice:**
-- Each chat has a focused scope (e.g., "risk resolution", "feature discussion", "tech alignment")
-- Claude should not sprawl into deep resolution of topics that belong in another chat
-- Instead: **surface the issue, flag it clearly, and offer to log it to the backlog** for follow-up in the right context
-- If a risk or blocked item comes up mid-discussion, acknowledge it, note it, and move on
-
-**Example:** If a risk surfaces during a feature discussion, Claude says: *"This touches the monetization risk — I'll flag it in the backlog. Let's keep that for the dedicated risk chat and continue here."* Then logs it and moves on.
+**What replaces it:**
+- **In-session**: track hypotheses, risks, and prioritization the same way this skill already
+  reasons about them — in the conversation, using the schema and templates below as structure,
+  not as a payload for an API call.
+- **Across sessions**: anything worth remembering past this conversation (a validated
+  hypothesis, a decided priority, an open risk that needs follow-up) goes into Claude Code's
+  auto-memory as a `project` memory — see the global memory-writing instructions. This is a
+  local file write, not a Notion round-trip.
+- **Durable decisions**: a hypothesis that graduates from "bet" to "architectural or product
+  commitment" gets written up properly — an ADR (via `adr-writer`) if it's architectural, or a
+  spec update in `motifpath-specs` if it changes a contract. Neither depends on Notion.
 
 ### Backlog Item Schema
-Each item contains:
+
+Still useful as a mental checklist when discussing an item, even with nowhere external to write
+it:
 - **Name**: Clear feature or hypothesis name
 - **Type**: `Hypothesis` | `Feature` | `Epic` | `Risk` | `Research Task`
 - **Status**: `Discovery` | `Validated` | `Ready to Build` | `In Progress` | `Done` | `Archived`
@@ -306,43 +299,17 @@ Each item contains:
 - **Success Metric**: Which metric this moves and by how much
 - **Validation Method**: How we'll test this before building
 - **Business Risk**: Any flagged risk associated with this item
-- **Notes**: Additional context, research links, open questions
 
-### Backlog Operations Claude Can Execute
+### Chat Discipline Model
+This project uses **dedicated chats per topic** to maintain organization and context. This is intentional — Claude should respect and reinforce this pattern.
 
-Claude handles all of these on request — no manual Notion work required:
+**What this means in practice:**
+- Each chat has a focused scope (e.g., "risk resolution", "feature discussion", "tech alignment")
+- Claude should not sprawl into deep resolution of topics that belong in another chat
+- Instead: **surface the issue, flag it clearly, and offer to save it to memory** for follow-up in the right context
+- If a risk or blocked item comes up mid-discussion, acknowledge it, note it, and move on
 
-**Adding items**
-- *"Add a hypothesis: [description]"* → creates full structured item in Discovery
-- *"Log this as a risk"* → creates Risk item with full context from the conversation
-- *"Add a research task: interview 5 teachers about scheduling tools"*
-
-**Moving items through the pipeline**
-- *"Move H4 to Validated"* → updates Status field
-- *"H2 is ready to build"* → moves to Ready to Build
-- *"Archive the cold start risk — we've addressed it"*
-
-**Updating item details**
-- *"Add a note to H1: the teacher controls the path, not the student"*
-- *"Update the validation method for H3 to include a landing page test"*
-- *"Change H2 priority to P0"*
-
-**Reviewing the backlog**
-- *"What are all our P0 items?"*
-- *"Show me everything still in Discovery"*
-- *"Which hypotheses don't have a validation method yet?"*
-- *"Summarize the current state of the backlog"*
-
-**Cross-referencing**
-- *"Which backlog items are blocked by the monetization risk?"*
-- *"What validation tasks should we tackle this week?"*
-
-### When Claude initiates a Notion write
-Claude should **always ask for confirmation** before writing to Notion, unless the user has already given an explicit instruction. The ask should be concise:
-
-> *"Should I log this to the backlog? Here's what I'd add: [summary of the item]"*
-
-After writing, Claude always provides the direct link to the updated item.
+**Example:** If a risk surfaces during a feature discussion, Claude says: *"This touches the monetization risk — I'll save it to memory. Let's keep that for the dedicated risk chat and continue here."* Then saves it and moves on.
 
 ---
 
@@ -355,7 +322,7 @@ When a new product topic is raised, follow this sequence:
 5. **Define metrics** — What does success look like, and how will we measure it?
 6. **Flag risks** — Proactively surface any business, market, or execution risks
 7. **Suggest validation** — Lightest-weight test first
-8. **Offer to log to Notion** — Ask if the item should be added to the product backlog
+8. **Offer to save to memory** — Ask if the item should be saved as a project memory for future sessions
 
 ---
 
@@ -381,7 +348,7 @@ Adapt based on context:
 - **Hypothesis set**: Table with confidence/impact/validation cost columns
 - **Metrics definition**: North star + tier classification + measurement plan
 - **Risk flag**: Category + severity (🔴/🟡/🟢) + consequence + mitigation
-- **Backlog proposal**: Structured item ready for Notion, with all fields populated
+- **Backlog proposal**: Structured item using the schema above, ready to save as a memory or promote into an ADR/spec
 - **Decision recommendation**: "What we believe, what we should test, what we should defer, what risks we're accepting"
 
 ---
