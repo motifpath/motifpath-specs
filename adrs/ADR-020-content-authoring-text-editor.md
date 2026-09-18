@@ -213,6 +213,60 @@ This amendment adds no new decision point beyond the scope line above and change
 part of this ADR — decision points 1, 2, 4, 6, 7, and 8 apply to the exercise-prompt field
 exactly as already written.
 
+### Amendment (2026-09-18) — extend scope to ExpandedContent and Exercise remediation content (PB-40)
+
+A `motifpath-specs` PR #72 review comment asked whether `ExpandedContent` (the image/GIF
+pop-ups shown at a specific video timestamp or article paragraph, decided independently of this
+ADR) should support richer authored content — specifically, content built with the same
+authoring tool already used elsewhere, including embedded video and audio, rather than adding
+separate `video`/`audio` content types with their own raw-URL fields. Separately, ADR-023's new
+`Exercise.remediation_targets` field needs a way to express external remediation content (a
+specific video, article, or clarifying note) richer than a bare URL.
+
+**Decision: extend this ADR's scope to `ExpandedContent.content_type` and
+`Exercise.remediation_targets[].rich_content`, with the persistence model unchanged.** Both gain
+a `rich_text` shape, persisted as **ProseMirror JSON** using the same `PromptDocument` structure
+this ADR already defines (decision point 2) — not a new document schema, and not separate
+`video`/`audio` content types. This is possible without inventing new node types because
+decision point 3 already commits to custom `audio`/`video` media-embed nodes for this editor's
+full (non-exercise-prompt-scoped) node set — a `rich_text` document can already contain a video
+or audio embed, a caption, and surrounding prose in one authored unit, which is exactly what
+both surfaces need.
+
+What changes for these two surfaces specifically:
+
+1. **`ExpandedContent.content_type` gains a third value, `rich_text`,** alongside the existing
+   `image`/`gif`. When `content_type` is `rich_text`, the item carries `rich_content` (a
+   `PromptDocument`) instead of `media_url` — `media_url` remains required for `image`/`gif` and
+   is absent for `rich_text`, the same shape of type-conditional requirement
+   `CreateExpandedContentRequest` already uses for the video/article trigger-field groups. The
+   existing `trigger_at_seconds`/`hide_at_seconds` (video parent) and
+   `trigger_at_paragraph`/`duration_ms` (article parent) timing fields are **unchanged** and
+   apply identically regardless of whether the item's content is `image`, `gif`, or `rich_text`
+   — timing is a property of *when* the item appears, orthogonal to what it contains.
+2. **`Exercise.remediation_targets[].rich_content`** (ADR-023) uses the identical
+   `PromptDocument` shape for the same reason: a remediation note that links to an external
+   video or article is authored the same way as any other rich-content surface on the platform,
+   not a bespoke reference format.
+3. **Editor placement stays internal-only**, consistent with this ADR's existing bundle-isolation
+   posture (the amendment above, point 1) — the Tiptap editor instance is mounted only in
+   teacher-facing authoring routes (the content-authoring and exercise-authoring tools), never on
+   any student-facing route. Students consume the persisted JSON through the same hand-written
+   node-walker rendering approach the exercise-prompt amendment already establishes, extended to
+   cover whichever node types `rich_text` ExpandedContent and remediation content actually use
+   (at minimum the `audio`/`video` media nodes this amendment newly puts in front of students,
+   beyond the exercise-prompt walker's current scope).
+4. **No new content type is added for video or audio directly.** A teacher who wants an
+   ExpandedContent pop-up or a remediation target to *be* a video does so by authoring a
+   `rich_text` document containing (primarily or solely) a video embed node — not by picking a
+   separate `video` content type. This keeps the content-type enum small and avoids two ways to
+   express the same authoring intent.
+
+This amendment adds no new decision point beyond the scope line above and changes no other part
+of this ADR — decision points 1 through 8 and the PB-46 amendment both apply to these two
+surfaces exactly as already written, with the node-walker's rendered scope (PB-46 amendment,
+point 2) extended per point 3 above.
+
 ## Related ADRs
 
 - **ADR-018** (Frontend UI architecture) — this decision follows its headless-primitives,
@@ -222,6 +276,9 @@ exactly as already written.
   lesson prose; this ADR does not change or depend on ADR-019's Exercise/Challenge model.
   PB-41's Practice view (built under ADR-019's model) is the consumer referenced in this ADR's
   2026-09-17 amendment.
+- **ADR-023** (Challenge timebox and exercise remediation) — its
+  `Exercise.remediation_targets[].rich_content` field reuses this ADR's `PromptDocument` shape,
+  referenced in this ADR's 2026-09-18 amendment.
 
 ---
 
