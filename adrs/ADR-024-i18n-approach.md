@@ -164,15 +164,20 @@ class of bug entirely.
   case in application code) — any future engineer needs to know it exists and what it means before
   writing content-filtering queries.
 
-## Open Question — Not Resolved by This ADR
+## Open Question — Resolved 2026-09-18
 
 **Fallback behavior when a student's locale has no matching content for a given node or path
-item** is a product policy decision, not a technical one, and is explicitly out of scope here.
-Options include (non-exhaustively) silently substituting the other available language, skipping
-or locking that node/path item until a translation exists, or surfacing it to the student as
-"available in English only" with an explicit opt-in. This must be decided — likely via a
-follow-up spec or a product-discovery pass — before the content-filtering read path
-(part 3 of this decision) is implemented, since it changes what that query actually returns.
+item** was left open at acceptance as a product policy decision, not a technical one. Resolved:
+**lock/skip the node** — a node or path item with no `ContentNode`/`Exercise` tagged for the
+student's resolved locale (and no `any`-language edge) is treated as unavailable to that student
+until a matching-language version exists, rather than silently substituting the other language or
+surfacing an opt-in prompt. This guarantees a student never receives content outside their
+selected language, at the cost of a path being able to stall on translation lag — an accepted
+trade-off given the team controls both authoring and translation pace as concierge.
+
+This resolution governs the content-filtering read path referenced in Decision part 3 and needs a
+Gherkin scenario (`motifpath-specs/features/`) covering the lock/skip behavior before that read
+path is implemented, per this repo's Definition of Ready.
 
 ## Related ADRs
 
