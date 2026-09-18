@@ -60,6 +60,29 @@ Feature: Manage expanded content
     When "alice" retrieves the expanded content item "triad-diagram"
     Then the response returns the item's type, media URL, trigger, and hide fields
 
+  # ── Rich text content — happy path ────────────────────────────────────────────
+
+  Scenario: A teacher adds rich text content to a video lesson at a specific timestamp
+    Given "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" adds rich text content to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165
+    Then the expanded content item is created and assigned a stable identifier
+    And the item's content_type is "rich_text"
+
+  Scenario: A teacher adds rich text content to an article at a specific paragraph
+    Given "bob" is authenticated as a teacher
+    And an article content node "chord-theory-explained" exists in the system
+    When "bob" adds rich text content to "chord-theory-explained" with trigger_at_paragraph 2 and duration_ms 6000
+    Then the expanded content item is created and assigned a stable identifier
+    And the item's content_type is "rich_text"
+
+  Scenario: Rich text expanded content may embed a video or audio track
+    Given "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" adds rich text content containing an embedded video to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165
+    Then the expanded content item is created and assigned a stable identifier
+    And the item's rich content contains a video node
+
   # ── Happy path — updating and deleting ────────────────────────────────────────
 
   Scenario: A teacher updates an expanded content item's timing and caption
@@ -108,10 +131,31 @@ Feature: Manage expanded content
     Then the request is rejected as invalid
     And the rejection identifies "content_type" as the source of the error
 
-  Scenario: Creating an expanded content item without a media URL is rejected
+  Scenario: Creating an image expanded content item without a media URL is rejected
     Given "bob" is authenticated as a teacher
     And a video content node "intro-to-triads" exists in the system
     When "bob" submits a create expanded content request with the media_url field omitted
+    Then the request is rejected as invalid
+    And the rejection identifies "media_url" as the source of the error
+
+  Scenario: Creating a rich_text expanded content item without rich content is rejected
+    Given "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" submits a create expanded content request with content_type "rich_text" and the rich_content field omitted
+    Then the request is rejected as invalid
+    And the rejection identifies "rich_content" as the source of the error
+
+  Scenario: Creating an image expanded content item that also carries rich content is rejected
+    Given "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" submits a create expanded content request with content_type "image" carrying both media_url and rich_content
+    Then the request is rejected as invalid
+    And the rejection identifies "rich_content" as the source of the error
+
+  Scenario: Creating a rich_text expanded content item that also carries a media URL is rejected
+    Given "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" submits a create expanded content request with content_type "rich_text" carrying both media_url and rich_content
     Then the request is rejected as invalid
     And the rejection identifies "media_url" as the source of the error
 

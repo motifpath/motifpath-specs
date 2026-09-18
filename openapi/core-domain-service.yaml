@@ -358,11 +358,13 @@ paths:
       description: |
         Creates a new challenge attached to the specified content node. A challenge
         is the assessment unit for a class — it groups exercises and carries the
-        subject tag, pass threshold, and optional remediation target used by the
-        rules-based recommendation engine.
+        subject tag and pass threshold used by the rules-based recommendation
+        engine, plus an optional, purely informational time threshold.
 
         Subject tag is mandatory. Without it, right/wrong outcomes on exercises are
-        analytically meaningless and gap detection cannot function.
+        analytically meaningless and gap detection cannot function. Remediation
+        targets are configured per exercise, not on the challenge — see
+        Exercise.remediation_targets.
       tags:
         - Content
       parameters:
@@ -381,11 +383,11 @@ paths:
               $ref: '#/components/schemas/CreateChallengeRequest'
             examples:
               chord_recognition:
-                summary: A challenge for chord recognition with a remediation target
+                summary: A challenge for chord recognition with an explicit time threshold
                 value:
                   subject_tag: "triad-shapes"
                   pass_threshold: 70
-                  remediation_target_content_node_id: "c9d1e2f3-0000-0000-0000-000000000002"
+                  time_threshold_ms: 120000
       responses:
         "201":
           description: Challenge created.
@@ -461,12 +463,13 @@ paths:
       operationId: updateChallenge
       summary: Update a challenge's assessment configuration
       description: |
-        Replaces the given challenge's subject tag, pass threshold,
-        remediation target, and shuffle flags with the request body. The
-        challenge's linked exercises are untouched by this call — use
-        POST/DELETE /challenges/{challenge_id}/exercises/{exercise_id} to
-        change those. Only the creating teacher or an admin may update a
-        challenge.
+        Replaces the given challenge's subject tag, pass threshold, time
+        threshold, and shuffle flags with the request body. The challenge's
+        linked exercises are untouched by this call — use POST/DELETE
+        /challenges/{challenge_id}/exercises/{exercise_id} to change those.
+        Remediation targets are configured per exercise, not on the
+        challenge — see updateExercise. Only the creating teacher or an
+        admin may update a challenge.
       tags:
         - Content
       parameters:
@@ -1036,10 +1039,10 @@ paths:
       operationId: createExpandedContent
       summary: Add an expanded content item to a content node
       description: |
-        Attaches an expositive media item (image or GIF) to a content node. The
-        item is shown to the student at a specific point during consumption —
-        at a video timestamp for video nodes, or at a paragraph position for
-        article nodes.
+        Attaches an expositive item (image, GIF, or rich content) to a
+        content node. The item is shown to the student at a specific point
+        during consumption — at a video timestamp for video nodes, or at a
+        paragraph position for article nodes.
 
         **Trigger and hide rules by content node type:**
 
@@ -1050,8 +1053,16 @@ paths:
           must be provided (minimum 1 ms). `trigger_at_seconds` and `hide_at_seconds`
           must be absent.
 
+        These timing rules apply the same way regardless of content_type.
+
+        **Content rules by content_type:** `image` and `gif` require `media_url`
+        and must not carry `rich_content`. `rich_text` requires `rich_content`
+        and must not carry `media_url` — video or audio embeds go inside the
+        rich content itself, there is no separate `video`/`audio` content_type.
+
         These constraints are enforced at write time. A request that mixes fields
-        from both groups is rejected with 400.
+        from either group (trigger/hide, or media_url/rich_content) is rejected
+        with 400.
       tags:
         - Content
       parameters:
@@ -1094,8 +1105,10 @@ paths:
                 $ref: '#/components/schemas/ExpandedContent'
         "400":
           description: |
-            The request body failed schema validation, or the trigger/hide field
-            combination is inconsistent with the parent content node type.
+            The request body failed schema validation, the trigger/hide field
+            combination is inconsistent with the parent content node type, or
+            the media_url/rich_content combination is inconsistent with
+            content_type.
           content:
             application/json:
               schema:
@@ -1243,9 +1256,10 @@ paths:
                 $ref: '#/components/schemas/ExpandedContent'
         "400":
           description: |
-            The request body failed schema validation, or the trigger/hide
+            The request body failed schema validation, the trigger/hide
             field combination is inconsistent with the parent content node
-            type.
+            type, or the media_url/rich_content combination is inconsistent
+            with content_type.
           content:
             application/json:
               schema:
@@ -2289,21 +2303,39 @@ components:
     CreateExpandedContentRequest:
       type: object
       description: |
-        Payload for attaching an expositive media item to a content node.
-        The trigger and hide fields used depend on the parent content node type:
+        Payload for attaching an expositive item to a content node. The
+        trigger and hide fields used depend on the parent content node type:
         video nodes use trigger_at_seconds + hide_at_seconds; article nodes use
         trigger_at_paragraph + duration_ms. Mixing fields across groups is invalid.
+        These timing fields apply identically regardless of content_type —
+        timing is a property of when the item appears, independent of what
+        it contains.
       properties:
         content_type:
           type: string
           enum:
             - image
             - gif
-          description: The media format of the expanded content item.
+            - rich_text
+          description: |
+            The format of the expanded content item. image and gif require
+            media_url; rich_text requires rich_content instead — the two
+            are mutually exclusive.
         media_url:
           type: string
           format: uri
-          description: External URL of the image or GIF to display.
+          description: |
+            External URL of the image or GIF to display. Required when
+            content_type is image or gif; must be absent when content_type
+            is rich_text.
+        rich_content:
+          allOf:
+            - $ref: '#/components/schemas/PromptDocument'
+          description: |
+            Rich content authored with the Tiptap-based content editor,
+            which may embed video or audio alongside text and images —
+            no separate video/audio content_type is needed. Required when
+            content_type is rich_text; must be absent otherwise.
         trigger_at_seconds:
           type: integer
           minimum: 0
@@ -2331,18 +2363,18 @@ components:
             after it is triggered. Must be absent for video nodes.
         caption:
           type: string
-          description: Optional caption displayed alongside the media item.
+          description: Optional caption displayed alongside the item.
       required:
         - content_type
-        - media_url
 
     ExpandedContent:
       type: object
       description: |
-        An expositive media item (image or GIF) attached to a content node and
-        shown to the student at a specific point during content consumption.
-        For video nodes the item is synced to the video timeline; for article
-        nodes it is triggered by paragraph position.
+        An expositive item (image, GIF, or rich content) attached to a
+        content node and shown to the student at a specific point during
+        content consumption. For video nodes the item is synced to the
+        video timeline; for article nodes it is triggered by paragraph
+        position.
       properties:
         expanded_content_id:
           type: string
@@ -2357,11 +2389,21 @@ components:
           enum:
             - image
             - gif
-          description: The media format of this item.
+            - rich_text
+          description: |
+            The format of this item. image and gif carry media_url;
+            rich_text carries rich_content instead.
         media_url:
           type: string
           format: uri
-          description: External URL of the image or GIF.
+          description: External URL of the image or GIF. Present only when content_type is image or gif.
+        rich_content:
+          allOf:
+            - $ref: '#/components/schemas/PromptDocument'
+          description: |
+            Rich content authored with the Tiptap-based content editor,
+            which may embed video or audio. Present only when content_type
+            is rich_text.
         trigger_at_seconds:
           type: integer
           minimum: 0
@@ -2380,7 +2422,7 @@ components:
           description: Article nodes only. Display duration in milliseconds.
         caption:
           type: string
-          description: Optional caption displayed alongside the media item.
+          description: Optional caption displayed alongside the item.
         created_at:
           type: string
           format: date-time
@@ -2389,29 +2431,42 @@ components:
         - expanded_content_id
         - content_node_id
         - content_type
-        - media_url
         - created_at
 
     UpdateExpandedContentRequest:
       type: object
       description: |
-        Payload for replacing an existing expanded content item's media,
+        Payload for replacing an existing expanded content item's content,
         trigger/hide position, and caption. Same trigger/hide field-group
-        rules as CreateExpandedContentRequest — the fields present must
-        match the parent content node's type (seconds-based for video,
-        paragraph-based for article); this is unchanged by the update since
-        content_type itself cannot change after creation.
+        rules as CreateExpandedContentRequest apply, keyed off the parent
+        content node's type (seconds-based for video, paragraph-based for
+        article) — the parent content node's own type cannot change, so
+        which trigger group is valid is unchanged by this update. The
+        item's own content_type (image/gif/rich_text) may change.
       properties:
         content_type:
           type: string
           enum:
             - image
             - gif
-          description: The media format of the expanded content item.
+            - rich_text
+          description: |
+            The format of the expanded content item. image and gif require
+            media_url; rich_text requires rich_content instead.
         media_url:
           type: string
           format: uri
-          description: External URL of the image or GIF to display.
+          description: |
+            External URL of the image or GIF to display. Required when
+            content_type is image or gif; must be absent when content_type
+            is rich_text.
+        rich_content:
+          allOf:
+            - $ref: '#/components/schemas/PromptDocument'
+          description: |
+            Rich content authored with the Tiptap-based content editor.
+            Required when content_type is rich_text; must be absent
+            otherwise.
         trigger_at_seconds:
           type: integer
           minimum: 0
@@ -2432,10 +2487,9 @@ components:
           description: Article nodes only. Must be absent for video nodes.
         caption:
           type: string
-          description: Optional caption displayed alongside the media item.
+          description: Optional caption displayed alongside the item.
       required:
         - content_type
-        - media_url
 
     CreateChallengeRequest:
       type: object
@@ -2454,15 +2508,21 @@ components:
           maximum: 100
           description: |
             The minimum score (as a percentage of exercises answered correctly)
-            required to pass this challenge. Scores below this value trigger
-            the remediation recommendation if a target is configured.
-        remediation_target_content_node_id:
-          type: string
-          format: uuid
+            required to pass this challenge.
+        time_threshold_ms:
+          type: integer
+          minimum: 1
           description: |
-            The content node to recommend when a student's score falls below
-            pass_threshold. If omitted, no automatic recommendation is made on
-            failure.
+            An informational time expectation for this challenge, in
+            milliseconds. Purely advisory — never enforced, never affects
+            scoring or submission. When omitted, the value returned by
+            GET/list endpoints is computed as the sum of the challenge's
+            currently linked exercises' estimated_duration_seconds
+            (converted to milliseconds; an exercise with no estimate
+            contributes 0), recomputed on every read rather than stored, so
+            it always reflects the challenge's current exercise links. Set
+            this explicitly to override that computed value with the
+            teacher's own estimate.
         shuffle_exercises:
           type: boolean
           default: false
@@ -2505,10 +2565,19 @@ components:
           minimum: 1
           maximum: 100
           description: Minimum score percentage required to pass.
-        remediation_target_content_node_id:
-          type: string
-          format: uuid
-          description: Content node recommended when the student fails this challenge. Absent if not configured.
+        time_threshold_ms:
+          type: integer
+          minimum: 1
+          description: |
+            An informational time expectation for this challenge, in
+            milliseconds — never enforced, never affects scoring or
+            submission. Equal to the teacher's explicit override if one was
+            set, otherwise computed as the sum of the challenge's currently
+            linked exercises' estimated_duration_seconds converted to
+            milliseconds (an exercise with no estimate contributes 0),
+            recomputed on every read. Absent only when the challenge has no
+            override and no linked exercise has an estimated_duration_seconds
+            set, so there is nothing to sum.
         shuffle_exercises:
           type: boolean
           description: Whether this challenge's exercise order varies per request.
@@ -2547,12 +2616,15 @@ components:
           description: |
             The minimum score (as a percentage of exercises answered
             correctly) required to pass this challenge.
-        remediation_target_content_node_id:
-          type: string
-          format: uuid
+        time_threshold_ms:
+          type: integer
+          minimum: 1
           description: |
-            The content node to recommend when a student's score falls below
-            pass_threshold. Omit to clear a previously configured target.
+            An informational time expectation for this challenge, in
+            milliseconds — never enforced, never affects scoring or
+            submission. Omit to clear a previously set override and fall
+            back to the computed sum of linked exercises'
+            estimated_duration_seconds.
         shuffle_exercises:
           type: boolean
           default: false
@@ -2568,9 +2640,15 @@ components:
     PromptDocument:
       type: object
       description: |
-        A structured rich-text document for an exercise's prompt, authored
-        with the exercise-prompt rich-text editor and persisted exactly as
-        the editor produces it. Always has type "doc" at the root, with the
+        A structured rich-text document, authored with MotifPath's
+        Tiptap-based content-authoring editor and persisted exactly as the
+        editor produces it (ProseMirror JSON). Used for an exercise's
+        prompt, rich_text expanded content, and an exercise's
+        remediation_targets rich content — the same document shape across
+        all three, though which PromptNode types a given surface's own
+        toolbar can actually produce varies (an exercise prompt's toolbar
+        does not offer audio/video embeds; expanded content and remediation
+        content may). Always has type "doc" at the root, with the
         document's block-level content nested beneath it.
       properties:
         type:
@@ -2595,9 +2673,9 @@ components:
         content; the text node is a leaf that carries the literal string
         under text and any inline marks under marks. attrs holds
         type-specific attributes (e.g. heading's level, paragraph/heading's
-        text alignment, image's src and alt, table cell's colspan, rowspan,
-        backgroundColor, and borderColor) and is validated by the authoring
-        editor, not by this schema.
+        text alignment, image's src and alt, audio/video's src, table
+        cell's colspan, rowspan, backgroundColor, and borderColor) and is
+        validated by the authoring editor, not by this schema.
       properties:
         type:
           type: string
@@ -2613,7 +2691,13 @@ components:
             - tableHeader
             - tableCell
             - image
-          description: The kind of node this is.
+            - audio
+            - video
+          description: |
+            The kind of node this is. audio and video are available to
+            rich_text expanded content and remediation content; the
+            exercise-prompt authoring toolbar does not offer them, so they
+            do not appear in a PromptDocument used as an exercise's prompt.
         attrs:
           type: object
           additionalProperties: true
@@ -2732,11 +2816,45 @@ components:
             Authoring estimate of the time a student needs to attempt this
             exercise once. Optional — used to fit practice sessions and
             challenges to a student's available time.
+        remediation_targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/RemediationTarget'
+          description: |
+            Content to recommend a student who answers this specific
+            exercise incorrectly, in priority order. Empty or omitted means
+            no remediation is configured for this exercise.
       required:
         - title
         - prompt
         - exercise_type
         - options
+
+    RemediationTarget:
+      type: object
+      description: |
+        One piece of content recommended to a student who answers a
+        specific exercise incorrectly. Exactly one of content_node_id or
+        rich_content must be present — a target is either a reference to an
+        existing content node already published on the platform, or
+        inline-authored content (for example, a specific external video or
+        article, with a caption explaining why it's suggested) using the
+        same rich-content model as an exercise prompt.
+      properties:
+        content_node_id:
+          type: string
+          format: uuid
+          description: |
+            An existing content node to recommend. Must be absent if
+            rich_content is present.
+        rich_content:
+          $ref: '#/components/schemas/PromptDocument'
+        caption:
+          type: string
+          description: |
+            Optional short label shown alongside this target (e.g. "Watch
+            this if the chord shapes felt unfamiliar"). Applies to either
+            target shape.
 
     UpdateExerciseRequest:
       type: object
@@ -2790,6 +2908,14 @@ components:
             Authoring estimate of the time a student needs to attempt this
             exercise once. Optional — used to fit practice sessions and
             challenges to a student's available time.
+        remediation_targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/RemediationTarget'
+          description: |
+            Content to recommend a student who answers this specific
+            exercise incorrectly, in priority order, replacing the current
+            set. Empty or omitted clears any previously configured targets.
       required:
         - title
         - prompt
@@ -2867,6 +2993,14 @@ components:
             exercise once. Used to fit a practice session to the time a
             student reports having available, and to size a challenge's
             expected length. Absent when the author has not estimated it.
+        remediation_targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/RemediationTarget'
+          description: |
+            Content recommended to a student who answers this exercise
+            incorrectly, in priority order. May be empty — an exercise can
+            exist without any remediation configured.
         created_at:
           type: string
           format: date-time
@@ -2879,6 +3013,7 @@ components:
         - options
         - challenge_ids
         - content_node_ids
+        - remediation_targets
         - created_at
 
     PracticeSession:

@@ -15,11 +15,38 @@ Feature: Manage challenges
     Then the challenge is created and assigned a stable identifier
     And the challenge records "intro-to-triads" as its parent content node
 
-  Scenario: A teacher creates a challenge with a remediation target
+  Scenario: A teacher creates a challenge with an explicit time threshold
     Given "bob" is authenticated as a teacher
-    And a content node "triad-remediation" exists in the system
-    When "bob" creates a challenge for "intro-to-triads" with subject tag "triad-shapes", pass threshold 70, and remediation target "triad-remediation"
-    Then the challenge is created with the remediation target recorded
+    When "bob" creates a challenge for "intro-to-triads" with subject tag "triad-shapes", pass threshold 70, and time threshold 120000 ms
+    Then the challenge is created with time_threshold_ms 120000
+
+  Scenario: A challenge's time threshold defaults to the sum of its linked exercises' estimated durations
+    Given a challenge "computed-challenge" exists for content node "intro-to-triads" with no time threshold set
+    And an exercise "triad-exercise-01" exists with an estimated duration of 30 seconds
+    And an exercise "picking-drill-01" exists with an estimated duration of 45 seconds
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "triad-exercise-01" to "computed-challenge"
+    And "bob" has linked exercise "picking-drill-01" to "computed-challenge"
+    And "alice" is authenticated as a student
+    When "alice" retrieves the challenge "computed-challenge"
+    Then the response reports time_threshold_ms 75000
+
+  Scenario: A challenge's computed time threshold treats a linked exercise with no estimate as zero
+    Given a challenge "computed-challenge" exists for content node "intro-to-triads" with no time threshold set
+    And an exercise "triad-exercise-01" exists with an estimated duration of 30 seconds
+    And an exercise "undated-exercise" exists with no estimated duration
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "triad-exercise-01" to "computed-challenge"
+    And "bob" has linked exercise "undated-exercise" to "computed-challenge"
+    And "alice" is authenticated as a student
+    When "alice" retrieves the challenge "computed-challenge"
+    Then the response reports time_threshold_ms 30000
+
+  Scenario: A challenge's computed time threshold is absent when no linked exercise has an estimate
+    Given a challenge "computed-challenge" exists for content node "intro-to-triads" with no time threshold set
+    And "alice" is authenticated as a student
+    When "alice" retrieves the challenge "computed-challenge"
+    Then the response does not report a time_threshold_ms
 
   Scenario: An admin creates a challenge
     Given "admin" is authenticated as an admin
@@ -65,12 +92,19 @@ Feature: Manage challenges
     Then the challenge's subject tag is "triad-shapes-revised"
     And the challenge's pass threshold is 85
 
-  Scenario: A teacher sets a remediation target on an existing challenge
+  Scenario: A teacher sets an explicit time threshold on an existing challenge
     Given a challenge "triad-challenge" exists for content node "intro-to-triads"
-    And a content node "triad-remediation" exists in the system
     And "bob" is authenticated as a teacher
-    When "bob" updates challenge "triad-challenge" with subject tag "triad-shapes" and pass threshold 70 and remediation target "triad-remediation"
-    Then the challenge's remediation target is "triad-remediation"
+    When "bob" updates challenge "triad-challenge" with subject tag "triad-shapes" and pass threshold 70 and time threshold 90000 ms
+    Then the challenge's time_threshold_ms is 90000
+
+  Scenario: A teacher clears a challenge's explicit time threshold
+    Given a challenge "triad-challenge" exists for content node "intro-to-triads" with time threshold 90000 ms
+    And an exercise "triad-exercise-01" exists with an estimated duration of 30 seconds
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "triad-exercise-01" to "triad-challenge"
+    When "bob" updates challenge "triad-challenge" with subject tag "triad-shapes" and pass threshold 70 and the time_threshold_ms field omitted
+    Then the challenge's time_threshold_ms is 30000
 
   Scenario: A teacher enables shuffling on an existing challenge
     Given a challenge "ordered-challenge" exists for content node "intro-to-triads" with exercise shuffling disabled

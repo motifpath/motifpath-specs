@@ -132,6 +132,62 @@ Feature: Manage exercises
     When "bob" updates exercise "triad-exercise-01" with title "Root position, revised"
     Then the exercise records "triad-challenge" among its linked challenges
 
+  # ── Happy path — remediation targets ──────────────────────────────────────────
+
+  Scenario: A teacher creates an exercise with an internal remediation target
+    Given a content node "triad-remediation" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates an image_recognition exercise titled "Root position of a C major triad" with prompt "Identify the root position of a C major triad" and one correct option and a remediation target that is content node "triad-remediation"
+    Then the exercise records one remediation target
+    And that remediation target is content node "triad-remediation"
+
+  Scenario: A teacher creates an exercise with inline rich-content remediation
+    Given "bob" is authenticated as a teacher
+    When "bob" creates an image_recognition exercise titled "Root position of a C major triad" with prompt "Identify the root position of a C major triad" and one correct option and a remediation target with rich content and caption "Watch this if the shape felt unfamiliar"
+    Then the exercise records one remediation target
+    And that remediation target carries rich content with caption "Watch this if the shape felt unfamiliar"
+
+  Scenario: A teacher creates an exercise with multiple remediation targets in priority order
+    Given a content node "triad-remediation" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates an image_recognition exercise titled "Root position of a C major triad" with prompt "Identify the root position of a C major triad" and one correct option and remediation targets in order: content node "triad-remediation", then rich content with caption "Or read this instead"
+    Then the exercise records 2 remediation targets in that order
+
+  Scenario: A teacher replaces an exercise's remediation targets
+    Given an exercise "triad-exercise-01" exists with a remediation target that is content node "triad-remediation"
+    And a content node "picking-fundamentals" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" updates exercise "triad-exercise-01" with a remediation target that is content node "picking-fundamentals"
+    Then the exercise records one remediation target
+    And that remediation target is content node "picking-fundamentals"
+
+  Scenario: A teacher clears an exercise's remediation targets
+    Given an exercise "triad-exercise-01" exists with a remediation target that is content node "triad-remediation"
+    And "bob" is authenticated as a teacher
+    When "bob" updates exercise "triad-exercise-01" with the remediation_targets field omitted
+    Then the exercise records no remediation targets
+
+  # ── Validation failures — remediation targets ─────────────────────────────────
+
+  Scenario: Creating an exercise with a remediation target carrying both a content node and rich content is rejected
+    Given a content node "triad-remediation" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" submits a create exercise request with a remediation target carrying both content_node_id and rich_content
+    Then the request is rejected as invalid
+    And the rejection identifies "remediation_targets" as the source of the error
+
+  Scenario: Creating an exercise with a remediation target carrying neither a content node nor rich content is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create exercise request with a remediation target carrying neither content_node_id nor rich_content
+    Then the request is rejected as invalid
+    And the rejection identifies "remediation_targets" as the source of the error
+
+  Scenario: Creating an exercise with a remediation target referencing a non-existent content node is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" creates an exercise with a remediation target referencing a content node ID that does not exist
+    Then the request is rejected as invalid
+    And the rejection identifies "remediation_targets" as the source of the error
+
   # ── Validation failures — updating ────────────────────────────────────────────
 
   Scenario: Updating an exercise without a title is rejected
