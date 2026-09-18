@@ -72,6 +72,45 @@ Feature: Student path view
     Then "node-01" and "node-02" have section_label "Open chords"
     And "node-03" has section_label "Strumming patterns"
 
+  # ── Language availability ────────────────────────────────────────────────
+  # Per ADR-024: a node with no content available in the student's locale is
+  # locked, the same as an unmet prerequisite — never silently substituted
+  # with another language, never surfaced as an opt-in choice.
+
+  Scenario: A node with no content in the student's locale is locked even though it is the first item
+    Given "alice" is authenticated as a student
+    And "alice" has locale "pt_BR"
+    And "alice" has "beginner-guitar-path" assigned with no progress recorded
+    And "node-01" has content available only in locale "en"
+    When "alice" retrieves her current path
+    Then "node-01" has status "locked"
+
+  Scenario: A node available in the student's locale is not locked for language reasons
+    Given "alice" is authenticated as a student
+    And "alice" has locale "pt_BR"
+    And "alice" has "beginner-guitar-path" assigned with no progress recorded
+    And "node-01" has content available in locale "pt_BR"
+    When "alice" retrieves her current path
+    Then "node-01" has status "not_started"
+
+  Scenario: A node tagged for any locale is never locked for language reasons
+    Given "alice" is authenticated as a student
+    And "alice" has locale "pt_BR"
+    And "alice" has "beginner-guitar-path" assigned with no progress recorded
+    And "node-01" has content available in any locale
+    When "alice" retrieves her current path
+    Then "node-01" has status "not_started"
+
+  Scenario: A node otherwise unlocked by progress stays locked when its locale is missing
+    Given "alice" is authenticated as a student
+    And "alice" has locale "pt_BR"
+    And "alice" has "beginner-guitar-path" assigned
+    And "alice" has completed "node-01"
+    And "node-02" has content available only in locale "en"
+    When "alice" retrieves her current path
+    Then "node-01" has status "completed"
+    And "node-02" has status "locked"
+
   # ── Not found ─────────────────────────────────────────────────────────────
 
   Scenario: A student with no active assignment gets not found
