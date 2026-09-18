@@ -92,6 +92,67 @@ paths:
                 $ref: '#/components/schemas/ConflictError'
 
   /content-nodes:
+    get:
+      operationId: listContentNodes
+      summary: List content nodes for authoring
+      description: |
+        Returns content nodes from the library, for browsing and picking one
+        to edit, use as a remediation target, or add to a learning path —
+        not a student-facing catalog. Results are unordered beyond a stable
+        id order and are not paginated. Only teachers and admins may list
+        content nodes.
+      tags:
+        - Content
+      parameters:
+        - name: content_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - video
+              - article
+          description: When given, only content nodes of this type are returned.
+        - name: skill
+          in: query
+          required: false
+          schema:
+            type: string
+          description: When given, only content nodes classified with this exact skill are returned.
+        - name: difficulty_level
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - beginner
+              - intermediate
+              - advanced
+          description: When given, only content nodes at this difficulty level are returned.
+      responses:
+        "200":
+          description: The matching content nodes, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContentNode'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to list content
+            nodes. Only teachers and admins may list content nodes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
     post:
       operationId: createContentNode
       summary: Create a content node
@@ -181,6 +242,68 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No content node exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+    put:
+      operationId: updateContentNode
+      summary: Update a content node's title and classification
+      description: |
+        Replaces the given content node's title and classification with the
+        request body. content_type cannot be changed — it determines which
+        expanded-content trigger fields (seconds vs. paragraph) are valid for
+        items already attached to this node, so changing it would leave those
+        items in an inconsistent shape; publish a new content node of the
+        desired type instead. review_state is not affected by this call — an
+        edit does not reset or require re-confirming an admin's prior review.
+        Only the creating teacher or an admin may update a content node.
+      tags:
+        - Content
+      parameters:
+        - name: content_node_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the content node to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContentNodeRequest'
+      responses:
+        "200":
+          description: The updated content node.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentNode'
+        "400":
+          description: The request body failed schema validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to update this
+            content node. Only the creating teacher or an admin may update it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
         "404":
           description: No content node exists with the given ID.
           content:
@@ -327,6 +450,66 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No challenge exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+    put:
+      operationId: updateChallenge
+      summary: Update a challenge's assessment configuration
+      description: |
+        Replaces the given challenge's subject tag, pass threshold,
+        remediation target, and shuffle flags with the request body. The
+        challenge's linked exercises are untouched by this call — use
+        POST/DELETE /challenges/{challenge_id}/exercises/{exercise_id} to
+        change those. Only the creating teacher or an admin may update a
+        challenge.
+      tags:
+        - Content
+      parameters:
+        - name: challenge_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the challenge to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChallengeRequest'
+      responses:
+        "200":
+          description: The updated challenge.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+        "400":
+          description: The request body failed schema validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to update this
+            challenge. Only the creating teacher or an admin may update it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
         "404":
           description: No challenge exists with the given ID.
           content:
@@ -1026,6 +1209,111 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+    put:
+      operationId: updateExpandedContent
+      summary: Update an expanded content item
+      description: |
+        Replaces the given expanded content item's media, trigger/hide
+        position, and caption with the request body. The same trigger/hide
+        field-group rules as POST .../expanded-content apply, validated
+        against the parent content node's type. Only the creating teacher or
+        an admin may update an expanded content item.
+      tags:
+        - Content
+      parameters:
+        - name: expanded_content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the expanded content item to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExpandedContentRequest'
+      responses:
+        "200":
+          description: The updated expanded content item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpandedContent'
+        "400":
+          description: |
+            The request body failed schema validation, or the trigger/hide
+            field combination is inconsistent with the parent content node
+            type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to update this
+            expanded content item. Only the creating teacher or an admin may
+            update it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No expanded content item exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+    delete:
+      operationId: deleteExpandedContent
+      summary: Delete an expanded content item
+      description: |
+        Permanently removes the given expanded content item from its content
+        node. Only the creating teacher or an admin may delete an expanded
+        content item.
+      tags:
+        - Content
+      parameters:
+        - name: expanded_content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the expanded content item to delete.
+      responses:
+        "204":
+          description: The expanded content item was deleted.
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to delete this
+            expanded content item. Only the creating teacher or an admin may
+            delete it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No expanded content item exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /exercises/{exercise_id}:
     get:
       operationId: getExercise
@@ -1203,6 +1491,39 @@ paths:
                 $ref: '#/components/schemas/NotFoundError'
 
   /learning-paths:
+    get:
+      operationId: listLearningPaths
+      summary: List learning paths for authoring
+      description: |
+        Returns learning paths from the library, for browsing and picking one
+        to edit or assign to a student. Results are unordered beyond a stable
+        id order and are not paginated. Teachers and admins may list learning
+        paths; students may not browse paths directly — their view is
+        through GET /students/me/path.
+      tags:
+        - Learning Paths
+      responses:
+        "200":
+          description: The existing learning paths, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LearningPath'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Students may not list learning paths directly.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
     post:
       operationId: createLearningPath
       summary: Create a learning path
@@ -1301,6 +1622,71 @@ paths:
                 $ref: '#/components/schemas/UnauthorizedError'
         "403":
           description: Students may not retrieve learning paths directly.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No learning path exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+    put:
+      operationId: replaceLearningPath
+      summary: Replace a learning path's title and items
+      description: |
+        Replaces the given learning path's title and ordered items wholesale,
+        the same way POST /learning-paths establishes them initially — a
+        caller that wants to add, remove, reorder, or relabel a single item
+        resends the full items array with the desired result. Positions are
+        reassigned 1-based from the new array's order, same as on create.
+        Existing student progress against this path (a copied StudentPath
+        per student, not a shared reference) is unaffected by this call.
+        Only the creating teacher or an admin may replace a learning path.
+      tags:
+        - Learning Paths
+      parameters:
+        - name: learning_path_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the learning path to replace.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplaceLearningPathRequest'
+      responses:
+        "200":
+          description: The updated learning path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningPath'
+        "400":
+          description: |
+            The request body failed schema validation — missing title, empty
+            items array, or a content_node_id that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to replace this
+            learning path. Only the creating teacher or an admin may replace
+            it.
           content:
             application/json:
               schema:
@@ -1623,6 +2009,22 @@ components:
         - classification
         - created_at
 
+    UpdateContentNodeRequest:
+      type: object
+      description: |
+        Payload for updating an existing content node's title and
+        classification. content_type is not present here — it cannot be
+        changed after creation.
+      properties:
+        title:
+          type: string
+          description: Human-readable title of the content node, displayed to students.
+        classification:
+          $ref: '#/components/schemas/ClassificationInput'
+      required:
+        - title
+        - classification
+
     CreateLearningPathRequest:
       type: object
       description: Payload for creating a learning path.
@@ -1722,6 +2124,39 @@ components:
         - title
         - items
         - created_at
+
+    ReplaceLearningPathRequest:
+      type: object
+      description: |
+        Payload for replacing an existing learning path's title and items
+        wholesale — the same shape as CreateLearningPathRequest, since a
+        change to any single item (add, remove, reorder, relabel) is
+        expressed by resending the complete desired items array.
+      properties:
+        title:
+          type: string
+          description: Human-readable name for this learning path, displayed to teachers and admins.
+        items:
+          type: array
+          minItems: 1
+          description: Ordered list of content nodes that make up this path. At least one item is required.
+          items:
+            type: object
+            properties:
+              content_node_id:
+                type: string
+                format: uuid
+                description: The ID of the content node at this position. Must exist in the system.
+              section_label:
+                type: string
+                description: >-
+                  Optional label grouping this item with its immediate
+                  neighbors under a named section in the resulting path view.
+            required:
+              - content_node_id
+      required:
+        - title
+        - items
 
     AssignLearningPathRequest:
       type: object
@@ -1957,6 +2392,51 @@ components:
         - media_url
         - created_at
 
+    UpdateExpandedContentRequest:
+      type: object
+      description: |
+        Payload for replacing an existing expanded content item's media,
+        trigger/hide position, and caption. Same trigger/hide field-group
+        rules as CreateExpandedContentRequest — the fields present must
+        match the parent content node's type (seconds-based for video,
+        paragraph-based for article); this is unchanged by the update since
+        content_type itself cannot change after creation.
+      properties:
+        content_type:
+          type: string
+          enum:
+            - image
+            - gif
+          description: The media format of the expanded content item.
+        media_url:
+          type: string
+          format: uri
+          description: External URL of the image or GIF to display.
+        trigger_at_seconds:
+          type: integer
+          minimum: 0
+          description: Video nodes only. Must be absent for article nodes.
+        hide_at_seconds:
+          type: integer
+          minimum: 0
+          description: |
+            Video nodes only. Must be greater than trigger_at_seconds. Must
+            be absent for article nodes.
+        trigger_at_paragraph:
+          type: integer
+          minimum: 1
+          description: Article nodes only. Must be absent for video nodes.
+        duration_ms:
+          type: integer
+          minimum: 1
+          description: Article nodes only. Must be absent for video nodes.
+        caption:
+          type: string
+          description: Optional caption displayed alongside the media item.
+      required:
+        - content_type
+        - media_url
+
     CreateChallengeRequest:
       type: object
       description: Payload for creating a challenge within a content node.
@@ -2047,6 +2527,43 @@ components:
         - shuffle_exercises
         - shuffle_options
         - created_at
+
+    UpdateChallengeRequest:
+      type: object
+      description: |
+        Payload for updating an existing challenge's assessment
+        configuration. Linked exercises are not part of this payload — they
+        are changed via POST/DELETE
+        /challenges/{challenge_id}/exercises/{exercise_id}, not by resending
+        them here.
+      properties:
+        subject_tag:
+          type: string
+          description: The subject this challenge assesses.
+        pass_threshold:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: |
+            The minimum score (as a percentage of exercises answered
+            correctly) required to pass this challenge.
+        remediation_target_content_node_id:
+          type: string
+          format: uuid
+          description: |
+            The content node to recommend when a student's score falls below
+            pass_threshold. Omit to clear a previously configured target.
+        shuffle_exercises:
+          type: boolean
+          default: false
+          description: Whether this challenge's exercise order varies per request.
+        shuffle_options:
+          type: boolean
+          default: false
+          description: Whether each exercise's option order varies per request.
+      required:
+        - subject_tag
+        - pass_threshold
 
     PromptDocument:
       type: object

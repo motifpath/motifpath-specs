@@ -36,6 +36,68 @@ Feature: Manage learning paths
     And "node-01" and "node-02" are returned with section_label "Open chords"
     And "node-03" is returned with section_label "Strumming patterns"
 
+  # ── Happy path — listing learning paths for authoring ─────────────────────────
+
+  Scenario: A teacher lists all learning paths in the library
+    Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And a learning path "advanced-path" exists with items "node-01", "node-02"
+    And "bob" is authenticated as a teacher
+    When "bob" lists all learning paths
+    Then the response includes "beginner-guitar-path" and "advanced-path"
+
+  Scenario: An admin lists all learning paths in the library
+    Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And "admin" is authenticated as an admin
+    When "admin" lists all learning paths
+    Then the response includes "beginner-guitar-path"
+
+  Scenario: Listing learning paths when none exist returns an empty list
+    Given "bob" is authenticated as a teacher
+    When "bob" lists all learning paths
+    Then the response is an empty list
+
+  # ── Happy path — replacing a learning path ────────────────────────────────────
+
+  Scenario: A teacher reorders a learning path's items
+    Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And "bob" is authenticated as a teacher
+    When "bob" replaces learning path "beginner-guitar-path" with items in order: "node-02", "node-01", "node-03"
+    Then the items are returned with positions 1, 2, and 3 in the order "node-02", "node-01", "node-03"
+
+  Scenario: A teacher adds an item to an existing learning path
+    Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02"
+    And "bob" is authenticated as a teacher
+    When "bob" replaces learning path "beginner-guitar-path" with items in order: "node-01", "node-02", "node-03"
+    Then the learning path has 3 items
+
+  Scenario: A teacher removes an item from an existing learning path
+    Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And "bob" is authenticated as a teacher
+    When "bob" replaces learning path "beginner-guitar-path" with items in order: "node-01", "node-03"
+    Then the learning path has 2 items
+
+  Scenario: A teacher relabels a learning path's sections
+    Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And "bob" is authenticated as a teacher
+    When "bob" replaces learning path "beginner-guitar-path" with items in order: "node-01" in section "Open chords, revised", "node-02" in section "Open chords, revised", "node-03"
+    Then "node-01" and "node-02" are returned with section_label "Open chords, revised"
+
+  # ── Validation failures — replacing ───────────────────────────────────────────
+
+  Scenario: Replacing a learning path with no items is rejected
+    Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And "bob" is authenticated as a teacher
+    When "bob" submits a replace learning path request for "beginner-guitar-path" with an empty items array
+    Then the request is rejected as invalid
+    And the rejection identifies "items" as the source of the error
+
+  Scenario: Replacing a learning path that references a non-existent content node is rejected
+    Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And "bob" is authenticated as a teacher
+    When "bob" replaces learning path "beginner-guitar-path" with an item referencing a content node ID that does not exist
+    Then the request is rejected as invalid
+    And the rejection identifies "content_node_id" as the source of the error
+
   # ── Validation failures ────────────────────────────────────────────────────
 
   Scenario: Creating a learning path without a title is rejected
@@ -69,9 +131,31 @@ Feature: Manage learning paths
     When "alice" attempts to retrieve the learning path "beginner-guitar-path"
     Then the request is refused with a forbidden error
 
+  Scenario: A student cannot list learning paths
+    Given "alice" is authenticated as a student
+    When "alice" attempts to list all learning paths
+    Then the request is refused with a forbidden error
+
+  Scenario: A student cannot replace a learning path
+    Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And "alice" is authenticated as a student
+    When "alice" attempts to replace learning path "beginner-guitar-path" with items in order: "node-01"
+    Then the request is refused with a forbidden error
+
   Scenario: Creating a learning path without an authentication token is refused
     Given no authentication token is provided
     When an unauthenticated request attempts to create a learning path
+    Then the request is refused with an authentication error
+
+  Scenario: Listing learning paths without an authentication token is refused
+    Given no authentication token is provided
+    When an unauthenticated request attempts to list all learning paths
+    Then the request is refused with an authentication error
+
+  Scenario: Replacing a learning path without an authentication token is refused
+    Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And no authentication token is provided
+    When an unauthenticated request attempts to replace learning path "beginner-guitar-path" with items in order: "node-01"
     Then the request is refused with an authentication error
 
   # ── Not found ─────────────────────────────────────────────────────────────
@@ -79,4 +163,9 @@ Feature: Manage learning paths
   Scenario: Retrieving a learning path that does not exist returns not found
     Given "bob" is authenticated as a teacher
     When "bob" retrieves a learning path with an ID that does not exist
+    Then the request is refused with a not-found error
+
+  Scenario: Replacing a learning path that does not exist returns not found
+    Given "bob" is authenticated as a teacher
+    When "bob" attempts to replace a learning path with an ID that does not exist
     Then the request is refused with a not-found error

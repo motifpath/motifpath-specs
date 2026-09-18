@@ -60,6 +60,45 @@ Feature: Manage expanded content
     When "alice" retrieves the expanded content item "triad-diagram"
     Then the response returns the item's type, media URL, trigger, and hide fields
 
+  # ── Happy path — updating and deleting ────────────────────────────────────────
+
+  Scenario: A teacher updates an expanded content item's timing and caption
+    Given an expanded content item "triad-diagram" exists for "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165
+    And "bob" is authenticated as a teacher
+    When "bob" updates expanded content item "triad-diagram" with trigger_at_seconds 160 and hide_at_seconds 180 and caption "Updated timing"
+    Then the item's trigger_at_seconds is 160
+    And the item's hide_at_seconds is 180
+    And the item's caption is "Updated timing"
+
+  Scenario: A teacher updates an article expanded content item's paragraph and duration
+    Given an expanded content item "tuning-diagram" exists for "chord-theory-explained" at paragraph 1
+    And "bob" is authenticated as a teacher
+    When "bob" updates expanded content item "tuning-diagram" with trigger_at_paragraph 2 and duration_ms 6000
+    Then the item's trigger_at_paragraph is 2
+    And the item's duration_ms is 6000
+
+  Scenario: A teacher deletes an expanded content item
+    Given an expanded content item "triad-diagram" exists for "intro-to-triads"
+    And "bob" is authenticated as a teacher
+    When "bob" deletes expanded content item "triad-diagram"
+    Then retrieving expanded content item "triad-diagram" returns not found
+
+  # ── Validation failures — updating ────────────────────────────────────────────
+
+  Scenario: Updating a video expanded content item with an inconsistent hide time is rejected
+    Given an expanded content item "triad-diagram" exists for "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165
+    And "bob" is authenticated as a teacher
+    When "bob" submits an update expanded content request for "triad-diagram" with trigger_at_seconds 150 and hide_at_seconds 150
+    Then the request is rejected as invalid
+    And the rejection identifies "hide_at_seconds" as the source of the error
+
+  Scenario: Updating an expanded content item without a media URL is rejected
+    Given an expanded content item "triad-diagram" exists for "intro-to-triads"
+    And "bob" is authenticated as a teacher
+    When "bob" submits an update expanded content request for "triad-diagram" with the media_url field omitted
+    Then the request is rejected as invalid
+    And the rejection identifies "media_url" as the source of the error
+
   # ── Validation failures — missing required fields ──────────────────────────
 
   Scenario: Creating an expanded content item without a content type is rejected
@@ -127,6 +166,16 @@ Feature: Manage expanded content
     When "alice" retrieves an expanded content item with an ID that does not exist
     Then the request is refused with a not-found error
 
+  Scenario: Updating an expanded content item that does not exist returns not found
+    Given "bob" is authenticated as a teacher
+    When "bob" attempts to update an expanded content item with an ID that does not exist
+    Then the request is refused with a not-found error
+
+  Scenario: Deleting an expanded content item that does not exist returns not found
+    Given "bob" is authenticated as a teacher
+    When "bob" attempts to delete an expanded content item with an ID that does not exist
+    Then the request is refused with a not-found error
+
   # ── Authorisation failures ─────────────────────────────────────────────────
 
   Scenario: A student cannot add expanded content to a content node
@@ -135,7 +184,31 @@ Feature: Manage expanded content
     When "alice" attempts to add expanded content to "intro-to-triads"
     Then the request is refused with a forbidden error
 
+  Scenario: A student cannot update an expanded content item
+    Given an expanded content item "triad-diagram" exists for "intro-to-triads"
+    And "alice" is authenticated as a student
+    When "alice" attempts to update expanded content item "triad-diagram" with caption "Hijacked caption"
+    Then the request is refused with a forbidden error
+
+  Scenario: A student cannot delete an expanded content item
+    Given an expanded content item "triad-diagram" exists for "intro-to-triads"
+    And "alice" is authenticated as a student
+    When "alice" attempts to delete expanded content item "triad-diagram"
+    Then the request is refused with a forbidden error
+
   Scenario: Adding expanded content without an authentication token is refused
     Given no authentication token is provided
     When an unauthenticated request attempts to add expanded content
+    Then the request is refused with an authentication error
+
+  Scenario: Updating expanded content without an authentication token is refused
+    Given an expanded content item "triad-diagram" exists for "intro-to-triads"
+    And no authentication token is provided
+    When an unauthenticated request attempts to update expanded content item "triad-diagram" with caption "Hijacked caption"
+    Then the request is refused with an authentication error
+
+  Scenario: Deleting expanded content without an authentication token is refused
+    Given an expanded content item "triad-diagram" exists for "intro-to-triads"
+    And no authentication token is provided
+    When an unauthenticated request attempts to delete expanded content item "triad-diagram"
     Then the request is refused with an authentication error
