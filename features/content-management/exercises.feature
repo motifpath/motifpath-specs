@@ -250,7 +250,7 @@ Feature: Manage exercises
 
   Scenario: Creating an exercise with a prompt using an unsupported node type is rejected
     Given "bob" is authenticated as a teacher
-    When "bob" submits a create exercise request whose prompt document contains a video node
+    When "bob" submits a create exercise request whose prompt document contains a footnote node
     Then the request is rejected as invalid
     And the rejection identifies "prompt" as the source of the error
 
