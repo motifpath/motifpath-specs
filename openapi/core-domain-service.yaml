@@ -184,6 +184,8 @@ paths:
                     skill: "triad-shapes"
                     concept: "chord-theory"
                     difficulty_level: beginner
+                  language_codes:
+                    - en
       responses:
         "201":
           description: Content node created.
@@ -630,6 +632,8 @@ paths:
                         width: 0.1
                         height: 0.1
                         shape: rectangle
+                  language_codes:
+                    - any
       responses:
         "201":
           description: Exercise created.
@@ -1850,6 +1854,53 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+    patch:
+      operationId: updateMyLocale
+      summary: Set the authenticated user's locale preference
+      description: |
+        Updates the locale preference on the MotifPath user record associated
+        with the authenticated Clerk identity. See ADR-024 — this is the
+        authenticated counterpart to the Accept-Language-header/localStorage
+        preference used for anonymous visitors.
+      tags:
+        - Identity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMyLocaleRequest'
+      responses:
+        "200":
+          description: The updated user profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        "400":
+          description: |
+            The request body failed schema validation, or locale is not a
+            known language code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: |
+            Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: |
+            No user record exists for this Clerk identity. The caller must
+            complete registration via POST /users first.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /healthz:
     get:
       operationId: livenessCheck
@@ -1926,10 +1977,22 @@ components:
           description: The media format of this content node.
         classification:
           $ref: '#/components/schemas/ClassificationInput'
+        language_codes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+          description: |
+            One or more Language.code values this content node is available
+            in, or a single-element array containing "any" for
+            language-agnostic content. Must not be empty — a node must be
+            explicitly tagged as either a specific language or
+            language-agnostic, never left unclassified. See ADR-024.
       required:
         - title
         - content_type
         - classification
+        - language_codes
 
     ClassificationInput:
       type: object
@@ -2011,6 +2074,15 @@ components:
           description: The media format of this content node.
         classification:
           $ref: '#/components/schemas/Classification'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Language'
+          description: |
+            The language(s) this content node is available in, or a single
+            "any" entry for language-agnostic content. See ADR-024 — a
+            student whose locale matches none of these (and "any" is absent)
+            sees this node locked.
         created_at:
           type: string
           format: date-time
@@ -2021,6 +2093,7 @@ components:
         - title
         - content_type
         - classification
+        - languages
         - created_at
 
     UpdateContentNodeRequest:
@@ -2035,9 +2108,20 @@ components:
           description: Human-readable title of the content node, displayed to students.
         classification:
           $ref: '#/components/schemas/ClassificationInput'
+        language_codes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+          description: |
+            One or more Language.code values this content node is available
+            in, replacing its current set, or a single-element array
+            containing "any" for language-agnostic content. Must not be
+            empty. See ADR-024.
       required:
         - title
         - classification
+        - language_codes
 
     CreateLearningPathRequest:
       type: object
@@ -2824,11 +2908,22 @@ components:
             Content to recommend a student who answers this specific
             exercise incorrectly, in priority order. Empty or omitted means
             no remediation is configured for this exercise.
+        language_codes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+          description: |
+            One or more Language.code values this exercise is available in,
+            or a single-element array containing "any" for language-agnostic
+            content. Must not be empty. Independent of any content node's
+            language tagging — see ADR-024.
       required:
         - title
         - prompt
         - exercise_type
         - options
+        - language_codes
 
     RemediationTarget:
       type: object
@@ -2916,10 +3011,21 @@ components:
             Content to recommend a student who answers this specific
             exercise incorrectly, in priority order, replacing the current
             set. Empty or omitted clears any previously configured targets.
+        language_codes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+          description: |
+            One or more Language.code values this exercise is available in,
+            replacing its current set, or a single-element array containing
+            "any" for language-agnostic content. Must not be empty. See
+            ADR-024.
       required:
         - title
         - prompt
         - options
+        - language_codes
 
     Exercise:
       type: object
@@ -3001,6 +3107,16 @@ components:
             Content recommended to a student who answers this exercise
             incorrectly, in priority order. May be empty — an exercise can
             exist without any remediation configured.
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Language'
+          description: |
+            The language(s) this exercise is available in, or a single "any"
+            entry for language-agnostic content. Independent of any
+            ContentNode's languages — an exercise reused across nodes (see
+            ADR-019) has no single parent to inherit a language from. See
+            ADR-024.
         created_at:
           type: string
           format: date-time
@@ -3014,6 +3130,7 @@ components:
         - challenge_ids
         - content_node_ids
         - remediation_targets
+        - languages
         - created_at
 
     PracticeSession:
@@ -3218,6 +3335,42 @@ components:
       required:
         - role
 
+    Language:
+      type: object
+      description: |
+        A language MotifPath content or a user's locale preference can be
+        tagged with. Includes the literal code "any", which marks content as
+        language-agnostic (e.g. an image with no spoken or written words)
+        rather than belonging to a specific language. See ADR-024.
+      properties:
+        code:
+          type: string
+          description: |
+            Stable identifier for this language (e.g. "en", "pt_BR"), or the
+            literal value "any" for language-agnostic content. Used as the
+            value of UpdateMyLocaleRequest.locale and of
+            ContentNode.languages / Exercise.languages entries.
+        name:
+          type: string
+          description: Human-readable name of this language (e.g. "English", "Portuguese (Brazil)").
+      required:
+        - code
+        - name
+
+    UpdateMyLocaleRequest:
+      type: object
+      description: Payload for setting the authenticated user's locale preference.
+      properties:
+        locale:
+          type: string
+          description: |
+            The Language.code to set as this user's locale preference. Must
+            be an existing language code; "any" is not a valid locale for a
+            user, since it names language-agnostic content, not a language
+            a person reads or speaks.
+      required:
+        - locale
+
     UserProfile:
       type: object
       description: |
@@ -3241,6 +3394,8 @@ components:
             The role assigned at registration. Immutable after creation. The admin
             role is provisioned directly in the database and is never returned from
             a self-registration flow.
+        locale:
+          $ref: '#/components/schemas/Language'
         registered_at:
           type: string
           format: date-time
@@ -3248,6 +3403,7 @@ components:
       required:
         - user_id
         - role
+        - locale
         - registered_at
 
     ValidationError:
