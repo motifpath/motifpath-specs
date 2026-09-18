@@ -1,6 +1,6 @@
 # ADR-024: Internationalization approach — vue-i18n, locale preference, and content-language modeling
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-18
 **Deciders:** Gilson (Product Owner)
 
