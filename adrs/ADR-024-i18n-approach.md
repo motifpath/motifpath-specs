@@ -179,6 +179,27 @@ This resolution governs the content-filtering read path referenced in Decision p
 Gherkin scenario (`motifpath-specs/features/`) covering the lock/skip behavior before that read
 path is implemented, per this repo's Definition of Ready.
 
+## Amendment — 2026-09-18: `Exercise` gets its own `Language` edge
+
+Decision part 3, as originally written, edged only `ContentNode` to `Language` and treated
+`Exercise` as inheriting language availability from whichever `ContentNode` it's attached to.
+That doesn't hold: ADR-019 decoupled `Exercise` from `ContentNode`/`Challenge` into a many-to-many
+relationship specifically so a single exercise can be reused across multiple content nodes. An
+exercise authored only in Portuguese but attached to an English-tagged `ContentNode` (or vice
+versa, or attached to several nodes in different languages) has no single parent to inherit a
+language from — inheritance is not well-defined once reuse is possible.
+
+**Amended decision:** `Exercise` gets its own many-to-many edge to `Language`, structurally
+identical to `ContentNode`'s (a new join entity mirroring `ContentNodeLanguage`, or a shared join
+pattern if the two can reasonably share one — an implementation-level choice, not an
+architectural one). An exercise's language availability is evaluated independently of its parent
+`ContentNode`(s); the locking rule from the previous section applies per-entity — a path item can
+be locked because its `ContentNode` lacks the student's locale, because an attached `Exercise`
+required by that item does, or both.
+
+This does not change Decision parts 1 or 2, or the `any`-row convention, which apply unchanged to
+`Exercise`.
+
 ## Related ADRs
 
 - [ADR-005: Ent migration strategy](./ADR-005-ent-migration-strategy.md) — governs how `Language`
