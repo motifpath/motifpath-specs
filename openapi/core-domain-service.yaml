@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.6.0
+  version: 0.7.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -1859,9 +1859,9 @@ paths:
       summary: Set the authenticated user's locale preference
       description: |
         Updates the locale preference on the MotifPath user record associated
-        with the authenticated Clerk identity. See ADR-024 — this is the
-        authenticated counterpart to the Accept-Language-header/localStorage
-        preference used for anonymous visitors.
+        with the authenticated Clerk identity. This is the authenticated
+        counterpart to the Accept-Language-header/localStorage preference
+        used for anonymous visitors.
       tags:
         - Identity
       requestBody:
@@ -1982,12 +1982,18 @@ components:
           minItems: 1
           items:
             type: string
+          if:
+            contains:
+              const: any
+          then:
+            maxItems: 1
           description: |
             One or more Language.code values this content node is available
-            in, or a single-element array containing "any" for
-            language-agnostic content. Must not be empty — a node must be
-            explicitly tagged as either a specific language or
-            language-agnostic, never left unclassified. See ADR-024.
+            in. A single-element array containing "any" marks the content as
+            language-agnostic; "any" cannot be combined with other language
+            codes in the same array. Must not be empty — a node must be
+            explicitly tagged as either specific language(s) or
+            language-agnostic, never left unclassified.
       required:
         - title
         - content_type
@@ -2080,9 +2086,9 @@ components:
             $ref: '#/components/schemas/Language'
           description: |
             The language(s) this content node is available in, or a single
-            "any" entry for language-agnostic content. See ADR-024 — a
-            student whose locale matches none of these (and "any" is absent)
-            sees this node locked.
+            "any" entry for language-agnostic content. A student whose locale
+            matches none of these (and "any" is absent) sees this node
+            locked.
         created_at:
           type: string
           format: date-time
@@ -2113,11 +2119,17 @@ components:
           minItems: 1
           items:
             type: string
+          if:
+            contains:
+              const: any
+          then:
+            maxItems: 1
           description: |
             One or more Language.code values this content node is available
-            in, replacing its current set, or a single-element array
-            containing "any" for language-agnostic content. Must not be
-            empty. See ADR-024.
+            in, replacing its current set. A single-element array containing
+            "any" marks the content as language-agnostic; "any" cannot be
+            combined with other language codes in the same array. Must not
+            be empty.
       required:
         - title
         - classification
@@ -2913,11 +2925,18 @@ components:
           minItems: 1
           items:
             type: string
+          if:
+            contains:
+              const: any
+          then:
+            maxItems: 1
           description: |
-            One or more Language.code values this exercise is available in,
-            or a single-element array containing "any" for language-agnostic
-            content. Must not be empty. Independent of any content node's
-            language tagging — see ADR-024.
+            One or more Language.code values this exercise is available in.
+            A single-element array containing "any" marks the exercise as
+            language-agnostic; "any" cannot be combined with other language
+            codes in the same array. Must not be empty. Tagged independently
+            of any content node's own language tagging, since an exercise
+            can be reused across multiple content nodes.
       required:
         - title
         - prompt
@@ -3016,11 +3035,17 @@ components:
           minItems: 1
           items:
             type: string
+          if:
+            contains:
+              const: any
+          then:
+            maxItems: 1
           description: |
             One or more Language.code values this exercise is available in,
-            replacing its current set, or a single-element array containing
-            "any" for language-agnostic content. Must not be empty. See
-            ADR-024.
+            replacing its current set. A single-element array containing
+            "any" marks the exercise as language-agnostic; "any" cannot be
+            combined with other language codes in the same array. Must not
+            be empty.
       required:
         - title
         - prompt
@@ -3113,10 +3138,10 @@ components:
             $ref: '#/components/schemas/Language'
           description: |
             The language(s) this exercise is available in, or a single "any"
-            entry for language-agnostic content. Independent of any
-            ContentNode's languages — an exercise reused across nodes (see
-            ADR-019) has no single parent to inherit a language from. See
-            ADR-024.
+            entry for language-agnostic content. Independent of any content
+            node's languages — an exercise can be reused across multiple
+            content nodes and so has no single parent to inherit a language
+            from.
         created_at:
           type: string
           format: date-time
@@ -3341,7 +3366,7 @@ components:
         A language MotifPath content or a user's locale preference can be
         tagged with. Includes the literal code "any", which marks content as
         language-agnostic (e.g. an image with no spoken or written words)
-        rather than belonging to a specific language. See ADR-024.
+        rather than belonging to a specific language.
       properties:
         code:
           type: string
@@ -3363,6 +3388,8 @@ components:
       properties:
         locale:
           type: string
+          not:
+            const: any
           description: |
             The Language.code to set as this user's locale preference. Must
             be an existing language code; "any" is not a valid locale for a
