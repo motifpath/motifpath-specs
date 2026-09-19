@@ -118,7 +118,13 @@ paths:
           required: false
           schema:
             type: string
-          description: When given, only content nodes classified with this exact skill are returned.
+          description: When given, only content nodes with this skill name among their linked skills are returned.
+        - name: concept
+          in: query
+          required: false
+          schema:
+            type: string
+          description: When given, only content nodes with this concept name among their linked concepts are returned.
         - name: difficulty_level
           in: query
           required: false
@@ -126,8 +132,10 @@ paths:
             type: string
             enum:
               - beginner
+              - early_intermediate
               - intermediate
               - advanced
+              - expert
           description: When given, only content nodes at this difficulty level are returned.
       responses:
         "200":
@@ -161,7 +169,7 @@ paths:
         A content node is the base unit of a class — a video or article that a
         student consumes on their learning path.
 
-        Classification (skill, concept, difficulty level) must be supplied at
+        Classification (skills, concepts, difficulty level) must be supplied at
         creation time. The review_state is always set to pending on creation
         regardless of the value supplied; an admin must explicitly confirm it.
         Classification is the minimum semantic layer required for gap detection
@@ -181,8 +189,8 @@ paths:
                   title: "Introduction to Triad Shapes"
                   content_type: video
                   classification:
-                    skill: "triad-shapes"
-                    concept: "chord-theory"
+                    skills: ["triad-shapes"]
+                    concepts: ["chord-theory"]
                     difficulty_level: beginner
                   language_codes:
                     - en
@@ -1508,6 +1516,60 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+  /skills:
+    get:
+      operationId: listSkills
+      summary: List all known skills
+      description: |
+        Returns every Skill currently known to the system, sorted by name.
+        Skills are created implicitly by ContentNode authoring — this is a
+        read-only catalog for populating an authoring picker/suggestion list,
+        not a management surface. Any authenticated user may list skills.
+      tags:
+        - Content
+      responses:
+        "200":
+          description: All known skills, possibly empty, sorted by name.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Skill'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
+  /concepts:
+    get:
+      operationId: listConcepts
+      summary: List all known concepts
+      description: |
+        Returns every Concept currently known to the system, sorted by name.
+        Concepts are created implicitly by ContentNode authoring — this is a
+        read-only catalog for populating an authoring picker/suggestion list,
+        not a management surface. Any authenticated user may list concepts.
+      tags:
+        - Content
+      responses:
+        "200":
+          description: All known concepts, possibly empty, sorted by name.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Concept'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
   /learning-paths:
     get:
       operationId: listLearningPaths
@@ -2007,28 +2069,41 @@ components:
         dimensions are the minimum semantic layer required for gap detection and
         the rules-based recommendation engine to function.
       properties:
-        skill:
-          type: string
+        skills:
+          type: array
+          minItems: 1
+          items:
+            type: string
           description: |
-            The observable, practicable skill this content teaches. Must be a
-            short kebab-case tag (e.g. triad-shapes, chord-transitions,
-            sweep-picking).
-        concept:
-          type: string
+            The observable, practicable skill(s) this content teaches, by name.
+            Each must be a short kebab-case tag (e.g. triad-shapes,
+            chord-transitions, sweep-picking). A name that doesn't already
+            match an existing Skill creates one — there is no separate
+            skill-management endpoint. Must not be empty.
+        concepts:
+          type: array
+          minItems: 1
+          items:
+            type: string
           description: |
-            The intellectual concept this content addresses. Must be a short
-            kebab-case tag (e.g. chord-theory, interval-recognition,
-            scale-construction).
+            The intellectual concept(s) this content addresses, by name. Each
+            must be a short kebab-case tag (e.g. chord-theory,
+            interval-recognition, scale-construction). A name that doesn't
+            already match an existing Concept creates one. Must not be empty.
         difficulty_level:
           type: string
           enum:
             - beginner
+            - early_intermediate
             - intermediate
             - advanced
-          description: The difficulty level of this content node.
+            - expert
+          description: |
+            The difficulty level of this content node, ordered beginner <
+            early_intermediate < intermediate < advanced < expert.
       required:
-        - skill
-        - concept
+        - skills
+        - concepts
         - difficulty_level
 
     Classification:
@@ -2134,6 +2209,46 @@ components:
         - title
         - classification
         - language_codes
+
+    Skill:
+      type: object
+      description: |
+        An observable, practicable skill a content node can teach. Created
+        implicitly the first time its name is used on a ContentNode's
+        classification — there is no separate create endpoint.
+      properties:
+        skill_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this skill.
+        name:
+          type: string
+          description: |
+            Short kebab-case tag naming the skill (e.g. triad-shapes,
+            sweep-picking). Unique across all skills.
+      required:
+        - skill_id
+        - name
+
+    Concept:
+      type: object
+      description: |
+        An intellectual concept a content node can address. Created
+        implicitly the first time its name is used on a ContentNode's
+        classification — there is no separate create endpoint.
+      properties:
+        concept_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this concept.
+        name:
+          type: string
+          description: |
+            Short kebab-case tag naming the concept (e.g. chord-theory,
+            interval-recognition). Unique across all concepts.
+      required:
+        - concept_id
+        - name
 
     CreateLearningPathRequest:
       type: object
@@ -2594,10 +2709,10 @@ components:
         subject_tag:
           type: string
           description: |
-            The subject this challenge assesses. Must match a skill or concept
-            tag on the parent content node's classification. This tag is the
-            minimum required for gap detection — a challenge without a subject
-            tag produces analytically meaningless outcomes.
+            The subject this challenge assesses. Must match the name of one
+            of the parent content node's linked skills or concepts. This tag
+            is the minimum required for gap detection — a challenge without a
+            subject tag produces analytically meaningless outcomes.
         pass_threshold:
           type: integer
           minimum: 1
