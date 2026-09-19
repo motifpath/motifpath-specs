@@ -1,6 +1,6 @@
 # ADR-025: Video player selection — Vidstack as a unified player
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-19
 **Deciders:** Gilson (Product Owner)
 
