@@ -113,18 +113,20 @@ paths:
               - video
               - article
           description: When given, only content nodes of this type are returned.
-        - name: skill
+        - name: skill_id
           in: query
           required: false
           schema:
             type: string
-          description: When given, only content nodes with this skill name among their linked skills are returned.
-        - name: concept
+            format: uuid
+          description: When given, only content nodes with this exact skill id among their linked skills are returned. Matches that node only, not its ancestors or descendants.
+        - name: concept_id
           in: query
           required: false
           schema:
             type: string
-          description: When given, only content nodes with this concept name among their linked concepts are returned.
+            format: uuid
+          description: When given, only content nodes with this exact concept id among their linked concepts are returned. Matches that node only, not its ancestors or descendants.
         - name: difficulty_level
           in: query
           required: false
@@ -189,8 +191,8 @@ paths:
                   title: "Introduction to Triad Shapes"
                   content_type: video
                   classification:
-                    skills: ["triad-shapes"]
-                    concepts: ["chord-theory"]
+                    skill_ids: ["3f4b6f2a-8c3e-4b1a-9d2e-7a1c5f0e9b21"]
+                    concept_ids: ["7a2d9e10-4f3b-4c5a-8e6d-1b2c3d4e5f60"]
                     difficulty_level: beginner
                   language_codes:
                     - en
@@ -368,13 +370,15 @@ paths:
       description: |
         Creates a new challenge attached to the specified content node. A challenge
         is the assessment unit for a class — it groups exercises and carries the
-        subject tag and pass threshold used by the rules-based recommendation
-        engine, plus an optional, purely informational time threshold.
+        subject (a Skill or Concept reference) and pass threshold used by the
+        rules-based recommendation engine, plus an optional, purely informational
+        time threshold.
 
-        Subject tag is mandatory. Without it, right/wrong outcomes on exercises are
-        analytically meaningless and gap detection cannot function. Remediation
-        targets are configured per exercise, not on the challenge — see
-        Exercise.remediation_targets.
+        A subject is mandatory — exactly one of subject_skill_id/subject_concept_id,
+        referencing one of the parent content node's linked skill_ids/concept_ids.
+        Without it, right/wrong outcomes on exercises are analytically meaningless
+        and gap detection cannot function. Remediation targets are configured per
+        exercise, not on the challenge — see Exercise.remediation_targets.
       tags:
         - Content
       parameters:
@@ -395,7 +399,7 @@ paths:
               chord_recognition:
                 summary: A challenge for chord recognition with an explicit time threshold
                 value:
-                  subject_tag: "triad-shapes"
+                  subject_skill_id: "3f4b6f2a-8c3e-4b1a-9d2e-7a1c5f0e9b21"
                   pass_threshold: 70
                   time_threshold_ms: 120000
       responses:
@@ -1521,15 +1525,16 @@ paths:
       operationId: listSkills
       summary: List all known skills
       description: |
-        Returns every Skill currently known to the system, sorted by name.
-        Skills are created implicitly by ContentNode authoring — this is a
-        read-only catalog for populating an authoring picker/suggestion list,
-        not a management surface. Any authenticated user may list skills.
+        Returns every Skill currently known to the system as a flat list
+        (id, name, parent_id), sorted by name within each level — the shape
+        a client needs both to render the tree for browsing and to resolve
+        any node's breadcrumb by walking parent_id. Any authenticated user
+        may list skills.
       tags:
         - Content
       responses:
         "200":
-          description: All known skills, possibly empty, sorted by name.
+          description: All known skills, possibly empty.
           content:
             application/json:
               schema:
@@ -1543,20 +1548,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
 
+    post:
+      operationId: createSkill
+      summary: Create a skill node
+      description: |
+        Creates a new skill, either as a root (parent_id omitted) or as a
+        child of an existing skill. Only teachers and admins may create a
+        skill — the tree is an authoring surface.
+      tags:
+        - Content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSkillRequest'
+      responses:
+        "201":
+          description: Skill created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Skill'
+        "400":
+          description: The request body failed schema validation, or parent_id does not reference an existing skill.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user does not have permission to create a skill. Only teachers and admins may.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
   /concepts:
     get:
       operationId: listConcepts
       summary: List all known concepts
       description: |
-        Returns every Concept currently known to the system, sorted by name.
-        Concepts are created implicitly by ContentNode authoring — this is a
-        read-only catalog for populating an authoring picker/suggestion list,
-        not a management surface. Any authenticated user may list concepts.
+        Returns every Concept currently known to the system as a flat list
+        (id, name, parent_id), sorted by name within each level — the shape
+        a client needs both to render the tree for browsing and to resolve
+        any node's breadcrumb by walking parent_id. Any authenticated user
+        may list concepts.
       tags:
         - Content
       responses:
         "200":
-          description: All known concepts, possibly empty, sorted by name.
+          description: All known concepts, possibly empty.
           content:
             application/json:
               schema:
@@ -1569,6 +1616,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+
+    post:
+      operationId: createConcept
+      summary: Create a concept node
+      description: |
+        Creates a new concept, either as a root (parent_id omitted) or as a
+        child of an existing concept. Only teachers and admins may create a
+        concept — the tree is an authoring surface.
+      tags:
+        - Content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConceptRequest'
+      responses:
+        "201":
+          description: Concept created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Concept'
+        "400":
+          description: The request body failed schema validation, or parent_id does not reference an existing concept.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user does not have permission to create a concept. Only teachers and admins may.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
 
   /learning-paths:
     get:
@@ -2065,31 +2153,34 @@ components:
     ClassificationInput:
       type: object
       description: |
-        The three mandatory classification dimensions for a content node. These
-        dimensions are the minimum semantic layer required for gap detection and
-        the rules-based recommendation engine to function.
+        The three mandatory classification dimensions for a content node.
+        These dimensions are the minimum semantic layer required for gap
+        detection and the rules-based recommendation engine to function.
+        skill_ids/concept_ids reference existing Skill/Concept tree nodes —
+        create one first via POST /skills or POST /concepts if the one you
+        need doesn't exist yet.
       properties:
-        skills:
+        skill_ids:
           type: array
           minItems: 1
           items:
             type: string
+            format: uuid
           description: |
-            The observable, practicable skill(s) this content teaches, by name.
-            Each must be a short kebab-case tag (e.g. triad-shapes,
-            chord-transitions, sweep-picking). A name that doesn't already
-            match an existing Skill creates one — there is no separate
-            skill-management endpoint. Must not be empty.
-        concepts:
+            The id(s) of the Skill tree node(s) this content teaches — may
+            be a root, a leaf, or a mix of nodes at different depths,
+            whichever set actually fits this content's scope. Must not be
+            empty; each id must reference an existing skill.
+        concept_ids:
           type: array
           minItems: 1
           items:
             type: string
+            format: uuid
           description: |
-            The intellectual concept(s) this content addresses, by name. Each
-            must be a short kebab-case tag (e.g. chord-theory,
-            interval-recognition, scale-construction). A name that doesn't
-            already match an existing Concept creates one. Must not be empty.
+            The id(s) of the Concept tree node(s) this content addresses —
+            same depth/mix rules as skill_ids. Must not be empty; each id
+            must reference an existing concept.
         difficulty_level:
           type: string
           enum:
@@ -2102,32 +2193,59 @@ components:
             The difficulty level of this content node, ordered beginner <
             early_intermediate < intermediate < advanced < expert.
       required:
-        - skills
-        - concepts
+        - skill_ids
+        - concept_ids
         - difficulty_level
 
     Classification:
-      allOf:
-        - $ref: '#/components/schemas/ClassificationInput'
-        - type: object
+      type: object
+      description: |
+        The classification of a content node as returned by the API —
+        skills/concepts are embedded in full (id, name, parent_id) rather
+        than left as bare ids, so a client can render each one's position
+        in the tree without a follow-up lookup per id. Includes review
+        state: all classifications start as pending and must be confirmed
+        by an admin before the content node is considered fully ready.
+      properties:
+        skills:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Skill'
+          description: The Skill tree node(s) this content teaches, in full.
+        concepts:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Concept'
+          description: The Concept tree node(s) this content addresses, in full.
+        difficulty_level:
+          type: string
+          enum:
+            - beginner
+            - early_intermediate
+            - intermediate
+            - advanced
+            - expert
           description: |
-            The classification of a content node including its review state.
-            All classifications start as pending and must be confirmed by an
-            admin before the content node is considered fully ready.
-          properties:
-            review_state:
-              type: string
-              enum:
-                - pending
-                - confirmed
-                - overridden
-              description: |
-                The review state of this classification. pending — awaiting
-                admin review. confirmed — approved as ground truth.
-                overridden — a previous classification was corrected by a
-                human reviewer.
-          required:
-            - review_state
+            The difficulty level of this content node, ordered beginner <
+            early_intermediate < intermediate < advanced < expert.
+        review_state:
+          type: string
+          enum:
+            - pending
+            - confirmed
+            - overridden
+          description: |
+            The review state of this classification. pending — awaiting
+            admin review. confirmed — approved as ground truth.
+            overridden — a previous classification was corrected by a
+            human reviewer.
+      required:
+        - skills
+        - concepts
+        - difficulty_level
+        - review_state
 
     ContentNode:
       type: object
@@ -2213,9 +2331,11 @@ components:
     Skill:
       type: object
       description: |
-        An observable, practicable skill a content node can teach. Created
-        implicitly the first time its name is used on a ContentNode's
-        classification — there is no separate create endpoint.
+        An observable, practicable skill a content node can teach. Skills
+        form a tree — parent_id null means a root skill; any skill may have
+        children, to any depth. A node's name is unique among its siblings
+        (including other roots), not globally, so two different branches may
+        contain a same-named skill.
       properties:
         skill_id:
           type: string
@@ -2225,17 +2345,42 @@ components:
           type: string
           description: |
             Short kebab-case tag naming the skill (e.g. triad-shapes,
-            sweep-picking). Unique across all skills.
+            sweep-picking).
+        parent_id:
+          type: [string, "null"]
+          format: uuid
+          description: The parent skill's id, or null if this is a root skill.
       required:
         - skill_id
+        - name
+        - parent_id
+
+    CreateSkillRequest:
+      type: object
+      description: |
+        Payload for creating a new skill node. There is no update or delete
+        endpoint yet — re-parenting, renaming, or deleting a skill that
+        already has links is a deliberately open question.
+      properties:
+        name:
+          type: string
+          description: Short kebab-case tag naming the skill.
+        parent_id:
+          type: string
+          format: uuid
+          description: |
+            The parent skill's id. Omit to create a root skill. Must
+            reference an existing skill if given.
+      required:
         - name
 
     Concept:
       type: object
       description: |
-        An intellectual concept a content node can address. Created
-        implicitly the first time its name is used on a ContentNode's
-        classification — there is no separate create endpoint.
+        An intellectual concept a content node can address. Concepts form a
+        tree the same way Skills do — parent_id null means a root concept;
+        any concept may have children, to any depth. A node's name is unique
+        among its siblings (including other roots), not globally.
       properties:
         concept_id:
           type: string
@@ -2245,9 +2390,33 @@ components:
           type: string
           description: |
             Short kebab-case tag naming the concept (e.g. chord-theory,
-            interval-recognition). Unique across all concepts.
+            interval-recognition).
+        parent_id:
+          type: [string, "null"]
+          format: uuid
+          description: The parent concept's id, or null if this is a root concept.
       required:
         - concept_id
+        - name
+        - parent_id
+
+    CreateConceptRequest:
+      type: object
+      description: |
+        Payload for creating a new concept node. There is no update or
+        delete endpoint yet — re-parenting, renaming, or deleting a concept
+        that already has links is a deliberately open question.
+      properties:
+        name:
+          type: string
+          description: Short kebab-case tag naming the concept.
+        parent_id:
+          type: string
+          format: uuid
+          description: |
+            The parent concept's id. Omit to create a root concept. Must
+            reference an existing concept if given.
+      required:
         - name
 
     CreateLearningPathRequest:
@@ -2704,15 +2873,26 @@ components:
 
     CreateChallengeRequest:
       type: object
-      description: Payload for creating a challenge within a content node.
+      description: |
+        Payload for creating a challenge within a content node. Exactly one
+        of subject_skill_id or subject_concept_id must be set.
       properties:
-        subject_tag:
+        subject_skill_id:
           type: string
+          format: uuid
           description: |
-            The subject this challenge assesses. Must match the name of one
-            of the parent content node's linked skills or concepts. This tag
-            is the minimum required for gap detection — a challenge without a
-            subject tag produces analytically meaningless outcomes.
+            The Skill this challenge assesses. Must be one of the parent
+            content node's linked skill_ids. Exactly one of
+            subject_skill_id/subject_concept_id must be set — the subject is
+            the minimum required for gap detection, a challenge without one
+            produces analytically meaningless outcomes.
+        subject_concept_id:
+          type: string
+          format: uuid
+          description: |
+            The Concept this challenge assesses. Must be one of the parent
+            content node's linked concept_ids. Exactly one of
+            subject_skill_id/subject_concept_id must be set.
         pass_threshold:
           type: integer
           minimum: 1
@@ -2749,16 +2929,16 @@ components:
             When true, each returned exercise's options are reordered per
             request, independent of shuffle_exercises. Defaults to false.
       required:
-        - subject_tag
         - pass_threshold
 
     Challenge:
       type: object
       description: |
-        A challenge is the assessment unit for a content node. It groups exercises
-        and carries the subject tag and threshold rules used by the recommendation
-        engine. Its ID is carried in exercise-family tracking events as challenge_id
-        inside trigger_context.
+        A challenge is the assessment unit for a content node. It groups
+        exercises and carries the subject (a Skill or Concept reference) and
+        threshold rules used by the recommendation engine. Its ID is carried
+        in exercise-family tracking events as challenge_id inside
+        trigger_context.
       properties:
         challenge_id:
           type: string
@@ -2768,9 +2948,14 @@ components:
           type: string
           format: uuid
           description: The content node this challenge belongs to.
-        subject_tag:
+        subject_skill_id:
           type: string
-          description: The subject this challenge assesses.
+          format: uuid
+          description: The Skill this challenge assesses. Exactly one of subject_skill_id/subject_concept_id is set.
+        subject_concept_id:
+          type: string
+          format: uuid
+          description: The Concept this challenge assesses. Exactly one of subject_skill_id/subject_concept_id is set.
         pass_threshold:
           type: integer
           minimum: 1
@@ -2802,7 +2987,6 @@ components:
       required:
         - challenge_id
         - content_node_id
-        - subject_tag
         - pass_threshold
         - shuffle_exercises
         - shuffle_options
@@ -2815,11 +2999,17 @@ components:
         configuration. Linked exercises are not part of this payload — they
         are changed via POST/DELETE
         /challenges/{challenge_id}/exercises/{exercise_id}, not by resending
-        them here.
+        them here. Exactly one of subject_skill_id or subject_concept_id
+        must be set.
       properties:
-        subject_tag:
+        subject_skill_id:
           type: string
-          description: The subject this challenge assesses.
+          format: uuid
+          description: The Skill this challenge assesses. Must be one of the parent content node's linked skill_ids.
+        subject_concept_id:
+          type: string
+          format: uuid
+          description: The Concept this challenge assesses. Must be one of the parent content node's linked concept_ids.
         pass_threshold:
           type: integer
           minimum: 1
@@ -2845,7 +3035,6 @@ components:
           default: false
           description: Whether each exercise's option order varies per request.
       required:
-        - subject_tag
         - pass_threshold
 
     PromptDocument:

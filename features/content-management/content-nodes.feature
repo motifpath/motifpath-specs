@@ -155,13 +155,33 @@ Feature: Manage content nodes
     Given "bob" is authenticated as a teacher
     When "bob" submits a create content node request with an empty skills list
     Then the request is rejected as invalid
-    And the rejection identifies "skills" as the source of the error
+    And the rejection identifies "skill_ids" as the source of the error
 
   Scenario: Creating a content node with no concepts is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create content node request with an empty concepts list
     Then the request is rejected as invalid
-    And the rejection identifies "concepts" as the source of the error
+    And the rejection identifies "concept_ids" as the source of the error
+
+  Scenario: Creating a content node with a skill id that does not exist is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create content node request with a skill id that does not exist
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
+
+  Scenario: Creating a content node with a concept id that does not exist is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create content node request with a concept id that does not exist
+    Then the request is rejected as invalid
+    And the rejection identifies "concept_ids" as the source of the error
+
+  Scenario: A content node can be classified at a specific leaf skill rather than its root
+    Given a root skill "guitar-technique" exists in the system
+    And a skill "alternate-picking" exists under skill "guitar-technique"
+    And "bob" is authenticated as a teacher
+    When "bob" creates a video content node titled "Alternate Picking Drills" with skills "alternate-picking", concepts "chord-theory", and difficulty "intermediate"
+    Then the content node is created and assigned a stable identifier
+    And the content node's classification carries skills "alternate-picking"
 
   # ── Not found ──────────────────────────────────────────────────────────────
 
