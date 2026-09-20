@@ -38,11 +38,12 @@ Feature: Manage exercises
       | image_choice      | Pick the E minor chord diagram | Which of these chord-shape diagrams is E minor?       |
       | audio_selection   | Pick the pentatonic lick       | Which of these recordings is a minor pentatonic lick? |
 
-  Scenario: A teacher creates an exercise with skill tags
+  Scenario: A teacher creates an exercise with skills and concepts
     Given "bob" is authenticated as a teacher
-    When "bob" creates an image_recognition exercise titled "Alternate picking — descending run" with prompt "Play the descending run cleanly" and one correct option and skill tags "alternate_picking, technique"
+    When "bob" creates an image_recognition exercise titled "Alternate picking — descending run" with prompt "Play the descending run cleanly" and one correct option and skills "alternate_picking, technique" and concepts "right-hand-technique"
     Then the exercise is created and assigned a stable identifier
-    And the exercise carries skill tags "alternate_picking, technique"
+    And the exercise carries skills "alternate_picking, technique"
+    And the exercise carries concepts "right-hand-technique"
 
   Scenario: A teacher creates an exercise with a richly formatted prompt
     Given "bob" is authenticated as a teacher
@@ -82,11 +83,11 @@ Feature: Manage exercises
     When "admin" lists all exercises
     Then the response includes "triad-exercise-01"
 
-  Scenario: A teacher filters the exercise list by skill tag
-    Given an exercise "triad-exercise-01" exists with skill tags "triad-shapes"
-    And an exercise "picking-drill-01" exists with skill tags "alternate_picking"
+  Scenario: A teacher filters the exercise list by skill
+    Given an exercise "triad-exercise-01" exists with skills "triad-shapes"
+    And an exercise "picking-drill-01" exists with skills "alternate_picking"
     And "bob" is authenticated as a teacher
-    When "bob" lists exercises filtered by skill tag "alternate_picking"
+    When "bob" lists exercises filtered by skill "alternate_picking"
     Then the response includes "picking-drill-01"
     And the response does not include "triad-exercise-01"
 
@@ -118,12 +119,12 @@ Feature: Manage exercises
     When "bob" updates exercise "triad-exercise-01" with a prompt formatted as bold text and a bulleted list, and one correct option
     Then the exercise's prompt preserves its bold text and bulleted list structure
 
-  Scenario: A teacher replaces an exercise's skill tags
-    Given an exercise "picking-drill-01" exists with skill tags "alternate_picking"
+  Scenario: A teacher replaces an exercise's skills
+    Given an exercise "picking-drill-01" exists with skills "alternate_picking"
     And "bob" is authenticated as a teacher
-    When "bob" updates exercise "picking-drill-01" with skill tags "hybrid_picking, technique"
-    Then the exercise carries skill tags "hybrid_picking, technique"
-    And the exercise no longer carries skill tag "alternate_picking"
+    When "bob" updates exercise "picking-drill-01" with skills "hybrid_picking, technique"
+    Then the exercise carries skills "hybrid_picking, technique"
+    And the exercise no longer carries skill "alternate_picking"
 
   Scenario: Updating an exercise does not change its links to challenges or content nodes
     Given an exercise "triad-exercise-01" exists
@@ -236,11 +237,23 @@ Feature: Manage exercises
     Then the request is rejected as invalid
     And the rejection identifies "options" as the source of the error
 
-  Scenario: Creating an exercise with an empty-string skill tag is rejected
+  Scenario: Creating an exercise with no skills is rejected
     Given "bob" is authenticated as a teacher
-    When "bob" submits a create exercise request with an empty-string skill tag
+    When "bob" submits a create exercise request with an empty skills list
     Then the request is rejected as invalid
-    And the rejection identifies "skill_tags" as the source of the error
+    And the rejection identifies "skill_ids" as the source of the error
+
+  Scenario: Creating an exercise with no concepts is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create exercise request with an empty concepts list
+    Then the request is rejected as invalid
+    And the rejection identifies "concept_ids" as the source of the error
+
+  Scenario: Creating an exercise with a skill id that does not exist is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create exercise request with a skill id that does not exist
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
 
   Scenario: Creating an exercise with an unstructured prompt is rejected
     Given "bob" is authenticated as a teacher
@@ -393,49 +406,49 @@ Feature: Manage exercises
 
   # ── Happy path — practice sessions ────────────────────────────────────────────
 
-  Scenario: A student starts a practice session for a skill with enough tagged exercises
-    Given 12 exercises tagged "alternate_picking" exist in the system
+  Scenario: A student starts a practice session for a skill with enough linked exercises
+    Given 12 exercises linked to skill "alternate_picking" exist in the system
     And "alice" is authenticated as a student
-    When "alice" starts a practice session for skill tag "alternate_picking" with count 10
+    When "alice" starts a practice session for skill "alternate_picking" with count 10
     Then the practice session contains 10 exercises
-    And every exercise in the practice session is tagged "alternate_picking"
+    And every exercise in the practice session is linked to skill "alternate_picking"
     And the practice session is assigned a stable practice_session_id
 
-  Scenario: A practice session returns fewer exercises when the tagged pool is smaller than requested
-    Given 3 exercises tagged "hybrid_picking" exist in the system
+  Scenario: A practice session returns fewer exercises when the linked pool is smaller than requested
+    Given 3 exercises linked to skill "hybrid_picking" exist in the system
     And "alice" is authenticated as a student
-    When "alice" starts a practice session for skill tag "hybrid_picking" with count 10
+    When "alice" starts a practice session for skill "hybrid_picking" with count 10
     Then the practice session contains 3 exercises
 
   Scenario: A practice session defaults its count when none is given
-    Given 12 exercises tagged "alternate_picking" exist in the system
+    Given 12 exercises linked to skill "alternate_picking" exist in the system
     And "alice" is authenticated as a student
-    When "alice" starts a practice session for skill tag "alternate_picking" without specifying a count
+    When "alice" starts a practice session for skill "alternate_picking" without specifying a count
     Then the practice session contains 10 exercises
 
-  Scenario: Two practice sessions for the same skill tag may differ in composition and order
-    Given 12 exercises tagged "alternate_picking" exist in the system
+  Scenario: Two practice sessions for the same skill may differ in composition and order
+    Given 12 exercises linked to skill "alternate_picking" exist in the system
     And "alice" is authenticated as a student
-    When "alice" starts two practice sessions for skill tag "alternate_picking" with count 10
+    When "alice" starts two practice sessions for skill "alternate_picking" with count 10
     Then the two practice sessions are assigned different practice_session_ids
 
   # ── Validation failures — practice sessions ───────────────────────────────────
 
-  Scenario: Starting a practice session without a skill tag is rejected
+  Scenario: Starting a practice session without a skill is rejected
     Given "alice" is authenticated as a student
-    When "alice" submits a start practice session request with the skill_tag field omitted
+    When "alice" submits a start practice session request with the skill_id field omitted
     Then the request is rejected as invalid
-    And the rejection identifies "skill_tag" as the source of the error
+    And the rejection identifies "skill_id" as the source of the error
 
   Scenario: Starting a practice session with a count above the maximum is rejected
     Given "alice" is authenticated as a student
-    When "alice" submits a start practice session request with skill_tag "alternate_picking" and count 51
+    When "alice" submits a start practice session request with skill "alternate_picking" and count 51
     Then the request is rejected as invalid
     And the rejection identifies "count" as the source of the error
 
-  Scenario: Starting a practice session for a skill tag with no matching exercises returns an empty session
+  Scenario: Starting a practice session for a skill with no matching exercises returns an empty session
     Given "alice" is authenticated as a student
-    When "alice" starts a practice session for skill tag "nonexistent-skill" with count 10
+    When "alice" starts a practice session for skill "nonexistent-skill" with count 10
     Then the practice session contains 0 exercises
 
   # ── Conflict — linking ───────────────────────────────────────────────────────
@@ -541,7 +554,7 @@ Feature: Manage exercises
 
   Scenario: Starting a practice session without an authentication token is refused
     Given no authentication token is provided
-    When an unauthenticated request attempts to start a practice session for skill tag "alternate_picking"
+    When an unauthenticated request attempts to start a practice session for skill "alternate_picking"
     Then the request is refused with an authentication error
 
   Scenario: Listing exercises without an authentication token is refused
