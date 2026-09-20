@@ -85,6 +85,22 @@ Four concrete problems follow from that:
    voicing, an arpeggio, or any pattern played in an order that doesn't match its visual layout
    has no correct inferred order — the order has to be authored data, not derived geometry.
 
+**Alternatives considered for showing more than one scale/chord pattern together:**
+
+1. Author one `Diagram` covering both patterns, with each position tagged which pattern(s) it
+   belongs to. Rejected: `interval` is only meaningful relative to its own `Diagram`'s root — A
+   minor pentatonic's `b3` and C major scale's `b3` are different notes, because the two patterns
+   have different roots. Merging them into one `Diagram` would force one pattern's positions to
+   carry an `interval` value that's wrong relative to its own scale, just to share a row with the
+   other pattern's data.
+2. No support for showing more than one `Diagram` at once — a teacher who wants to compare two
+   patterns exports/screenshots two separate renders. Rejected: relative major/minor comparison
+   (and comparing two chord voicings sharing a root) is a common, real teaching pattern, and the
+   underlying model already has everything needed to support it — refusing to composite two
+   already-correct `diagram_ref`s would be leaving a nearly-free capability on the table.
+3. A `diagram_stack_ref` — an ordered list of independently-configured `diagram_ref`s, each
+   correct on its own terms, composited at render time. Accepted.
+
 **Alternatives considered for Exercise linkage:**
 
 1. Leave `image_recognition`/`image_choice` as-is (flat `image_url` + hand-drawn `region`) and
@@ -196,21 +212,42 @@ an `Exercise` quizzing only the root notes highlighted in a lesson-chosen accent
 back in sequence, both reference the same underlying `Diagram`. No new `Diagram` row, and no new
 stored image, is created for either.
 
+### A usage can stack more than one Diagram in the same coordinate space
+
+Wherever a `diagram_ref` is accepted, a `diagram_stack_ref` is accepted as an alternative:
+
+```
+diagram_stack_ref {
+  stack: diagram_ref[]   // painted in order — later entries render on top of earlier ones
+}
+```
+
+Every `diagram_ref` in a `stack` must reference `Diagram`s that share the same `instrument_id` —
+stacking a `fretted` diagram under a `keyboard` diagram has no shared coordinate space to composite
+into. Each entry in the stack keeps its own `root_override`, `layers`, `styling`, and `playback`,
+evaluated independently exactly as a standalone `diagram_ref` would be, then composited into one
+drawing. This is how a teacher shows, e.g., the A minor pentatonic scale overlaid on its relative
+major (C major) at the same fretboard position: two separately-authored `Diagram`s, each correct
+on its own terms, drawn into the same view.
+
 ### `ContentNode` and `Exercise` both gain diagram linkage, using the same `diagram_ref` shape
 
 **`ContentNode` body** gains a third variant alongside `media_url` (video) and `rich_content`
-(article): `diagram_ref`. A node's body is exactly one of the three — video, article, or diagram —
-unchanged from the existing one-of-body-types rule PB-40 established for the first two.
+(article): `diagram_ref`, which accepts either a single `diagram_ref` or a `diagram_stack_ref`. A
+node's body is exactly one of the three — video, article, or diagram — unchanged from the existing
+one-of-body-types rule PB-40 established for the first two.
 
 **`Exercise` options** (`image_recognition` and `image_choice` types only, per ADR-019) gain
-`diagram_ref` as an alternative to `image_url`. For `image_recognition` specifically, when an
-option is diagram-driven, **the option's clickable region is read directly from the referenced
-`Diagram`'s `positions`**, regardless of instrument family — a fretted position and a keyboard
-position are both just "one addressable, checkable location" from the exercise's point of view. A
-diagram-driven `image_recognition` exercise has no hand-drawn `region` field to author at all;
-each position in the diagram (filtered by the render config's `subset`, if set) becomes one
-clickable, checkable option automatically. `image_url`/`region` remain fully supported, unchanged,
-for teacher-uploaded custom images — `diagram_ref` is an addition, not a replacement.
+`diagram_ref` (single or stacked) as an alternative to `image_url`. For `image_recognition`
+specifically, when an option is diagram-driven, **the option's clickable region is read directly
+from the referenced `Diagram`'s `positions`**, regardless of instrument family — a fretted position
+and a keyboard position are both just "one addressable, checkable location" from the exercise's
+point of view. A diagram-driven `image_recognition` exercise has no hand-drawn `region` field to
+author at all; each position in the diagram (filtered by the render config's `subset`, if set)
+becomes one clickable, checkable option automatically. When the option is a stack, positions from
+every layer in the stack are checkable, distinguished by which `Diagram` they came from.
+`image_url`/`region` remain fully supported, unchanged, for teacher-uploaded custom images —
+`diagram_ref` is an addition, not a replacement.
 
 `text_response` and `audio_recognition` option types are unaffected — diagrams are a visual
 content mechanism and have no bearing on those types' checking model.
@@ -275,6 +312,14 @@ the structured model doesn't yet cover.
 content, and stretching the linkage into non-visual exercise types wouldn't serve any real
 authoring case, only add unused fields to two option types that already have a settled shape.
 
+**Compositing independently-authored Diagrams, rather than merging their data**, is accepted
+because it preserves the one property that makes any of this queryable or reusable in the first
+place: every `Diagram`'s `interval` values stay correct relative to its own root. The
+same-`instrument_id` constraint on a stack is accepted because overlaying two patterns only makes
+pedagogical sense when they occupy the same physical coordinate space — a fretted diagram and a
+keyboard diagram have no shared position to align on, so allowing a cross-family stack would only
+produce a composite with nothing actually stacked.
+
 ## Consequences
 
 ### Positive
@@ -295,6 +340,9 @@ authoring case, only add unused fields to two option types that already have a s
   query across all three resource types, not three independent lookups.
 - A diagram can demonstrate motion (a scale run, an arpeggio) without becoming a video — sequenced
   playback is computed from the same structured data everything else in this ADR already stores.
+- Comparing two related patterns (relative major/minor, two chord voicings sharing a root) is a
+  composition of two already-correct `diagram_ref`s — no new position data, no new `Diagram`
+  authoring, to support a real and common teaching case.
 
 ### Negative / Trade-offs
 
@@ -317,6 +365,10 @@ authoring case, only add unused fields to two option types that already have a s
   stops a color choice that fails contrast or is indistinguishable to a colorblind student — this
   ADR does not add validation for that, and it's real accessibility follow-up work, not a solved
   problem.
+- A stack says nothing about how two overlapping positions should look when both layers mark the
+  same physical spot — that's a rendering convention (e.g., base dimmed/outlined, overlay solid)
+  this ADR leaves to ADR-027's layer system, not decided here. A stack also doesn't reduce
+  authoring cost: both `Diagram`s in it must already exist, correctly authored, on their own.
 - `root_override`'s transposition math (mapping an authored shape's intervals onto a chosen root,
   per instrument family and tuning/key-range) and `playback`'s timing/animation behavior are both
   real logic that has to live somewhere — this ADR assigns both to `motifpath-web`'s render-time
@@ -371,6 +423,9 @@ authoring case, only add unused fields to two option types that already have a s
   root-transposition logic flagged as unresolved above, for both instrument families.
 - Accessibility guidance/validation for author-chosen `styling` colors (contrast, colorblind-safe
   defaults) — flagged as a real gap above, not designed here.
+- A rendering convention for overlapping positions within a `diagram_stack_ref` (which layer wins
+  visually, how a dimmed/outlined base layer is styled by default) — an ADR-027-level rendering
+  question, not decided here.
 - A first content pass: author the initial library of common scale/chord `Diagram`s per
   instrument (starting with the minor pentatonic guitar pattern used in the ADR-027 spike) once
   the schema and renderer exist.
