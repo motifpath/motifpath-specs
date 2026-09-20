@@ -10,19 +10,20 @@ Feature: Manage content nodes
 
   Scenario: A teacher creates a video content node with classification
     Given "bob" is authenticated as a teacher
-    When "bob" creates a video content node titled "Introduction to Triad Shapes" with skill "triad-shapes", concept "chord-theory", and difficulty "beginner"
+    When "bob" creates a video content node titled "Introduction to Triad Shapes" with media url "https://cdn.motifpath.io/videos/triad-shapes-intro.mp4", skill "triad-shapes", concept "chord-theory", and difficulty "beginner"
     Then the content node is created and assigned a stable identifier
     And the classification review state is "pending"
     And the content node records "bob" as the owner
+    And the content node's media url is "https://cdn.motifpath.io/videos/triad-shapes-intro.mp4"
 
   Scenario: A teacher creates an article content node
     Given "bob" is authenticated as a teacher
-    When "bob" creates an article content node titled "Understanding Chord Theory" with skill "chord-transitions", concept "chord-theory", and difficulty "intermediate"
+    When "bob" creates an article content node titled "Understanding Chord Theory" with article body "Chord theory explains how notes combine into triads.", skill "chord-transitions", concept "chord-theory", and difficulty "intermediate"
     Then the content node is created and assigned a stable identifier
 
   Scenario: An admin creates a content node
     Given "admin" is authenticated as an admin
-    When "admin" creates a video content node titled "Sweep Picking Fundamentals" with skill "sweep-picking", concept "technique", and difficulty "advanced"
+    When "admin" creates a video content node titled "Sweep Picking Fundamentals" with media url "https://cdn.motifpath.io/videos/sweep-picking.mp4", skill "sweep-picking", concept "technique", and difficulty "advanced"
     Then the content node is created and assigned a stable identifier
 
   Scenario: Any authenticated user retrieves a content node by ID
@@ -124,6 +125,30 @@ Feature: Manage content nodes
     When "bob" submits a create content node request with difficulty level "expert"
     Then the request is rejected as invalid
     And the rejection identifies "difficulty_level" as the source of the error
+
+  Scenario: Creating a video content node without a media url is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create video content node request with the media_url field omitted
+    Then the request is rejected as invalid
+    And the rejection identifies "media_url" as the source of the error
+
+  Scenario: Creating an article content node without an article body is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create article content node request with the rich_content field omitted
+    Then the request is rejected as invalid
+    And the rejection identifies "rich_content" as the source of the error
+
+  Scenario: Creating a video content node with an article body is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create video content node request carrying rich_content
+    Then the request is rejected as invalid
+    And the rejection identifies "rich_content" as the source of the error
+
+  Scenario: Creating an article content node with a media url is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create article content node request carrying media_url
+    Then the request is rejected as invalid
+    And the rejection identifies "media_url" as the source of the error
 
   # ── Not found ──────────────────────────────────────────────────────────────
 
