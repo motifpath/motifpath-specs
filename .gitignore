@@ -18,3 +18,7 @@ out/
 
 # Node (if any tooling is added)
 node_modules/
+
+# Implementation plans (ADR-022): local-only, never committed or PR'd.
+# Historical plans already tracked before ADR-022 are unaffected by this rule.
+/plans/*.md
