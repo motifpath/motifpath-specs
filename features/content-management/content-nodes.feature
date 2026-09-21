@@ -10,19 +10,25 @@ Feature: Manage content nodes
 
   Scenario: A teacher creates a video content node with classification
     Given "bob" is authenticated as a teacher
-    When "bob" creates a video content node titled "Introduction to Triad Shapes" with skill "triad-shapes", concept "chord-theory", and difficulty "beginner"
+    When "bob" creates a video content node titled "Introduction to Triad Shapes" with skills "triad-shapes", concepts "chord-theory", and difficulty "beginner"
     Then the content node is created and assigned a stable identifier
     And the classification review state is "pending"
     And the content node records "bob" as the owner
 
+  Scenario: A teacher creates a content node classified under multiple skills and concepts
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a video content node titled "Right-Hand Technique Basics" with skills "alternate-picking, string-muting", concepts "right-hand-technique", and difficulty "beginner"
+    Then the content node is created and assigned a stable identifier
+    And the content node's classification carries skills "alternate-picking, string-muting"
+
   Scenario: A teacher creates an article content node
     Given "bob" is authenticated as a teacher
-    When "bob" creates an article content node titled "Understanding Chord Theory" with skill "chord-transitions", concept "chord-theory", and difficulty "intermediate"
+    When "bob" creates an article content node titled "Understanding Chord Theory" with skills "chord-transitions", concepts "chord-theory", and difficulty "intermediate"
     Then the content node is created and assigned a stable identifier
 
   Scenario: An admin creates a content node
     Given "admin" is authenticated as an admin
-    When "admin" creates a video content node titled "Sweep Picking Fundamentals" with skill "sweep-picking", concept "technique", and difficulty "advanced"
+    When "admin" creates a video content node titled "Sweep Picking Fundamentals" with skills "sweep-picking", concepts "technique", and difficulty "advanced"
     Then the content node is created and assigned a stable identifier
 
   Scenario: Any authenticated user retrieves a content node by ID
@@ -55,12 +61,26 @@ Feature: Manage content nodes
     And the response does not include "intro-to-triads"
 
   Scenario: A teacher filters the content node list by skill
-    Given a content node "intro-to-triads" exists in the system with skill "triad-shapes"
-    And a content node "sweep-picking-basics" exists in the system with skill "sweep-picking"
+    Given a content node "intro-to-triads" exists in the system with skills "triad-shapes"
+    And a content node "sweep-picking-basics" exists in the system with skills "sweep-picking"
     And "bob" is authenticated as a teacher
     When "bob" lists content nodes filtered by skill "sweep-picking"
     Then the response includes "sweep-picking-basics"
     And the response does not include "intro-to-triads"
+
+  Scenario: A teacher filters the content node list by concept
+    Given a content node "intro-to-triads" exists in the system with concepts "chord-theory"
+    And a content node "sweep-picking-basics" exists in the system with concepts "technique"
+    And "bob" is authenticated as a teacher
+    When "bob" lists content nodes filtered by concept "technique"
+    Then the response includes "sweep-picking-basics"
+    And the response does not include "intro-to-triads"
+
+  Scenario: A content node with multiple skills is returned by a filter matching any one of them
+    Given a content node "right-hand-basics" exists in the system with skills "alternate-picking, string-muting"
+    And "bob" is authenticated as a teacher
+    When "bob" lists content nodes filtered by skill "string-muting"
+    Then the response includes "right-hand-basics"
 
   Scenario: Listing content nodes when none exist returns an empty list
     Given "bob" is authenticated as a teacher
@@ -72,9 +92,15 @@ Feature: Manage content nodes
   Scenario: A teacher updates a content node's title and classification
     Given a content node "intro-to-triads" exists in the system
     And "bob" is authenticated as a teacher
-    When "bob" updates content node "intro-to-triads" with title "Introduction to Triad Shapes, revised" and skill "triad-shapes", concept "chord-theory", and difficulty "intermediate"
+    When "bob" updates content node "intro-to-triads" with title "Introduction to Triad Shapes, revised" and skills "triad-shapes", concepts "chord-theory", and difficulty "intermediate"
     Then the content node's title is "Introduction to Triad Shapes, revised"
     And the content node's classification difficulty is "intermediate"
+
+  Scenario: A teacher adds a second skill to a content node's classification
+    Given a content node "intro-to-triads" exists in the system with skills "triad-shapes"
+    And "bob" is authenticated as a teacher
+    When "bob" updates content node "intro-to-triads" with skills "triad-shapes, chord-transitions"
+    Then the content node's classification carries skills "triad-shapes, chord-transitions"
 
   Scenario: Updating a content node does not change its content type
     Given a video content node "intro-to-triads" exists in the system
@@ -121,9 +147,41 @@ Feature: Manage content nodes
 
   Scenario: Creating a content node with an unrecognised difficulty level is rejected
     Given "bob" is authenticated as a teacher
-    When "bob" submits a create content node request with difficulty level "expert"
+    When "bob" submits a create content node request with difficulty level "master"
     Then the request is rejected as invalid
     And the rejection identifies "difficulty_level" as the source of the error
+
+  Scenario: Creating a content node with no skills is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create content node request with an empty skills list
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
+
+  Scenario: Creating a content node with no concepts is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create content node request with an empty concepts list
+    Then the request is rejected as invalid
+    And the rejection identifies "concept_ids" as the source of the error
+
+  Scenario: Creating a content node with a skill id that does not exist is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create content node request with a skill id that does not exist
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
+
+  Scenario: Creating a content node with a concept id that does not exist is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create content node request with a concept id that does not exist
+    Then the request is rejected as invalid
+    And the rejection identifies "concept_ids" as the source of the error
+
+  Scenario: A content node can be classified at a specific leaf skill rather than its root
+    Given a root skill "guitar-technique" exists in the system
+    And a skill "alternate-picking" exists under skill "guitar-technique"
+    And "bob" is authenticated as a teacher
+    When "bob" creates a video content node titled "Alternate Picking Drills" with skills "alternate-picking", concepts "chord-theory", and difficulty "intermediate"
+    Then the content node is created and assigned a stable identifier
+    And the content node's classification carries skills "alternate-picking"
 
   # ── Not found ──────────────────────────────────────────────────────────────
 
