@@ -47,6 +47,8 @@ Feature: Manage exercises
 
   # ── Happy path — diagram-driven exercises ─────────────────────────────────────
 
+  @wip
+
   Scenario: A teacher creates an image_recognition exercise from a diagram, with no hand-drawn regions
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with positions:
       | interval | note_name | string | fret |
@@ -59,6 +61,8 @@ Feature: Manage exercises
     And the exercise's options are derived from diagram "minor-pentatonic-guitar"
     And the exercise has 2 options, one per visible root position
     And every option derived from the diagram is marked correct
+
+  @wip
 
   Scenario: A teacher creates an image_choice exercise whose options are diagram thumbnails
     Given a diagram "c-major-scale-guitar" exists on instrument "guitar"

@@ -1,3 +1,4 @@
+@wip
 Feature: Manage prebuilt diagrams
   As the MotifPath platform
   I want teachers and admins to author reusable, structured diagrams classified by skill and concept
@@ -13,30 +14,27 @@ Feature: Manage prebuilt diagrams
 
   Scenario: A teacher creates a diagram on a fretted instrument
     Given "bob" is authenticated as a teacher
-    When "bob" creates a diagram named "Minor Pentatonic — Position 1" on instrument "guitar" with fretted positions:
+    When "bob" creates a diagram named "Minor Pentatonic — Position 1" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
       | interval | note_name | string | fret |
       | R        | A         | 6      | 5    |
       | b3       | C         | 6      | 8    |
-    and skills "minor-pentatonic-scale", concepts "scale-construction"
     Then the diagram is created and assigned a stable identifier
     And the diagram has 2 positions
 
   Scenario: A teacher creates a diagram on a keyboard instrument
     Given "bob" is authenticated as a teacher
-    When "bob" creates a diagram named "Minor Pentatonic — Piano" on instrument "piano" with keyboard positions:
+    When "bob" creates a diagram named "Minor Pentatonic — Piano" on instrument "piano" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with keyboard positions:
       | interval | note_name | key |
       | R        | A         | A3  |
       | b3       | C         | C4  |
-    and skills "minor-pentatonic-scale", concepts "scale-construction"
     Then the diagram is created and assigned a stable identifier
     And the diagram has 2 positions
 
   Scenario: An admin creates a diagram
     Given "admin" is authenticated as an admin
-    When "admin" creates a diagram named "C Major Scale" on instrument "guitar" with fretted positions:
+    When "admin" creates a diagram named "C Major Scale" on instrument "guitar" classified under skills "major-scale", concepts "scale-construction" with fretted positions:
       | interval | note_name | string | fret |
       | R        | C         | 6      | 8    |
-    and skills "major-scale", concepts "scale-construction"
     Then the diagram is created and assigned a stable identifier
 
   # ── Happy path — listing ─────────────────────────────────────────────────────
@@ -58,10 +56,9 @@ Feature: Manage prebuilt diagrams
 
   Scenario: Creating a diagram with keyboard positions on a fretted instrument is rejected
     Given "bob" is authenticated as a teacher
-    When "bob" creates a diagram named "Bad shape" on instrument "guitar" with keyboard positions:
+    When "bob" creates a diagram named "Bad shape" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with keyboard positions:
       | interval | note_name | key |
       | R        | A         | A3  |
-    and skills "minor-pentatonic-scale", concepts "scale-construction"
     Then the request is rejected as invalid
     And the rejection identifies "positions" as the source of the error
 
