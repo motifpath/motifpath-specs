@@ -8,8 +8,6 @@ Feature: Manage content nodes
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  @wip
-
   Scenario: A teacher creates a video content node with classification
     Given "bob" is authenticated as a teacher
     When "bob" creates a video content node titled "Introduction to Triad Shapes" with media url "https://cdn.motifpath.io/videos/triad-shapes-intro.mp4", skills "triad-shapes", concepts "chord-theory", and difficulty "beginner"
@@ -24,14 +22,10 @@ Feature: Manage content nodes
     Then the content node is created and assigned a stable identifier
     And the content node's classification carries skills "alternate-picking, string-muting"
 
-  @wip
-
   Scenario: A teacher creates an article content node
     Given "bob" is authenticated as a teacher
     When "bob" creates an article content node titled "Understanding Chord Theory" with article body "Chord theory explains how notes combine into triads.", skills "chord-transitions", concepts "chord-theory", and difficulty "intermediate"
     Then the content node is created and assigned a stable identifier
-
-  @wip
 
   Scenario: An admin creates a content node
     Given "admin" is authenticated as an admin
@@ -200,15 +194,11 @@ Feature: Manage content nodes
     Then the request is rejected as invalid
     And the rejection identifies "difficulty_level" as the source of the error
 
-  @wip
-
   Scenario: Creating a video content node without a media url is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create video content node request with the media_url field omitted
     Then the request is rejected as invalid
     And the rejection identifies "media_url" as the source of the error
-
-  @wip
 
   Scenario: Creating an article content node without an article body is rejected
     Given "bob" is authenticated as a teacher
@@ -216,15 +206,11 @@ Feature: Manage content nodes
     Then the request is rejected as invalid
     And the rejection identifies "rich_content" as the source of the error
 
-  @wip
-
   Scenario: Creating a video content node with an article body is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create video content node request carrying rich_content
     Then the request is rejected as invalid
     And the rejection identifies "rich_content" as the source of the error
-
-  @wip
 
   Scenario: Creating an article content node with a media url is rejected
     Given "bob" is authenticated as a teacher
