@@ -45,6 +45,30 @@ Feature: Manage exercises
     And the exercise carries skills "alternate_picking, technique"
     And the exercise carries concepts "right-hand-technique"
 
+  # ── Happy path — diagram-driven exercises ─────────────────────────────────────
+
+  Scenario: A teacher creates an image_recognition exercise from a diagram, with no hand-drawn regions
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with positions:
+      | interval | note_name | string | fret |
+      | R        | A         | 6      | 5    |
+      | R        | A         | 4      | 7    |
+      | b3       | C         | 6      | 8    |
+    And "bob" is authenticated as a teacher
+    When "bob" creates an image_recognition exercise titled "Tap every root note" with prompt "Tap every root note in this pattern" from diagram "minor-pentatonic-guitar" showing only interval "R" as the correct answer
+    Then the exercise is created and assigned a stable identifier
+    And the exercise's options are derived from diagram "minor-pentatonic-guitar"
+    And the exercise has 2 options, one per visible root position
+    And every option derived from the diagram is marked correct
+
+  Scenario: A teacher creates an image_choice exercise whose options are diagram thumbnails
+    Given a diagram "c-major-scale-guitar" exists on instrument "guitar"
+    And a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    When "bob" creates an image_choice exercise titled "Which diagram is the minor pentatonic scale?" with prompt "Pick the minor pentatonic scale" and options rendered from diagrams "c-major-scale-guitar, minor-pentatonic-guitar" with "minor-pentatonic-guitar" correct
+    Then the exercise is created and assigned a stable identifier
+    And the exercise has 2 options
+    And the option rendered from diagram "minor-pentatonic-guitar" is marked correct
+
   Scenario: A teacher creates an exercise with a richly formatted prompt
     Given "bob" is authenticated as a teacher
     When "bob" creates a text_response exercise titled "Circle of fifths" with a prompt formatted as a heading, a bulleted list, a table, and an image, and one correct option

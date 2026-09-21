@@ -112,6 +112,7 @@ paths:
             enum:
               - video
               - article
+              - diagram
           description: When given, only content nodes of this type are returned.
         - name: skill_id
           in: query
@@ -178,8 +179,9 @@ paths:
         to function.
 
         The node's actual content is supplied by exactly one of media_url
-        (video) or rich_content (article), matching content_type — the two
-        are mutually exclusive and the one matching content_type is required.
+        (video), rich_content (article), or diagram_ref/diagram_stack_ref
+        (diagram), matching content_type — these are mutually exclusive and
+        whichever matches content_type is required.
       tags:
         - Content
       requestBody:
@@ -1666,6 +1668,278 @@ paths:
               schema:
                 $ref: '#/components/schemas/ForbiddenError'
 
+  /instruments:
+    get:
+      operationId: listInstruments
+      summary: List all known instruments
+      description: |
+        Returns every Instrument currently known to the system. Any
+        authenticated user may list instruments.
+      tags:
+        - Content
+      responses:
+        "200":
+          description: All known instruments, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instrument'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
+    post:
+      operationId: createInstrument
+      summary: Create an instrument
+      description: |
+        Creates a new instrument. Only teachers and admins may create an
+        instrument — instruments are an authoring surface, expected to be
+        created rarely.
+      tags:
+        - Content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInstrumentRequest'
+      responses:
+        "201":
+          description: Instrument created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instrument'
+        "400":
+          description: |
+            The request body failed schema validation — including
+            string_count/tuning present with family keyboard, key_range
+            present with family fretted, or the matching field-group
+            missing for the given family.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user does not have permission to create an instrument. Only teachers and admins may.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /diagrams:
+    get:
+      operationId: listDiagrams
+      summary: List prebuilt diagrams for authoring
+      description: |
+        Returns diagrams from the reusable library, for browsing and
+        picking one to attach to a content node or exercise. Results are
+        unordered beyond a stable id order and are not paginated. Any
+        authenticated user may list diagrams.
+      tags:
+        - Content
+      parameters:
+        - name: instrument_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: When given, only diagrams authored against this instrument are returned.
+        - name: skill_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: When given, only diagrams with this exact skill id among their linked skills are returned.
+        - name: concept_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: When given, only diagrams with this exact concept id among their linked concepts are returned.
+      responses:
+        "200":
+          description: The matching diagrams, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Diagram'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
+    post:
+      operationId: createDiagram
+      summary: Create a prebuilt diagram
+      description: |
+        Creates a new, reusable diagram against an existing instrument.
+        Only teachers and admins may create a diagram.
+      tags:
+        - Content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDiagramRequest'
+            examples:
+              minor_pentatonic_guitar:
+                summary: A guitar minor pentatonic scale position
+                value:
+                  instrument_id: "5c1a2b3c-0000-0000-0000-000000000001"
+                  name: "Minor Pentatonic — Position 1"
+                  positions:
+                    - position_id: "5c1a2b3c-0000-0000-0000-000000000101"
+                      interval: "R"
+                      note_name: "A"
+                      sequence_index: 0
+                      string: 6
+                      fret: 5
+                    - position_id: "5c1a2b3c-0000-0000-0000-000000000102"
+                      interval: "b3"
+                      note_name: "C"
+                      sequence_index: 1
+                      string: 6
+                      fret: 8
+                  classification:
+                    skill_ids: ["3f4b6f2a-8c3e-4b1a-9d2e-7a1c5f0e9b21"]
+                    concept_ids: ["7a2d9e10-4f3b-4c5a-8e6d-1b2c3d4e5f60"]
+      responses:
+        "201":
+          description: Diagram created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Diagram'
+        "400":
+          description: |
+            The request body failed schema validation — including a
+            position's coordinate fields not matching the referenced
+            instrument's family, or a skill_ids/concept_ids entry that does
+            not reference an existing skill or concept.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user does not have permission to create a diagram. Only teachers and admins may.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /diagrams/{diagram_id}:
+    get:
+      operationId: getDiagram
+      summary: Retrieve a diagram by ID
+      tags:
+        - Content
+      parameters:
+        - name: diagram_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: The requested diagram.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Diagram'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No diagram exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+    patch:
+      operationId: updateDiagram
+      summary: Update a diagram's name, positions, or classification
+      description: |
+        Only teachers and admins may update a diagram. Updating a diagram
+        that is already referenced by one or more diagram_refs changes what
+        every one of them renders — there is no versioning or copy-on-write.
+      tags:
+        - Content
+      parameters:
+        - name: diagram_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDiagramRequest'
+      responses:
+        "200":
+          description: Diagram updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Diagram'
+        "400":
+          description: The request body failed schema validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user does not have permission to update this diagram. Only teachers and admins may.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No diagram exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /learning-paths:
     get:
       operationId: listLearningPaths
@@ -2132,6 +2406,7 @@ components:
           enum:
             - video
             - article
+            - diagram
           description: The media format of this content node.
         classification:
           $ref: '#/components/schemas/ClassificationInput'
@@ -2141,14 +2416,29 @@ components:
           description: |
             The video file or embeddable video URL students watch. Required
             when content_type is video; must be absent when content_type is
-            article.
+            article or diagram.
         rich_content:
           $ref: '#/components/schemas/PromptDocument'
           description: |
             The article's body, authored with the same Tiptap-based rich
             content model used for exercise prompts and expanded content.
             Required when content_type is article; must be absent when
-            content_type is video.
+            content_type is video or diagram.
+        diagram_ref:
+          $ref: '#/components/schemas/DiagramRef'
+          description: |
+            A single prebuilt diagram, shown per its layer/styling/playback
+            config. Required when content_type is diagram and
+            diagram_stack_ref is absent; must be absent when content_type is
+            video or article, or when diagram_stack_ref is present.
+        diagram_stack_ref:
+          $ref: '#/components/schemas/DiagramStackRef'
+          description: |
+            Two or more prebuilt diagrams composited in one view (e.g. a
+            scale overlaid on its relative major). Required when
+            content_type is diagram and diagram_ref is absent; must be
+            absent when content_type is video or article, or when
+            diagram_ref is present.
         language_codes:
           type: array
           minItems: 1
@@ -2292,6 +2582,7 @@ components:
           enum:
             - video
             - article
+            - diagram
           description: The media format of this content node.
         classification:
           $ref: '#/components/schemas/Classification'
@@ -2305,6 +2596,18 @@ components:
           $ref: '#/components/schemas/PromptDocument'
           description: |
             The article's body. Present only when content_type is article.
+        diagram_ref:
+          $ref: '#/components/schemas/DiagramRef'
+          description: |
+            A single prebuilt diagram and its render config. Present only
+            when content_type is diagram and the node uses a single diagram
+            rather than a stack.
+        diagram_stack_ref:
+          $ref: '#/components/schemas/DiagramStackRef'
+          description: |
+            Two or more composited prebuilt diagrams. Present only when
+            content_type is diagram and the node uses a stack rather than a
+            single diagram.
         languages:
           type: array
           items:
@@ -2345,13 +2648,28 @@ components:
           description: |
             The video file or embeddable video URL students watch, replacing
             the current value. Required when the content node's content_type
-            is video; must be absent when it is article.
+            is video; must be absent when it is article or diagram.
         rich_content:
           $ref: '#/components/schemas/PromptDocument'
           description: |
             The article's body, replacing the current value. Required when
             the content node's content_type is article; must be absent when
-            it is video.
+            it is video or diagram.
+        diagram_ref:
+          $ref: '#/components/schemas/DiagramRef'
+          description: |
+            A single prebuilt diagram and its render config, replacing the
+            current value. Required when the content node's content_type is
+            diagram and it uses a single diagram rather than a stack; must
+            be absent when it is video or article, or when diagram_stack_ref
+            is present.
+        diagram_stack_ref:
+          $ref: '#/components/schemas/DiagramStackRef'
+          description: |
+            Two or more composited prebuilt diagrams, replacing the current
+            value. Required when the content node's content_type is diagram
+            and it uses a stack rather than a single diagram; must be absent
+            when it is video or article, or when diagram_ref is present.
         language_codes:
           type: array
           minItems: 1
@@ -2464,6 +2782,440 @@ components:
       required:
         - name
 
+    Instrument:
+      type: object
+      description: |
+        An instrument a Diagram can be authored against. family decides the
+        shape of every Diagram.positions[].coordinate written for this
+        instrument — fretted instruments (guitar, bass, ...) share one
+        coordinate shape (string, fret); keyboard instruments (piano) use a
+        different one (key). family is open-ended: a genuinely new
+        coordinate shape is a new family value plus new coordinate fields,
+        not a breaking change to existing instruments or diagrams.
+      properties:
+        instrument_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this instrument.
+        name:
+          type: string
+          description: |
+            Human-readable name (e.g. "6-string guitar, standard tuning",
+            "4-string bass", "Piano").
+        family:
+          type: string
+          enum:
+            - fretted
+            - keyboard
+          description: |
+            Which coordinate shape Diagrams authored against this
+            instrument use. fretted diagrams populate
+            positions[].string/positions[].fret; keyboard diagrams populate
+            positions[].key. A single Diagram cannot mix families.
+        string_count:
+          type: integer
+          minimum: 1
+          description: |
+            Number of strings/courses. Present only when family is fretted;
+            absent when family is keyboard.
+        tuning:
+          type: array
+          items:
+            type: string
+          description: |
+            Open-string note name per string, lowest string first (e.g.
+            ["E", "A", "D", "G", "B", "E"] for standard guitar tuning).
+            Present only when family is fretted, with length equal to
+            string_count; absent when family is keyboard.
+        key_range:
+          type: object
+          description: |
+            The lowest and highest playable key, by note name. Present only
+            when family is keyboard; absent when family is fretted.
+          properties:
+            lowest:
+              type: string
+              description: Note name of the lowest key (e.g. "A0").
+            highest:
+              type: string
+              description: Note name of the highest key (e.g. "C8").
+          required:
+            - lowest
+            - highest
+      required:
+        - instrument_id
+        - name
+        - family
+
+    CreateInstrumentRequest:
+      type: object
+      description: |
+        Payload for creating a new instrument. There is no update or delete
+        endpoint yet — instruments are expected to be created rarely, and
+        changing family or string/key shape after Diagrams exist against it
+        is a deliberately open question.
+      properties:
+        name:
+          type: string
+          description: Human-readable name for this instrument.
+        family:
+          type: string
+          enum:
+            - fretted
+            - keyboard
+          description: Which coordinate shape Diagrams against this instrument will use.
+        string_count:
+          type: integer
+          minimum: 1
+          description: Required when family is fretted; must be absent when family is keyboard.
+        tuning:
+          type: array
+          items:
+            type: string
+          description: |
+            Required when family is fretted, with length equal to
+            string_count; must be absent when family is keyboard.
+        key_range:
+          type: object
+          description: Required when family is keyboard; must be absent when family is fretted.
+          properties:
+            lowest:
+              type: string
+              description: Note name of the lowest key (e.g. "A0").
+            highest:
+              type: string
+              description: Note name of the highest key (e.g. "C8").
+          required:
+            - lowest
+            - highest
+      required:
+        - name
+        - family
+
+    DiagramPosition:
+      type: object
+      description: |
+        One marked location in a Diagram — a note the diagram shows, at a
+        specific physical location on its instrument. interval, note_name,
+        and sequence_index are shared by every instrument family; string/
+        fret vs. key depend on the parent Diagram's Instrument.family and
+        are mutually exclusive, mirroring how Option's per-type fields
+        (region, image_url, audio_url) already work in this spec.
+      properties:
+        position_id:
+          type: string
+          format: uuid
+          description: |
+            Stable identifier for this position, addressable independently
+            of its array order — used to derive Exercise options from a
+            diagram-driven image_recognition exercise (see Option). Always
+            present in a response; optional in a create/update request —
+            omitted values are assigned by the server.
+        interval:
+          type: string
+          description: |
+            The interval this position represents, relative to the
+            Diagram's own (unstated) root — e.g. "R", "b3", "4", "5", "b7",
+            "2", "3", "6", "7". Not globally standardized beyond being
+            consistent within one Diagram; MotifPath does not validate
+            interval names against a fixed enum.
+        note_name:
+          type: string
+          description: |
+            The concrete note name this position sounds at the Diagram's own
+            root (e.g. "A", "C"). A diagram_ref's root_override recomputes
+            the note actually shown; note_name here is always relative to
+            this Diagram's own authored root.
+        sequence_index:
+          type: [integer, "null"]
+          minimum: 0
+          description: |
+            This position's order in an authored playback sequence (e.g. a
+            scale run). Null means this position is not part of any defined
+            sequence — playback (see DiagramRef) skips it regardless of
+            playback config.
+        string:
+          type: integer
+          minimum: 1
+          description: |
+            Which string this position is on (1 = highest-pitched string).
+            Present only when the parent Diagram's instrument family is
+            fretted; absent when keyboard.
+        fret:
+          type: integer
+          minimum: 0
+          description: |
+            Which fret this position is on. Present only when the parent
+            Diagram's instrument family is fretted; absent when keyboard.
+        key:
+          type: string
+          description: |
+            Note name of the key, relative to the Diagram's own root (e.g.
+            "C4"). Present only when the parent Diagram's instrument family
+            is keyboard; absent when fretted.
+      required:
+        - interval
+        - note_name
+
+    DiagramClassificationInput:
+      type: object
+      description: |
+        Classification for a new or updated Diagram. Diagrams share the
+        exact Skill/Concept tree ContentNode and Exercise use (see
+        ClassificationInput) — not a separate tagging scheme — but carry no
+        difficulty_level; a diagram is a reusable shape, not a leveled
+        piece of content.
+      properties:
+        skill_ids:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: uuid
+          description: |
+            The id(s) of the Skill tree node(s) this diagram illustrates.
+            Must not be empty; each id must reference an existing skill.
+        concept_ids:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: uuid
+          description: |
+            The id(s) of the Concept tree node(s) this diagram addresses.
+            Must not be empty; each id must reference an existing concept.
+      required:
+        - skill_ids
+        - concept_ids
+
+    DiagramClassification:
+      type: object
+      description: |
+        A Diagram's classification as returned by the API — skills/concepts
+        embedded in full (id, name, parent_id), the same convention
+        Classification uses for ContentNode.
+      properties:
+        skills:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Skill'
+          description: The Skill tree node(s) this diagram illustrates, in full.
+        concepts:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Concept'
+          description: The Concept tree node(s) this diagram addresses, in full.
+      required:
+        - skills
+        - concepts
+
+    Diagram:
+      type: object
+      description: |
+        A prebuilt, reusable diagram — structured position data for a scale,
+        chord, or similar pattern on a specific instrument. Never stores a
+        rendered image or SVG; motifpath-web renders positions client-side
+        per the layer/styling/playback config carried in whatever
+        diagram_ref points at this diagram (see ADR-027, ADR-028).
+      properties:
+        diagram_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this diagram.
+        instrument_id:
+          type: string
+          format: uuid
+          description: The instrument this diagram is authored against.
+        name:
+          type: string
+          description: Human-readable name (e.g. "Minor Pentatonic — Position 1").
+        positions:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/DiagramPosition'
+          description: |
+            Every marked position in this diagram. All positions share the
+            same coordinate shape, decided by this diagram's instrument's
+            family.
+        classification:
+          $ref: '#/components/schemas/DiagramClassification'
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp at which the diagram was created.
+      required:
+        - diagram_id
+        - instrument_id
+        - name
+        - positions
+        - classification
+        - created_at
+
+    CreateDiagramRequest:
+      type: object
+      description: |
+        Payload for creating a new diagram. Every position's string/fret vs.
+        key must match the referenced instrument's family — the API rejects
+        a request that mixes shapes or supplies the wrong shape for the
+        instrument.
+      properties:
+        instrument_id:
+          type: string
+          format: uuid
+          description: The instrument this diagram is authored against. Must reference an existing instrument.
+        name:
+          type: string
+          description: Human-readable name for this diagram.
+        positions:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/DiagramPosition'
+          description: |
+            Every marked position in this diagram, in the coordinate shape
+            matching the referenced instrument's family. position_id may be
+            supplied by the client or left for the server to assign.
+        classification:
+          $ref: '#/components/schemas/DiagramClassificationInput'
+      required:
+        - instrument_id
+        - name
+        - positions
+        - classification
+
+    UpdateDiagramRequest:
+      type: object
+      description: |
+        Payload for replacing an existing diagram's name, positions, or
+        classification. instrument_id is not present here — it cannot be
+        changed after creation, since every position's coordinate shape
+        depends on it.
+      properties:
+        name:
+          type: string
+          description: Human-readable name for this diagram, replacing the current value.
+        positions:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/DiagramPosition'
+          description: |
+            The diagram's full position list, replacing the current set. A
+            caller that only wants to change one position must resend the
+            full set.
+        classification:
+          $ref: '#/components/schemas/DiagramClassificationInput'
+
+    DiagramRef:
+      type: object
+      description: |
+        A usage of one Diagram — its render config, never a stored variant
+        of the diagram itself. The same Diagram can be pointed at by any
+        number of DiagramRefs with different configs.
+      properties:
+        diagram_id:
+          type: string
+          format: uuid
+          description: The diagram this ref points at. Must reference an existing diagram.
+        root_override:
+          type: [string, "null"]
+          description: |
+            Transposes the diagram to this root note (e.g. "C"). Null uses
+            the diagram's own authored root. The actual transposition math
+            is motifpath-web rendering logic, not decided by this schema.
+        layers:
+          type: object
+          description: Which optional layers are shown, decorating the diagram's base positions.
+          properties:
+            intervals:
+              type: boolean
+              description: Whether to show each visible position's interval label.
+            subset:
+              type: [array, "null"]
+              items:
+                type: string
+              description: |
+                Interval names to show; positions with any other interval
+                are hidden. Null shows every position.
+            shape_overlay:
+              type: [string, "null"]
+              description: |
+                Identifier of a shape overlay style (e.g. a box outline) to
+                draw around the currently-visible positions. Null shows no
+                overlay.
+          required:
+            - intervals
+        styling:
+          type: [object, "null"]
+          description: |
+            Author-chosen colors for this usage. Null uses motifpath-web's
+            default colors entirely.
+          properties:
+            root_color:
+              type: [string, "null"]
+              description: Color for root-interval positions. Null uses the default.
+            interval_color:
+              type: [string, "null"]
+              description: Color for every visible non-root position. Null uses the default.
+        playback:
+          type: [object, "null"]
+          description: |
+            Sequenced playback config. Only affects positions with a
+            non-null sequence_index; null means this usage does not play
+            back.
+          properties:
+            direction:
+              type: string
+              enum:
+                - as_authored
+                - reversed
+              description: Order to step through sequence_index values in.
+            step_ms:
+              type: integer
+              minimum: 1
+              description: Milliseconds between each position during playback.
+          required:
+            - direction
+            - step_ms
+        correct_intervals:
+          type: [array, "null"]
+          items:
+            type: string
+          description: |
+            Which interval value(s) among this diagram's currently-visible
+            positions (after layers.subset filtering) are correct answers.
+            Meaningful, and required, only when this diagram_ref is an
+            Exercise's image_recognition stimulus (see Exercise.diagram_ref)
+            — ignored when used as a ContentNode body or as an image_choice
+            Option's own diagram_ref.
+      required:
+        - diagram_id
+        - layers
+
+    DiagramStackRef:
+      type: object
+      description: |
+        Two or more DiagramRefs composited into one view — e.g. a scale
+        overlaid on its relative major, at the same fretboard position.
+        Painted in array order; later entries render on top of earlier
+        ones. Every entry must reference a Diagram on the same instrument —
+        stacking diagrams from different instruments is rejected, since
+        there is no shared coordinate space to composite into.
+      properties:
+        stack:
+          type: array
+          minItems: 2
+          items:
+            $ref: '#/components/schemas/DiagramRef'
+          description: |
+            The diagrams to composite, in paint order. Every referenced
+            Diagram must share the same instrument_id.
+      required:
+        - stack
+
     CreateLearningPathRequest:
       type: object
       description: Payload for creating a learning path.
@@ -2518,6 +3270,7 @@ components:
           enum:
             - video
             - article
+            - diagram
           description: Media format of the content node, denormalised for display.
         section_label:
           type: string
@@ -2661,6 +3414,7 @@ components:
           enum:
             - video
             - article
+            - diagram
           description: Media format of the content node.
         status:
           type: string
@@ -3221,9 +3975,10 @@ components:
             The type of practice interaction, which determines how its
             options are authored and rendered. text_response and
             audio_recognition options carry a text label; image_recognition
-            options carry a region on image_url; image_choice options each
-            carry their own image_url; audio_selection options each carry
-            their own audio_url.
+            options carry a region on image_url (or are derived from
+            diagram_ref/diagram_stack_ref — see below); image_choice
+            options each carry their own image_url or diagram_ref;
+            audio_selection options each carry their own audio_url.
         skill_ids:
           type: array
           minItems: 1
@@ -3248,8 +4003,28 @@ components:
           type: string
           format: uri
           description: |
-            The stimulus image for this exercise. Required when exercise_type
-            is image_recognition; absent otherwise.
+            The stimulus image for this exercise. For exercise_type
+            image_recognition, required unless diagram_ref or
+            diagram_stack_ref is given instead; absent otherwise.
+        diagram_ref:
+          $ref: '#/components/schemas/DiagramRef'
+          description: |
+            A single prebuilt diagram as this exercise's stimulus, replacing
+            image_url. Only meaningful when exercise_type is
+            image_recognition. Its correct_intervals must be set — the
+            diagram's own positions (after layers.subset filtering) become
+            this exercise's options automatically; options must be omitted
+            when this is given. Mutually exclusive with image_url and
+            diagram_stack_ref.
+        diagram_stack_ref:
+          $ref: '#/components/schemas/DiagramStackRef'
+          description: |
+            Two or more composited prebuilt diagrams as this exercise's
+            stimulus, replacing image_url. Only meaningful when
+            exercise_type is image_recognition. Each entry's own
+            correct_intervals must be set; options must be omitted when
+            this is given. Mutually exclusive with image_url and
+            diagram_ref.
         audio_url:
           type: string
           format: uri
@@ -3264,7 +4039,10 @@ components:
           description: |
             The exercise's selectable answer choices. At least one option
             must have is_correct set to true — an exercise with no correct
-            option cannot be graded.
+            option cannot be graded. Required unless exercise_type is
+            image_recognition and diagram_ref or diagram_stack_ref is
+            given, in which case options are derived automatically from the
+            diagram's positions and must be omitted here.
         estimated_duration_seconds:
           type: integer
           minimum: 1
@@ -3303,7 +4081,6 @@ components:
         - exercise_type
         - skill_ids
         - concept_ids
-        - options
         - language_codes
 
     RemediationTarget:
@@ -3372,8 +4149,23 @@ components:
           type: string
           format: uri
           description: |
-            The stimulus image for this exercise. Required when the
-            exercise's exercise_type is image_recognition; absent otherwise.
+            The stimulus image for this exercise. For exercise_type
+            image_recognition, required unless diagram_ref or
+            diagram_stack_ref is given instead; absent otherwise.
+        diagram_ref:
+          $ref: '#/components/schemas/DiagramRef'
+          description: |
+            A single prebuilt diagram as this exercise's stimulus, replacing
+            image_url, replacing the current value. Only meaningful when the
+            exercise's exercise_type is image_recognition. Mutually
+            exclusive with image_url and diagram_stack_ref.
+        diagram_stack_ref:
+          $ref: '#/components/schemas/DiagramStackRef'
+          description: |
+            Two or more composited prebuilt diagrams as this exercise's
+            stimulus, replacing the current value. Only meaningful when the
+            exercise's exercise_type is image_recognition. Mutually
+            exclusive with image_url and diagram_ref.
         audio_url:
           type: string
           format: uri
@@ -3388,7 +4180,9 @@ components:
           description: |
             The exercise's selectable answer choices, replacing its current
             set. At least one option must have is_correct set to true — an
-            exercise with no correct option cannot be graded.
+            exercise with no correct option cannot be graded. Must be
+            omitted when the exercise's exercise_type is image_recognition
+            and diagram_ref or diagram_stack_ref is given.
         estimated_duration_seconds:
           type: integer
           minimum: 1
@@ -3425,7 +4219,6 @@ components:
         - prompt
         - skill_ids
         - concept_ids
-        - options
         - language_codes
 
     Exercise:
@@ -3469,7 +4262,21 @@ components:
         image_url:
           type: string
           format: uri
-          description: The stimulus image for this exercise, present when exercise_type is image_recognition.
+          description: |
+            The stimulus image for this exercise, present when exercise_type
+            is image_recognition and diagram_ref/diagram_stack_ref are absent.
+        diagram_ref:
+          $ref: '#/components/schemas/DiagramRef'
+          description: |
+            The single prebuilt diagram used as this exercise's stimulus,
+            present only when exercise_type is image_recognition and the
+            exercise uses one diagram rather than a stack.
+        diagram_stack_ref:
+          $ref: '#/components/schemas/DiagramStackRef'
+          description: |
+            The composited prebuilt diagrams used as this exercise's
+            stimulus, present only when exercise_type is image_recognition
+            and the exercise uses a stack rather than one diagram.
         audio_url:
           type: string
           format: uri
@@ -3478,7 +4285,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Option'
-          description: The exercise's selectable answer choices.
+          description: |
+            The exercise's selectable answer choices. When diagram_ref or
+            diagram_stack_ref is present, these are derived automatically
+            from the diagram's positions (see Option.diagram_position_id)
+            rather than authored directly.
         challenge_ids:
           type: array
           items:
@@ -3581,9 +4392,11 @@ components:
         correct answer is expressed by marking one or more options as
         is_correct. The fields expected beyond option_id and is_correct
         depend on the parent exercise's exercise_type: image_recognition
-        options carry region, image_choice options carry image_url,
-        audio_selection options carry audio_url, and text_response /
-        audio_recognition options carry label.
+        options carry region, or are entirely server-derived (see
+        diagram_id/diagram_position_id) when the exercise uses diagram_ref/
+        diagram_stack_ref instead of image_url; image_choice options carry
+        image_url or diagram_ref; audio_selection options carry audio_url;
+        text_response/audio_recognition options carry label.
       properties:
         option_id:
           type: string
@@ -3601,8 +4414,17 @@ components:
           type: string
           format: uri
           description: |
-            The image shown for this option. Required for image_choice
-            options; absent otherwise.
+            The image shown for this option. For image_choice options,
+            required unless diagram_ref is given instead; absent otherwise.
+        diagram_ref:
+          $ref: '#/components/schemas/DiagramRef'
+          description: |
+            A prebuilt diagram rendered as this option's own thumbnail,
+            replacing image_url — e.g. "which of these four diagrams shows
+            C major?" where each option is a different diagram. Only
+            meaningful for image_choice options; correct_intervals is
+            ignored here since correctness is this Option's own is_correct.
+            Mutually exclusive with image_url.
         audio_url:
           type: string
           format: uri
@@ -3611,6 +4433,23 @@ components:
             audio_selection options; absent otherwise.
         region:
           $ref: '#/components/schemas/OptionRegion'
+        diagram_id:
+          type: string
+          format: uuid
+          description: |
+            Which Diagram this option's clickable position came from.
+            Server-derived and read-only: present only on options belonging
+            to an image_recognition exercise whose stimulus is diagram_ref/
+            diagram_stack_ref, absent for every authored option (including
+            image_choice's own diagram_ref, which is a per-option thumbnail,
+            not a source of derived options).
+        diagram_position_id:
+          type: string
+          format: uuid
+          description: |
+            Which position (DiagramPosition.position_id) within diagram_id
+            this option represents. Server-derived and read-only, present
+            under the same condition as diagram_id.
       required:
         - option_id
         - is_correct
