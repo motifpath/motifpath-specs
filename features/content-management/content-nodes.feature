@@ -38,6 +38,40 @@ Feature: Manage content nodes
     When "alice" retrieves the content node "intro-to-triads"
     Then the response returns the content node's title, type, and classification
 
+  # ── Happy path — diagram content nodes ────────────────────────────────────────
+
+  Scenario: A teacher creates a diagram content node from a single diagram
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    When "bob" creates a diagram content node titled "Minor Pentatonic, Position 1" from diagram "minor-pentatonic-guitar", skills "minor-pentatonic-scale", concepts "scale-construction", and difficulty "beginner"
+    Then the content node is created and assigned a stable identifier
+    And the content node's diagram is "minor-pentatonic-guitar"
+
+  Scenario: A teacher creates a diagram content node from a diagram on a keyboard instrument
+    Given a diagram "minor-pentatonic-piano" exists on instrument "piano"
+    And "bob" is authenticated as a teacher
+    When "bob" creates a diagram content node titled "Minor Pentatonic on Piano" from diagram "minor-pentatonic-piano", skills "minor-pentatonic-scale", concepts "scale-construction", and difficulty "beginner"
+    Then the content node is created and assigned a stable identifier
+    And the content node's diagram is "minor-pentatonic-piano"
+
+  Scenario: A teacher stacks two diagrams from the same instrument on a content node
+    Given a diagram "c-major-scale-guitar" exists on instrument "guitar"
+    And a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    When "bob" creates a diagram content node titled "Relative minor pentatonic, in context" from a stack of diagrams "c-major-scale-guitar, minor-pentatonic-guitar", skills "minor-pentatonic-scale", concepts "scale-construction", and difficulty "intermediate"
+    Then the content node is created and assigned a stable identifier
+    And the content node's diagram stack has 2 layers
+
+  # ── Validation failures — diagram content nodes ───────────────────────────────
+
+  Scenario: Stacking diagrams from two different instruments is rejected
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
+    And a diagram "minor-pentatonic-piano" exists on instrument "piano"
+    And "bob" is authenticated as a teacher
+    When "bob" creates a diagram content node titled "Mismatched stack" from a stack of diagrams "minor-pentatonic-guitar, minor-pentatonic-piano", skills "minor-pentatonic-scale", concepts "scale-construction", and difficulty "intermediate"
+    Then the request is rejected as invalid
+    And the rejection identifies "diagram_stack_ref" as the source of the error
+
   # ── Happy path — listing content nodes for authoring ─────────────────────────
 
   Scenario: A teacher lists all content nodes in the library
