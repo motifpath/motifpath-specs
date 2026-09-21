@@ -3017,8 +3017,8 @@ components:
         A prebuilt, reusable diagram — structured position data for a scale,
         chord, or similar pattern on a specific instrument. Never stores a
         rendered image or SVG; motifpath-web renders positions client-side
-        per the layer/styling/playback config carried in whatever
-        diagram_ref points at this diagram (see ADR-027, ADR-028).
+        per the layer/styling/playback config carried in whatever diagram_ref
+        points at this diagram.
       properties:
         diagram_id:
           type: string
@@ -4082,6 +4082,14 @@ components:
         - skill_ids
         - concept_ids
         - language_codes
+      if:
+        not:
+          anyOf:
+            - required: [diagram_ref]
+            - required: [diagram_stack_ref]
+      then:
+        required:
+          - options
 
     RemediationTarget:
       type: object
@@ -4220,6 +4228,14 @@ components:
         - skill_ids
         - concept_ids
         - language_codes
+      if:
+        not:
+          anyOf:
+            - required: [diagram_ref]
+            - required: [diagram_stack_ref]
+      then:
+        required:
+          - options
 
     Exercise:
       type: object
