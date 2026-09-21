@@ -1,3 +1,4 @@
+@wip
 Feature: Manage instruments
   As the MotifPath platform
   I want teachers and admins to define the instruments a prebuilt diagram can be authored against
