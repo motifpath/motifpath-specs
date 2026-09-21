@@ -176,6 +176,10 @@ paths:
         regardless of the value supplied; an admin must explicitly confirm it.
         Classification is the minimum semantic layer required for gap detection
         to function.
+
+        The node's actual content is supplied by exactly one of media_url
+        (video) or rich_content (article), matching content_type — the two
+        are mutually exclusive and the one matching content_type is required.
       tags:
         - Content
       requestBody:
@@ -194,6 +198,7 @@ paths:
                     skill_ids: ["3f4b6f2a-8c3e-4b1a-9d2e-7a1c5f0e9b21"]
                     concept_ids: ["7a2d9e10-4f3b-4c5a-8e6d-1b2c3d4e5f60"]
                     difficulty_level: beginner
+                  media_url: "https://cdn.motifpath.io/videos/triad-shapes-intro.mp4"
                   language_codes:
                     - en
       responses:
@@ -2130,6 +2135,20 @@ components:
           description: The media format of this content node.
         classification:
           $ref: '#/components/schemas/ClassificationInput'
+        media_url:
+          type: string
+          format: uri
+          description: |
+            The video file or embeddable video URL students watch. Required
+            when content_type is video; must be absent when content_type is
+            article.
+        rich_content:
+          $ref: '#/components/schemas/PromptDocument'
+          description: |
+            The article's body, authored with the same Tiptap-based rich
+            content model used for exercise prompts and expanded content.
+            Required when content_type is article; must be absent when
+            content_type is video.
         language_codes:
           type: array
           minItems: 1
@@ -2276,6 +2295,16 @@ components:
           description: The media format of this content node.
         classification:
           $ref: '#/components/schemas/Classification'
+        media_url:
+          type: string
+          format: uri
+          description: |
+            The video file or embeddable video URL students watch. Present
+            only when content_type is video.
+        rich_content:
+          $ref: '#/components/schemas/PromptDocument'
+          description: |
+            The article's body. Present only when content_type is article.
         languages:
           type: array
           items:
@@ -2310,6 +2339,19 @@ components:
           description: Human-readable title of the content node, displayed to students.
         classification:
           $ref: '#/components/schemas/ClassificationInput'
+        media_url:
+          type: string
+          format: uri
+          description: |
+            The video file or embeddable video URL students watch, replacing
+            the current value. Required when the content node's content_type
+            is video; must be absent when it is article.
+        rich_content:
+          $ref: '#/components/schemas/PromptDocument'
+          description: |
+            The article's body, replacing the current value. Required when
+            the content node's content_type is article; must be absent when
+            it is video.
         language_codes:
           type: array
           minItems: 1
