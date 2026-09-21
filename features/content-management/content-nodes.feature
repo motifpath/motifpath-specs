@@ -167,6 +167,13 @@ Feature: Manage content nodes
     Then the request is rejected as invalid
     And the rejection identifies "title" as the source of the error
 
+  Scenario: Updating a video content node with a media url that is not an http or https URL is rejected
+    Given a video content node "intro-to-triads" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" submits an update content node request for "intro-to-triads" with media url "javascript:alert(1)"
+    Then the request is rejected as invalid
+    And the rejection identifies "media_url" as the source of the error
+
   Scenario: Updating a content node without classification is rejected
     Given a content node "intro-to-triads" exists in the system
     And "bob" is authenticated as a teacher
@@ -199,6 +206,19 @@ Feature: Manage content nodes
     When "bob" submits a create video content node request with the media_url field omitted
     Then the request is rejected as invalid
     And the rejection identifies "media_url" as the source of the error
+
+  Scenario Outline: Creating a video content node with a media url that is not an http or https URL is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create video content node request with media url "<media_url>"
+    Then the request is rejected as invalid
+    And the rejection identifies "media_url" as the source of the error
+
+    Examples:
+      | media_url                        |
+      | not a url                        |
+      | /videos/lesson.mp4               |
+      | javascript:alert(1)              |
+      | ftp://cdn.example.com/lesson.mp4 |
 
   Scenario: Creating an article content node without an article body is rejected
     Given "bob" is authenticated as a teacher
