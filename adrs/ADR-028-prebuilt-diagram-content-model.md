@@ -1,6 +1,6 @@
 # ADR-028: Diagram becomes a first-class, reusable content entity — polymorphic per-instrument-family positions, and render-time layer, styling, and playback config
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-20
 **Deciders:** Gilson (Product Owner)
 
