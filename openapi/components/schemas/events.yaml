@@ -145,11 +145,12 @@ TriggerContext:
       description: |
         ID of the Challenge this exercise belongs to. Present only when source is
         challenge_sequence. Enables per-challenge scoring in the Aggregation Worker.
-    skill_tag:
+    skill_id:
       type: string
+      format: uuid
       description: |
-        The skill tag this exercise was selected for. Present only when
-        source is practice_session — the tag passed to
+        ID of the Skill this exercise was selected for. Present only when
+        source is practice_session — the skill_id passed to
         GET /practice-sessions. Lets the Aggregation Worker compute
         per-skill accuracy for the recommendation engine.
     practice_session_id:
