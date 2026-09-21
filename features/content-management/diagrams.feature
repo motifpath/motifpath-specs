@@ -1,4 +1,3 @@
-@wip
 Feature: Manage prebuilt diagrams
   As the MotifPath platform
   I want teachers and admins to author reusable, structured diagrams classified by skill and concept
