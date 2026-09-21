@@ -209,9 +209,28 @@ things appear next to it exactly when they're relevant."
 - **The practice step** (if the node has a challenge) is a single affordance that appears
   when the video ends — "Go to practice", or "Mark complete" for a node with no challenge.
   It does not compete with the video while it is playing.
-- The cue schema (timestamp, resource reference, render style) is **not yet specified** — a
-  content-spec prerequisite for PB-8e, authored against the video timeline (see PB-8i and
-  Open questions).
+- **A cue is a timed expanded-content item** on the video node — an image, a GIF or rich
+  text — shown from its start second up to, but not including, its end second. Cues come from
+  the node's expanded-content list (`content-management`); no separate cue schema exists.
+  Visibility follows the playback position, so seeking back into a cue's window shows it
+  again and seeking past it hides it. If two cues overlap, the one with the earlier start
+  shows.
+
+**S6 — lesson behaviour (PB-8e)**
+
+- **Opening the step** emits `lesson.started` if the step is not yet started, or
+  `lesson.resumed` if it is in progress — once per node per session.
+- **Finishing** is the student's explicit tap on "Mark complete" (or "Go to practice"), shown
+  only once the video ends. It emits `lesson.completed`, with the time spent in the session
+  unless the tab was ever hidden.
+- **Reopening a completed step** first asks the student whether they want to watch it again or
+  just review it. Neither choice emits an event: completion is final (ADR-011), so watching
+  again cannot reset the step's status.
+- **A locked step** shows the standard locked state. A step that is not on the student's path
+  shows a not-found state.
+- **A video that fails to load** shows the standard error state with "Try again". A
+  "Report a problem" bypass is deferred (PB-63).
+- **Article and diagram steps** keep the "not available yet" holding screen until PB-64.
 
 ### S7 — practice screen anatomy
 
@@ -380,13 +399,13 @@ Rough reference for the three screens that anchor the loop:
 | Can S6/S7 use multi-column / landscape? | S6 splits video / timed-content while a cue is active (side by side in landscape, stacked in portrait); S7 is responsive, two-region in landscape; no forced rotation (ADR-015) |
 | Is S6 a video-plus-panels page, an overlay, or something else? | A dynamic layout — video fills the frame, shrinks to share it with timed content only while a cue is active; content is continuous with the frame, never over the video (ADR-015) |
 | S7 structure and navigation? | Slim bar (back · thin progress, no count · help "?") then the exercise fills the screen. Answer registers in place → "Next ›"; "‹ Back" revisits answered exercises (answers revisable in the alpha) |
+| S6 timed-resource cue schema? | A cue is an expanded-content item on the video node — start and end second plus an image, GIF or rich text — already specified in `content-management`; authored in the teacher content editor |
 
 ### Still open
 
 | Question | Owner | Note |
 |---|---|---|
 | Does a node with a challenge require *passing* it to count as complete, or is finishing the lesson enough for the alpha? | Gilson | Defer to PB-8f + the rules engine; affects the S6→S7→S5 status flow |
-| Timed-resource cue schema — timestamp, resource reference, render style | Gilson + content spec | **Blocks PB-8e.** Needs a `content-management` spec before S6 can be built. Authored as part of the video (see PB-8i) |
 | Where in the concierge flow does the teacher set section labels, and what guidance keeps them consistent? | Gilson | Authoring-side; feeds the `learning-paths` spec revision (ADR-015 follow-up) |
 | Landscape breakpoint and behaviour for S7 (two-region) and the S6 player | Gilson | Needs the hi-fi canvas + a real device/orientation test pass |
 | S7: ordered vs. randomised exercise sequence (some exercises have no natural order) | Gilson | PB-8f + `content-management` / challenge model |
