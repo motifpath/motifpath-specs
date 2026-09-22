@@ -92,18 +92,27 @@ ever been published:
   `retired`. **Editing the live `Course`/`CourseCheckpoint` rows never changes `status` and never
   affects what a student sees** — only publishing does that (below). A `published` course with
   unreleased draft edits is still `published`; the draft/published split is orthogonal to status.
+  **Retiring removes a course from the catalog for new enrollment only** — it is not a delete and
+  does not cascade. Every `CourseEnrollment` already created against the course, and the
+  `StudentPath`s under it, are untouched and continue to resolve normally.
 - A template referenced by any checkpoint, in any published `CourseVersion`, cannot be deleted
   (restrict); retire the course first.
 
 **Publishing snapshots the draft into an immutable `CourseVersion`.** `CourseVersion{course_id,
-version_number, checkpoints_snapshot, published_at, available_for_new_enrollments}` is created only
-by an explicit **admin-only** publish action, which copies the current `Course`/`CourseCheckpoint`
-state verbatim. `Course.latest_published_version` then points at it. **Students and new enrollees
-only ever see the latest `CourseVersion`, never the live draft** — so an author can freely reshape
-checkpoints toward the next release while every current student keeps seeing the last published,
-stable sequence. A course with `status = draft` (nothing published yet) is not in the catalog at
-all. `available_for_new_enrollments` (default true) lets an author freeze a version to only the
-students already progressing through it, while a newer version takes new enrollees.
+version_number, title_snapshot, summary_snapshot, level_snapshot, checkpoints_snapshot,
+published_at, available_for_new_enrollments}` is created only by an explicit **admin-only** publish
+action, which copies the current `Course` (`title`, `summary`, `level`) and `CourseCheckpoint`
+state verbatim, field for field — every reader-facing property is snapshotted, not just the
+checkpoint list. `Course.latest_published_version` then points at it. **Students, new enrollees and
+the catalog read (`GET /courses`, `GET /courses/{course_id}`) render only from the latest
+`CourseVersion`, never the live `Course`/`CourseCheckpoint` rows** — so an author can freely
+retitle, re-summarise or reshape checkpoints toward the next release while every current student,
+and the catalog itself, keeps showing the last published, stable snapshot. A course with `status =
+draft` (nothing published yet) is not in the catalog at all. `available_for_new_enrollments`
+(default true) on a `CourseVersion` lets an author pause new enrollment against that *specific*
+version — without retiring the course — while every already-enrolled student keeps progressing on
+it unaffected. It is a deliberate intake pause the author can lift at will; it does not require a
+newer version to exist or take over.
 
 **Enrollment is its own record, tracking a per-course active checkpoint.**
 `CourseEnrollment{id, student_id, course_id, course_version_number, enrolled_at, status (active |
@@ -188,23 +197,51 @@ already decided.
 This ADR **amends ADR-017** in three respects — the current-path pointer becomes two-level and
 lives partly on a new `CourseEnrollment` entity rather than solely on `StudentLearningState`;
 self-enrollment sets current only when nothing is set; and a current course/path can no longer be
-left while another is available without switching first — and otherwise builds on it. Exact
-request/response shapes, error bodies and Gherkin are settled in the OpenAPI and feature files, not
-here.
+left while another is available without switching first — and **amends ADR-011** so completion is
+keyed by node lineage rather than by a bare `content_node_id` (see Content node versioning, below).
+It otherwise builds on both. Exact request/response shapes, error bodies and Gherkin are settled in
+the OpenAPI and feature files, not here.
 
-**Content node versioning.** `ContentNode` gains a `version_number` and a `superseded_by_node_id`
-(nullable, set when a new version is published). Editing a published node's substance (not a typo
-fix — that stays a same-version edit) publishes a new node version: the new version reuses the
-node's stable identity for authoring purposes but is a distinct row with its own id, and the old
-version's row is marked `superseded_by_node_id`. A `StudentPathItem` and its per-node completion
-fact continue to reference the exact node version the student worked with: an existing completion
-is never retargeted to the new version and is never invalidated. A freshly copied `StudentPathItem`
-(new enrollment, or a template/checkpoint pointing at the node going forward) always resolves to the
-current version. This is the same "copy is a point-in-time snapshot, never live" rule ADR-017
-already applies to templates, and this ADR now applies to courses, applied one level further down.
-Node authoring UX and the exact migration of existing `ContentNode.classification` rows are out of
-scope here — this ADR settles only that versions exist and how completion and path items resolve
-them.
+**Content node versioning mirrors the course draft/publish split, one level down.** `ContentNode`
+is likewise a live, always-editable **draft** row, carrying a stable `lineage_id` (equal to its own
+`id` for a node's first version, and copied forward unchanged on every later version — the lineage
+is "this node, across all its published revisions"). Publishing a node (same authorisation as
+`ContentNode` authoring — **not** admin-only; nodes are not student-browsable the way a course is,
+so the self-enrollment exposure risk that justifies admin-only course publishing does not apply
+here) snapshots the current draft into an immutable `ContentNodeVersion{lineage_id, version_number,
+body, published_at}` row and advances the lineage's `latest_published_version`. A same-version edit
+(one a student would not notice as changed content, e.g. a typo fix) may be folded into the current
+draft without a new publish, at the author's judgement; anything a student would notice as changed
+content requires a new version.
+
+**Every copy of a node — into a `LearningPathItem`, a `CourseCheckpoint`'s template item, or a
+`StudentPathItem` — resolves to the lineage's latest *published* version at the moment of copy,
+never to an in-progress draft.** This is the course's own rule ("the course gets the last published
+version") applied one level down: a template item references a node by `lineage_id`; every time
+that item is copied (enrollment, checkpoint advance, staff assignment), the copy resolves
+`lineage_id → latest_published_version` at that instant and stores the resulting concrete
+`content_node_version_id` on the `StudentPathItem`. Two students copying the same template a
+version apart can therefore land on different concrete node versions from the same lineage —
+intended, and identical in kind to two enrollments pinned to different `CourseVersion`s.
+
+**Completion is tracked per lineage, not per node version — a node finished anywhere is finished
+everywhere.** The Aggregation Worker (ADR-011) records a completion fact keyed by `(student,
+node_lineage_id)`, resolved from whichever concrete `content_node_version_id` the student actually
+interacted with. Consequently: if a student completes a node while it is at version 2 (in one
+`StudentPath`), and the *same lineage* later appears — now at version 5 — in a different
+`StudentPath`, under an unrelated course or a fresh standalone assignment, that item shows
+`completed` immediately, without the student redoing it. This extends ADR-017's existing rule ("a
+node the student already completed elsewhere shows completed immediately") across node versions and
+across every path or course that happens to share the lineage — not only across a single student's
+different paths, which is as far as ADR-017 originally went. A `StudentPathItem`'s stored
+`content_node_version_id` — the exact body the student was shown — is never retargeted or
+invalidated by a later node edit; only the *completion lookup* generalises across versions of the
+same lineage.
+
+Node authoring UX and the exact migration of existing `ContentNode.classification` rows onto
+`lineage_id` are out of scope here — this ADR settles only that node versions and lineages exist,
+that copies always resolve to the latest published version, and that completion is a per-lineage
+fact.
 
 ## Rationale
 
@@ -246,6 +283,14 @@ them.
   mid-journey, and a node can be re-authored after students have completed it, the same guarantee
   has to extend to both, or an edit anywhere in the content graph becomes a hazard to in-progress or
   completed student work.
+- **Completion keyed by node lineage, not by the specific version copied.** If a student's
+  `StudentPathItem` completion were tied to the exact `content_node_version_id` they saw, the same
+  underlying lesson reappearing later — in a different course, a later checkpoint, or after the node
+  was revised — would show as not-yet-done and make the student redo material they already know.
+  Keying completion by `lineage_id` instead makes "have I learned this" a fact about the lesson, not
+  about which authored revision delivered it — consistent with ADR-017's existing "already completed
+  elsewhere" behaviour, now generalised across versions and across every path or course that shares
+  the lineage.
 - **A student cannot leave their only current course/path without a replacement, but abandoning is
   otherwise free.** Letting "abandon current" silently clear the pointer when nothing else is
   available puts a student one click from a dead-end home screen even when they have somewhere to
@@ -266,6 +311,9 @@ them.
   be retroactively altered by an authoring change.
 - ADR-017's deferred surface (list, switch, archive) is specified once, together with the reason it
   is needed, and the current-path abandonment hazard from the original draft is closed.
+- A node shared across multiple templates or courses is taught once: completing it under any
+  lineage version, via any path, satisfies it everywhere — closing a redundant-re-teaching gap a
+  purely per-version completion scheme would otherwise have introduced.
 
 ### Negative / Trade-offs
 - **Business-model risk is accepted, not mitigated by mediation.** Student self-enrollment moves
@@ -285,8 +333,12 @@ them.
 - **PB-31 is a hard prerequisite.** Nothing here can be built until the `StudentPath` /
   `StudentLearningState` model exists; this ADR only specifies the catalog on top of it.
 - No cap on concurrent `CourseEnrollment`s per student; acceptable at alpha scale.
-- Node versioning duplicates node rows over time (a `superseded_by_node_id` chain); no archival or
-  cleanup policy is decided here.
+- Node versioning duplicates node rows over time (one row per published version per lineage); no
+  archival or cleanup policy is decided here.
+- Existing `ContentNode` rows have no `lineage_id` yet; a migration must backfill each row's
+  `lineage_id` to itself before this scheme is meaningful, and the ADR-026 classification and
+  ADR-028 diagram-linkage schemas that reference `ContentNode` need to decide whether they attach to
+  a lineage or to a specific version — not resolved here.
 - Amending ADR-017 means its "assigning sets the current path" and single-pointer sentences are now
   qualified or restructured; readers must consult this ADR for self-enrollment, the two-level current
   model, and the leave/archive restriction.
@@ -297,7 +349,7 @@ them.
 ### Neutral
 - `source_course_enrollment_id` / `course_checkpoint_position` on `StudentPath`, and
   `course_version_number` on `CourseEnrollment`, are provenance and resolution fields; none are used
-  for completion logic, which stays `(student, content_node_version)`.
+  for completion logic, which is keyed `(student, node_lineage_id)`.
 - Student data-erasure scope grows to include `CourseEnrollment` alongside `StudentPath`,
   `StudentPathItem` and `StudentLearningState`; `Course`, `CourseCheckpoint` and `CourseVersion` hold
   no student data.
@@ -312,8 +364,9 @@ them.
   checkpoint in `GET /courses/{course_id}`.
 - **ADR-026** (Content classification graph) — `Course.level` reuses its 5-level difficulty enum;
   node versioning here extends the same `ContentNode` this ADR classifies.
-- **ADR-011** (Minimal Aggregation Worker) — unchanged in mechanism; completion now keys off a
-  specific node version rather than a version-less node id.
+- **ADR-011** (Minimal Aggregation Worker) — amended: completion is now keyed by `(student,
+  node_lineage_id)` rather than a bare, version-less `content_node_id`, so that node versioning does
+  not fragment a single lesson's completion state across its revisions.
 
 ---
 
