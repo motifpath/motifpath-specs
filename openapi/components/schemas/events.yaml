@@ -96,6 +96,7 @@ ContentContext:
       enum:
         - video
         - article
+        - diagram
       description: |
         Media format of the content node. Mirrors ContentNode.content_type. Included in
         the event payload to avoid a lookup at aggregation time.
