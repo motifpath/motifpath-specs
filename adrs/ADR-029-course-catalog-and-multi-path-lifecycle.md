@@ -1,6 +1,6 @@
 # ADR-029: Course Catalog with Student Self-Enrollment, and the Multi-Path Lifecycle
 
-**Status:** Proposed
+**Status:** Accepted — 2026-09-22
 **Date:** 2026-09-21
 **Deciders:** Gilson Yamada (solo engineering at MVP)
 
