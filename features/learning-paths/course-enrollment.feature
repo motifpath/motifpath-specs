@@ -43,9 +43,19 @@ Feature: Student self-enrollment in courses
     And "alice" is enrolled in "fingerstyle-journey" with checkpoint 2 active as her current path
     And checkpoint 2 is the last checkpoint of "fingerstyle-journey"
     When "alice" completes every item in checkpoint 2's student path
-    Then the enrollment status becomes "completed"
-    And the completing response signals that the course itself is now complete
+    And "alice" retrieves her current path
+    Then the response shows checkpoint 2's items, all completed, with course_completed true
+    And the enrollment status becomes "completed"
     And "alice" has no current course or path
+
+  Scenario: A read after course completion no longer signals course_completed
+    Given "alice" is authenticated as a student
+    And "alice" is enrolled in "fingerstyle-journey" with checkpoint 2 active as her current path
+    And checkpoint 2 is the last checkpoint of "fingerstyle-journey"
+    And "alice" completes every item in checkpoint 2's student path
+    And "alice" retrieves her current path
+    When "alice" retrieves her current path again
+    Then the request is refused with a not-found error
 
   # ── Congrats page ──────────────────────────────────────────────────────────
 

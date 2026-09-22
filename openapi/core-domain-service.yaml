@@ -2211,6 +2211,63 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+    delete:
+      operationId: deleteLearningPath
+      summary: Delete a learning path template
+      description: |
+        Permanently deletes the learning path template. This never
+        touches existing progress: every StudentPath already copied
+        from this template (standalone or as a course checkpoint) is
+        its own independent snapshot and is unaffected. Refused if the
+        template is referenced by any checkpoint of any published
+        CourseVersion, even a version belonging to a since-retired
+        course — a published course's checkpoint sequence must always
+        resolve, for both future re-publishes and any student still
+        reading it. Only the creating teacher or an admin may delete a
+        learning path.
+      tags:
+        - Learning Paths
+      parameters:
+        - name: learning_path_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the learning path to delete.
+      responses:
+        "204":
+          description: Learning path deleted.
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to delete
+            this learning path. Only the creating teacher or an admin
+            may delete it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No learning path exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: |
+            This learning path is referenced by a checkpoint of at
+            least one published CourseVersion and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+
   /courses:
     get:
       operationId: listCourses
@@ -4251,12 +4308,26 @@ components:
           description: All path items with progress state, sorted by position ascending.
           items:
             $ref: '#/components/schemas/StudentPathItem'
+        course_completed:
+          type: boolean
+          description: >-
+            True when this response reflects the checkpoint that just
+            completed the student's course — every item shown here is
+            complete, the request that returned this view was the one
+            that discovered it, and the student's current course/path
+            pointer has already been cleared as a result. Always false
+            for a standalone path, and false on every subsequent read
+            (the pointer is null afterward, so there is nothing left to
+            return this flag on). The client should treat true as a
+            one-time signal to show course completion, not a
+            recheckable status field.
       required:
         - student_path_id
         - source_template_id
         - title
         - current_position
         - items
+        - course_completed
 
     CreateCourseRequest:
       type: object
