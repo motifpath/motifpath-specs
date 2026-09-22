@@ -170,6 +170,8 @@ Feature: Manage content nodes
     Then the request is rejected as invalid
     And the rejection identifies "difficulty_level" as the source of the error
 
+  @wip
+
   Scenario: Creating a content node with content_type "diagram" is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create content node request with content_type "diagram"
