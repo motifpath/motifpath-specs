@@ -29,19 +29,19 @@ Feature: Author courses
     Then the first checkpoint's effective title is "Stage 1: Open chords"
     And the second checkpoint's effective title is the title of "strumming-path"
 
-  # ── Happy path — fetching the draft for editing ───────────────────────────
+  # ── Happy path — fetching the live state for editing ──────────────────────
 
-  Scenario: A teacher fetches a course's draft to edit it
+  Scenario: A teacher retrieves a course's live state to edit it
     Given a course "fingerstyle-journey" exists as a draft with checkpoints "open-chords-path", "strumming-path"
     And "bob" is authenticated as a teacher
-    When "bob" fetches the draft of course "fingerstyle-journey"
+    When "bob" retrieves course "fingerstyle-journey"
     Then the response includes each checkpoint's learning_path_id
 
-  Scenario: A teacher reorders a course by resending the fetched draft's checkpoints
+  Scenario: A teacher reorders a course by resending its retrieved checkpoints
     Given a course "fingerstyle-journey" exists as a draft with checkpoints "open-chords-path", "strumming-path"
     And "bob" is authenticated as a teacher
-    And "bob" fetches the draft of course "fingerstyle-journey"
-    When "bob" replaces course "fingerstyle-journey" with the fetched checkpoints reordered to: "strumming-path", "open-chords-path"
+    And "bob" retrieves course "fingerstyle-journey"
+    When "bob" replaces course "fingerstyle-journey" with the retrieved checkpoints reordered to: "strumming-path", "open-chords-path"
     Then the checkpoints are returned with positions 1 and 2 in the order "strumming-path", "open-chords-path"
 
   # ── Happy path — editing the draft ────────────────────────────────────────
@@ -128,9 +128,17 @@ Feature: Author courses
   Scenario: A student sees a course's checkpoints as a title-only outline, never lesson content
     Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path", "strumming-path"
     And "alice" is authenticated as a student
-    When "alice" retrieves course "fingerstyle-journey"
+    When "alice" retrieves the published version of course "fingerstyle-journey"
     Then the response includes each checkpoint's title and its ordered item titles
     And the response does not include any item's lesson content
+    And the response does not include any checkpoint's learning_path_id
+
+  Scenario: A teacher or admin previewing the published version never sees unpublished draft edits
+    Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path", "strumming-path"
+    And "bob" is authenticated as a teacher
+    And "bob" replaces course "fingerstyle-journey" with checkpoints in order: "strumming-path"
+    When "bob" retrieves the published version of course "fingerstyle-journey"
+    Then the response still shows checkpoints "open-chords-path", "strumming-path" from the last published version
 
   # ── Validation failures ────────────────────────────────────────────────────
 
@@ -177,10 +185,10 @@ Feature: Author courses
     When "bob" attempts to retire course "fingerstyle-journey"
     Then the request is refused with a forbidden error
 
-  Scenario: A student cannot fetch a course's draft
+  Scenario: A student cannot retrieve a course's live state
     Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
     And "alice" is authenticated as a student
-    When "alice" attempts to fetch the draft of course "fingerstyle-journey"
+    When "alice" attempts to retrieve course "fingerstyle-journey"
     Then the request is refused with a forbidden error
 
   Scenario: Creating a course without an authentication token is refused
@@ -195,13 +203,19 @@ Feature: Author courses
     When "bob" retrieves a course with an ID that does not exist
     Then the request is refused with a not-found error
 
-  Scenario: Fetching the draft of a course that does not exist returns not found
+  Scenario: Retrieving the published version of a course that does not exist returns not found
     Given "bob" is authenticated as a teacher
-    When "bob" attempts to fetch the draft of a course with an ID that does not exist
+    When "bob" attempts to retrieve the published version of a course with an ID that does not exist
     Then the request is refused with a not-found error
 
-  Scenario: A student retrieving a course with no published version gets not found
+  Scenario: A student retrieving the published version of a course that has never been published gets not found
     Given a course "draft-only-course" exists as a draft with checkpoints "strumming-path"
     And "alice" is authenticated as a student
-    When "alice" retrieves course "draft-only-course"
+    When "alice" retrieves the published version of course "draft-only-course"
+    Then the request is refused with a not-found error
+
+  Scenario: A teacher retrieving the published version of a course that has never been published also gets not found
+    Given a course "draft-only-course" exists as a draft with checkpoints "strumming-path"
+    And "bob" is authenticated as a teacher
+    When "bob" retrieves the published version of course "draft-only-course"
     Then the request is refused with a not-found error

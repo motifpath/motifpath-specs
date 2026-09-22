@@ -2208,14 +2208,16 @@ paths:
       operationId: listCourses
       summary: List courses
       description: |
-        Returns the course catalog as lightweight entries — never the
-        live draft's editable detail (see GET /courses/{course_id}/draft
-        for that). Students see only published courses, rendered from
-        each course's latest published version. Teachers and admins see
-        courses of every status; passing status narrows the list to
-        just that status, otherwise every status is returned. Results
-        are unordered beyond a stable id order and are not paginated;
-        the catalog is expected to stay small.
+        Returns the course catalog as lightweight entries — never a
+        checkpoint's learning_path_id or other live-draft authoring
+        detail (see GET /courses/{course_id} for that). Students see
+        only published courses, rendered from each course's latest
+        published version. Teachers and admins see courses of every
+        status; passing status narrows the list to just that status,
+        otherwise every status is returned, each annotated with whether
+        its live draft has unpublished changes. Results are unordered
+        beyond a stable id order and are not paginated; the catalog is
+        expected to stay small.
       tags:
         - Courses
       parameters:
@@ -2312,19 +2314,18 @@ paths:
   /courses/{course_id}:
     get:
       operationId: getCourse
-      summary: Get a course's catalog detail by ID
+      summary: Get a course's live, current state by ID
       description: |
-        Returns a course as an outline — each checkpoint's title and its
-        ordered item titles grouped by section_label, never lesson
-        content or authoring detail such as a checkpoint's
-        learning_path_id. For a student, this is always the latest
-        published version's snapshot, and 404s if the course has no
-        published version or is not published. For a teacher or admin,
-        this previews the live draft's outline even before it is first
-        published. To fetch the editable draft for authoring — with
-        each checkpoint's learning_path_id, so it can be resent to PUT
-        /courses/{course_id} — use GET /courses/{course_id}/draft
-        instead.
+        Returns the course's live, currently-being-authored row — title,
+        summary, level, status, and checkpoints with each checkpoint's
+        learning_path_id — regardless of whether it has ever been
+        published. This is the resource's actual current state, and the
+        representation to fetch before editing: its checkpoints array
+        can be resent as-is (after modification) to PUT
+        /courses/{course_id}. Teachers and admins only. To see what
+        students currently see — the latest published version, rendered
+        as an outline, never the live row — use GET
+        /courses/{course_id}/published instead.
       tags:
         - Courses
       parameters:
@@ -2337,51 +2338,7 @@ paths:
           description: The ID of the course to retrieve.
       responses:
         "200":
-          description: The requested course's catalog detail.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CourseDetail'
-        "401":
-          description: Missing or invalid Bearer token.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError'
-        "404":
-          description: |
-            No course exists with the given ID, or (for a student) the
-            course has no published version.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundError'
-
-  /courses/{course_id}/draft:
-    get:
-      operationId: getCourseDraft
-      summary: Get a course's live, editable draft by ID
-      description: |
-        Returns the course's live, currently-being-authored draft —
-        title, summary, level, and checkpoints with each checkpoint's
-        learning_path_id — regardless of whether the course has ever
-        been published. This is the representation to fetch before
-        editing, since its checkpoints array can be resent as-is (after
-        modification) to PUT /courses/{course_id}. Teachers and admins
-        only; students have no notion of a draft.
-      tags:
-        - Courses
-      parameters:
-        - name: course_id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: The ID of the course to retrieve the draft of.
-      responses:
-        "200":
-          description: The course's live draft.
+          description: The course's live, current state.
           content:
             application/json:
               schema:
@@ -2393,7 +2350,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "403":
-          description: Only teachers and admins may view a course's draft.
+          description: Only teachers and admins may view a course's live state.
           content:
             application/json:
               schema:
@@ -2467,6 +2424,52 @@ paths:
                 $ref: '#/components/schemas/ForbiddenError'
         "404":
           description: No course exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /courses/{course_id}/published:
+    get:
+      operationId: getPublishedCourse
+      summary: Get a course's latest published version, as students see it
+      description: |
+        Returns the course's latest published version rendered as an
+        outline — each checkpoint's title and its ordered item titles
+        grouped by section_label, never lesson content or authoring
+        detail such as a checkpoint's learning_path_id. This is the
+        specific, derived view of the course every non-owning caller
+        gets: it never reflects unpublished draft edits, even for a
+        teacher or admin previewing what students currently see. 404s
+        if the course has never been published, regardless of caller
+        role — "the published version" genuinely does not exist yet.
+      tags:
+        - Courses
+      parameters:
+        - name: course_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the course to retrieve the published version of.
+      responses:
+        "200":
+          description: The course's latest published version, as an outline.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDetail'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: |
+            No course exists with the given ID, or it has never been
+            published.
           content:
             application/json:
               schema:
@@ -4420,9 +4423,8 @@ components:
       description: |
         A course as it appears in the catalog list — enough to browse
         and pick one, never authoring detail such as a checkpoint's
-        learning_path_id or whether the draft has unpublished changes.
-        Returned by GET /courses for every caller, teacher/admin and
-        student alike.
+        learning_path_id. Returned by GET /courses for every caller,
+        teacher/admin and student alike.
       properties:
         course_id:
           type: string
@@ -4458,6 +4460,13 @@ components:
           description: >-
             Timestamp the latest published version was published at, or
             null if the course has never been published.
+        has_unpublished_changes:
+          type: boolean
+          description: >-
+            True when the live draft differs from the latest published
+            version (or nothing has been published yet). Present only
+            in the teacher/admin representation; a student never
+            receives this field.
       required:
         - course_id
         - title
