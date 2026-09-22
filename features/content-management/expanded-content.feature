@@ -83,6 +83,61 @@ Feature: Manage expanded content
     Then the expanded content item is created and assigned a stable identifier
     And the item's rich content contains a video node
 
+  # ── Diagram content — happy path ──────────────────────────────────────────────
+
+  @wip
+
+  Scenario: A teacher adds a diagram to a video lesson at a specific timestamp
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" adds diagram "minor-pentatonic-guitar" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165
+    Then the expanded content item is created and assigned a stable identifier
+    And the item's content_type is "diagram"
+
+  @wip
+
+  Scenario: A teacher adds a stack of two diagrams to an article at a specific paragraph
+    Given a diagram "c-major-scale-guitar" exists on instrument "guitar"
+    And a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    And an article content node "chord-theory-explained" exists in the system
+    When "bob" adds a stack of diagrams "c-major-scale-guitar, minor-pentatonic-guitar" to "chord-theory-explained" with trigger_at_paragraph 3 and duration_ms 8000
+    Then the expanded content item is created and assigned a stable identifier
+    And the item's diagram stack has 2 layers
+
+  # ── Diagram content — validation failures ─────────────────────────────────────
+
+  @wip
+
+  Scenario: Adding a diagram stack from two different instruments is rejected
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
+    And a diagram "minor-pentatonic-piano" exists on instrument "piano"
+    And "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" adds a stack of diagrams "minor-pentatonic-guitar, minor-pentatonic-piano" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165
+    Then the request is rejected as invalid
+    And the rejection identifies "diagram_stack_ref" as the source of the error
+
+  @wip
+
+  Scenario: Creating a diagram expanded content item without a diagram reference is rejected
+    Given "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" submits a create expanded content request with content_type "diagram" and both diagram_ref and diagram_stack_ref omitted
+    Then the request is rejected as invalid
+    And the rejection identifies "diagram_ref" as the source of the error
+
+  @wip
+
+  Scenario: Creating a diagram expanded content item that also carries a media URL is rejected
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" submits a create expanded content request with content_type "diagram" carrying both media_url and a diagram_ref to "minor-pentatonic-guitar"
+    Then the request is rejected as invalid
+    And the rejection identifies "media_url" as the source of the error
+
   # ── Happy path — updating and deleting ────────────────────────────────────────
 
   Scenario: A teacher updates an expanded content item's timing and caption
