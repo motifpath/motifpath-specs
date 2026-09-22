@@ -2148,16 +2148,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
-  /students/{student_id}/path-assignments:
+  /students/{student_id}/student-paths:
     post:
       operationId: assignLearningPath
       summary: Assign a learning path to a student
       description: |
-        Assigns a learning path to the specified student. The student must have
-        role student. If the student already has an active path assignment, the
-        existing assignment is replaced by this one and the student's progress
-        is reset to the first item. Only one active assignment per student is
-        supported for MVP.
+        Copies the specified learning path template's items into a new
+        StudentPath owned by the student, and sets it as the student's
+        current path. The student must have role student. Copying is
+        additive: any existing StudentPath the student has is left
+        untouched — including the one that was current before this call —
+        and remains reachable unless separately archived. A student may
+        hold many StudentPaths at once.
       tags:
         - Learning Paths
       parameters:
@@ -2181,11 +2183,11 @@ paths:
                   learning_path_id: "d4e5f6a7-0000-0000-0000-000000000001"
       responses:
         "201":
-          description: Path assigned. Returns the new assignment record.
+          description: Path assigned. Returns the new StudentPath.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PathAssignment'
+                $ref: '#/components/schemas/StudentPath'
         "400":
           description: The request body failed schema validation.
           content:
@@ -2218,9 +2220,9 @@ paths:
       operationId: getMyPath
       summary: Get the authenticated student's current learning path and progress
       description: |
-        Returns the student's active learning path assignment together with the
-        progress state of each item. This is the primary endpoint for the SPA's
-        main screen.
+        Resolves the caller's current path and returns it together with the
+        progress state of each item. This is the primary endpoint for the
+        SPA's main screen.
 
         Item status values:
         - completed — the student has finished this content node.
@@ -2229,8 +2231,8 @@ paths:
         - locked — the student must complete an earlier node before accessing this one.
 
         Accessible by authenticated users with role student, teacher, or admin,
-        returning the caller's own active assignment in every case. Returns 404
-        if the caller has no active path assignment.
+        returning the caller's own current StudentPath in every case. Returns
+        404 if the caller has no current path set.
       tags:
         - Learning Paths
       responses:
@@ -2247,7 +2249,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "404":
-          description: The authenticated caller has no active path assignment.
+          description: The authenticated caller has no current path set.
           content:
             application/json:
               schema:
@@ -3365,36 +3367,48 @@ components:
       required:
         - learning_path_id
 
-    PathAssignment:
+    StudentPath:
       type: object
       description: |
-        A record of a learning path being assigned to a student. One active
-        assignment exists per student at any time for MVP.
+        A student's own copy of a learning path template's items. Created by
+        copying a LearningPath at assign time; independently editable
+        afterwards and never affected by later changes to the template it
+        was copied from.
       properties:
-        assignment_id:
+        student_path_id:
           type: string
           format: uuid
-          description: Stable identifier for this assignment record.
+          description: Stable identifier for this StudentPath.
         student_id:
           type: string
           format: uuid
-          description: The user_id of the student this path is assigned to.
-        learning_path_id:
+          description: The user_id of the student who owns this path.
+        source_template_id:
           type: string
           format: uuid
-          description: The learning path assigned to the student.
+          description: The learning path this StudentPath was copied from.
+        title:
+          type: string
+          description: Title of the path, copied from the template at assign time and independently editable afterwards.
         assigned_by:
           type: string
           format: uuid
-          description: The user_id of the teacher or admin who created this assignment.
+          description: The user_id of the teacher or admin who assigned this path.
         assigned_at:
           type: string
           format: date-time
-          description: Timestamp at which the assignment was created.
+          description: Timestamp at which this StudentPath was created.
+        archived_at:
+          type: [string, "null"]
+          format: date-time
+          description: >-
+            Timestamp at which this StudentPath was archived, hiding it from
+            the student. Null means the path is active and visible.
       required:
-        - assignment_id
+        - student_path_id
         - student_id
-        - learning_path_id
+        - source_template_id
+        - title
         - assigned_by
         - assigned_at
 
@@ -3450,21 +3464,21 @@ components:
     StudentPathView:
       type: object
       description: |
-        The student's active learning path with per-item progress state.
+        The student's current learning path with per-item progress state.
         Returned by GET /students/me/path and used by the SPA to render
         the main learning screen.
       properties:
-        assignment_id:
+        student_path_id:
           type: string
           format: uuid
-          description: The active assignment record ID.
-        learning_path_id:
+          description: The current StudentPath's ID.
+        source_template_id:
           type: string
           format: uuid
-          description: The assigned learning path ID.
+          description: The learning path this StudentPath was copied from.
         title:
           type: string
-          description: Title of the assigned learning path.
+          description: Title of the current StudentPath.
         current_position:
           type: integer
           minimum: 1
@@ -3477,8 +3491,8 @@ components:
           items:
             $ref: '#/components/schemas/StudentPathItem'
       required:
-        - assignment_id
-        - learning_path_id
+        - student_path_id
+        - source_template_id
         - title
         - current_position
         - items

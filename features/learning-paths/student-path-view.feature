@@ -1,6 +1,6 @@
 Feature: Student path view
   As the MotifPath platform
-  I want students, teachers, and admins to retrieve their own active learning path with progress state
+  I want students, teachers, and admins to retrieve their own current learning path with progress state
   So that the SPA can display what to do next and how far the caller has come
 
   Background:
@@ -11,9 +11,9 @@ Feature: Student path view
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  Scenario: A student with a fresh assignment sees all items as not_started except the first
+  Scenario: A student with a freshly assigned path sees all items as not_started except the first
     Given "alice" is authenticated as a student
-    And "alice" has "beginner-guitar-path" assigned with no progress recorded
+    And "alice" has "beginner-guitar-path" assigned as her current path with no progress recorded
     When "alice" retrieves her current path
     Then the response contains all three items in order
     And "node-01" has status "not_started"
@@ -23,7 +23,7 @@ Feature: Student path view
 
   Scenario: A student who has completed the first node sees it as completed and the second as not_started
     Given "alice" is authenticated as a student
-    And "alice" has "beginner-guitar-path" assigned
+    And "alice" has "beginner-guitar-path" assigned as her current path
     And "alice" has completed "node-01"
     When "alice" retrieves her current path
     Then "node-01" has status "completed"
@@ -33,7 +33,7 @@ Feature: Student path view
 
   Scenario: A student who has started but not finished the second node sees it as in_progress
     Given "alice" is authenticated as a student
-    And "alice" has "beginner-guitar-path" assigned
+    And "alice" has "beginner-guitar-path" assigned as her current path
     And "alice" has completed "node-01"
     And "alice" has started but not completed "node-02"
     When "alice" retrieves her current path
@@ -44,7 +44,7 @@ Feature: Student path view
 
   Scenario: A student who has completed all nodes sees the full path as completed
     Given "alice" is authenticated as a student
-    And "alice" has "beginner-guitar-path" assigned
+    And "alice" has "beginner-guitar-path" assigned as her current path
     And "alice" has completed "node-01", "node-02", and "node-03"
     When "alice" retrieves her current path
     Then all three items have status "completed"
@@ -52,22 +52,29 @@ Feature: Student path view
 
   Scenario: The path view includes each item's title and content type
     Given "alice" is authenticated as a student
-    And "alice" has "beginner-guitar-path" assigned
+    And "alice" has "beginner-guitar-path" assigned as her current path
     When "alice" retrieves her current path
     Then each item in the response includes a title and content_type
+
+  Scenario: A node already completed via an earlier path shows as completed the moment it appears in a newly copied path
+    Given "alice" is authenticated as a student
+    And "alice" has completed "node-01" through an earlier, unrelated student path
+    And "alice" has "beginner-guitar-path" assigned as her current path with no progress recorded on this new copy
+    When "alice" retrieves her current path
+    Then "node-01" has status "completed"
 
   # ── Section labels ─────────────────────────────────────────────────────────
 
   Scenario: The path view has no section labels when the path defines none
     Given "alice" is authenticated as a student
-    And "alice" has "beginner-guitar-path" assigned
+    And "alice" has "beginner-guitar-path" assigned as her current path
     When "alice" retrieves her current path
     Then none of the items have a section_label
 
   Scenario: The path view includes each item's section label when the path defines one
     Given "alice" is authenticated as a student
     And a learning path "rhythm-foundations-path" exists with "node-01" and "node-02" in section "Open chords" and "node-03" in section "Strumming patterns"
-    And "alice" has "rhythm-foundations-path" assigned
+    And "alice" has "rhythm-foundations-path" assigned as her current path
     When "alice" retrieves her current path
     Then "node-01" and "node-02" have section_label "Open chords"
     And "node-03" has section_label "Strumming patterns"
@@ -80,7 +87,7 @@ Feature: Student path view
   Scenario: A node with no content in the student's locale is locked even though it is the first item
     Given "alice" is authenticated as a student
     And "alice" has locale "pt_BR"
-    And "alice" has "beginner-guitar-path" assigned with no progress recorded
+    And "alice" has "beginner-guitar-path" assigned as her current path with no progress recorded
     And "node-01" has content available only in locale "en"
     When "alice" retrieves her current path
     Then "node-01" has status "locked"
@@ -88,7 +95,7 @@ Feature: Student path view
   Scenario: A node available in the student's locale is not locked for language reasons
     Given "alice" is authenticated as a student
     And "alice" has locale "pt_BR"
-    And "alice" has "beginner-guitar-path" assigned with no progress recorded
+    And "alice" has "beginner-guitar-path" assigned as her current path with no progress recorded
     And "node-01" has content available in locale "pt_BR"
     When "alice" retrieves her current path
     Then "node-01" has status "not_started"
@@ -96,7 +103,7 @@ Feature: Student path view
   Scenario: A node tagged for any locale is never locked for language reasons
     Given "alice" is authenticated as a student
     And "alice" has locale "pt_BR"
-    And "alice" has "beginner-guitar-path" assigned with no progress recorded
+    And "alice" has "beginner-guitar-path" assigned as her current path with no progress recorded
     And "node-01" has content available in any locale
     When "alice" retrieves her current path
     Then "node-01" has status "not_started"
@@ -104,7 +111,7 @@ Feature: Student path view
   Scenario: A node otherwise unlocked by progress stays locked when its locale is missing
     Given "alice" is authenticated as a student
     And "alice" has locale "pt_BR"
-    And "alice" has "beginner-guitar-path" assigned
+    And "alice" has "beginner-guitar-path" assigned as her current path
     And "alice" has completed "node-01"
     And "node-02" has content available only in locale "en"
     When "alice" retrieves her current path
@@ -113,23 +120,23 @@ Feature: Student path view
 
   # ── Not found ─────────────────────────────────────────────────────────────
 
-  Scenario: A student with no active assignment gets not found
+  Scenario: A student with no current path set gets not found
     Given "alice" is authenticated as a student
-    And "alice" has no active path assignment
+    And "alice" has no current path set
     When "alice" retrieves her current path
     Then the request is refused with a not-found error
 
   # ── Access by other roles ────────────────────────────────────────────────
 
-  Scenario: A teacher with no active path assignment gets not found, not forbidden
+  Scenario: A teacher with no current path set gets not found, not forbidden
     Given "bob" is authenticated as a teacher
-    And "bob" has no active path assignment
+    And "bob" has no current path set
     When "bob" requests GET /students/me/path
     Then the request is refused with a not-found error
 
-  Scenario: An admin with no active path assignment gets not found, not forbidden
+  Scenario: An admin with no current path set gets not found, not forbidden
     Given "admin" is authenticated as an admin
-    And "admin" has no active path assignment
+    And "admin" has no current path set
     When "admin" requests GET /students/me/path
     Then the request is refused with a not-found error
 
