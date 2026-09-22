@@ -3924,8 +3924,8 @@ components:
             positions (after layers.subset filtering) are correct answers.
             Meaningful, and required, only when this diagram_ref is an
             Exercise's image_recognition stimulus (see Exercise.diagram_ref)
-            — ignored when used as a ContentNode body or as an image_choice
-            Option's own diagram_ref.
+            — ignored when used inline via a PromptNode, attached via
+            ExpandedContent, or as an image_choice Option's own diagram_ref.
       required:
         - diagram_id
         - layers
@@ -5182,7 +5182,7 @@ components:
         under text and any inline marks under marks. attrs holds
         type-specific attributes (e.g. heading's level, paragraph/heading's
         text alignment, image's src and alt, audio/video's src, diagram's
-        diagram_id/diagram_ids and render config (the same fields DiagramRef/
+        diagram_ref or diagram_stack_ref (the same shapes DiagramRef/
         DiagramStackRef carry elsewhere in this spec), table cell's colspan,
         rowspan, backgroundColor, and borderColor) and is validated by the
         authoring editor, not by this schema.
