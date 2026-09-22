@@ -1,8 +1,15 @@
 # ADR-028: Diagram becomes a first-class, reusable content entity — polymorphic per-instrument-family positions, and render-time layer, styling, and playback config
 
-**Status:** Accepted
+**Status:** Accepted (partially superseded by ADR-030)
 **Date:** 2026-09-20
 **Deciders:** Gilson (Product Owner)
+
+> **2026-09-22:** This ADR's "`ContentNode` and `Exercise` both gain diagram linkage" decision
+> (the `ContentNode.body` third variant specifically) is superseded by
+> [ADR-030](./ADR-030-diagram-embedded-resource.md) — a diagram embeds into a `ContentNode` via
+> `PromptNode`/`ExpandedContent`, not as a body content type. Everything else in this ADR (the
+> `Instrument`/`Diagram` entity model, render-time `diagram_ref` config, and `diagram_stack_ref`
+> stacking) is unchanged and still Accepted, as is `Exercise`/`Option`'s diagram linkage below.
 
 ---
 

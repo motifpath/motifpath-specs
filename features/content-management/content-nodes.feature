@@ -38,47 +38,16 @@ Feature: Manage content nodes
     When "alice" retrieves the content node "intro-to-triads"
     Then the response returns the content node's title, type, and classification
 
-  # ── Happy path — diagram content nodes ────────────────────────────────────────
+  # ── Happy path — inline diagram embeds ────────────────────────────────────────
 
   @wip
 
-  Scenario: A teacher creates a diagram content node from a single diagram
+  Scenario: A teacher creates an article content node with an inline diagram embed
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
     And "bob" is authenticated as a teacher
-    When "bob" creates a diagram content node titled "Minor Pentatonic, Position 1" from diagram "minor-pentatonic-guitar", skills "minor-pentatonic-scale", concepts "scale-construction", and difficulty "beginner"
+    When "bob" creates an article content node titled "Understanding the Minor Pentatonic" with article body containing an inline diagram embed of "minor-pentatonic-guitar", skills "minor-pentatonic-scale", concepts "scale-construction", and difficulty "beginner"
     Then the content node is created and assigned a stable identifier
-    And the content node's diagram is "minor-pentatonic-guitar"
-
-  @wip
-
-  Scenario: A teacher creates a diagram content node from a diagram on a keyboard instrument
-    Given a diagram "minor-pentatonic-piano" exists on instrument "piano"
-    And "bob" is authenticated as a teacher
-    When "bob" creates a diagram content node titled "Minor Pentatonic on Piano" from diagram "minor-pentatonic-piano", skills "minor-pentatonic-scale", concepts "scale-construction", and difficulty "beginner"
-    Then the content node is created and assigned a stable identifier
-    And the content node's diagram is "minor-pentatonic-piano"
-
-  @wip
-
-  Scenario: A teacher stacks two diagrams from the same instrument on a content node
-    Given a diagram "c-major-scale-guitar" exists on instrument "guitar"
-    And a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
-    And "bob" is authenticated as a teacher
-    When "bob" creates a diagram content node titled "Relative minor pentatonic, in context" from a stack of diagrams "c-major-scale-guitar, minor-pentatonic-guitar", skills "minor-pentatonic-scale", concepts "scale-construction", and difficulty "intermediate"
-    Then the content node is created and assigned a stable identifier
-    And the content node's diagram stack has 2 layers
-
-  # ── Validation failures — diagram content nodes ───────────────────────────────
-
-  @wip
-
-  Scenario: Stacking diagrams from two different instruments is rejected
-    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
-    And a diagram "minor-pentatonic-piano" exists on instrument "piano"
-    And "bob" is authenticated as a teacher
-    When "bob" creates a diagram content node titled "Mismatched stack" from a stack of diagrams "minor-pentatonic-guitar, minor-pentatonic-piano", skills "minor-pentatonic-scale", concepts "scale-construction", and difficulty "intermediate"
-    Then the request is rejected as invalid
-    And the rejection identifies "diagram_stack_ref" as the source of the error
+    And the content node's rich content contains a diagram node
 
   # ── Happy path — listing content nodes for authoring ─────────────────────────
 
@@ -200,6 +169,12 @@ Feature: Manage content nodes
     When "bob" submits a create content node request with difficulty level "master"
     Then the request is rejected as invalid
     And the rejection identifies "difficulty_level" as the source of the error
+
+  Scenario: Creating a content node with content_type "diagram" is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create content node request with content_type "diagram"
+    Then the request is rejected as invalid
+    And the rejection identifies "content_type" as the source of the error
 
   Scenario: Creating a video content node without a media url is rejected
     Given "bob" is authenticated as a teacher
