@@ -223,9 +223,12 @@ things appear next to it exactly when they're relevant."
 - **Finishing** is the student's explicit tap on "Mark complete" (or "Go to practice"), shown
   only once the video ends. It emits `lesson.completed`, with the time spent in the session
   unless the tab was ever hidden.
-- **Reopening a completed step** first asks the student whether they want to watch it again or
-  just review it. Neither choice emits an event: completion is final (ADR-011), so watching
-  again cannot reset the step's status.
+- **Reopening a completed step** shows the video exactly as any other step's — nothing
+  auto-plays, and nothing is ever reported, since completion is final (ADR-011) and there is no
+  way to un-complete a step. If the step has a challenge, "Go to practice" is offered right
+  away rather than waiting for the video to end, since the student is reviewing, not finishing
+  it. There is no prompt: the path screen's own **Review** affordance on a completed step (S5)
+  is what got the student here.
 - **A locked step** shows the standard locked state. A step that is not on the student's path
   shows a not-found state.
 - **A video that fails to load** shows the standard error state with "Try again". A
