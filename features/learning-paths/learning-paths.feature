@@ -169,3 +169,65 @@ Feature: Manage learning paths
     Given "bob" is authenticated as a teacher
     When "bob" attempts to replace a learning path with an ID that does not exist
     Then the request is refused with a not-found error
+
+  # ── Deleting a learning path ────────────────────────────────────────────────
+
+  Scenario: A teacher deletes a learning path that is not used by any course
+    Given "bob" is authenticated as a teacher
+    And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    When "bob" deletes the learning path "beginner-guitar-path"
+    Then the learning path is deleted
+
+  Scenario: Deleting a learning path does not affect students who already copied it
+    Given "bob" is authenticated as a teacher
+    And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And student "alice" has "beginner-guitar-path" assigned as a standalone path
+    When "bob" deletes the learning path "beginner-guitar-path"
+    Then the learning path is deleted
+    And "alice"'s copy of the path is unaffected
+
+  Scenario: An admin deletes a learning path created by a teacher
+    Given "bob" is authenticated as a teacher
+    And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And "admin" is authenticated as an admin
+    When "admin" deletes the learning path "beginner-guitar-path"
+    Then the learning path is deleted
+
+  Scenario: A teacher cannot delete a learning path they do not own
+    Given "bob" is authenticated as a teacher
+    And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03", owned by a different teacher
+    When "bob" attempts to delete the learning path "beginner-guitar-path"
+    Then the request is refused with a forbidden error
+
+  Scenario: Deleting a learning path referenced by a published course's checkpoint is refused
+    Given "bob" is authenticated as a teacher
+    And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And a course "fingerstyle-journey" exists, published, with checkpoints "beginner-guitar-path"
+    When "bob" attempts to delete the learning path "beginner-guitar-path"
+    Then the request is refused with a conflict error
+
+  Scenario: Deleting a learning path referenced only by a retired course's published checkpoint is still refused
+    Given "bob" is authenticated as a teacher
+    And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And a course "fingerstyle-journey" exists, published, with checkpoints "beginner-guitar-path"
+    And "fingerstyle-journey" has since been retired
+    When "bob" attempts to delete the learning path "beginner-guitar-path"
+    Then the request is refused with a conflict error
+
+  Scenario: Deleting a learning path referenced only by an unpublished course draft is allowed
+    Given "bob" is authenticated as a teacher
+    And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And a course "fingerstyle-journey" exists as a draft with checkpoints "beginner-guitar-path"
+    When "bob" deletes the learning path "beginner-guitar-path"
+    Then the learning path is deleted
+
+  Scenario: Deleting a learning path that does not exist returns not found
+    Given "bob" is authenticated as a teacher
+    When "bob" attempts to delete a learning path with an ID that does not exist
+    Then the request is refused with a not-found error
+
+  Scenario: Deleting a learning path without an authentication token is refused
+    Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And no authentication token is provided
+    When an unauthenticated request attempts to delete learning path "beginner-guitar-path"
+    Then the request is refused with an authentication error
