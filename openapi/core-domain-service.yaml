@@ -330,6 +330,61 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+  /content-nodes/{content_node_id}/publish:
+    post:
+      operationId: publishContentNode
+      summary: Publish a content node's current draft
+      description: |
+        Snapshots the content node's current reader-facing state — title,
+        classification, and whichever of media_url, rich_content,
+        diagram_ref, or diagram_stack_ref applies, plus languages — into
+        a new immutable ContentNodeVersion, and advances the node's
+        latest_published_version to it. Every future copy of an item
+        referencing this node (into a StudentPathItem, at assignment,
+        enrollment, or checkpoint advance) resolves to this version
+        until a newer one is published. Already-copied StudentPathItems
+        keep the version they were copied at; they are never
+        retargeted. Same authorisation as content node authoring — not
+        admin-only, since nodes are not student-browsable the way a
+        course is.
+      tags:
+        - Content
+      parameters:
+        - name: content_node_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the content node to publish.
+      responses:
+        "201":
+          description: The new ContentNodeVersion.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentNodeVersion'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            Only the creating teacher or an admin may publish this
+            content node.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No content node exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /content-nodes/{content_node_id}/challenges:
     get:
       operationId: listContentNodeChallenges
@@ -2148,18 +2203,392 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+  /courses:
+    get:
+      operationId: listCourses
+      summary: List courses
+      description: |
+        Returns the course catalog as lightweight entries — never a
+        checkpoint's learning_path_id or other live-draft authoring
+        detail (see GET /courses/{course_id} for that). Students see
+        only published courses, rendered from each course's latest
+        published version. Teachers and admins see courses of every
+        status; passing status narrows the list to just that status,
+        otherwise every status is returned, each annotated with whether
+        its live draft has unpublished changes. Results are unordered
+        beyond a stable id order and are not paginated; the catalog is
+        expected to stay small.
+      tags:
+        - Courses
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - draft
+              - published
+              - retired
+          description: |
+            Restricts the results to courses in this status. Only
+            teachers and admins may use this parameter; a student's
+            results are always implicitly published regardless of this
+            parameter.
+      responses:
+        "200":
+          description: The courses visible to the caller, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseCatalogEntry'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
+    post:
+      operationId: createCourse
+      summary: Create a course
+      description: |
+        Creates a new course as a draft — an ordered sequence of
+        checkpoints, each pointing at one existing learning path
+        template. The course is not visible to students, and has no
+        published version, until it is explicitly published. Checkpoints
+        are specified in the desired order; the service assigns each a
+        1-based position. All learning_path_ids must exist in the
+        system. A course must contain at least one checkpoint. Only
+        teachers and admins may create courses.
+      tags:
+        - Courses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourseRequest'
+            examples:
+              fingerstyle_journey:
+                summary: A two-checkpoint course
+                value:
+                  title: "Fingerstyle Journey"
+                  summary: "From first fingerpicked chords to a full repertoire."
+                  level: beginner
+                  checkpoints:
+                    - learning_path_id: "d4e5f6a7-0000-0000-0000-000000000001"
+                      title: "Stage 1: Open chords"
+                    - learning_path_id: "d4e5f6a7-0000-0000-0000-000000000002"
+      responses:
+        "201":
+          description: Course created as a draft.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        "400":
+          description: |
+            The request body failed schema validation — missing title,
+            empty checkpoints array, or a learning_path_id that does
+            not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only teachers and admins may create courses.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /courses/{course_id}:
+    get:
+      operationId: getCourse
+      summary: Get a course's live, current state by ID
+      description: |
+        Returns the course's live, currently-being-authored row — title,
+        summary, level, status, and checkpoints with each checkpoint's
+        learning_path_id — regardless of whether it has ever been
+        published. This is the resource's actual current state, and the
+        representation to fetch before editing: its checkpoints array
+        can be resent as-is (after modification) to PUT
+        /courses/{course_id}. Teachers and admins only. To see what
+        students currently see — the latest published version, rendered
+        as an outline, never the live row — use GET
+        /courses/{course_id}/published instead.
+      tags:
+        - Courses
+      parameters:
+        - name: course_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the course to retrieve.
+      responses:
+        "200":
+          description: The course's live, current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only teachers and admins may view a course's live state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No course exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+    put:
+      operationId: replaceCourse
+      summary: Replace a course's draft title, summary, level, and checkpoints
+      description: |
+        Replaces the given course's live draft wholesale, the same way
+        POST /courses establishes it initially — a caller that wants to
+        add, remove, reorder, or relabel a single checkpoint resends the
+        full checkpoints array with the desired result. Positions are
+        reassigned 1-based from the new array's order. This never
+        changes what students following an already-published version
+        see; it only takes effect for new enrollments and future
+        checkpoint advances once separately published. Only the
+        creating teacher or an admin may replace a course.
+      tags:
+        - Courses
+      parameters:
+        - name: course_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the course to replace.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplaceCourseRequest'
+      responses:
+        "200":
+          description: The updated course draft.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        "400":
+          description: |
+            The request body failed schema validation — missing title,
+            empty checkpoints array, or a learning_path_id that does
+            not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The authenticated user does not have permission to replace
+            this course. Only the creating teacher or an admin may
+            replace it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No course exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /courses/{course_id}/published:
+    get:
+      operationId: getPublishedCourse
+      summary: Get a course's latest published version, as students see it
+      description: |
+        Returns the course's latest published version rendered as an
+        outline — each checkpoint's title and its ordered item titles
+        grouped by section_label, never lesson content or authoring
+        detail such as a checkpoint's learning_path_id. This is the
+        specific, derived view of the course every non-owning caller
+        gets: it never reflects unpublished draft edits, even for a
+        teacher or admin previewing what students currently see. 404s
+        if the course has never been published, regardless of caller
+        role — "the published version" genuinely does not exist yet.
+      tags:
+        - Courses
+      parameters:
+        - name: course_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the course to retrieve the published version of.
+      responses:
+        "200":
+          description: The course's latest published version, as an outline.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDetail'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: |
+            No course exists with the given ID, or it has never been
+            published.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /courses/{course_id}/publish:
+    post:
+      operationId: publishCourse
+      summary: Publish a course's current draft
+      description: |
+        Snapshots the course's current title, summary, level, and
+        checkpoints, field for field, into a new immutable CourseVersion,
+        and advances the course's latest_published_version to it. The
+        course's status becomes published if this is its first
+        publication. Every already-enrolled student is unaffected — they
+        keep progressing on the version their enrollment is pinned to.
+        Admin-only, because publishing exposes the draft to students for
+        the first time.
+      tags:
+        - Courses
+      parameters:
+        - name: course_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the course to publish.
+      responses:
+        "201":
+          description: The new CourseVersion.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseVersion'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only admins may publish a course.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No course exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /courses/{course_id}/retire:
+    post:
+      operationId: retireCourse
+      summary: Retire a course
+      description: |
+        Removes the course from the catalog for new enrollment only.
+        This is not a delete: it does not cascade, and every
+        CourseEnrollment already created against the course, and the
+        StudentPaths under it, continue to resolve normally. A retired
+        course's templates remain undeletable if referenced by any
+        published CourseVersion. Admin-only.
+      tags:
+        - Courses
+      parameters:
+        - name: course_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the course to retire.
+      responses:
+        "200":
+          description: The retired course.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only admins may retire a course.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No course exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /students/{student_id}/student-paths:
     post:
       operationId: assignLearningPath
       summary: Assign a learning path to a student
       description: |
-        Copies the specified learning path template's items into a new
-        StudentPath owned by the student, and sets it as the student's
-        current path. The student must have role student. Copying is
-        additive: any existing StudentPath the student has is left
-        untouched — including the one that was current before this call —
-        and remains reachable unless separately archived. A student may
-        hold many StudentPaths at once.
+        Copies the specified learning path template's items into a new,
+        standalone StudentPath (not tied to any course) owned by the
+        student, and sets it as the student's current path
+        unconditionally — an explicit, supervised act, unlike
+        self-enrollment in a course, which only sets current if nothing
+        is currently set. The student must have role student. Copying is
+        additive: any existing StudentPath or course enrollment the
+        student has is left untouched — including whichever was current
+        before this call — and remains reachable unless separately
+        archived or abandoned. A student may hold many StudentPaths at
+        once. Every content node the template's items reference must
+        have at least one published version; each item's copy resolves
+        to that node's latest published version at this instant.
       tags:
         - Learning Paths
       parameters:
@@ -2209,7 +2638,8 @@ paths:
         "404":
           description: |
             The student_id does not exist, the student's role is not student,
-            or the learning_path_id does not exist.
+            the learning_path_id does not exist, or one of its items'
+            content nodes has never been published.
           content:
             application/json:
               schema:
@@ -2220,9 +2650,10 @@ paths:
       operationId: getMyPath
       summary: Get the authenticated student's current learning path and progress
       description: |
-        Resolves the caller's current path and returns it together with the
-        progress state of each item. This is the primary endpoint for the
-        SPA's main screen.
+        Resolves the caller's current path — whichever course enrollment's
+        active checkpoint, or standalone path, is currently set — and
+        returns it together with the progress state of each item. This is
+        the primary endpoint for the SPA's main screen.
 
         Item status values:
         - completed — the student has finished this content node.
@@ -2250,6 +2681,281 @@ paths:
                 $ref: '#/components/schemas/UnauthorizedError'
         "404":
           description: The authenticated caller has no current path set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /students/me/course-enrollments:
+    get:
+      operationId: listMyCourseEnrollments
+      summary: List the authenticated student's course enrollments
+      description: |
+        Returns every CourseEnrollment the student has ever held —
+        active, completed, and abandoned — each with its course summary
+        and derived progress. Used to render the congrats page after a
+        course completes (offering other active enrollments to resume,
+        or the catalog if none remain) and any other multi-course
+        browsing surface.
+      tags:
+        - Courses
+      responses:
+        "200":
+          description: The caller's course enrollments, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseEnrollment'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only students hold course enrollments.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+    post:
+      operationId: createCourseEnrollment
+      summary: Self-enroll the authenticated student in a course
+      description: |
+        Creates a CourseEnrollment pinned to the course's latest
+        published version, plus checkpoint 1's StudentPath
+        (copy-on-assign, as for a standalone path), which becomes the
+        enrollment's active_checkpoint_student_path_id. Sets the new
+        enrollment as the student's current course, but only if nothing
+        is currently set — a student actively running another course or
+        a standalone path is never silently switched away from it.
+      tags:
+        - Courses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourseEnrollmentRequest'
+      responses:
+        "201":
+          description: Enrollment created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseEnrollment'
+        "400":
+          description: The request body failed schema validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only students may self-enroll.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: |
+            The course_id does not exist, the course is draft or
+            retired, or its latest published version is not currently
+            available for new enrollments.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: |
+            The student already has an active CourseEnrollment for this
+            course.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+
+  /students/me/course-enrollments/{course_enrollment_id}/abandon:
+    post:
+      operationId: abandonCourseEnrollment
+      summary: Abandon a course enrollment
+      description: |
+        Sets the enrollment's status to abandoned. All of its
+        checkpoints' StudentPaths are implicitly left behind —
+        per-checkpoint partial archiving does not exist, since
+        checkpoints are sequential and owned by one enrollment. Refused
+        if this is the student's only current course or path and
+        nothing else exists to become current — the student must switch
+        via PUT /students/me/current-path first, unless this truly is
+        the only thing they have running, in which case abandoning is
+        allowed and clears their current pointer entirely.
+      tags:
+        - Courses
+      parameters:
+        - name: course_enrollment_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the enrollment to abandon.
+      responses:
+        "200":
+          description: The abandoned enrollment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseEnrollment'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only students hold course enrollments.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: |
+            No active enrollment with this ID exists for the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: |
+            This is the student's only current course or path, and they
+            have nothing else eligible to become current. Switch to
+            another course or path first via PUT
+            /students/me/current-path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+
+  /students/me/paths/{student_path_id}/archive:
+    post:
+      operationId: archiveStandaloneStudentPath
+      summary: Archive a standalone student path
+      description: |
+        Archives a standalone StudentPath (one not tied to any course
+        checkpoint — course checkpoints are managed via POST
+        /students/me/course-enrollments/{id}/abandon instead), hiding it
+        from the student. Refused if this is the student's only current
+        course or path and nothing else exists to become current, on
+        the same terms as abandoning a course enrollment.
+      tags:
+        - Courses
+      parameters:
+        - name: student_path_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the standalone StudentPath to archive.
+      responses:
+        "200":
+          description: The archived StudentPath.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentPath'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only students hold standalone student paths.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: |
+            No non-archived standalone StudentPath with this ID exists
+            for the caller. (A StudentPath tied to a course checkpoint
+            is also refused here with this status — abandon its
+            enrollment instead.)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: |
+            This is the student's only current course or path, and they
+            have nothing else eligible to become current. Switch to
+            another course or path first via PUT
+            /students/me/current-path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+
+  /students/me/current-path:
+    put:
+      operationId: setCurrentPath
+      summary: Switch the authenticated student's current course or path
+      description: |
+        Repoints StudentLearningState to a different course enrollment
+        or standalone path the student already holds. Does not touch
+        any CourseEnrollment's own checkpoint progress — switching back
+        later resumes exactly where that course's checkpoint was left.
+        Exactly one of course_enrollment_id or student_path_id must be
+        given.
+      tags:
+        - Courses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetCurrentPathRequest'
+      responses:
+        "200":
+          description: The caller's current path after switching.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentPathView'
+        "400":
+          description: |
+            The request body failed schema validation — neither or both
+            of course_enrollment_id and student_path_id were given.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only students hold a current course or path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: |
+            The given course_enrollment_id does not belong to the
+            caller or is not active, or the given student_path_id does
+            not belong to the caller or is archived.
           content:
             application/json:
               schema:
@@ -2625,6 +3331,13 @@ components:
           type: string
           format: date-time
           description: Timestamp at which the content node was created.
+        latest_published_version:
+          type: [integer, "null"]
+          description: >-
+            The version_number of the most recently published
+            ContentNodeVersion, or null if this node has never been
+            published. A node with no published version cannot be
+            copied into a StudentPathItem.
       required:
         - content_node_id
         - teacher_id
@@ -2633,6 +3346,63 @@ components:
         - classification
         - languages
         - created_at
+
+    ContentNodeVersion:
+      type: object
+      description: |
+        An immutable, permanent snapshot of a content node's
+        reader-facing state at the moment it was published. Every copy
+        of an item referencing this node resolves to the latest
+        ContentNodeVersion at the moment of copy and stores that
+        version's id; an already-copied item is never retargeted by a
+        later publish.
+      properties:
+        content_node_id:
+          type: string
+          format: uuid
+          description: The content node this version belongs to.
+        version_number:
+          type: integer
+          minimum: 1
+          description: 1-based, increasing per content node.
+        title_snapshot:
+          type: string
+          description: The node's title at the moment of publishing.
+        classification_snapshot:
+          $ref: '#/components/schemas/Classification'
+        media_url_snapshot:
+          type: string
+          format: uri
+          description: Present only when the node's content_type is video.
+        rich_content_snapshot:
+          $ref: '#/components/schemas/PromptDocument'
+          description: Present only when the node's content_type is article.
+        diagram_ref_snapshot:
+          $ref: '#/components/schemas/DiagramRef'
+          description: >-
+            Present only when the node's content_type is diagram and it
+            uses a single diagram.
+        diagram_stack_ref_snapshot:
+          $ref: '#/components/schemas/DiagramStackRef'
+          description: >-
+            Present only when the node's content_type is diagram and it
+            uses a stack.
+        languages_snapshot:
+          type: array
+          items:
+            $ref: '#/components/schemas/Language'
+          description: The node's available languages at the moment of publishing.
+        published_at:
+          type: string
+          format: date-time
+          description: Timestamp at which this version was published.
+      required:
+        - content_node_id
+        - version_number
+        - title_snapshot
+        - classification_snapshot
+        - languages_snapshot
+        - published_at
 
     UpdateContentNodeRequest:
       type: object
@@ -3404,6 +4174,19 @@ components:
           description: >-
             Timestamp at which this StudentPath was archived, hiding it from
             the student. Null means the path is active and visible.
+        source_course_enrollment_id:
+          type: [string, "null"]
+          format: uuid
+          description: >-
+            The CourseEnrollment this StudentPath is a checkpoint of, or
+            null when it is a standalone path (staff-assigned directly,
+            not via a course). Set together with course_checkpoint_position.
+        course_checkpoint_position:
+          type: [integer, "null"]
+          description: >-
+            1-based position of this checkpoint within its course, or
+            null for a standalone path. Set together with
+            source_course_enrollment_id.
       required:
         - student_path_id
         - student_id
@@ -3424,6 +4207,13 @@ components:
           type: string
           format: uuid
           description: The ID of the content node at this position.
+        content_node_version_id:
+          type: string
+          format: uuid
+          description: >-
+            The specific ContentNodeVersion this item was copied at —
+            the node's latest published version at the moment of copy.
+            Never retargeted by a later publish of the same node.
         title:
           type: string
           description: Title of the content node.
@@ -3457,6 +4247,7 @@ components:
       required:
         - position
         - content_node_id
+        - content_node_version_id
         - title
         - content_type
         - status
@@ -3479,6 +4270,19 @@ components:
         title:
           type: string
           description: Title of the current StudentPath.
+        course_enrollment_id:
+          type: [string, "null"]
+          format: uuid
+          description: >-
+            The CourseEnrollment this is a checkpoint of, or null when
+            the caller's current path is a standalone path. Set together
+            with course_checkpoint_position.
+        course_checkpoint_position:
+          type: [integer, "null"]
+          description: >-
+            1-based position of this checkpoint within its course, or
+            null for a standalone path. Set together with
+            course_enrollment_id.
         current_position:
           type: integer
           minimum: 1
@@ -3496,6 +4300,492 @@ components:
         - title
         - current_position
         - items
+
+    CreateCourseRequest:
+      type: object
+      description: Payload for creating a course as a draft.
+      properties:
+        title:
+          type: string
+          description: Title of the course.
+        summary:
+          type: string
+          description: Short description of the course shown in the catalog.
+        level:
+          type: string
+          enum:
+            - beginner
+            - early_intermediate
+            - intermediate
+            - advanced
+            - expert
+          description: >-
+            The level a student should be at to start this course, using
+            the same five-value rubric applied to content nodes.
+        checkpoints:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            properties:
+              learning_path_id:
+                type: string
+                format: uuid
+                description: The learning path template at this checkpoint. Must exist in the system.
+              title:
+                type: string
+                description: >-
+                  Optional override shown for this checkpoint instead of
+                  the learning path's own title (e.g. "Stage 1: Open
+                  chords").
+            required:
+              - learning_path_id
+      required:
+        - title
+        - summary
+        - level
+        - checkpoints
+
+    ReplaceCourseRequest:
+      type: object
+      description: Payload for replacing a course's draft wholesale.
+      properties:
+        title:
+          type: string
+          description: Title of the course.
+        summary:
+          type: string
+          description: Short description of the course shown in the catalog.
+        level:
+          type: string
+          enum:
+            - beginner
+            - early_intermediate
+            - intermediate
+            - advanced
+            - expert
+          description: >-
+            The level a student should be at to start this course, using
+            the same five-value rubric applied to content nodes.
+        checkpoints:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            properties:
+              learning_path_id:
+                type: string
+                format: uuid
+                description: The learning path template at this checkpoint. Must exist in the system.
+              title:
+                type: string
+                description: >-
+                  Optional override shown for this checkpoint instead of
+                  the learning path's own title.
+            required:
+              - learning_path_id
+      required:
+        - title
+        - summary
+        - level
+        - checkpoints
+
+    CourseCheckpoint:
+      type: object
+      description: One stage of a course's journey, pointing at a learning path template.
+      properties:
+        position:
+          type: integer
+          minimum: 1
+          description: 1-based position of this checkpoint within the course.
+        learning_path_id:
+          type: string
+          format: uuid
+          description: The learning path template at this checkpoint.
+        title:
+          type: string
+          description: >-
+            The title override for this checkpoint, if one was set;
+            absent when the checkpoint uses the learning path's own
+            title.
+        effective_title:
+          type: string
+          description: >-
+            The title actually shown for this checkpoint — the override
+            if one was set, otherwise the learning path's own title.
+      required:
+        - position
+        - learning_path_id
+        - effective_title
+
+    CourseCatalogEntry:
+      type: object
+      description: |
+        A course as it appears in the catalog list — enough to browse
+        and pick one, never authoring detail such as a checkpoint's
+        learning_path_id. Returned by GET /courses for every caller,
+        teacher/admin and student alike.
+      properties:
+        course_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this course.
+        title:
+          type: string
+          description: Title of the course.
+        summary:
+          type: string
+          description: Short description of the course.
+        level:
+          type: string
+          enum:
+            - beginner
+            - early_intermediate
+            - intermediate
+            - advanced
+            - expert
+          description: The level a student should be at to start this course.
+        status:
+          type: string
+          enum:
+            - draft
+            - published
+            - retired
+          description: >-
+            A student's result is always published. Teachers and admins
+            may see any status.
+        published_at:
+          type: [string, "null"]
+          format: date-time
+          description: >-
+            Timestamp the latest published version was published at, or
+            null if the course has never been published.
+        has_unpublished_changes:
+          type: boolean
+          description: >-
+            True when the live draft differs from the latest published
+            version (or nothing has been published yet). Present only
+            in the teacher/admin representation; a student never
+            receives this field.
+      required:
+        - course_id
+        - title
+        - summary
+        - level
+        - status
+        - published_at
+
+    Course:
+      type: object
+      description: |
+        A course: an ordered, author-editable journey of learning-path
+        checkpoints, with an explicit draft/publish split. This
+        representation is the live, currently-being-authored draft,
+        returned to teachers and admins. Editing it never affects what
+        an already-enrolled student sees — only publishing does that.
+      properties:
+        course_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this course.
+        title:
+          type: string
+          description: Title of the course's current draft.
+        summary:
+          type: string
+          description: Short description of the course's current draft.
+        level:
+          type: string
+          enum:
+            - beginner
+            - early_intermediate
+            - intermediate
+            - advanced
+            - expert
+          description: The level a student should be at to start this course.
+        status:
+          type: string
+          enum:
+            - draft
+            - published
+            - retired
+          description: >-
+            draft — never published. published — has at least one
+            CourseVersion. retired — removed from the catalog for new
+            enrollment only; existing enrollments are unaffected.
+        created_by:
+          type: string
+          format: uuid
+          description: The user_id of the teacher or admin who created this course.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp at which the course was created.
+        latest_published_version:
+          type: [integer, "null"]
+          description: >-
+            The version_number of the most recently published
+            CourseVersion, or null if the course has never been
+            published.
+        has_unpublished_changes:
+          type: boolean
+          description: >-
+            True when the live draft differs from the latest published
+            version (or nothing has been published yet).
+        checkpoints:
+          type: array
+          description: The course's checkpoints, sorted by position ascending.
+          items:
+            $ref: '#/components/schemas/CourseCheckpoint'
+      required:
+        - course_id
+        - title
+        - summary
+        - level
+        - status
+        - created_by
+        - created_at
+        - has_unpublished_changes
+        - checkpoints
+
+    CourseOutlineItem:
+      type: object
+      description: One content node's title within a checkpoint's outline.
+      properties:
+        title:
+          type: string
+          description: Title of the content node.
+        section_label:
+          type: string
+          description: >-
+            Optional label grouping this item with its immediate
+            neighbors under a named section, carried through from the
+            underlying learning path.
+      required:
+        - title
+
+    CourseOutlineCheckpoint:
+      type: object
+      description: >-
+        A checkpoint as shown to a prospective or enrolled student —
+        title and item outline, never lesson content.
+      properties:
+        position:
+          type: integer
+          minimum: 1
+          description: 1-based position of this checkpoint within the course.
+        title:
+          type: string
+          description: The title shown for this checkpoint.
+        items:
+          type: array
+          description: The checkpoint's items, in order, as a title-only outline.
+          items:
+            $ref: '#/components/schemas/CourseOutlineItem'
+      required:
+        - position
+        - title
+        - items
+
+    CourseDetail:
+      type: object
+      description: |
+        A single course's detail. For a student, this is always the
+        latest published version's snapshot, rendered as an outline. For
+        a teacher or admin, this is the live draft with its checkpoints'
+        full outlines resolved.
+      properties:
+        course_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this course.
+        title:
+          type: string
+          description: Title of the course.
+        summary:
+          type: string
+          description: Short description of the course.
+        level:
+          type: string
+          enum:
+            - beginner
+            - early_intermediate
+            - intermediate
+            - advanced
+            - expert
+          description: The level a student should be at to start this course.
+        status:
+          type: string
+          enum:
+            - draft
+            - published
+            - retired
+          description: >-
+            The course's authoring status. A student's result is always
+            published.
+        published_at:
+          type: [string, "null"]
+          format: date-time
+          description: >-
+            Timestamp the latest published version was published at, or
+            null if the course has never been published.
+        checkpoints:
+          type: array
+          description: The course's checkpoints, sorted by position ascending.
+          items:
+            $ref: '#/components/schemas/CourseOutlineCheckpoint'
+      required:
+        - course_id
+        - title
+        - summary
+        - level
+        - status
+        - checkpoints
+
+    CourseVersion:
+      type: object
+      description: |
+        An immutable, permanent snapshot of a course's title, summary,
+        level, and checkpoints at the moment it was published. Students
+        and the catalog only ever read the latest CourseVersion, never
+        the live draft.
+      properties:
+        course_id:
+          type: string
+          format: uuid
+          description: The course this version belongs to.
+        version_number:
+          type: integer
+          minimum: 1
+          description: 1-based, increasing per course.
+        title_snapshot:
+          type: string
+          description: The course's title at the moment of publishing.
+        summary_snapshot:
+          type: string
+          description: The course's summary at the moment of publishing.
+        level_snapshot:
+          type: string
+          enum:
+            - beginner
+            - early_intermediate
+            - intermediate
+            - advanced
+            - expert
+          description: The course's level at the moment of publishing.
+        published_at:
+          type: string
+          format: date-time
+          description: Timestamp at which this version was published.
+        available_for_new_enrollments:
+          type: boolean
+          description: >-
+            When false, this version can no longer be self-enrolled
+            into, without retiring the course or requiring a newer
+            version. Already-enrolled students are unaffected.
+      required:
+        - course_id
+        - version_number
+        - title_snapshot
+        - summary_snapshot
+        - level_snapshot
+        - published_at
+        - available_for_new_enrollments
+
+    CreateCourseEnrollmentRequest:
+      type: object
+      description: Payload for self-enrolling in a course.
+      properties:
+        course_id:
+          type: string
+          format: uuid
+          description: >-
+            The ID of the course to enroll in. Must be published and
+            currently open to new enrollments.
+      required:
+        - course_id
+
+    CourseEnrollment:
+      type: object
+      description: |
+        A student's enrollment in one course, tracking their active
+        checkpoint independently of whichever course or path is
+        currently focused.
+      properties:
+        course_enrollment_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this enrollment.
+        student_id:
+          type: string
+          format: uuid
+          description: The user_id of the enrolled student.
+        course_id:
+          type: string
+          format: uuid
+          description: The enrolled course.
+        course_title:
+          type: string
+          description: The course's title, as of the pinned version.
+        course_version_number:
+          type: integer
+          minimum: 1
+          description: The CourseVersion this enrollment is pinned to.
+        status:
+          type: string
+          enum:
+            - active
+            - completed
+            - abandoned
+          description: >-
+            active — in progress. completed — every checkpoint finished.
+            abandoned — the student left this enrollment.
+        active_checkpoint_student_path_id:
+          type: [string, "null"]
+          format: uuid
+          description: >-
+            The StudentPath for the checkpoint the student is currently
+            working through. Null once the enrollment is completed or
+            abandoned.
+        active_checkpoint_position:
+          type: [integer, "null"]
+          description: >-
+            1-based position of the active checkpoint within the
+            course. Null once the enrollment is completed or abandoned.
+        enrolled_at:
+          type: string
+          format: date-time
+          description: Timestamp at which the student enrolled.
+      required:
+        - course_enrollment_id
+        - student_id
+        - course_id
+        - course_title
+        - course_version_number
+        - status
+        - active_checkpoint_student_path_id
+        - active_checkpoint_position
+        - enrolled_at
+
+    SetCurrentPathRequest:
+      type: object
+      description: >-
+        Payload for switching the caller's current course or path.
+        Exactly one of course_enrollment_id or student_path_id must be
+        given.
+      properties:
+        course_enrollment_id:
+          type: string
+          format: uuid
+          description: >-
+            An active CourseEnrollment already belonging to the caller,
+            to make current.
+        student_path_id:
+          type: string
+          format: uuid
+          description: >-
+            A non-archived standalone StudentPath already belonging to
+            the caller, to make current.
 
     CreateExpandedContentRequest:
       type: object
