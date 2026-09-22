@@ -29,6 +29,21 @@ Feature: Author courses
     Then the first checkpoint's effective title is "Stage 1: Open chords"
     And the second checkpoint's effective title is the title of "strumming-path"
 
+  # ── Happy path — fetching the draft for editing ───────────────────────────
+
+  Scenario: A teacher fetches a course's draft to edit it
+    Given a course "fingerstyle-journey" exists as a draft with checkpoints "open-chords-path", "strumming-path"
+    And "bob" is authenticated as a teacher
+    When "bob" fetches the draft of course "fingerstyle-journey"
+    Then the response includes each checkpoint's learning_path_id
+
+  Scenario: A teacher reorders a course by resending the fetched draft's checkpoints
+    Given a course "fingerstyle-journey" exists as a draft with checkpoints "open-chords-path", "strumming-path"
+    And "bob" is authenticated as a teacher
+    And "bob" fetches the draft of course "fingerstyle-journey"
+    When "bob" replaces course "fingerstyle-journey" with the fetched checkpoints reordered to: "strumming-path", "open-chords-path"
+    Then the checkpoints are returned with positions 1 and 2 in the order "strumming-path", "open-chords-path"
+
   # ── Happy path — editing the draft ────────────────────────────────────────
 
   Scenario: A teacher reorders a course's checkpoints
@@ -162,6 +177,12 @@ Feature: Author courses
     When "bob" attempts to retire course "fingerstyle-journey"
     Then the request is refused with a forbidden error
 
+  Scenario: A student cannot fetch a course's draft
+    Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And "alice" is authenticated as a student
+    When "alice" attempts to fetch the draft of course "fingerstyle-journey"
+    Then the request is refused with a forbidden error
+
   Scenario: Creating a course without an authentication token is refused
     Given no authentication token is provided
     When an unauthenticated request attempts to create a course
@@ -172,6 +193,11 @@ Feature: Author courses
   Scenario: Retrieving a course that does not exist returns not found
     Given "bob" is authenticated as a teacher
     When "bob" retrieves a course with an ID that does not exist
+    Then the request is refused with a not-found error
+
+  Scenario: Fetching the draft of a course that does not exist returns not found
+    Given "bob" is authenticated as a teacher
+    When "bob" attempts to fetch the draft of a course with an ID that does not exist
     Then the request is refused with a not-found error
 
   Scenario: A student retrieving a course with no published version gets not found
