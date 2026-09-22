@@ -2220,9 +2220,9 @@ paths:
       operationId: getMyPath
       summary: Get the authenticated student's current learning path and progress
       description: |
-        Resolves the caller's current_student_path_id and returns that
-        StudentPath together with the progress state of each item. This is
-        the primary endpoint for the SPA's main screen.
+        Resolves the caller's current path and returns it together with the
+        progress state of each item. This is the primary endpoint for the
+        SPA's main screen.
 
         Item status values:
         - completed — the student has finished this content node.
