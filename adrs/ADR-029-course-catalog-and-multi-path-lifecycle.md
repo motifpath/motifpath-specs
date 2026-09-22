@@ -95,8 +95,11 @@ ever been published:
   **Retiring removes a course from the catalog for new enrollment only** — it is not a delete and
   does not cascade. Every `CourseEnrollment` already created against the course, and the
   `StudentPath`s under it, are untouched and continue to resolve normally.
-- A template referenced by any checkpoint, in any published `CourseVersion`, cannot be deleted
-  (restrict); retire the course first.
+- A template referenced by any checkpoint, in any published `CourseVersion`, can **never** be
+  deleted — not even after the course is retired. Retiring does not detach or remove past
+  `CourseVersion`s (they are permanent, by design — see below), so the reference, and the
+  restriction, both persist for the life of the system. A template is only ever deletable if it has
+  never appeared in a published `CourseVersion`.
 
 **Publishing snapshots the draft into an immutable `CourseVersion`.** `CourseVersion{course_id,
 version_number, title_snapshot, summary_snapshot, level_snapshot, checkpoints_snapshot,
@@ -124,8 +127,11 @@ row pinned to the course's `latest_published_version` at that moment, plus check
 `StudentPath` creates the next checkpoint's `StudentPath` and updates
 `active_checkpoint_student_path_id` to it (a client-visible "next stage unlocked" moment — the
 concrete answer to "what's next" the PB-32 hypothesis is testing). Completing the last checkpoint
-sets `CourseEnrollment.status = completed`; the enrollment (and its checkpoint history) is kept, not
-deleted.
+sets `CourseEnrollment.status = completed` and, if this enrollment was current, **clears
+`StudentLearningState.current_course_enrollment_id`**; the enrollment (and its checkpoint history)
+is kept, not deleted. The response to the completing action carries the fact that the *course* (not
+just the checkpoint) is now complete, so the client can render the congrats moment immediately,
+rather than the student discovering it later from a bare 404.
 
 **Authoring.** Teachers and admins may create and edit courses and checkpoints (same authorisation
 as learning-path authoring) at any time, published or not. **Publishing and retiring are
@@ -175,6 +181,22 @@ already decided.
   actively running another course, or a standalone path, is never silently switched away from it.
   Staff assignment of a standalone path **does** set it as current unconditionally (ADR-017,
   unchanged) — an explicit, supervised act.
+
+**The congrats page.** Finishing a course is exactly the "what's next" moment PB-32 exists to
+answer, so it is specified here rather than left to the client to improvise. `GET
+/students/me/course-enrollments` returns every `CourseEnrollment` the student has ever held —
+`active`, `completed` and `abandoned` — each with its course summary and derived progress; this is
+also the list surface ADR-017 left deferred for courses specifically. On finishing a course (the
+completion signal above), the client fetches this list and renders one of two outcomes:
+
+- **Other `active` enrollments exist:** show them (course title, current checkpoint, progress),
+  each linking to resume it (`PUT /students/me/current-path` with that `course_enrollment_id`), plus
+  a link to the course catalog (`GET /courses`) to start something new instead.
+- **No other `active` enrollments exist:** show only the link to the course catalog.
+
+A standalone (non-course) current path, if any, is unaffected by a course completing and does not
+factor into this choice — the prompt is specifically "another course to move into or resume,"
+because that is what the catalog offers.
 
 **Leaving / archiving.**
 
@@ -256,7 +278,10 @@ copies always resolve to the latest published version, and that completion is a 
   `CourseVersion` gives every enrolled student a stable, citable sequence that only moves forward
   when the author decides. The cost is two representations of "the checkpoints" (live draft rows vs.
   a version snapshot) instead of one, accepted because the alternative directly blocks authoring
-  workflow.
+  workflow. A direct consequence of "immutable and kept forever": a template that has ever appeared
+  in a published `CourseVersion` can never be deleted, since no later event (including retiring the
+  course) removes that historical reference — accepted as the price of the history being trustworthy
+  at all.
 - **`CourseEnrollment` as its own entity, not folded into `StudentPath`.** Once a student can run
   several courses in parallel, each needs its own "where am I in this course" state independent of
   which one is globally current — that is exactly what `active_checkpoint_student_path_id` on
@@ -290,6 +315,13 @@ copies always resolve to the latest published version, and that completion is a 
   before this ADR, unchanged — makes "have I learned this" a fact about the lesson, not about which
   authored revision delivered it, and needs no new identifier: `ContentNode.id` never changes, the
   same way `Course.id` never changes across `CourseVersion`s.
+- **The congrats page is specified, not left to client improvisation.** PB-32's hypothesis is
+  specifically about the moment a student finishes — leaving what happens next unstated would let
+  the one moment this whole ADR exists to test go undefined. Clearing the current pointer on
+  completion (rather than leaving it dangling on a `completed` enrollment) and shipping the
+  completion signal in the same response that finishes the checkpoint means the client never has to
+  infer "did they just finish, or were they never assigned anything?" from a bare 404 — the two cases
+  stay distinguishable at the moment they happen, not reconstructed later.
 - **A student cannot leave their only current course/path without a replacement, but abandoning is
   otherwise free.** Letting "abandon current" silently clear the pointer when nothing else is
   available puts a student one click from a dead-end home screen even when they have somewhere to
@@ -300,8 +332,10 @@ copies always resolve to the latest published version, and that completion is a 
 ## Consequences
 
 ### Positive
-- The product itself answers "what's next" at two grains: a new checkpoint within a course, and a
-  new course once a journey ends — both measurable from existing data.
+- The product itself answers "what's next" at two grains: a new checkpoint within a course
+  (unlocked automatically), and a new course once a journey ends (the congrats page, backed by
+  `GET /students/me/course-enrollments`) — both measurable from existing data, and neither left for
+  a client team to invent later.
 - Authors can continuously improve a course without ever exposing in-progress edits to students, and
   without blocking on a publish decision to keep working.
 - A student can run multiple courses in parallel with independent progress in each, switching
@@ -332,6 +366,9 @@ copies always resolve to the latest published version, and that completion is a 
 - **PB-31 is a hard prerequisite.** Nothing here can be built until the `StudentPath` /
   `StudentLearningState` model exists; this ADR only specifies the catalog on top of it.
 - No cap on concurrent `CourseEnrollment`s per student; acceptable at alpha scale.
+- **A template used in any published `CourseVersion` can never be deleted, permanently** — not a
+  temporary restriction lifted by retiring the course, since version history never shrinks. Content
+  authors need to know this before a template is first published inside a course.
 - Node versioning duplicates node rows over time (one immutable `ContentNodeVersion` per publish,
   per node); no archival or cleanup policy is decided here.
 - The ADR-026 classification and ADR-028 diagram-linkage schemas that reference `ContentNode` need
@@ -340,9 +377,10 @@ copies always resolve to the latest published version, and that completion is a 
 - Amending ADR-017 means its "assigning sets the current path" and single-pointer sentences are now
   qualified or restructured; readers must consult this ADR for self-enrollment, the two-level current
   model, and the leave/archive restriction.
-- The web client needs: a "next checkpoint unlocked" moment, a "newer course/node version available"
+- The web client needs several new UI states beyond today's holding-state screen: a "next checkpoint
+  unlocked" moment, the congrats page (specified above), a "newer course/node version available"
   notice, a course switcher distinct from a plain path switcher, and a "must switch before leaving"
-  flow — several new UI states beyond today's holding-state screen.
+  flow.
 
 ### Neutral
 - `source_course_enrollment_id` / `course_checkpoint_position` on `StudentPath`, and
