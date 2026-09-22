@@ -25,7 +25,7 @@ Feature: Student self-enrollment in courses
 
   Scenario: Self-enrolling does not switch a student away from a course they are already running
     Given "alice" is authenticated as a student
-    And a second course "rhythm-mastery" exists, published, with checkpoints "strumming-path"
+    And a second course "rhythm-mastery" exists, published, with checkpoints "rhythm-basics-path"
     And "alice" is already enrolled in "rhythm-mastery" as her current course
     When "alice" enrolls in course "fingerstyle-journey"
     Then a new enrollment for "fingerstyle-journey" is created
@@ -51,7 +51,7 @@ Feature: Student self-enrollment in courses
 
   Scenario: The congrats list offers another active enrollment to resume
     Given "alice" is authenticated as a student
-    And a second course "rhythm-mastery" exists, published, with checkpoints "strumming-path"
+    And a second course "rhythm-mastery" exists, published, with checkpoints "rhythm-basics-path"
     And "alice" is enrolled in "rhythm-mastery" with an active checkpoint
     And "alice" is enrolled in "fingerstyle-journey" with checkpoint 2 active as her current path
     And checkpoint 2 is the last checkpoint of "fingerstyle-journey"
@@ -69,7 +69,7 @@ Feature: Student self-enrollment in courses
 
   Scenario: A student's list of enrollments includes active, completed, and abandoned ones
     Given "alice" is authenticated as a student
-    And a second course "rhythm-mastery" exists, published, with checkpoints "strumming-path"
+    And a second course "rhythm-mastery" exists, published, with checkpoints "rhythm-basics-path"
     And "alice" is enrolled in "fingerstyle-journey" with checkpoint 2 active as her current path
     And checkpoint 2 is the last checkpoint of "fingerstyle-journey"
     And "alice" completes every item in checkpoint 2's student path

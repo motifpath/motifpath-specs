@@ -38,19 +38,12 @@ Feature: Switch, abandon, and archive a student's courses and paths
 
   # ── Abandoning a course enrollment ────────────────────────────────────────
 
-  Scenario: A student abandons a course enrollment while another is available
+  Scenario: Abandoning a course enrollment that is current, while another course enrollment is available, requires switching first
     Given "alice" is authenticated as a student
     And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
     And a course "rhythm-mastery" exists, published, with checkpoints "strumming-path"
     And "alice" is enrolled in "fingerstyle-journey" as her current course
     And "alice" is enrolled in "rhythm-mastery"
-    When "alice" abandons her "fingerstyle-journey" enrollment
-    Then the enrollment status becomes "abandoned"
-
-  Scenario: Abandoning the only current course or path is refused when nothing else is available
-    Given "alice" is authenticated as a student
-    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
-    And "alice" is enrolled in "fingerstyle-journey" as her only current course
     When "alice" attempts to abandon her "fingerstyle-journey" enrollment
     Then the request is refused with a conflict error
 
@@ -83,12 +76,13 @@ Feature: Switch, abandon, and archive a student's courses and paths
     When "alice" archives her standalone "strumming-path" copy
     Then that student path becomes archived
 
-  Scenario: Archiving the only current standalone path is refused when nothing else is available
+  Scenario: Archiving the only current standalone path is allowed once the student truly has nothing else
     Given "alice" is authenticated as a student
     And a learning path "open-chords-path" exists in the system
     And "alice" has "open-chords-path" assigned as her only current path
-    When "alice" attempts to archive her current standalone path
-    Then the request is refused with a conflict error
+    When "alice" archives her current standalone path
+    Then that student path becomes archived
+    And "alice" has no current course or path
 
   Scenario: A student cannot archive a course checkpoint's student path via the standalone archive action
     Given "alice" is authenticated as a student
