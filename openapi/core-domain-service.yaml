@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.8.0
+  version: 0.9.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -3734,6 +3734,17 @@ components:
             visually distinguish a subset of positions (e.g. every root, or
             one particular degree) without relying on color alone. Defaults
             to dot when omitted.
+        color:
+          type: [string, "null"]
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          description: |
+            A custom marker color for this one position, as a #RRGGBB hex
+            string — overrides the parent Diagram's general color for this
+            marker only. Null (or omitted) means the position uses the
+            Diagram's general color, or motifpath-web's default when that is
+            also unset. Independent of shape and of a diagram_ref's own
+            styling, which still takes precedence for one particular
+            embedding.
         sequence_index:
           type: [integer, "null"]
           minimum: 0
@@ -3859,6 +3870,16 @@ components:
             neither. An authoring-time display preference, independent of a
             diagram_ref's own layers.intervals visibility toggle for one
             particular embedding.
+        color:
+          type: [string, "null"]
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          description: |
+            The diagram's general marker color, as a #RRGGBB hex string,
+            applied to every position that has no color of its own (see
+            DiagramPosition.color). Null means no general color is recorded
+            and motifpath-web's default colors apply. An authoring-time
+            choice, independent of — and overridden by — a diagram_ref's
+            styling for one particular embedding.
         positions:
           type: array
           minItems: 1
@@ -3880,6 +3901,7 @@ components:
         - name
         - root_note
         - label_display
+        - color
         - positions
         - classification
         - created_at
@@ -3914,6 +3936,12 @@ components:
             Which of a position's interval or note_name its marker shows by
             default when reopened for authoring; hidden shows neither.
             Omitted defaults to interval.
+        color:
+          type: [string, "null"]
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          description: |
+            The diagram's general marker color as #RRGGBB. Null (or omitted)
+            leaves it unrecorded.
         positions:
           type: array
           minItems: 1
@@ -3935,7 +3963,7 @@ components:
       type: object
       description: |
         Payload for replacing an existing diagram's name, positions,
-        classification, root_note, or label_display. instrument_id is not
+        classification, root_note, label_display, or color. instrument_id is not
         present here — it cannot be changed after creation, since every
         position's coordinate shape depends on it.
       properties:
@@ -3960,6 +3988,16 @@ components:
             default when reopened for authoring, replacing the current
             value; hidden shows neither. Omitted leaves the current value
             unchanged.
+        color:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          description: |
+            The diagram's general marker color as #RRGGBB, replacing the
+            current value. Omitted leaves the current value unchanged; like
+            root_note, there is currently no way to clear an already-set
+            general color back to unrecorded via this request. Per-position
+            colors are replaced together with positions and can be cleared
+            by omitting them.
         positions:
           type: array
           minItems: 1
