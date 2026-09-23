@@ -40,8 +40,6 @@ Feature: Manage content nodes
 
   # ── Happy path — inline diagram embeds ────────────────────────────────────────
 
-  @wip
-
   Scenario: A teacher creates an article content node with an inline diagram embed
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
     And "bob" is authenticated as a teacher

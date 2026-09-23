@@ -85,8 +85,6 @@ Feature: Manage expanded content
 
   # ── Diagram content — happy path ──────────────────────────────────────────────
 
-  @wip
-
   Scenario: A teacher adds a diagram to a video lesson at a specific timestamp
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
     And "bob" is authenticated as a teacher
@@ -94,8 +92,6 @@ Feature: Manage expanded content
     When "bob" adds diagram "minor-pentatonic-guitar" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165
     Then the expanded content item is created and assigned a stable identifier
     And the item's content_type is "diagram"
-
-  @wip
 
   Scenario: A teacher adds a stack of two diagrams to an article at a specific paragraph
     Given a diagram "c-major-scale-guitar" exists on instrument "guitar"
@@ -108,8 +104,6 @@ Feature: Manage expanded content
 
   # ── Diagram content — validation failures ─────────────────────────────────────
 
-  @wip
-
   Scenario: Adding a diagram stack from two different instruments is rejected
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
     And a diagram "minor-pentatonic-piano" exists on instrument "piano"
@@ -119,16 +113,12 @@ Feature: Manage expanded content
     Then the request is rejected as invalid
     And the rejection identifies "diagram_stack_ref" as the source of the error
 
-  @wip
-
   Scenario: Creating a diagram expanded content item without a diagram reference is rejected
     Given "bob" is authenticated as a teacher
     And a video content node "intro-to-triads" exists in the system
     When "bob" submits a create expanded content request with content_type "diagram" and both diagram_ref and diagram_stack_ref omitted
     Then the request is rejected as invalid
     And the rejection identifies "diagram_ref" as the source of the error
-
-  @wip
 
   Scenario: Creating a diagram expanded content item that also carries a media URL is rejected
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
