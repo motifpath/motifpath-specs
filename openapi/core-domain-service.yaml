@@ -386,6 +386,55 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+  /content-nodes/{content_node_id}/versions:
+    get:
+      operationId: listContentNodeVersions
+      summary: List a content node's published version history
+      description: |
+        Returns every ContentNodeVersion the node has ever been
+        published as, newest first. A node that has never been
+        published returns an empty array. Same authorisation as
+        publishing — the creating teacher or an admin.
+      tags:
+        - Content
+      parameters:
+        - name: content_node_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the content node whose history to list.
+      responses:
+        "200":
+          description: The node's versions, newest first, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContentNodeVersion'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            Only the creating teacher or an admin may view this
+            content node's version history.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No content node exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /content-nodes/{content_node_id}/challenges:
     get:
       operationId: listContentNodeChallenges
@@ -2283,9 +2332,43 @@ paths:
         its live draft has unpublished changes. Results are unordered
         beyond a stable id order and are not paginated; the catalog is
         expected to stay small.
+
+        The created_by filter is role-scoped. A teacher caller is
+        always limited to the courses they created; passing a
+        created_by other than their own user_id is refused with 403.
+        An admin may pass any created_by, or omit it for every
+        creator's courses. For a student it is a free discovery filter.
+
+        skill_id and concept_id match a course when any of its
+        checkpoints' learning path templates contains a content node
+        classified with that skill or concept. A student's match is
+        evaluated against the checkpoints of the course's latest
+        published version; a teacher's or admin's, against the live
+        draft's checkpoints — the same split as status.
       tags:
         - Courses
       parameters:
+        - name: created_by
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Restricts the results to courses created by this user.
+        - name: skill_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Restricts the results to courses classified with this skill.
+        - name: concept_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Restricts the results to courses classified with this concept.
         - name: status
           in: query
           required: false
@@ -2315,6 +2398,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            A teacher passed a created_by other than their own user_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
 
     post:
       operationId: createCourse
@@ -2750,6 +2840,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+
+  /students/me/student-paths:
+    get:
+      operationId: listMyStandalonePaths
+      summary: List the authenticated student's standalone paths
+      description: |
+        Returns every StudentPath the student holds that is not part of
+        a course enrollment (source_course_enrollment_id is null) —
+        active and archived alike — so a student can browse and switch
+        to one via PUT /students/me/current-path. Paths belonging to a
+        course enrollment are reached through
+        GET /students/me/course-enrollments instead.
+      tags:
+        - Learning Paths
+      responses:
+        "200":
+          description: The caller's standalone paths, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StudentPath'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only students hold student paths.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
 
   /students/me/course-enrollments:
     get:
@@ -4544,6 +4669,10 @@ components:
             - advanced
             - expert
           description: The level a student should be at to start this course.
+        created_by:
+          type: string
+          format: uuid
+          description: The user_id of the teacher or admin who created this course.
         status:
           type: string
           enum:
@@ -4571,6 +4700,7 @@ components:
         - title
         - summary
         - level
+        - created_by
         - status
         - published_at
 

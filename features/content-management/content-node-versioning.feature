@@ -102,3 +102,39 @@ Feature: Content node versioning
     Given "bob" is authenticated as a teacher
     When "bob" attempts to publish a content node with an ID that does not exist
     Then the request is refused with a not-found error
+
+  # ── Version history ───────────────────────────────────────────────────────
+
+  Scenario: The creating teacher lists a content node's versions newest first
+    Given "bob" is authenticated as a teacher
+    And "bob" published content node "node-01" as version 1
+    And "bob" published content node "node-01" as version 2
+    When "bob" lists the versions of content node "node-01"
+    Then the response contains versions 2 and 1, in that order
+    And each version includes its title, classification, and published timestamp
+
+  Scenario: An admin lists a content node's versions
+    Given "bob" published content node "node-01" as version 1
+    And "admin" is authenticated as an admin
+    When "admin" lists the versions of content node "node-01"
+    Then the response contains version 1
+
+  Scenario: A content node that was never published has an empty version history
+    Given "bob" is authenticated as a teacher
+    When "bob" lists the versions of content node "node-01"
+    Then the response is an empty list
+
+  Scenario: A teacher who did not create the content node cannot list its versions
+    Given "carol" is authenticated as a teacher
+    When "carol" attempts to list the versions of content node "node-01"
+    Then the request is refused with a forbidden error
+
+  Scenario: Listing versions of a content node that does not exist returns not found
+    Given "bob" is authenticated as a teacher
+    When "bob" attempts to list the versions of a content node with an ID that does not exist
+    Then the request is refused with a not-found error
+
+  Scenario: Listing a content node's versions without an authentication token is refused
+    Given no authentication token is provided
+    When an unauthenticated request attempts to list a content node's versions
+    Then the request is refused with an authentication error
