@@ -36,6 +36,28 @@ Feature: Manage prebuilt diagrams
       | R        | C         | 6      | 8    |
     Then the diagram is created and assigned a stable identifier
 
+  Scenario: A teacher records a root note, label display, and per-position shapes
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a diagram named "Minor Pentatonic — Position 1" on instrument "guitar" with root note "A", label display "note" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
+      | interval | note_name | string | fret | shape |
+      | R        | A         | 6      | 5    | star  |
+      | b3       | C         | 6      | 8    |       |
+    Then the diagram is created and assigned a stable identifier
+    And the diagram's root note is "A"
+    And the diagram's label display is "note"
+    And position 1 has shape "star"
+    And position 2 has shape "dot"
+
+  Scenario: Omitting root note, label display, and shape leaves them unrecorded or defaulted
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a diagram named "No Extras" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
+      | interval | note_name | string | fret |
+      | R        | A         | 6      | 5    |
+    Then the diagram is created and assigned a stable identifier
+    And the diagram has no recorded root note
+    And the diagram's label display is "interval"
+    And position 1 has shape "dot"
+
   # ── Happy path — listing ─────────────────────────────────────────────────────
 
   Scenario: A teacher filters diagrams by instrument
@@ -51,7 +73,24 @@ Feature: Manage prebuilt diagrams
     When "bob" lists all diagrams
     Then the response is an empty list
 
+  # ── Happy path — updating ────────────────────────────────────────────────────
+
+  Scenario: A teacher updates a diagram's root note and label display
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    When "bob" updates diagram "minor-pentatonic-guitar" setting root note "A" and label display "hidden"
+    Then the diagram's root note is "A"
+    And the diagram's label display is "hidden"
+
   # ── Validation failures ────────────────────────────────────────────────────
+
+  Scenario: Creating a diagram with an unrecognised label display is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a diagram named "Bad label display" on instrument "guitar" with root note "A", label display "loud" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
+      | interval | note_name | string | fret |
+      | R        | A         | 6      | 5    |
+    Then the request is rejected as invalid
+    And the rejection identifies "label_display" as the source of the error
 
   Scenario: Creating a diagram with keyboard positions on a fretted instrument is rejected
     Given "bob" is authenticated as a teacher

@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.7.0
+  version: 0.8.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -3706,18 +3706,34 @@ components:
         interval:
           type: string
           description: |
-            The interval this position represents, relative to the
-            Diagram's own (unstated) root — e.g. "R", "b3", "4", "5", "b7",
-            "2", "3", "6", "7". Not globally standardized beyond being
-            consistent within one Diagram; MotifPath does not validate
-            interval names against a fixed enum.
+            The interval this position represents, relative to the parent
+            Diagram's own root (see Diagram.root_note) — e.g. "R", "b3",
+            "4", "5", "b7", "2", "3", "6", "7". Not globally standardized
+            beyond being consistent within one Diagram; MotifPath does not
+            validate interval names against a fixed enum.
         note_name:
           type: string
           description: |
             The concrete note name this position sounds at the Diagram's own
             root (e.g. "A", "C"). A diagram_ref's root_override recomputes
             the note actually shown; note_name here is always relative to
-            this Diagram's own authored root.
+            this Diagram's own authored root (see Diagram.root_note).
+        shape:
+          type: string
+          enum:
+            - dot
+            - square
+            - star
+          default: dot
+          description: |
+            Which marker shape this position renders as (standard fretboard-
+            diagram terminology — a round marker is a "dot", not a
+            "circle", which this spec already uses for Option's rectangle/
+            circle region shape and isn't reused here to keep every
+            generated enum constant name unambiguous). Lets an author
+            visually distinguish a subset of positions (e.g. every root, or
+            one particular degree) without relying on color alone. Defaults
+            to dot when omitted.
         sequence_index:
           type: [integer, "null"]
           minimum: 0
@@ -3823,6 +3839,26 @@ components:
         name:
           type: string
           description: Human-readable name (e.g. "Minor Pentatonic — Position 1").
+        root_note:
+          type: [string, "null"]
+          description: |
+            The root note this diagram was authored against (e.g. "A"),
+            relative to which every position's interval and note_name are
+            computed. Null for a diagram with no recorded root (e.g. created
+            before this field existed).
+        label_display:
+          type: string
+          enum:
+            - interval
+            - note
+            - hidden
+          default: interval
+          description: |
+            Which of a position's interval or note_name its marker shows by
+            default when this diagram is opened for authoring; hidden shows
+            neither. An authoring-time display preference, independent of a
+            diagram_ref's own layers.intervals visibility toggle for one
+            particular embedding.
         positions:
           type: array
           minItems: 1
@@ -3842,6 +3878,8 @@ components:
         - diagram_id
         - instrument_id
         - name
+        - root_note
+        - label_display
         - positions
         - classification
         - created_at
@@ -3861,6 +3899,21 @@ components:
         name:
           type: string
           description: Human-readable name for this diagram.
+        root_note:
+          type: [string, "null"]
+          description: |
+            The root note this diagram is authored against (e.g. "A"). Null
+            (or omitted) leaves it unrecorded.
+        label_display:
+          type: string
+          enum:
+            - interval
+            - note
+            - hidden
+          description: |
+            Which of a position's interval or note_name its marker shows by
+            default when reopened for authoring; hidden shows neither.
+            Omitted defaults to interval.
         positions:
           type: array
           minItems: 1
@@ -3881,14 +3934,32 @@ components:
     UpdateDiagramRequest:
       type: object
       description: |
-        Payload for replacing an existing diagram's name, positions, or
-        classification. instrument_id is not present here — it cannot be
-        changed after creation, since every position's coordinate shape
-        depends on it.
+        Payload for replacing an existing diagram's name, positions,
+        classification, root_note, or label_display. instrument_id is not
+        present here — it cannot be changed after creation, since every
+        position's coordinate shape depends on it.
       properties:
         name:
           type: string
           description: Human-readable name for this diagram, replacing the current value.
+        root_note:
+          type: string
+          description: |
+            The root note this diagram is authored against (e.g. "A"),
+            replacing the current value. Omitted leaves the current value
+            unchanged; there is currently no way to clear an already-set
+            root note back to unrecorded via this request.
+        label_display:
+          type: string
+          enum:
+            - interval
+            - note
+            - hidden
+          description: |
+            Which of a position's interval or note_name its marker shows by
+            default when reopened for authoring, replacing the current
+            value; hidden shows neither. Omitted leaves the current value
+            unchanged.
         positions:
           type: array
           minItems: 1
