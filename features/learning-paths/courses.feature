@@ -7,6 +7,7 @@ Feature: Author courses
     Given the Core Domain Service is operational and ready to accept requests
     And a learning path "open-chords-path" exists in the system
     And a learning path "strumming-path" exists in the system
+    And a learning path "theory-path" exists in the system
 
   # ── Happy path — creating a course ────────────────────────────────────────
 
@@ -181,6 +182,38 @@ Feature: Author courses
     When "alice" lists the course catalog filtered by concept "syncopation"
     Then the response includes "strumming-basics"
     And the response does not include "fingerstyle-journey"
+
+  Scenario: Filtering by several skills matches a course with any of them
+    Given a content node in "open-chords-path" is classified with skill "fingerpicking"
+    And a content node in "strumming-path" is classified with skill "alternate-picking"
+    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists, published, with checkpoints "strumming-path"
+    And a course "theory-intro" exists, published, with checkpoints "theory-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by skills "fingerpicking", "alternate-picking"
+    Then the response includes "fingerstyle-journey" and "strumming-basics"
+    And the response does not include "theory-intro"
+
+  Scenario: Filtering by several concepts matches a course with any of them
+    Given a content node in "open-chords-path" is classified with concept "syncopation"
+    And a content node in "strumming-path" is classified with concept "swing"
+    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists, published, with checkpoints "strumming-path"
+    And a course "theory-intro" exists, published, with checkpoints "theory-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by concepts "syncopation", "swing"
+    Then the response includes "fingerstyle-journey" and "strumming-basics"
+    And the response does not include "theory-intro"
+
+  Scenario: Filtering by both skills and concepts requires a match on each
+    Given a content node in "open-chords-path" is classified with skill "fingerpicking" and concept "syncopation"
+    And a content node in "strumming-path" is classified with skill "fingerpicking"
+    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists, published, with checkpoints "strumming-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by skills "fingerpicking" and concepts "syncopation"
+    Then the response includes "fingerstyle-journey"
+    And the response does not include "strumming-basics"
 
   Scenario: A classification match in any checkpoint counts
     Given a content node in "strumming-path" is classified with skill "fingerpicking"

@@ -2339,9 +2339,11 @@ paths:
         An admin may pass any created_by, or omit it for every
         creator's courses. For a student it is a free discovery filter.
 
-        skill_id and concept_id match a course when any of its
-        checkpoints' learning path templates contains a content node
-        classified with that skill or concept. A student's match is
+        skill_ids and concept_ids each accept several ids (repeat the
+        parameter). A course matches when any of its checkpoints'
+        learning path templates contains a content node classified with
+        any of the given skills, and, if both parameters are given,
+        also with any of the given concepts. A student's match is
         evaluated against the checkpoints of the course's latest
         published version; a teacher's or admin's, against the live
         draft's checkpoints — the same split as status.
@@ -2355,20 +2357,32 @@ paths:
             type: string
             format: uuid
           description: Restricts the results to courses created by this user.
-        - name: skill_id
+        - name: skill_ids
           in: query
           required: false
+          style: form
+          explode: true
           schema:
-            type: string
-            format: uuid
-          description: Restricts the results to courses classified with this skill.
-        - name: concept_id
+            type: array
+            items:
+              type: string
+              format: uuid
+          description: >-
+            Restricts the results to courses classified with at least
+            one of these skills.
+        - name: concept_ids
           in: query
           required: false
+          style: form
+          explode: true
           schema:
-            type: string
-            format: uuid
-          description: Restricts the results to courses classified with this concept.
+            type: array
+            items:
+              type: string
+              format: uuid
+          description: >-
+            Restricts the results to courses classified with at least
+            one of these concepts.
         - name: status
           in: query
           required: false
