@@ -1,6 +1,6 @@
 # ADR-035: User display names and UserRef user references
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-24
 **Deciders:** Gilson (Product Owner)
 
@@ -62,7 +62,8 @@ A name is personal data under LGPD, so the ADR also has to decide who may see wh
   is the only place in MotifPath's database where a user's name is stored. No other table ever
   gets a copy of it.
 - **Registration:** `POST /users` stores the claim's value, trimmed and capped at 200
-  characters. It rejects with 422 when the claim is missing or empty, so no user row can exist
+  characters. It rejects with 400 when the claim is missing or empty: a `ValidationError` on
+  field `name`, like every other validation failure in the API. So no user row can exist
   without a name. The name is never accepted from a request body. It comes only from the
   Clerk-signed, already-verified JWT.
 - **Updates:** on every authenticated request, the caller-resolution step (`resolveCaller`)
@@ -145,8 +146,8 @@ request at no cost.
 **This does not contradict ADR-013.** ADR-013 moved *role* off a Clerk JWT claim because a
 misconfigured or stale claim, maintained by hand in the Clerk template, is an
 authorization-correctness risk. A display name is never used for authorization. If the claim is
-misconfigured, the worst case is that registration fails loudly with a 422, which is easy to
-spot and fix. Wrong permissions would not be. Clerk is also the real owner of the name, whereas
+misconfigured, the worst case is that registration fails loudly with a 400 on `name`, which is
+easy to spot and fix. Wrong permissions would not be. Clerk is also the real owner of the name, whereas
 core owns role.
 
 **Full name, not first name only,** because the teacher filter has to tell apart teachers who
@@ -170,7 +171,7 @@ visibility rule, not a shorter name, protects students.
   diagrams) must be rebased onto the new client.
 - The session-token template and the required-name setting live in the Clerk dashboard, not in
   code. They must be set by hand in every Clerk instance and can drift. If they drift, new
-  registrations fail with 422. This must be listed in the environment setup documentation.
+  registrations fail with 400. This must be listed in the environment setup documentation.
 - A stored name is only as fresh as the user's last request. A teacher who renames themselves
   in Clerk and never logs in again keeps the old name in MotifPath.
 - List queries gain a join to `users`. Repositories must load the names in bulk (one query or
