@@ -35,6 +35,13 @@ paths:
         caller supplies their intended role (student or teacher); the service maps
         the JWT sub claim to a new user_id and persists the record.
 
+        The user's display name is taken from the "name" claim of the Clerk
+        session token (trimmed, at most 200 characters), never from the
+        request body. A token without a non-blank name claim is rejected
+        with 400 on field "name". On every later authenticated request the
+        stored name is refreshed when the claim differs from it; a missing
+        or blank claim on a later request leaves the stored name unchanged.
+
         This endpoint must be called once per Clerk identity before any other
         authenticated operation. Subsequent calls with the same JWT sub return 409.
 
@@ -68,8 +75,9 @@ paths:
                 $ref: '#/components/schemas/UserProfile'
         "400":
           description: |
-            The request body is invalid. The role field is missing or contains an
-            unrecognised value.
+            The request is invalid. The role field is missing or contains an
+            unrecognised value (field "role"), or the session token carries no
+            non-blank name claim (field "name").
           content:
             application/json:
               schema:
@@ -3716,10 +3724,8 @@ components:
           type: string
           format: uuid
           description: Stable identifier for this content node. Used as content_node_id in tracking events.
-        teacher_id:
-          type: string
-          format: uuid
-          description: The user_id of the teacher who created this content node.
+        teacher:
+          $ref: '#/components/schemas/UserRef'
         title:
           type: string
           description: Human-readable title of the content node.
@@ -3764,7 +3770,7 @@ components:
             copied into a StudentPathItem.
       required:
         - content_node_id
-        - teacher_id
+        - teacher
         - title
         - content_type
         - classification
@@ -4251,11 +4257,7 @@ components:
             find them in the diagram list, and only the creator or an admin
             may update one. Fixed at creation.
         created_by:
-          type: string
-          format: uuid
-          description: |
-            The user_id of the teacher or admin who created this diagram.
-            Fixed at creation.
+          $ref: '#/components/schemas/UserRef'
         root_note:
           type: [string, "null"]
           description: |
@@ -4618,10 +4620,8 @@ components:
           type: string
           format: uuid
           description: Stable identifier for this learning path.
-        teacher_id:
-          type: string
-          format: uuid
-          description: The user_id of the teacher or admin who created this path.
+        teacher:
+          $ref: '#/components/schemas/UserRef'
         title:
           type: string
           description: Human-readable name for this learning path.
@@ -4636,7 +4636,7 @@ components:
           description: Timestamp at which this learning path was created.
       required:
         - learning_path_id
-        - teacher_id
+        - teacher
         - title
         - items
         - created_at
@@ -4697,10 +4697,8 @@ components:
           type: string
           format: uuid
           description: Stable identifier for this StudentPath.
-        student_id:
-          type: string
-          format: uuid
-          description: The user_id of the student who owns this path.
+        student:
+          $ref: '#/components/schemas/UserRef'
         source_template_id:
           type: string
           format: uuid
@@ -4709,9 +4707,7 @@ components:
           type: string
           description: Title of the path, copied from the template at assign time and independently editable afterwards.
         assigned_by:
-          type: string
-          format: uuid
-          description: The user_id of the teacher or admin who assigned this path.
+          $ref: '#/components/schemas/UserRef'
         assigned_at:
           type: string
           format: date-time
@@ -4737,7 +4733,7 @@ components:
             source_course_enrollment_id.
       required:
         - student_path_id
-        - student_id
+        - student
         - source_template_id
         - title
         - assigned_by
@@ -5007,9 +5003,7 @@ components:
             - expert
           description: The level a student should be at to start this course.
         created_by:
-          type: string
-          format: uuid
-          description: The user_id of the teacher or admin who created this course.
+          $ref: '#/components/schemas/UserRef'
         status:
           type: string
           enum:
@@ -5080,9 +5074,7 @@ components:
             CourseVersion. retired — removed from the catalog for new
             enrollment only; existing enrollments are unaffected.
         created_by:
-          type: string
-          format: uuid
-          description: The user_id of the teacher or admin who created this course.
+          $ref: '#/components/schemas/UserRef'
         created_at:
           type: string
           format: date-time
@@ -5282,10 +5274,8 @@ components:
           type: string
           format: uuid
           description: Stable identifier for this enrollment.
-        student_id:
-          type: string
-          format: uuid
-          description: The user_id of the enrolled student.
+        student:
+          $ref: '#/components/schemas/UserRef'
         course_id:
           type: string
           format: uuid
@@ -5324,7 +5314,7 @@ components:
           description: Timestamp at which the student enrolled.
       required:
         - course_enrollment_id
-        - student_id
+        - student
         - course_id
         - course_title
         - course_version_number
@@ -6561,6 +6551,31 @@ components:
       required:
         - locale
 
+    UserRef:
+      type: object
+      description: |
+        A reference to another MotifPath user, as it appears in any response
+        that points at a user (ADR-035). display_name is read from the
+        user's record when the response is built, never copied onto the
+        referencing entity, so a rename shows everywhere at once. A UserRef
+        appears only in responses the caller is already authorized to
+        receive.
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: Stable MotifPath identifier of the referenced user.
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: |
+            The user's full name, as held by Clerk. User-supplied text: render
+            it escaped and never use it as an identifier.
+      required:
+        - user_id
+        - display_name
+
     UserProfile:
       type: object
       description: |
@@ -6584,6 +6599,14 @@ components:
             The role assigned at registration. Immutable after creation. The admin
             role is provisioned directly in the database and is never returned from
             a self-registration flow.
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: |
+            The user's full name, taken from the "name" claim of the Clerk
+            session token and refreshed whenever that claim changes. This is
+            what other users see wherever this user is referenced (UserRef).
         locale:
           $ref: '#/components/schemas/Language'
         registered_at:
@@ -6592,6 +6615,7 @@ components:
           description: Timestamp at which the user record was created.
       required:
         - user_id
+        - display_name
         - role
         - locale
         - registered_at
