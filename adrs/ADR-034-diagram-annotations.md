@@ -1,6 +1,6 @@
 # ADR-034: Diagram annotations — custom marker labels, marker notes, and highlighted regions, all localized
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-24
 **Deciders:** Gilson (Product Owner)
 **Amends:** ADR-028's `Diagram`/`DiagramPosition` model (additive only). It builds on ADR-033's

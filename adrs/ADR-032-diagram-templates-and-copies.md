@@ -1,6 +1,6 @@
 # ADR-032: Diagrams are basic or custom templates with an owner — "Save as" copies, and stacks flatten into a new Diagram
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-24
 **Deciders:** Gilson (Product Owner)
 **Supersedes:** two parts of ADR-028: its implicit "any teacher or admin may edit any diagram"

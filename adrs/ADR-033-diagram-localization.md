@@ -1,6 +1,6 @@
 # ADR-033: Diagram localization — canonical interval codes displayed per locale, and per-language diagram names
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-24
 **Deciders:** Gilson (Product Owner)
 **Amends:** ADR-028's `DiagramPosition.interval` (free text → a fixed code list) and `Diagram.name`
