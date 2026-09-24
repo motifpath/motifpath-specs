@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.12.0
+  version: 0.13.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -2104,9 +2104,12 @@ paths:
         "400":
           description: |
             The request body failed schema validation — including a
-            position's coordinate fields not matching the referenced
-            instrument's family, or a skill_ids/concept_ids entry that does
-            not reference an existing skill or concept.
+            position's or region's coordinate fields not matching the
+            referenced instrument's family, a region range that runs
+            backwards or past the instrument's strings, per-language text
+            (custom_label, note, region description) not keyed by exactly
+            the languages of names, or a skill_ids/concept_ids entry that
+            does not reference an existing skill or concept.
           content:
             application/json:
               schema:
@@ -2197,7 +2200,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Diagram'
         "400":
-          description: The request body failed schema validation.
+          description: |
+            The request body failed validation — including the same rules
+            as createDiagram, checked against the diagram as it would be
+            after the update.
           content:
             application/json:
               schema:
@@ -4276,9 +4282,87 @@ components:
             Note name of the key, relative to the Diagram's own root (e.g.
             "C4"). Present only when the parent Diagram's instrument family
             is keyboard; absent when fretted.
+        custom_label:
+          $ref: '#/components/schemas/LocalizedMarkerLabel'
+          description: |
+            A short label (at most 2 characters per language, e.g. {"en":
+            "Av", "pt_BR": "Ev"}) the marker shows instead of the interval or
+            note name chosen by the Diagram's label_display; hidden still
+            hides every label, this one included. Absent means none. Keyed
+            by exactly the parent Diagram's languages.
+        note:
+          $ref: '#/components/schemas/LocalizedNote'
+          description: |
+            A note about this position (at most 280 characters per
+            language), shown when the marker is hovered, focused or tapped
+            and read by screen readers as the marker's description. Absent
+            means none. Keyed by exactly the parent Diagram's languages.
       required:
         - interval
         - note_name
+
+    DiagramRegion:
+      type: object
+      description: |
+        A highlighted area of a Diagram, drawn as a translucent band behind
+        the markers with its description shown alongside. Coordinates are
+        physical and follow the parent Diagram's instrument family, like
+        positions: fret_start/fret_end (and optionally string_start/
+        string_end) for fretted instruments, key_start/key_end for keyboard
+        ones — never both. Regions may overlap.
+      properties:
+        region_id:
+          type: string
+          format: uuid
+          description: |
+            Stable identifier for this region. Always present in a response;
+            optional in a create/update request — omitted values are
+            assigned by the server.
+        fret_start:
+          type: integer
+          minimum: 0
+          description: |
+            First fret of the band, inclusive. Required, with fret_end, when
+            the instrument family is fretted; absent when keyboard.
+        fret_end:
+          type: integer
+          minimum: 0
+          description: Last fret of the band, inclusive; not below fret_start.
+        string_start:
+          type: integer
+          minimum: 1
+          description: |
+            First string of the band, inclusive (1 = highest-pitched).
+            Optional, and only with string_end, for fretted instruments;
+            both omitted means the band covers every string.
+        string_end:
+          type: integer
+          minimum: 1
+          description: |
+            Last string of the band, inclusive; not below string_start and
+            not beyond the instrument's string count.
+        key_start:
+          type: string
+          description: |
+            First key of the band (e.g. "C4"), inclusive. Required, with
+            key_end, when the instrument family is keyboard; absent when
+            fretted.
+        key_end:
+          type: string
+          description: Last key of the band (e.g. "B4"), inclusive; not below key_start.
+        description:
+          $ref: '#/components/schemas/LocalizedCaption'
+          description: |
+            The band's caption, at most 60 characters per language. Keyed
+            by exactly the parent Diagram's languages.
+        color:
+          type: [string, "null"]
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          description: |
+            The band's tint as #RRGGBB. Null (or omitted) means the default
+            tint.
+      required:
+        - description
 
     DiagramClassificationInput:
       type: object
@@ -4419,6 +4503,13 @@ components:
             Every marked position in this diagram. All positions share the
             same coordinate shape, decided by this diagram's instrument's
             family.
+        regions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiagramRegion'
+          description: |
+            The diagram's highlighted regions, in drawing order (later ones
+            on top); empty when there are none.
         classification:
           $ref: '#/components/schemas/DiagramClassification'
         created_at:
@@ -4436,6 +4527,7 @@ components:
         - label_display
         - color
         - positions
+        - regions
         - classification
         - created_at
 
@@ -4443,9 +4535,11 @@ components:
       type: object
       description: |
         Payload for creating a new diagram. Every position's string/fret vs.
-        key must match the referenced instrument's family — the API rejects
-        a request that mixes shapes or supplies the wrong shape for the
-        instrument.
+        key, and every region's coordinates, must match the referenced
+        instrument's family — the API rejects a request that mixes shapes or
+        supplies the wrong shape for the instrument. Every per-language text
+        (positions' custom_label and note, regions' description) must be
+        keyed by exactly the languages of names.
       properties:
         instrument_id:
           type: string
@@ -4499,6 +4593,14 @@ components:
             Every marked position in this diagram, in the coordinate shape
             matching the referenced instrument's family. position_id may be
             supplied by the client or left for the server to assign.
+        regions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiagramRegion'
+          description: |
+            The diagram's highlighted regions, in drawing order, in the
+            coordinate shape matching the instrument's family. Omitted means
+            none. region_id may be supplied or left for the server to assign.
         classification:
           $ref: '#/components/schemas/DiagramClassificationInput'
       required:
@@ -4511,7 +4613,10 @@ components:
       type: object
       description: |
         Payload for replacing an existing diagram's names, positions,
-        classification, root_note, label_display, or color. instrument_id is not
+        regions, classification, root_note, label_display, or color. Every
+        per-language text on the diagram — names, positions' custom_label
+        and note, regions' description — must cover exactly the same
+        languages once the update is applied. instrument_id is not
         present here — it cannot be changed after creation, since every
         position's coordinate shape depends on it. Nor are kind and
         created_by, which are fixed at creation; a copy saved under a
@@ -4560,6 +4665,14 @@ components:
             The diagram's full position list, replacing the current set. A
             caller that only wants to change one position must resend the
             full set.
+        regions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiagramRegion'
+          description: |
+            The diagram's full region list, replacing the current set; an
+            empty list removes every region. Omitted leaves the regions
+            unchanged.
         classification:
           $ref: '#/components/schemas/DiagramClassificationInput'
 
@@ -6653,6 +6766,42 @@ components:
         minLength: 1
         maxLength: 200
         description: The text in the language its key names; not blank.
+
+    LocalizedMarkerLabel:
+      type: object
+      description: |
+        A marker label in one or more languages, keyed by Language.code
+        (never "any"); each value fits inside a marker.
+      minProperties: 1
+      additionalProperties:
+        type: string
+        minLength: 1
+        maxLength: 2
+        description: The label in the language its key names; 1-2 characters.
+
+    LocalizedNote:
+      type: object
+      description: |
+        A short note in one or more languages, keyed by Language.code
+        (never "any").
+      minProperties: 1
+      additionalProperties:
+        type: string
+        minLength: 1
+        maxLength: 280
+        description: The note in the language its key names; not blank.
+
+    LocalizedCaption:
+      type: object
+      description: |
+        A caption in one or more languages, keyed by Language.code (never
+        "any").
+      minProperties: 1
+      additionalProperties:
+        type: string
+        minLength: 1
+        maxLength: 60
+        description: The caption in the language its key names; not blank.
 
     UpdateInstrumentRequest:
       type: object
