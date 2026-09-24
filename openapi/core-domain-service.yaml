@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.10.0
+  version: 0.11.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -1857,8 +1857,9 @@ paths:
           description: |
             The request body failed schema validation — including
             string_count/tuning present with family keyboard, key_range
-            present with family fretted, or the matching field-group
-            missing for the given family.
+            present with family fretted, the matching field-group missing
+            for the given family, or names missing a language, carrying
+            "any" or an unknown language code, or holding an empty name.
           content:
             application/json:
               schema:
@@ -1875,6 +1876,66 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForbiddenError'
+
+  /instruments/{instrument_id}:
+    patch:
+      operationId: updateInstrument
+      summary: Replace an instrument's names
+      description: |
+        Replaces an instrument's names — the only part of an instrument that
+        can change after creation. family and the string/key shape are
+        fixed, because every diagram's positions depend on them. Only admins
+        may update an instrument, since instruments are shared by every user
+        of the platform.
+      tags:
+        - Content
+      parameters:
+        - name: instrument_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInstrumentRequest'
+      responses:
+        "200":
+          description: Instrument updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instrument'
+        "400":
+          description: |
+            The request body failed validation — including names missing a
+            language, carrying "any" or an unknown language code, or a name
+            that is empty.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user does not have permission to update an instrument. Only admins may.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No instrument exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
 
   /diagrams:
     get:
@@ -3978,11 +4039,16 @@ components:
           type: string
           format: uuid
           description: Stable identifier for this instrument.
-        name:
-          type: string
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: The instrument's name in each language it has one for.
+        languages:
+          type: array
+          items:
+            type: string
           description: |
-            Human-readable name (e.g. "6-string guitar, standard tuning",
-            "4-string bass", "Piano").
+            The Language.code of every language this instrument has a name
+            in — the keys of names, sorted.
         family:
           type: string
           enum:
@@ -4025,20 +4091,24 @@ components:
             - highest
       required:
         - instrument_id
-        - name
+        - names
+        - languages
         - family
 
     CreateInstrumentRequest:
       type: object
       description: |
-        Payload for creating a new instrument. There is no update or delete
-        endpoint yet — instruments are expected to be created rarely, and
+        Payload for creating a new instrument. Only its names can change
+        afterwards (see updateInstrument); there is no delete endpoint, and
         changing family or string/key shape after Diagrams exist against it
         is a deliberately open question.
       properties:
-        name:
-          type: string
-          description: Human-readable name for this instrument.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: |
+            The instrument's name in every language MotifPath offers — an
+            instrument is shared by every user, so every language is
+            required.
         family:
           type: string
           enum:
@@ -4070,7 +4140,7 @@ components:
             - lowest
             - highest
       required:
-        - name
+        - names
         - family
 
     DiagramPosition:
@@ -6512,6 +6582,32 @@ components:
             platform operations.
       required:
         - role
+
+    LocalizedNames:
+      type: object
+      description: |
+        Text in one or more languages, keyed by Language.code — for example
+        {"en": "Guitar", "pt_BR": "Violão"}. "any" is never a key: a name is
+        always words in some language. Clients display the name for the
+        viewer's locale, falling back to "en", then to any name present.
+      minProperties: 1
+      additionalProperties:
+        type: string
+        minLength: 1
+        maxLength: 200
+        description: The text in the language its key names; not blank.
+
+    UpdateInstrumentRequest:
+      type: object
+      description: Payload for replacing an instrument's names.
+      properties:
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: |
+            The instrument's names, replacing the current set — one for
+            every language MotifPath offers.
+      required:
+        - names
 
     Language:
       type: object
