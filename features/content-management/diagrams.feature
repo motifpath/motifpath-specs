@@ -58,7 +58,6 @@ Feature: Manage prebuilt diagrams
     And the diagram's label display is "interval"
     And position 1 has shape "dot"
 
-  @wip
   Scenario: A teacher records a general color and a custom color on one position
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Minor Pentatonic — Position 1" on instrument "guitar" with color "#3B82F6" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -70,7 +69,6 @@ Feature: Manage prebuilt diagrams
     And position 1 has color "#EF4444"
     And position 2 has no color of its own
 
-  @wip
   Scenario: Omitting colors leaves them unrecorded
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "No Colors" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -104,7 +102,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram's root note is "A"
     And the diagram's label display is "hidden"
 
-  @wip
   Scenario: A teacher updates a diagram's general color and a position's color
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
     And "bob" is authenticated as a teacher
@@ -122,7 +119,6 @@ Feature: Manage prebuilt diagrams
     Then the request is rejected as invalid
     And the rejection identifies "label_display" as the source of the error
 
-  @wip
   Scenario: Creating a diagram with a malformed general color is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Bad color" on instrument "guitar" with color "blue" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -131,14 +127,13 @@ Feature: Manage prebuilt diagrams
     Then the request is rejected as invalid
     And the rejection identifies "color" as the source of the error
 
-  @wip
   Scenario: Creating a diagram with a malformed position color is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Bad position color" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
       | interval | note_name | string | fret | color |
       | R        | A         | 6      | 5    | #GGG  |
     Then the request is rejected as invalid
-    And the rejection identifies "color" as the source of the error
+    And the rejection identifies "positions" as the source of the error
 
   Scenario: Creating a diagram with keyboard positions on a fretted instrument is rejected
     Given "bob" is authenticated as a teacher
