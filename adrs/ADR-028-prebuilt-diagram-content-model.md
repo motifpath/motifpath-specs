@@ -21,7 +21,7 @@
 > marker notes and highlighted regions.
 > `diagram_stack_ref` render-time compositing is unchanged.
 
-> **2026-09-24:** [ADR-036](./ADR-036-localized-catalog-names.md) (Proposed) turns `Instrument.name`
+> **2026-09-24:** [ADR-036](./ADR-036-localized-catalog-names.md) (Accepted) turns `Instrument.name`
 > into one name per language and adds an admin-only endpoint to update an instrument's names.
 > `family` and the string/key shape stay immutable.
 

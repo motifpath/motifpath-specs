@@ -6,7 +6,7 @@
 **Amends:** ADR-028's `DiagramPosition.interval` (free text → a fixed code list) and `Diagram.name`
 (one string → one name per language). Everything else in ADR-028 and ADR-032 is unchanged.
 
-> **2026-09-24:** [ADR-036](./ADR-036-localized-catalog-names.md) (Proposed) makes this ADR's
+> **2026-09-24:** [ADR-036](./ADR-036-localized-catalog-names.md) (Accepted) makes this ADR's
 > per-language name map the general rule for catalog data stored in the database, and applies it
 > to instrument names first.
 

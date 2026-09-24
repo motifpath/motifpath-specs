@@ -1,6 +1,6 @@
 # ADR-036: Catalog data carries a name per language — starting with instruments
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-24
 **Deciders:** Gilson (Product Owner)
 **Amends:** the `Instrument` entity of ADR-028 (`name`, one string → `names`, one name per
