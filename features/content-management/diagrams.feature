@@ -80,7 +80,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Kind and ownership — creating ──────────────────────────────────────────
 
-  @wip
   Scenario: A teacher's new diagram is a custom diagram they own
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "My Pentatonic" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -90,7 +89,6 @@ Feature: Manage prebuilt diagrams
     And the diagram's kind is "custom"
     And the diagram records "bob" as the creator
 
-  @wip
   Scenario: An admin creates a basic diagram
     Given "admin" is authenticated as an admin
     When "admin" creates a basic diagram named "C Major Scale" on instrument "guitar" classified under skills "major-scale", concepts "scale-construction" with fretted positions:
@@ -100,13 +98,11 @@ Feature: Manage prebuilt diagrams
     And the diagram's kind is "basic"
     And the diagram records "admin" as the creator
 
-  @wip
   Scenario: A teacher cannot create a basic diagram
     Given "bob" is authenticated as a teacher
     When "bob" attempts to create a basic diagram
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: Creating a diagram with an unrecognised kind is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Bad kind" on instrument "guitar" with kind "shared" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -117,7 +113,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Saving a copy ──────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher saves a copy of a basic diagram as their own custom diagram
     Given a basic diagram "minor-pentatonic-guitar" exists on instrument "guitar"
     And "bob" is authenticated as a teacher
@@ -127,7 +122,6 @@ Feature: Manage prebuilt diagrams
     And the new diagram records "bob" as the creator
     And diagram "minor-pentatonic-guitar" is unchanged
 
-  @wip
   Scenario: An admin saves a copy of a teacher's custom diagram as a basic diagram
     Given a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
     And "admin" is authenticated as an admin
@@ -139,7 +133,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Happy path — updating ────────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher updates their own diagram's root note and label display
     Given a custom diagram "minor-pentatonic-guitar" exists on instrument "guitar", created by "bob"
     And "bob" is authenticated as a teacher
@@ -147,7 +140,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram's root note is "A"
     And the diagram's label display is "hidden"
 
-  @wip
   Scenario: A teacher updates their own diagram's general color and a position's color
     Given a custom diagram "minor-pentatonic-guitar" exists on instrument "guitar", created by "bob"
     And "bob" is authenticated as a teacher
@@ -155,7 +147,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram's color is "#22C55E"
     And position 1 has color "#F59E0B"
 
-  @wip
   Scenario: An admin updates a basic diagram
     Given a basic diagram "major-scale-guitar" exists on instrument "guitar"
     And "admin" is authenticated as an admin
@@ -163,7 +154,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram's root note is "G"
     And the diagram's label display is "note"
 
-  @wip
   Scenario: An admin's update leaves a teacher's custom diagram owned by that teacher
     Given a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
     And "admin" is authenticated as an admin
@@ -174,7 +164,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Listing — role scoping ────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher's diagram list has every basic diagram and only their own custom diagrams
     Given a basic diagram "major-scale-guitar" exists on instrument "guitar"
     And a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
@@ -184,7 +173,6 @@ Feature: Manage prebuilt diagrams
     Then the response includes "major-scale-guitar" and "bobs-pentatonic"
     And the response does not include "carols-arpeggio"
 
-  @wip
   Scenario: A teacher narrows the diagram list to basic diagrams
     Given a basic diagram "major-scale-guitar" exists on instrument "guitar"
     And a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
@@ -193,7 +181,6 @@ Feature: Manage prebuilt diagrams
     Then the response includes "major-scale-guitar"
     And the response does not include "bobs-pentatonic"
 
-  @wip
   Scenario: A teacher narrows the diagram list to their own custom diagrams
     Given a basic diagram "major-scale-guitar" exists on instrument "guitar"
     And a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
@@ -203,7 +190,6 @@ Feature: Manage prebuilt diagrams
     Then the response includes "bobs-pentatonic"
     And the response does not include "major-scale-guitar" or "carols-arpeggio"
 
-  @wip
   Scenario: An admin's diagram list has every diagram
     Given a basic diagram "major-scale-guitar" exists on instrument "guitar"
     And a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
@@ -212,7 +198,6 @@ Feature: Manage prebuilt diagrams
     When "admin" lists all diagrams
     Then the response includes "major-scale-guitar", "bobs-pentatonic" and "carols-arpeggio"
 
-  @wip
   Scenario: An admin narrows the diagram list to one creator
     Given a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
     And a custom diagram "carols-arpeggio" exists on instrument "guitar", created by "carol"
@@ -223,7 +208,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Listing — filtering and pagination ────────────────────────────────────
 
-  @wip
   Scenario: A teacher filters diagrams by instrument
     Given a basic diagram "minor-pentatonic-guitar" exists on instrument "guitar"
     And a basic diagram "minor-pentatonic-piano" exists on instrument "piano"
@@ -232,14 +216,12 @@ Feature: Manage prebuilt diagrams
     Then the response includes "minor-pentatonic-guitar"
     And the response does not include "minor-pentatonic-piano"
 
-  @wip
   Scenario: Listing diagrams when none exist returns an empty page
     Given "bob" is authenticated as a teacher
     When "bob" lists all diagrams
     Then the response contains 0 items
     And the response reports a total of 0
 
-  @wip
   Scenario: The diagram list is paginated
     Given "bob" is authenticated as a teacher
     And 45 basic diagrams exist on instrument "guitar"
@@ -247,7 +229,6 @@ Feature: Manage prebuilt diagrams
     Then the response contains 20 items ordered by name
     And the response reports a total of 45, a limit of 20, and an offset of 0
 
-  @wip
   Scenario: A teacher requests a later page of diagrams
     Given "bob" is authenticated as a teacher
     And 45 basic diagrams exist on instrument "guitar"
@@ -255,7 +236,6 @@ Feature: Manage prebuilt diagrams
     Then the response contains 5 items
     And the response reports a total of 45
 
-  @wip
   Scenario: An offset past the end of the diagram list returns an empty page
     Given "bob" is authenticated as a teacher
     And 3 basic diagrams exist on instrument "guitar"
@@ -263,7 +243,6 @@ Feature: Manage prebuilt diagrams
     Then the response contains 0 items
     And the response reports a total of 3
 
-  @wip
   Scenario Outline: An out-of-range diagram page size or offset is rejected
     Given "bob" is authenticated as a teacher
     When "bob" lists diagrams with limit <limit> and offset <offset>
@@ -277,7 +256,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Retrieving ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A student retrieves a teacher's custom diagram by its id
     Given a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
     And "alice" is authenticated as a student
@@ -344,34 +322,29 @@ Feature: Manage prebuilt diagrams
     When "alice" attempts to create a diagram
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: A teacher cannot update a basic diagram
     Given a basic diagram "major-scale-guitar" exists on instrument "guitar"
     And "bob" is authenticated as a teacher
     When "bob" updates diagram "major-scale-guitar" setting root note "G" and label display "note"
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: A teacher cannot update another teacher's custom diagram
     Given a custom diagram "carols-arpeggio" exists on instrument "guitar", created by "carol"
     And "bob" is authenticated as a teacher
     When "bob" updates diagram "carols-arpeggio" setting root note "G" and label display "note"
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: A student cannot update a diagram
     Given a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
     And "alice" is authenticated as a student
     When "alice" updates diagram "bobs-pentatonic" setting root note "G" and label display "note"
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: A student cannot list diagrams
     Given "alice" is authenticated as a student
     When "alice" lists all diagrams
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: A teacher cannot list another teacher's diagrams
     Given "bob" is authenticated as a teacher
     When "bob" lists diagrams filtered by creator "carol"
