@@ -27,8 +27,9 @@ that points at a user carries only a bare id:
 | `Course` | `created_by` | author |
 | `CourseCatalogEntry` | `created_by` | author |
 | `CourseEnrollment` | `student_id` | enrolled student |
+| `Diagram` | `created_by` | author (the bootstrap admin for migrated diagrams, per ADR-032) |
 
-Fixing only the catalog would leave six other screens with the same gap and invite a different
+Fixing only the catalog would leave seven other schemas with the same gap and invite a different
 ad-hoc fix each time. The decision has to cover every user reference at once.
 
 Clerk is the identity provider (ADR-007), so Clerk already holds each user's first and last
@@ -79,7 +80,7 @@ A name is personal data under LGPD, so the ADR also has to decide who may see wh
 
 - A new component schema, `UserRef { user_id: uuid, display_name: string }`, both fields
   required. It's the only way a response refers to another user.
-- All seven fields in the table above become `UserRef` objects and are renamed to drop the
+- All eight fields in the table above become `UserRef` objects and are renamed to drop the
   `_id` suffix:
   - `ContentNode.teacher_id` → `teacher`
   - `LearningPath.teacher_id` → `teacher`
@@ -88,6 +89,7 @@ A name is personal data under LGPD, so the ADR also has to decide who may see wh
   - `Course.created_by` → `created_by`
   - `CourseCatalogEntry.created_by` → `created_by`
   - `CourseEnrollment.student_id` → `student`
+  - `Diagram.created_by` → `created_by`
 - `display_name` is resolved **at read time** by joining to `users`. It is never copied onto
   the referencing entity.
 - `UserProfile` gains `display_name`, so users can see what the platform shows about them.
@@ -163,7 +165,7 @@ visibility rule, not a shorter name, protects students.
 - MotifPath doesn't need its own name-editing screen, because Clerk's profile UI is the editor.
 
 ### Negative / Trade-offs
-- **Breaking API change** across six response schemas (seven fields). Core and every web
+- **Breaking API change** across seven response schemas (eight fields). Core and every web
   consumer must change in the same release. The open web branches (PB-32 catalog, PB-57
   diagrams) must be rebased onto the new client.
 - The session-token template and the required-name setting live in the Clerk dashboard, not in
