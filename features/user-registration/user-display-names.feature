@@ -1,4 +1,3 @@
-@wip
 Feature: User display names stay current and appear wherever a user is referenced
   As a MotifPath user
   I want to see the real, current name of the people behind the content and paths I work with
@@ -49,33 +48,40 @@ Feature: User display names stay current and appear wherever a user is reference
 
   Scenario: A course names its creator
     Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
+    And "bob" is authenticated as a teacher
     When "bob" retrieves course "fingerstyle-journey"
     Then the course names its creator as "bob", "Bob Ferreira"
 
   Scenario: A content node names its teacher
     Given content node "node-02" exists, created by "bob"
+    And "bob" is authenticated as a teacher
     When "bob" retrieves the content node "node-02"
     Then the content node names its teacher as "bob", "Bob Ferreira"
 
   Scenario: A learning path names its teacher
     Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03", created by "bob"
+    And "bob" is authenticated as a teacher
     When "bob" retrieves the learning path "beginner-guitar-path"
     Then the learning path names its teacher as "bob", "Bob Ferreira"
 
   Scenario: A diagram names its creator
     Given a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
+    And "bob" is authenticated as a teacher
     When "bob" retrieves diagram "bobs-pentatonic"
     Then the diagram names its creator as "bob", "Bob Ferreira"
 
   Scenario: An assigned student path names its student and the teacher who assigned it
     Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03", created by "bob"
+    And "bob" is authenticated as a teacher
     When "bob" assigns "beginner-guitar-path" to student "alice"
     Then the student path names its student as "alice", "Alice Martins"
     And the student path names its assigner as "bob", "Bob Ferreira"
 
   Scenario: A student sees who assigned each of their standalone paths
     Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03", created by "bob"
+    And "bob" is authenticated as a teacher
     And "bob" assigns "beginner-guitar-path" to student "alice"
+    And "alice" is authenticated as a student
     When "alice" lists their standalone paths
     Then standalone path "beginner-guitar-path" names its assigner as "bob", "Bob Ferreira"
 
