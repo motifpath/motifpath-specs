@@ -119,9 +119,9 @@ Feature: Author courses
     Then the response includes "fingerstyle-journey"
     And the response does not include "draft-only-course"
 
-  Scenario: A teacher's course list includes drafts, published, and retired courses
-    Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
-    And a course "draft-only-course" exists as a draft with checkpoints "strumming-path"
+  Scenario: A teacher's course list includes their own courses of every status
+    Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
+    And a course "draft-only-course" exists as a draft with checkpoints "strumming-path", created by "bob"
     And "bob" is authenticated as a teacher
     When "bob" lists the course catalog
     Then the response includes "fingerstyle-journey" and "draft-only-course"
