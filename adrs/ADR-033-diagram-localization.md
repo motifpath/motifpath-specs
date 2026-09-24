@@ -80,10 +80,12 @@ response also carries `languages`, derived from the map's keys, like `ContentNod
 - **custom** diagrams must carry at least one name.
 
 `motifpath-web` shows the name for the viewer's locale, falling back to `en`, then to the first
-available name. **Save as** (ADR-032) asks for the new diagram's name in the caller's locale. The
-source's names in other languages are not carried over, since they would describe the source
-rather than the copy. The author can add more names before saving. **Save as template** requires
-all languages, as above.
+available name. **Save as** (ADR-032) keeps the source's languages by default. It asks for the
+copy's name in each of them, pre-filled from the source's names, because the copy usually needs
+renaming. The author may remove languages from a custom copy, which drops that language's text,
+before saving. **Save as template** requires all languages, as above. ADR-034 extends this
+languages-from-names rule to every other piece of diagram text (custom labels, marker notes, region
+descriptions).
 
 `GET /diagrams` gains a `language` filter (diagrams with a name in that language). When a teacher
 embeds a diagram into a content node, the selector pre-filters to the node's languages.
@@ -150,6 +152,7 @@ language-specific. A diagram's body (its positions) is not, only its name is.
 - **ADR-024** (i18n approach): vue-i18n and the key-parity test render the interval labels. This
   ADR extends ADR-024 to diagram data.
 - **ADR-028** (Prebuilt diagram content model): amended as described above.
+- **ADR-034** (Diagram annotations): adds more per-language diagram text under this ADR's rule.
 - **ADR-032** (Diagram templates and copies): defines basic and custom, which this ADR's
   language requirements hang on, and Save as, whose naming step this ADR specifies.
 

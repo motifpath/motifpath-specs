@@ -1,6 +1,6 @@
 # ADR-028: Diagram becomes a first-class, reusable content entity — polymorphic per-instrument-family positions, and render-time layer, styling, and playback config
 
-**Status:** Accepted (partially superseded by ADR-030, ADR-032 and ADR-033)
+**Status:** Accepted (partially superseded by ADR-030, ADR-032 and ADR-033; extended by ADR-034)
 **Date:** 2026-09-20
 **Deciders:** Gilson (Product Owner)
 
@@ -17,6 +17,8 @@
 > merged into one `Diagram` row" rule for flattened diagrams only.
 > [ADR-033](./ADR-033-diagram-localization.md) (Proposed) turns `DiagramPosition.interval` into a
 > fixed list of codes displayed per locale, and `Diagram.name` into one name per language.
+> [ADR-034](./ADR-034-diagram-annotations.md) (Proposed) adds per-language custom marker labels,
+> marker notes and highlighted regions.
 > `diagram_stack_ref` render-time compositing is unchanged.
 
 ---

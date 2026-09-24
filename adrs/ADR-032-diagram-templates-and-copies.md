@@ -48,9 +48,13 @@ be changed after creation.
 non-admin asking for `kind: basic` is refused with 403. `PUT /diagrams/{id}` applies the ownership
 rule above and returns 403 otherwise.
 
-Diagrams that exist before this change are migrated to `kind: basic` with `created_by: null`.
-`created_by` is nullable only to represent these legacy rows. Every diagram created afterwards has
-one.
+`created_by` is required on every diagram. Diagrams that exist before this change are migrated to
+`kind: basic` with `created_by` set to the **zero user**: the platform's bootstrap admin, which
+`seed-full` creates from `ADMIN_CLERK_USER_ID` (PB-32). That user has no fixed id, so the migration
+resolves it as the earliest-created user with the `admin` role. If diagrams exist but no admin does,
+the migration fails with a clear error rather than inventing an owner. A fresh database has no
+diagrams, so nothing needs backfilling there. `seed-full` creates its seeded diagrams as `basic`,
+owned by the zero user.
 
 ### "Save as" copies; stacking is "Save as" with overlays
 
@@ -71,7 +75,8 @@ are present (Save as, or Save as template) flattens the base and every overlay i
 list. The layers are applied bottom-to-top: the base first, then overlays in the order they were
 added.
 
-- **Positions keep their own `interval`, `note_name` and `shape`.** Intervals are not recomputed
+- **Positions keep their own `interval`, `note_name` and `shape`**, and their ADR-034 annotations
+  (custom label and note). Layers' highlighted regions carry over too (ADR-034). Intervals are not recomputed
   against the new diagram's root.
 - **Colour is resolved into each position**: its own `color`, falling back to its layer's general
   `Diagram.color`, and null if both are unset. Each layer keeps its visual identity.
@@ -166,7 +171,10 @@ unpaginated `GET /diagrams` would be the outlier.
   notice it on screen.
 - **Copy and flatten rules live only in `motifpath-web`.** A second client would need to
   re-implement them, or the rules would need to move behind an endpoint.
-- **Legacy rows have `created_by: null`**, a nullable field that exists only for migrated data.
+- **Migrated diagrams are attributed to the zero user**, not to whoever actually authored them.
+  That matches reality today, since every existing diagram was seeded, but the attribution is a
+  convention rather than a record. The migration also depends on an admin row existing wherever
+  diagrams already do.
 
 ### Neutral
 
@@ -182,6 +190,8 @@ unpaginated `GET /diagrams` would be the outlier.
   relaxes its no-merge stack rule and per-root interval invariant for flattened diagrams.
 - **ADR-029 / ADR-031** (Course catalog; offset pagination): the `created_by` scoping and the
   pagination envelope reused here.
+- **ADR-034** (Diagram annotations): custom labels, notes and regions, which Save as and flattening
+  carry over.
 - **ADR-033** (Diagram localization): decided alongside this one. It makes interval labels
   language-independent and requires a basic template to carry a name in every language.
 - **ADR-027 / ADR-030**: overlays render through ADR-027's SVG layers, and a copy or flattened
@@ -196,7 +206,7 @@ unpaginated `GET /diagrams` would be the outlier.
   - Reworded `DiagramPosition.interval`/`note_name` and `Diagram.root_note`.
   - Gherkin coverage for each of the above.
 - `motifpath-core`:
-  - Schema and migration (existing rows become `basic` with a null creator), and the authorization
+  - Schema and migration (existing rows become `basic`, owned by the zero user), and the authorization
     rules.
   - Scoped, paginated list query. Seed data marks the seeded diagrams as `basic`.
 - `motifpath-web`:
