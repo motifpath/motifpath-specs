@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.9.0
+  version: 0.10.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -1874,12 +1874,50 @@ paths:
       summary: List prebuilt diagrams for authoring
       description: |
         Returns diagrams from the reusable library, for browsing and
-        picking one to attach to a content node or exercise. Results are
-        unordered beyond a stable id order and are not paginated. Any
-        authenticated user may list diagrams.
+        picking one to attach to a content node or exercise, or to open as
+        the starting point of a new one. Only teachers and admins may list
+        diagrams; students never browse the library, and read the diagrams
+        embedded in their content by id instead.
+
+        Which diagrams a caller sees depends on their role. A teacher sees
+        every basic diagram plus the custom diagrams they created
+        themselves, never another teacher's custom diagrams. An admin sees
+        every diagram.
+
+        The created_by filter is role-scoped. A teacher may pass only their
+        own user_id; passing any other created_by is refused with 403. An
+        admin may pass any created_by, or omit it for every creator's
+        diagrams.
+
+        Results are paginated in a {items, total, limit, offset} envelope,
+        ordered by name, then id; an offset past the end returns an empty
+        items array. Every filter below is optional and they combine with
+        AND.
       tags:
         - Content
       parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - name: kind
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - basic
+              - custom
+          description: |
+            Restricts the results to diagrams of this kind. For a teacher,
+            custom means only their own custom diagrams.
+        - name: created_by
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: |
+            Restricts the results to diagrams created by this user. A
+            teacher may pass only their own user_id.
         - name: instrument_id
           in: query
           required: false
@@ -1903,26 +1941,47 @@ paths:
           description: When given, only diagrams with this exact concept id among their linked concepts are returned.
       responses:
         "200":
-          description: The matching diagrams, possibly empty.
+          description: One page of the diagrams visible to the caller, possibly empty.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Diagram'
+                $ref: '#/components/schemas/PagedDiagrams'
+        "400":
+          description: limit, offset or kind is out of range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
         "401":
           description: Missing or invalid Bearer token.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The caller is a student, or a teacher passed a created_by other
+            than their own user_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
 
     post:
       operationId: createDiagram
       summary: Create a prebuilt diagram
       description: |
         Creates a new, reusable diagram against an existing instrument.
-        Only teachers and admins may create a diagram.
+        Only teachers and admins may create a diagram. The caller is
+        recorded as its creator (created_by). kind defaults to custom; only
+        an admin may create a basic diagram. Neither kind nor created_by
+        can change after creation.
+
+        This is also how a copy of an existing diagram is saved, and how
+        several overlaid diagrams are saved as one: the client composes the
+        new diagram from what its editor shows and creates it here. The
+        source diagrams are never modified, and the new diagram records no
+        link to them.
       tags:
         - Content
       requestBody:
@@ -1977,7 +2036,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "403":
-          description: The authenticated user does not have permission to create a diagram. Only teachers and admins may.
+          description: |
+            The authenticated user does not have permission to create this
+            diagram. Only teachers and admins may create a diagram, and only
+            an admin may create a basic one.
           content:
             application/json:
               schema:
@@ -1987,6 +2049,11 @@ paths:
     get:
       operationId: getDiagram
       summary: Retrieve a diagram by ID
+      description: |
+        Any authenticated user may retrieve a diagram by its id, whatever
+        its kind or creator, so that students can render the diagrams
+        embedded in the content they study. The role scoping of the diagram
+        list governs discovery, not access to a known id.
       tags:
         - Content
       parameters:
@@ -2020,7 +2087,9 @@ paths:
       operationId: updateDiagram
       summary: Update a diagram's name, positions, or classification
       description: |
-        Only teachers and admins may update a diagram. Updating a diagram
+        Only an admin may update a basic diagram. A custom diagram may be
+        updated only by its creator or by an admin. An update never changes
+        a diagram's kind or created_by. Updating a diagram
         that is already referenced by one or more diagram_refs changes what
         every one of them renders — there is no versioning or copy-on-write.
       tags:
@@ -2058,7 +2127,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "403":
-          description: The authenticated user does not have permission to update this diagram. Only teachers and admins may.
+          description: |
+            The authenticated user does not have permission to update this
+            diagram: they are a student, a teacher updating a basic diagram,
+            or a teacher updating another user's custom diagram.
           content:
             application/json:
               schema:
@@ -3462,6 +3534,19 @@ components:
           required:
             - items
 
+    PagedDiagrams:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Diagram'
+              description: The diagrams on this page, ordered by name, then id.
+          required:
+            - items
+
     HealthStatus:
       $ref: './components/schemas/health.yaml#/HealthStatus'
 
@@ -4004,18 +4089,24 @@ components:
         interval:
           type: string
           description: |
-            The interval this position represents, relative to the parent
-            Diagram's own root (see Diagram.root_note) — e.g. "R", "b3",
-            "4", "5", "b7", "2", "3", "6", "7". Not globally standardized
-            beyond being consistent within one Diagram; MotifPath does not
-            validate interval names against a fixed enum.
+            The interval this position represents — e.g. "R", "b3", "4",
+            "5", "b7", "2", "3", "6", "7" — relative to the root it was
+            authored against. That is normally the parent Diagram's own root
+            (see Diagram.root_note). In a diagram saved by combining several
+            overlaid diagrams into one, each position keeps the interval it
+            had in the diagram it came from, relative to that diagram's
+            root. Not globally standardized beyond being consistent within
+            one authored diagram; MotifPath does not validate interval names
+            against a fixed enum.
         note_name:
           type: string
           description: |
-            The concrete note name this position sounds at the Diagram's own
-            root (e.g. "A", "C"). A diagram_ref's root_override recomputes
-            the note actually shown; note_name here is always relative to
-            this Diagram's own authored root (see Diagram.root_note).
+            The concrete note name this position sounds at the root it was
+            authored against (e.g. "A", "C") — the parent Diagram's own root
+            (see Diagram.root_note), or, in a diagram saved by combining
+            several overlaid diagrams into one, the root of the diagram the
+            position came from. A diagram_ref's root_override recomputes the
+            note actually shown.
         shape:
           type: string
           enum:
@@ -4148,13 +4239,32 @@ components:
         name:
           type: string
           description: Human-readable name (e.g. "Minor Pentatonic — Position 1").
+        kind:
+          type: string
+          enum:
+            - basic
+            - custom
+          description: |
+            basic diagrams are curated templates: every teacher can find and
+            use them, and only an admin may create or update one. custom
+            diagrams belong to their creator: only the creator and admins can
+            find them in the diagram list, and only the creator or an admin
+            may update one. Fixed at creation.
+        created_by:
+          type: string
+          format: uuid
+          description: |
+            The user_id of the teacher or admin who created this diagram.
+            Fixed at creation.
         root_note:
           type: [string, "null"]
           description: |
             The root note this diagram was authored against (e.g. "A"),
-            relative to which every position's interval and note_name are
-            computed. Null for a diagram with no recorded root (e.g. created
-            before this field existed).
+            relative to which its positions' interval and note_name are
+            computed — except in a diagram saved by combining several
+            overlaid diagrams into one, where each position stays relative
+            to the root of the diagram it came from. Null for a diagram with
+            no recorded root (e.g. created before this field existed).
         label_display:
           type: string
           enum:
@@ -4197,6 +4307,8 @@ components:
         - diagram_id
         - instrument_id
         - name
+        - kind
+        - created_by
         - root_note
         - label_display
         - color
@@ -4219,6 +4331,18 @@ components:
         name:
           type: string
           description: Human-readable name for this diagram.
+        kind:
+          type: string
+          enum:
+            - basic
+            - custom
+          default: custom
+          description: |
+            Whether the new diagram is a curated basic template or the
+            caller's own custom diagram. Omitted defaults to custom. Only an
+            admin may create a basic diagram. The caller is always recorded
+            as the creator; there is no way to create a diagram on another
+            user's behalf.
         root_note:
           type: [string, "null"]
           description: |
@@ -4263,7 +4387,9 @@ components:
         Payload for replacing an existing diagram's name, positions,
         classification, root_note, label_display, or color. instrument_id is not
         present here — it cannot be changed after creation, since every
-        position's coordinate shape depends on it.
+        position's coordinate shape depends on it. Nor are kind and
+        created_by, which are fixed at creation; a copy saved under a
+        different kind or creator is a new diagram.
       properties:
         name:
           type: string
