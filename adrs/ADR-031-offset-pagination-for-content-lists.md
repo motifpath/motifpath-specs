@@ -1,6 +1,6 @@
 # ADR-031: Offset pagination and server-side search for content list endpoints
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-23
 **Deciders:** Gilson (Product Owner)
 
