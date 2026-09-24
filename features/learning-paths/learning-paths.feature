@@ -231,3 +231,24 @@ Feature: Manage learning paths
     And no authentication token is provided
     When an unauthenticated request attempts to delete learning path "beginner-guitar-path"
     Then the request is refused with an authentication error
+
+  # ── Pagination and search ─────────────────────────────────────────────────
+
+  Scenario: The learning path list is paginated
+    Given "bob" is authenticated as a teacher
+    And 45 learning paths exist in the library
+    When "bob" lists learning paths with limit 20 and offset 40
+    Then the response contains 5 items ordered by title
+    And the response reports a total of 45, a limit of 20, and an offset of 40
+
+  Scenario: A teacher searches learning paths by title text
+    Given "bob" is authenticated as a teacher
+    And learning paths titled "Open Chords Path" and "Strumming Path" exist
+    When "bob" lists learning paths matching text "chords"
+    Then the response includes "Open Chords Path"
+    And the response does not include "Strumming Path"
+
+  Scenario: An out-of-range learning path page size is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" lists learning paths with limit 0
+    Then the request is refused with a validation error

@@ -7,6 +7,7 @@ Feature: Author courses
     Given the Core Domain Service is operational and ready to accept requests
     And a learning path "open-chords-path" exists in the system
     And a learning path "strumming-path" exists in the system
+    And a learning path "theory-path" exists in the system
 
   # ── Happy path — creating a course ────────────────────────────────────────
 
@@ -125,6 +126,118 @@ Feature: Author courses
     When "bob" lists the course catalog
     Then the response includes "fingerstyle-journey" and "draft-only-course"
 
+  # ── Catalog filtering ─────────────────────────────────────────────────────
+
+  Scenario: A student filters the catalog by creator
+    Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists, published, created by "carol", with checkpoints "strumming-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by creator "bob"
+    Then the response includes "fingerstyle-journey"
+    And the response does not include "strumming-basics"
+
+  Scenario: Every catalog entry reports who created the course
+    Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog
+    Then the entry for "fingerstyle-journey" records "bob" as the creator
+
+  Scenario: A teacher's course list is always limited to their own courses
+    Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists as a draft, created by "carol", with checkpoints "strumming-path"
+    And "bob" is authenticated as a teacher
+    When "bob" lists the course catalog with no creator filter
+    Then the response includes "fingerstyle-journey"
+    And the response does not include "strumming-basics"
+
+  Scenario: A teacher cannot list another teacher's courses
+    Given "bob" is authenticated as a teacher
+    When "bob" lists the course catalog filtered by creator "carol"
+    Then the request is refused with a forbidden error
+
+  Scenario: An admin lists every creator's courses, or narrows to one
+    Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists as a draft, created by "carol", with checkpoints "strumming-path"
+    And "admin" is authenticated as an admin
+    When "admin" lists the course catalog with no creator filter
+    Then the response includes "fingerstyle-journey" and "strumming-basics"
+    When "admin" lists the course catalog filtered by creator "carol"
+    Then the response includes "strumming-basics"
+    And the response does not include "fingerstyle-journey"
+
+  Scenario: A student filters the catalog by skill
+    Given a content node in "open-chords-path" is classified with skill "fingerpicking"
+    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists, published, with checkpoints "strumming-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by skill "fingerpicking"
+    Then the response includes "fingerstyle-journey"
+    And the response does not include "strumming-basics"
+
+  Scenario: A student filters the catalog by concept
+    Given a content node in "strumming-path" is classified with concept "syncopation"
+    And a course "strumming-basics" exists, published, with checkpoints "strumming-path"
+    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by concept "syncopation"
+    Then the response includes "strumming-basics"
+    And the response does not include "fingerstyle-journey"
+
+  Scenario: Filtering by several skills matches a course with any of them
+    Given a content node in "open-chords-path" is classified with skill "fingerpicking"
+    And a content node in "strumming-path" is classified with skill "alternate-picking"
+    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists, published, with checkpoints "strumming-path"
+    And a course "theory-intro" exists, published, with checkpoints "theory-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by skills "fingerpicking", "alternate-picking"
+    Then the response includes "fingerstyle-journey" and "strumming-basics"
+    And the response does not include "theory-intro"
+
+  Scenario: Filtering by several concepts matches a course with any of them
+    Given a content node in "open-chords-path" is classified with concept "syncopation"
+    And a content node in "strumming-path" is classified with concept "swing"
+    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists, published, with checkpoints "strumming-path"
+    And a course "theory-intro" exists, published, with checkpoints "theory-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by concepts "syncopation", "swing"
+    Then the response includes "fingerstyle-journey" and "strumming-basics"
+    And the response does not include "theory-intro"
+
+  Scenario: Filtering by both skills and concepts requires a match on each
+    Given a content node in "open-chords-path" is classified with skill "fingerpicking" and concept "syncopation"
+    And a content node in "strumming-path" is classified with skill "fingerpicking"
+    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists, published, with checkpoints "strumming-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by skills "fingerpicking" and concepts "syncopation"
+    Then the response includes "fingerstyle-journey"
+    And the response does not include "strumming-basics"
+
+  Scenario: A classification match in any checkpoint counts
+    Given a content node in "strumming-path" is classified with skill "fingerpicking"
+    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path", "strumming-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by skill "fingerpicking"
+    Then the response includes "fingerstyle-journey"
+
+  Scenario: A student's classification filter ignores unpublished draft edits
+    Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And "admin" replaces the draft of "fingerstyle-journey" with checkpoints "open-chords-path", "strumming-path"
+    And a content node in "strumming-path" is classified with skill "fingerpicking"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by skill "fingerpicking"
+    Then the response does not include "fingerstyle-journey"
+
+  Scenario: A teacher's classification filter matches the live draft
+    Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
+    And "bob" replaces the draft of "fingerstyle-journey" with checkpoints "open-chords-path", "strumming-path"
+    And a content node in "strumming-path" is classified with skill "fingerpicking"
+    And "bob" is authenticated as a teacher
+    When "bob" lists the course catalog filtered by skill "fingerpicking"
+    Then the response includes "fingerstyle-journey"
+
   Scenario: A student sees a course's checkpoints as a title-only outline, never lesson content
     Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path", "strumming-path"
     And "alice" is authenticated as a student
@@ -219,3 +332,48 @@ Feature: Author courses
     And "bob" is authenticated as a teacher
     When "bob" retrieves the published version of course "draft-only-course"
     Then the request is refused with a not-found error
+
+  # ── Pagination, search, and mixed filters ─────────────────────────────────
+
+  Scenario: The course catalog is paginated
+    Given 45 courses exist, published
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog with limit 20 and offset 40
+    Then the response contains 5 items ordered by title
+    And the response reports a total of 45, a limit of 20, and an offset of 40
+
+  Scenario: A student searches the catalog by title or summary text
+    Given a course "fingerstyle-journey" exists, published, titled "Fingerstyle Journey"
+    And a course "strumming-basics" exists, published, titled "Strumming Basics"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog matching text "fingerstyle"
+    Then the response includes "fingerstyle-journey"
+    And the response does not include "strumming-basics"
+
+  Scenario: A student filters the catalog by several levels
+    Given courses exist, published, at levels "beginner", "intermediate" and "expert"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by levels "beginner", "intermediate"
+    Then the response includes the "beginner" and "intermediate" courses
+    And the response does not include the "expert" course
+
+  Scenario: A student mixes level, text, skill, and creator filters
+    Given a course "fingerstyle-journey" exists, published, created by "bob", at level "beginner", titled "Fingerstyle Journey", classified with skill "fingerpicking"
+    And a course "fingerstyle-advanced" exists, published, created by "bob", at level "expert", titled "Fingerstyle Mastery", classified with skill "fingerpicking"
+    And a course "strumming-basics" exists, published, created by "carol", at level "beginner", titled "Strumming Basics", classified with skill "fingerpicking"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by level "beginner", text "fingerstyle", skill "fingerpicking", and creator "bob"
+    Then the response includes "fingerstyle-journey"
+    And the response does not include "fingerstyle-advanced" or "strumming-basics"
+
+  Scenario: Filters narrow the total, not just the page
+    Given 30 courses exist, published, at level "beginner" and 30 at level "expert"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by level "beginner" with limit 10
+    Then the response contains 10 items
+    And the response reports a total of 30
+
+  Scenario: An out-of-range catalog page size is rejected
+    Given "alice" is authenticated as a student
+    When "alice" lists the course catalog with limit 101
+    Then the request is refused with a validation error
