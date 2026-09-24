@@ -591,3 +591,24 @@ Feature: Manage exercises
     And no authentication token is provided
     When an unauthenticated request attempts to update exercise "triad-exercise-01" with title "Hijacked title"
     Then the request is refused with an authentication error
+
+  # ── Pagination ────────────────────────────────────────────────────────────
+
+  Scenario: The exercise list is paginated
+    Given "bob" is authenticated as a teacher
+    And 45 exercises exist in the pool
+    When "bob" lists exercises with limit 20 and offset 20
+    Then the response contains 20 items
+    And the response reports a total of 45, a limit of 20, and an offset of 20
+
+  Scenario: Exercise filters combine with paging
+    Given "bob" is authenticated as a teacher
+    And 30 "text_response" exercises and 30 "image_choice" exercises exist
+    When "bob" lists exercises of type "text_response" with limit 10
+    Then the response contains 10 items
+    And the response reports a total of 30
+
+  Scenario: An out-of-range exercise page size is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" lists exercises with limit 101
+    Then the request is refused with a validation error

@@ -290,3 +290,51 @@ Feature: Manage content nodes
     And no authentication token is provided
     When an unauthenticated request attempts to update content node "intro-to-triads" with title "Hijacked title"
     Then the request is refused with an authentication error
+
+  # ── Pagination and search ─────────────────────────────────────────────────
+
+  Scenario: The content node list is paginated
+    Given "bob" is authenticated as a teacher
+    And 45 content nodes exist in the library
+    When "bob" lists content nodes with no paging parameters
+    Then the response contains 20 items ordered by title
+    And the response reports a total of 45, a limit of 20, and an offset of 0
+
+  Scenario: A teacher requests a later page of content nodes
+    Given "bob" is authenticated as a teacher
+    And 45 content nodes exist in the library
+    When "bob" lists content nodes with limit 20 and offset 40
+    Then the response contains 5 items
+    And the response reports a total of 45
+
+  Scenario: An offset past the end returns an empty page
+    Given "bob" is authenticated as a teacher
+    And 3 content nodes exist in the library
+    When "bob" lists content nodes with limit 20 and offset 100
+    Then the response contains 0 items
+    And the response reports a total of 3
+
+  Scenario: A teacher searches content nodes by title text
+    Given "bob" is authenticated as a teacher
+    And content nodes titled "Open Chords", "Barre Chords" and "Scales" exist
+    When "bob" lists content nodes matching text "chords"
+    Then the response includes "Open Chords" and "Barre Chords"
+    And the response does not include "Scales"
+
+  Scenario: Search and filters combine with paging
+    Given "bob" is authenticated as a teacher
+    And 30 article content nodes and 30 video content nodes titled "Chords N" exist
+    When "bob" lists content nodes of type "article" matching text "chords" with limit 10
+    Then the response contains 10 items
+    And the response reports a total of 30
+
+  Scenario Outline: An out-of-range page size or offset is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" lists content nodes with limit <limit> and offset <offset>
+    Then the request is refused with a validation error
+
+    Examples:
+      | limit | offset |
+      | 0     | 0      |
+      | 101   | 0      |
+      | 20    | -1     |

@@ -98,12 +98,17 @@ paths:
       description: |
         Returns content nodes from the library, for browsing and picking one
         to edit, use as a remediation target, or add to a learning path —
-        not a student-facing catalog. Results are unordered beyond a stable
-        id order and are not paginated. Only teachers and admins may list
-        content nodes.
+        not a student-facing catalog.
+        Results are paginated (ADR-031): ordered by title, then id and
+        returned in a {items, total, limit, offset} envelope. An offset
+        past the end returns an empty items array, not an error.
+        Only teachers and admins may list content nodes.
       tags:
         - Content
       parameters:
+        - $ref: '#/components/parameters/SearchText'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
         - name: content_type
           in: query
           required: false
@@ -141,13 +146,17 @@ paths:
           description: When given, only content nodes at this difficulty level are returned.
       responses:
         "200":
-          description: The matching content nodes, possibly empty.
+          description: One page of the matching content nodes, possibly empty.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ContentNode'
+                $ref: '#/components/schemas/PagedContentNodes'
+        "400":
+          description: limit or offset is out of range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
         "401":
           description: Missing or invalid Bearer token.
           content:
@@ -654,12 +663,17 @@ paths:
         Returns exercises from the reusable pool, for browsing and picking one
         to edit in an authoring tool — not the randomized, skill-targeted
         selection GET /practice-sessions performs for a student's practice
-        attempt. Results are unordered beyond a stable id order and are not
-        paginated. Only teachers and admins may list exercises; the pool is
-        an authoring surface, not a student-facing catalog.
+        attempt.
+        Results are paginated (ADR-031): ordered by id and
+        returned in a {items, total, limit, offset} envelope. An offset
+        past the end returns an empty items array, not an error.
+        Only teachers and admins may list exercises; the pool is an
+        authoring surface, not a student-facing catalog.
       tags:
         - Content
       parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
         - name: skill_id
           in: query
           required: false
@@ -683,13 +697,17 @@ paths:
           description: When given, only exercises of this type are returned.
       responses:
         "200":
-          description: The matching exercises, possibly empty.
+          description: One page of the matching exercises, possibly empty.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Exercise'
+                $ref: '#/components/schemas/PagedExercises'
+        "400":
+          description: limit or offset is out of range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
         "401":
           description: Missing or invalid Bearer token.
           content:
@@ -2058,21 +2076,32 @@ paths:
       summary: List learning paths for authoring
       description: |
         Returns learning paths from the library, for browsing and picking one
-        to edit or assign to a student. Results are unordered beyond a stable
-        id order and are not paginated. Teachers and admins may list learning
-        paths; students may not browse paths directly — their view is
-        through GET /students/me/path.
+        to edit or assign to a student.
+        Results are paginated (ADR-031): ordered by title, then id and
+        returned in a {items, total, limit, offset} envelope. An offset
+        past the end returns an empty items array, not an error.
+        Teachers and admins may list learning paths; students may not
+        browse paths directly — their view is through
+        GET /students/me/path.
       tags:
         - Learning Paths
+      parameters:
+        - $ref: '#/components/parameters/SearchText'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
       responses:
         "200":
-          description: The existing learning paths, possibly empty.
+          description: One page of the existing learning paths, possibly empty.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/LearningPath'
+                $ref: '#/components/schemas/PagedLearningPaths'
+        "400":
+          description: limit or offset is out of range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
         "401":
           description: Missing or invalid Bearer token.
           content:
@@ -2329,9 +2358,14 @@ paths:
         published version. Teachers and admins see courses of every
         status; passing status narrows the list to just that status,
         otherwise every status is returned, each annotated with whether
-        its live draft has unpublished changes. Results are unordered
-        beyond a stable id order and are not paginated; the catalog is
-        expected to stay small.
+        its live draft has unpublished changes. Results are ordered by
+        title, then id.
+
+        Results are paginated (ADR-031) in a {items, total, limit,
+        offset} envelope; an offset past the end returns an empty items
+        array. Every filter below is optional and they combine with AND,
+        so a student can mix any of them; levels, skill_ids and
+        concept_ids are any-of within themselves.
 
         The created_by filter is role-scoped. A teacher caller is
         always limited to the courses they created; passing a
@@ -2350,6 +2384,25 @@ paths:
       tags:
         - Courses
       parameters:
+        - $ref: '#/components/parameters/SearchText'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - name: levels
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - beginner
+                - early_intermediate
+                - intermediate
+                - advanced
+                - expert
+          description: Restricts the results to courses at any of these levels.
         - name: created_by
           in: query
           required: false
@@ -2399,13 +2452,17 @@ paths:
             parameter.
       responses:
         "200":
-          description: The courses visible to the caller, possibly empty.
+          description: One page of the courses visible to the caller, possibly empty.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CourseCatalogEntry'
+                $ref: '#/components/schemas/PagedCourseCatalog'
+        "400":
+          description: limit or offset is out of range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
         "401":
           description: Missing or invalid Bearer token.
           content:
@@ -3302,7 +3359,109 @@ components:
         Clerk-issued JWT validated locally by the service on every request.
         See ADR-007 for the full validation contract.
 
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Maximum number of items to return in this page (ADR-031).
+    Offset:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Number of matching items to skip before this page (ADR-031).
+    SearchText:
+      name: q
+      in: query
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 200
+      description: >-
+        Case-insensitive substring match against the item's title (and
+        summary, where it has one).
+
   schemas:
+    PageMeta:
+      type: object
+      description: |
+        Pagination metadata shared by every paginated list response
+        (ADR-031). total counts every item matching the request's
+        filters, not just this page.
+      properties:
+        total:
+          type: integer
+          minimum: 0
+          description: Number of items matching the filters across all pages.
+        limit:
+          type: integer
+          description: The page size that was applied.
+        offset:
+          type: integer
+          description: The number of matching items skipped before this page.
+      required:
+        - total
+        - limit
+        - offset
+
+    PagedContentNodes:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContentNode'
+          required:
+            - items
+
+    PagedExercises:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Exercise'
+          required:
+            - items
+
+    PagedLearningPaths:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/LearningPath'
+          required:
+            - items
+
+    PagedCourseCatalog:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/CourseCatalogEntry'
+          required:
+            - items
+
     HealthStatus:
       $ref: './components/schemas/health.yaml#/HealthStatus'
 

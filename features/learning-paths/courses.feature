@@ -332,3 +332,48 @@ Feature: Author courses
     And "bob" is authenticated as a teacher
     When "bob" retrieves the published version of course "draft-only-course"
     Then the request is refused with a not-found error
+
+  # ── Pagination, search, and mixed filters ─────────────────────────────────
+
+  Scenario: The course catalog is paginated
+    Given 45 courses exist, published
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog with limit 20 and offset 40
+    Then the response contains 5 items ordered by title
+    And the response reports a total of 45, a limit of 20, and an offset of 40
+
+  Scenario: A student searches the catalog by title or summary text
+    Given a course "fingerstyle-journey" exists, published, titled "Fingerstyle Journey"
+    And a course "strumming-basics" exists, published, titled "Strumming Basics"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog matching text "fingerstyle"
+    Then the response includes "fingerstyle-journey"
+    And the response does not include "strumming-basics"
+
+  Scenario: A student filters the catalog by several levels
+    Given courses exist, published, at levels "beginner", "intermediate" and "expert"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by levels "beginner", "intermediate"
+    Then the response includes the "beginner" and "intermediate" courses
+    And the response does not include the "expert" course
+
+  Scenario: A student mixes level, text, skill, and creator filters
+    Given a course "fingerstyle-journey" exists, published, created by "bob", at level "beginner", titled "Fingerstyle Journey", classified with skill "fingerpicking"
+    And a course "fingerstyle-advanced" exists, published, created by "bob", at level "expert", titled "Fingerstyle Mastery", classified with skill "fingerpicking"
+    And a course "strumming-basics" exists, published, created by "carol", at level "beginner", titled "Strumming Basics", classified with skill "fingerpicking"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by level "beginner", text "fingerstyle", skill "fingerpicking", and creator "bob"
+    Then the response includes "fingerstyle-journey"
+    And the response does not include "fingerstyle-advanced" or "strumming-basics"
+
+  Scenario: Filters narrow the total, not just the page
+    Given 30 courses exist, published, at level "beginner" and 30 at level "expert"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by level "beginner" with limit 10
+    Then the response contains 10 items
+    And the response reports a total of 30
+
+  Scenario: An out-of-range catalog page size is rejected
+    Given "alice" is authenticated as a student
+    When "alice" lists the course catalog with limit 101
+    Then the request is refused with a validation error
