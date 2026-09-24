@@ -1,6 +1,6 @@
 # ADR-035: User display names and UserRef user references
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-24
 **Deciders:** Gilson (Product Owner)
 
