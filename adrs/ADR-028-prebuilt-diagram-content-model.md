@@ -1,6 +1,6 @@
 # ADR-028: Diagram becomes a first-class, reusable content entity — polymorphic per-instrument-family positions, and render-time layer, styling, and playback config
 
-**Status:** Accepted (partially superseded by ADR-030)
+**Status:** Accepted (partially superseded by ADR-030, ADR-032 and ADR-033; extended by ADR-034)
 **Date:** 2026-09-20
 **Deciders:** Gilson (Product Owner)
 
@@ -10,6 +10,16 @@
 > `PromptNode`/`ExpandedContent`, not as a body content type. Everything else in this ADR (the
 > `Instrument`/`Diagram` entity model, render-time `diagram_ref` config, and `diagram_stack_ref`
 > stacking) is unchanged and still Accepted, as is `Exercise`/`Option`'s diagram linkage below.
+
+> **2026-09-24:** [ADR-032](./ADR-032-diagram-templates-and-copies.md) (Accepted) gives every
+> `Diagram` a `kind` (`basic` admin-curated template / `custom`) and an owner. It adds "Save as"
+> copies and allows a stack to be flattened into a new `Diagram`, relaxing this ADR's "can't be
+> merged into one `Diagram` row" rule for flattened diagrams only.
+> [ADR-033](./ADR-033-diagram-localization.md) (Accepted) turns `DiagramPosition.interval` into a
+> fixed list of codes displayed per locale, and `Diagram.name` into one name per language.
+> [ADR-034](./ADR-034-diagram-annotations.md) (Accepted) adds per-language custom marker labels,
+> marker notes and highlighted regions.
+> `diagram_stack_ref` render-time compositing is unchanged.
 
 ---
 
