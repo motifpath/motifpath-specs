@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.11.0
+  version: 0.12.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -1959,14 +1959,25 @@ paths:
         diagrams.
 
         Results are paginated in a {items, total, limit, offset} envelope,
-        ordered by name, then id; an offset past the end returns an empty
-        items array. Every filter below is optional and they combine with
-        AND.
+        ordered by the name the caller sees — the diagram's name in the
+        caller's locale, else its English name, else its name in the
+        alphabetically first language it has — then by id; an offset past
+        the end returns an empty items array. Every filter below is
+        optional and they combine with AND.
       tags:
         - Content
       parameters:
         - $ref: '#/components/parameters/Limit'
         - $ref: '#/components/parameters/Offset'
+        - name: language
+          in: query
+          required: false
+          schema:
+            type: string
+          description: |
+            Restricts the results to diagrams with a name in this language
+            (a Language.code other than "any") — e.g. to offer only
+            diagrams that read natively in a content node's language.
         - name: kind
           in: query
           required: false
@@ -2016,7 +2027,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedDiagrams'
         "400":
-          description: limit, offset or kind is out of range.
+          description: limit, offset, kind or language is out of range.
           content:
             application/json:
               schema:
@@ -2064,7 +2075,9 @@ paths:
                 summary: A guitar minor pentatonic scale position
                 value:
                   instrument_id: "5c1a2b3c-0000-0000-0000-000000000001"
-                  name: "Minor Pentatonic — Position 1"
+                  names:
+                    en: "Minor Pentatonic — Position 1"
+                    pt_BR: "Pentatônica menor — Posição 1"
                   positions:
                     - position_id: "5c1a2b3c-0000-0000-0000-000000000101"
                       interval: "R"
@@ -4164,18 +4177,44 @@ components:
             omitted values are assigned by the server.
         interval:
           type: string
+          enum:
+            - R
+            - b2
+            - '2'
+            - '#2'
+            - b3
+            - '3'
+            - '4'
+            - '#4'
+            - b5
+            - '5'
+            - '#5'
+            - b6
+            - '6'
+            - bb7
+            - b7
+            - '7'
+            - b9
+            - '9'
+            - '#9'
+            - '11'
+            - '#11'
+            - b13
+            - '13'
           description: |
-            The interval this position represents — e.g. "R", "b3", "4",
-            "5", "b7", "2", "3", "6", "7" — relative to the root it was
-            authored against. That is normally the parent Diagram's own root
-            (see Diagram.root_note). In a diagram saved by combining several
-            overlaid diagrams into one, each position keeps the interval it
-            had in the diagram it came from, relative to that diagram's
-            root. Not globally standardized beyond being consistent within
-            one authored diagram; MotifPath does not validate interval names
-            against a fixed enum.
+            The interval this position represents, as a canonical code (R is
+            the root) — a storage identifier, not display text: clients show
+            each code in the viewer's language (e.g. R as "T" and b3 as "3m"
+            in Brazilian Portuguese). Enharmonic codes stay distinct (#4 vs
+            b5) because the author's spelling carries musical meaning. The
+            interval is relative to the root it was authored against:
+            normally the parent Diagram's own root (see Diagram.root_note).
+            In a diagram saved by combining several overlaid diagrams into
+            one, each position keeps the interval it had in the diagram it
+            came from, relative to that diagram's root.
         note_name:
           type: string
+          pattern: '^[A-G](bb|b|##|#)?$'
           description: |
             The concrete note name this position sounds at the root it was
             authored against (e.g. "A", "C") — the parent Diagram's own root
@@ -4312,9 +4351,20 @@ components:
           type: string
           format: uuid
           description: The instrument this diagram is authored against.
-        name:
-          type: string
-          description: Human-readable name (e.g. "Minor Pentatonic — Position 1").
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: |
+            The diagram's name in each language it has one for (e.g. {"en":
+            "A Minor Pentatonic — Position 1", "pt_BR": "Pentatônica menor
+            de Lá — Posição 1"}). A basic diagram has a name in every
+            language MotifPath offers; a custom one in at least one.
+        languages:
+          type: array
+          items:
+            type: string
+          description: |
+            The Language.code of every language this diagram has a name in —
+            the keys of names, sorted.
         kind:
           type: string
           enum:
@@ -4378,7 +4428,8 @@ components:
       required:
         - diagram_id
         - instrument_id
-        - name
+        - names
+        - languages
         - kind
         - created_by
         - root_note
@@ -4400,9 +4451,12 @@ components:
           type: string
           format: uuid
           description: The instrument this diagram is authored against. Must reference an existing instrument.
-        name:
-          type: string
-          description: Human-readable name for this diagram.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: |
+            The diagram's name in each of its languages. A basic diagram
+            needs a name in every language MotifPath offers; a custom one
+            needs at least one.
         kind:
           type: string
           enum:
@@ -4449,23 +4503,26 @@ components:
           $ref: '#/components/schemas/DiagramClassificationInput'
       required:
         - instrument_id
-        - name
+        - names
         - positions
         - classification
 
     UpdateDiagramRequest:
       type: object
       description: |
-        Payload for replacing an existing diagram's name, positions,
+        Payload for replacing an existing diagram's names, positions,
         classification, root_note, label_display, or color. instrument_id is not
         present here — it cannot be changed after creation, since every
         position's coordinate shape depends on it. Nor are kind and
         created_by, which are fixed at creation; a copy saved under a
         different kind or creator is a new diagram.
       properties:
-        name:
-          type: string
-          description: Human-readable name for this diagram, replacing the current value.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: |
+            The diagram's names, replacing the current set. A basic diagram
+            must keep a name in every language MotifPath offers. Omitted
+            leaves the names unchanged.
         root_note:
           type: string
           description: |
