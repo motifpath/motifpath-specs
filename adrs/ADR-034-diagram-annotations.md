@@ -74,8 +74,19 @@ unchanged, with the same top-layer-wins order. Coordinates are physical, so noth
 recomputing. The flattened diagram takes the **base layer's languages**. Overlay text in a
 language the base lacks is dropped. Where an overlay lacks one of the base's languages, the editor
 flags that language's tab as incomplete (see below), and the teacher fills it in before saving.
-Automatically creating one region per flattened layer is **not** part of this
-decision. The teacher adds regions explicitly.
+**Flattening offers one region per layer, after confirmation.** When a teacher saves a stack, the
+save step asks whether to add a highlighted region for each stacked diagram. The option is
+pre-selected and the teacher can decline it. Each generated region:
+
+- spans that layer's own positions: its lowest to highest fret across all strings (fretted), or its
+  lowest to highest key (keyboard);
+- uses the layer's names as its description, pre-filled per language. A name longer than the
+  60-character limit is flagged for the teacher to shorten before saving;
+- uses the layer's general colour, or the default tint when the layer has none.
+
+Generated regions are ordinary regions, and the teacher can edit or remove any of them in the
+editor before or after saving. They are added alongside any regions the layers already carried
+over.
 
 ### Every piece of diagram text follows one language rule
 
@@ -123,8 +134,8 @@ Portuguese student could open a diagram whose name is translated but whose notes
   can be authored directly on the diagram instead of in surrounding article text.
 - All new text is localized under one rule, so a diagram's language support stays one reliable
   property.
-- Regions make flattened stacks (ADR-032) readable again: each original shape can be shown and
-  named.
+- Regions make flattened stacks (ADR-032) readable again. Each original shape is shown and named
+  by default, with one confirmation step.
 
 ### Negative / Trade-offs
 
@@ -167,7 +178,8 @@ Portuguese student could open a diagram whose name is translated but whose notes
   - Note tooltip, badge and popover (accessible).
   - Region bands and captions in `FrettedDiagramView`, and a region editor.
   - Per-language tabs in the diagram editor.
-  - `flattenDiagramStack` carrying regions over.
+  - `flattenDiagramStack` carrying regions over and generating the optional per-layer regions,
+    with the confirmation option in the stack save step.
 
 ---
 
