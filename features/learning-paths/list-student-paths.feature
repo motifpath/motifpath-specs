@@ -39,10 +39,11 @@ Feature: List a student's standalone paths
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
-  Scenario: A teacher cannot list student paths
+  @wip
+  Scenario: A teacher lists their own standalone paths, like any learner
     Given "bob" is authenticated as a teacher
     When "bob" attempts to list their standalone paths
-    Then the request is refused with a forbidden error
+    Then the response is an empty list
 
   Scenario: Listing standalone paths without an authentication token is refused
     Given no authentication token is provided

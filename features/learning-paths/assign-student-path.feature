@@ -49,11 +49,12 @@ Feature: Assign learning paths to students
     When "bob" assigns a learning path ID that does not exist to student "alice"
     Then the request is refused with a not-found error
 
-  Scenario: Assigning a path to a user with role teacher returns not found
+  @wip
+  Scenario: A teacher can be assigned a path, like any learner
     Given "bob" is authenticated as a teacher
     And "carol" is registered as a teacher
     When "bob" assigns "beginner-guitar-path" to "carol"
-    Then the request is refused with a not-found error
+    Then a student path is created and returned, copied from "beginner-guitar-path"
 
   # ── Authorisation failures ─────────────────────────────────────────────────
 

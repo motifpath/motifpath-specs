@@ -1,6 +1,6 @@
 Feature: Student self-enrollment in courses
   As the MotifPath platform
-  I want students to enroll themselves in a published course
+  I want every user, whatever their role, to enroll themselves in a published course
   So that the product itself answers "what's next" without depending on staff availability
 
   Background:
@@ -122,10 +122,11 @@ Feature: Student self-enrollment in courses
 
   # ── Authorisation failures ─────────────────────────────────────────────────
 
-  Scenario: A teacher cannot self-enroll in a course
+  @wip
+  Scenario: A teacher enrolls in a course as a learner, like any user
     Given "bob" is authenticated as a teacher
     When "bob" attempts to enroll in course "fingerstyle-journey"
-    Then the request is refused with a forbidden error
+    Then an enrollment is created and returned, pinned to the course's latest published version
 
   Scenario: Self-enrolling without an authentication token is refused
     Given no authentication token is provided
