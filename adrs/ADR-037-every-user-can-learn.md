@@ -1,6 +1,6 @@
 # ADR-037: Every user can learn, through a role-independent learner catalog
 
-**Status:** Proposed
+**Status:** Accepted — 2026-09-25
 **Date:** 2026-09-25
 **Deciders:** Gilson (PO), Claude Code
 
