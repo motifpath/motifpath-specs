@@ -1,17 +1,17 @@
-# ADR-038: Course language, course reactivation, and a filterable learning path library
+# ADR-038: Course language and reactivation, instruments and thumbnails, and a filterable path library
 
 **Status:** Proposed
 **Date:** 2026-09-25
 **Deciders:** Gilson (Product Owner)
-**Amends:** ADR-029 (course model and lifecycle). It extends the learning path library listing
-that ADR-031 paginated.
+**Amends:** ADR-029 (course model and lifecycle) and ADR-026's content node model. It extends
+the learning path library listing that ADR-031 paginated, and ADR-021's media uploads.
 
 ---
 
 ## Context
 
 PB-65 adds the web pages where teachers and admins build courses. Reviewing that UI spec
-surfaced three things the API can't do yet.
+surfaced five things the API can't do yet.
 
 - **A course has no language.** Content nodes carry `languages`, and a learner whose locale
   matches none of a node's languages sees that node locked. A learner can therefore enroll in a
@@ -26,6 +26,12 @@ surfaced three things the API can't do yet.
   by who made a path, how hard it is, and which skills and concepts it teaches. They also want
   to see recently changed paths first. A path has no difficulty level of its own, and no
   record of when it last changed.
+- **Nothing says which instrument something is for.** A guitar course, an electric guitar path
+  and a music theory lesson all look alike. Learners can't find material for their instrument,
+  and authors can't find paths and content for the course they're building. Some material
+  (music theory, for example) suits every instrument.
+- **Nothing has a picture.** Courses, paths and content nodes appear in lists and cards as
+  text only, which makes a catalog hard to browse.
 
 ## Decision
 
@@ -61,6 +67,23 @@ filtered and sorted.**
 - `sort` orders the results: `title` (the default: title, then id) or `updated` (most recently
   updated first, then id).
 
+**4. Courses, learning paths and content nodes say which instruments they're for.** Each gains
+`instrument_ids`: the instruments it suits, by `Instrument.instrument_id`. An empty list means it
+suits **every** instrument (music theory, for example). Create, replace and update requests
+require the field (it may be empty), every id must reference an existing instrument, and none
+may repeat. Existing rows are backfilled with an empty list. The course, path and content node
+lists (`GET /catalog/courses`, `GET /courses`, `GET /learning-paths`, `GET /content-nodes`)
+accept an `instrument_id` filter. It matches items for that instrument **and** items for every
+instrument, so a guitarist still finds music theory. Course and content node versions snapshot
+the list (`instrument_ids_snapshot`), and the catalog filters on the published version.
+
+**5. Courses, learning paths and content nodes can have a thumbnail.** Each gains an optional
+`thumbnail_url` (an absolute http or https URL). Create, replace and update requests accept it,
+and a replace or update that omits it removes the current one, as with `media_url`. It is
+uploaded like other media: `POST /media/upload-url` gains the purpose `thumbnail`, which only
+accepts images. Course and content node versions snapshot it (`thumbnail_url_snapshot`), so the
+catalog shows the published picture, not a draft one.
+
 ## Rationale
 
 **Reactivation is its own action endpoint, not a status field on `PUT /courses/{id}`.** `PUT`
@@ -84,6 +107,20 @@ stage. The author knows what level the path as a whole is aimed at.
 of what its nodes teach, and that's how the course filters already work. Authoring them again
 on the path would only let the two drift apart.
 
+**Instruments are a list where empty means "every instrument", not an explicit "all"
+marker.** A separate `all_instruments` flag would allow contradictory states (a flag plus a
+list) that every writer and reader would have to reconcile. An empty list can only mean one
+thing. The filter treats "every instrument" as a match, because that's what an author choosing
+it intends.
+
+**Instruments are authored on each level independently, not inherited.** A guitar course can
+include a theory path that suits every instrument, so a course's instruments can't be derived
+from its paths, and a path's can't be derived from its nodes. The builders can suggest values,
+but the stored list is the author's.
+
+**Thumbnails are URLs to uploaded images, not image data in the record.** This reuses ADR-021's
+presigned uploads and object storage, like every other image in the platform.
+
 **Existing courses are backfilled to `"en"` rather than to their creator's locale.** It's
 predictable, and the few courses that exist so far were created by the team. Admins fix any
 that are wrong.
@@ -95,12 +132,19 @@ that are wrong.
 - Learners can find courses in their language, and the builder makes an author choose one.
 - A retired course can come back without losing its versions or its enrolled learners.
 - The checkpoint picker can narrow a large library quickly and show recent work first.
+- Learners and authors can narrow courses, paths and content to their instrument without
+  losing material that suits every instrument.
+- Catalog cards and pickers can show a picture for each item.
 
 ### Negative / Trade-offs
 
-- **Breaking request changes.** `CreateCourseRequest`, `ReplaceCourseRequest`,
-  `CreateLearningPathRequest` and `ReplaceLearningPathRequest` gain required fields. The web
-  path builder must send `level` from now on, not just the new course builder.
+- **Breaking request changes.** The course, learning path and content node create, replace
+  and update requests all gain required fields. The web path builder and content authoring
+  page must send them from now on, not just the new course builder.
+- **Every existing item starts as "for every instrument"** until an author tags it. Until then
+  an instrument filter shows everything old, which is noisier than it will be.
+- **Authors do more per item**: instruments and a thumbnail on courses, paths and content
+  nodes alike.
 - **Existing paths have no level** until someone opens and saves them, so they're invisible to
   a level filter in the meantime.
 - **The `"en"` backfill can be wrong** for a course written in Portuguese, until an admin
@@ -111,15 +155,17 @@ that are wrong.
 ### Neutral
 
 - `sort` is the API's first sort parameter. Other lists can adopt the same shape later.
-- Enrollments and published versions are unaffected by any of this, apart from the language
-  now captured in each new version.
+- Enrollments and existing published versions are unaffected. New course versions capture the
+  language, instruments and thumbnail, and new content node versions capture the instruments
+  and thumbnail.
 
 ## Related ADRs
 
 - **ADR-029** (Course catalog and multi-path lifecycle): the course model and lifecycle this
   ADR amends (language, reactivation).
 - **ADR-026** (Content classification graph): the difficulty rubric and the skill/concept
-  classification the path filters reuse.
+  classification the path filters reuse, and the content node model this ADR extends.
+- **ADR-021** (Media storage strategy): the presigned uploads thumbnails reuse.
 - **ADR-031** (Offset pagination for content lists): the paginated library listing gaining
   filters and sorting.
 - **ADR-037** (Every user can learn): the learner catalog that gains the language filter.
