@@ -104,6 +104,32 @@ edits all per-language text (name, custom labels, notes, region descriptions) in
 language of the diagram**. A tab with missing text is flagged, and saving is blocked until every
 tab is complete, mirroring the server rule. Adding or removing a language adds or removes a tab.
 
+### Amendment (2026-09-25) — the language tab sets the editor's language
+
+Local testing of ADR-033's first name UI (one large name field for the author's UI language, plus
+one smaller "Name (Portuguese)" field for each other language) showed that it hid which languages a
+diagram supports and mixed languages in one form. The product owner refined the tabbed editor
+above:
+
+- **The author chooses the diagram's languages explicitly.** A language bar at the top of the
+  editor holds one tab per language, each shown as a flag plus a short code (🇺🇸 EN, 🇧🇷 PT), and a
+  **+** to add a language. A new custom diagram starts with the author's UI language. Removing a
+  language from a custom diagram asks for confirmation and drops that language's text. A basic
+  template always carries every language, so its tabs can't be removed.
+- **The active tab sets the language of the whole editor**, as if the author had changed their
+  language setting: the form's labels and hints, the single name field (for that language only),
+  the interval notation on the markers and the position list (`R`/`b3` in English, `T`/`3m` in
+  Portuguese, ADR-033), and the preview. Each language gets its own complete view of the diagram
+  as a student in that language will see it.
+- **The switch is scoped to the editor.** The app bar (breadcrumb, Save, Save as) and navigation
+  stay in the author's own UI language, because they act on the whole diagram rather than on one
+  language, and the author's language setting is never changed.
+- A tab with missing text shows a warning dot, and saving stays blocked until every tab is complete,
+  as above.
+
+This changes no API: `languages` is still derived from `names` (ADR-033). It lands in
+`motifpath-web` with ADR-033's name editing, before the rest of ADR-034's web work.
+
 ## Rationale
 
 **The custom label overrides rather than joins the interval/note label**, because a marker only
@@ -177,7 +203,8 @@ Portuguese student could open a diagram whose name is translated but whose notes
   - Custom-label rendering and override precedence.
   - Note tooltip, badge and popover (accessible).
   - Region bands and captions in `FrettedDiagramView`, and a region editor.
-  - Per-language tabs in the diagram editor.
+  - Per-language tabs in the diagram editor (delivered early with ADR-033's name editing; see the
+    2026-09-25 amendment).
   - `flattenDiagramStack` carrying regions over and generating the optional per-layer regions,
     with the confirmation option in the stack save step.
 
