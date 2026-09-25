@@ -1,6 +1,6 @@
 # PB-65 — Course builder (authoring UI)
 
-**Status:** Draft, revised after PO review (2026-09-25)
+**Status:** Approved by the PO (2026-09-25)
 **Repos:** `motifpath-specs` (ADR-038, OpenAPI 0.14.0, scenarios), `motifpath-core`,
 `motifpath-web`.
 **API:** the existing course calls (`createCourse`, `getCourse`, `replaceCourse`,
@@ -238,9 +238,9 @@ The course list shows each course's language, and its filters gain a language fi
 - **Localized course text:** not planned. It would need an API change like ADR-033's for
   diagrams.
 
-## For the PO to confirm
+## Confirmed defaults (PO, 2026-09-25)
 
-Still open. The defaults above are proposals:
+Approved with the spec:
 1. Retired courses open **read-only** (see "Retired courses").
 2. **Publish is disabled** when a published course has no unpublished changes.
 3. **Leaving with unsaved changes asks for confirmation.** None of the other builders do
@@ -251,3 +251,5 @@ Still open. The defaults above are proposals:
    everything that exists today.
 6. **Items with no thumbnail show a neutral placeholder** in cards and lists, rather than
    leaving a gap.
+7. **Standalone paths on My courses show the placeholder.** A learner's copy of a path has no
+   thumbnail of its own; adding one is a possible follow-up.

@@ -1,6 +1,6 @@
 # ADR-038: Course language and reactivation, instruments and thumbnails, and a filterable path library
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-25
 **Deciders:** Gilson (Product Owner)
 **Amends:** ADR-029 (course model and lifecycle) and ADR-026's content node model. It extends
@@ -172,5 +172,5 @@ that are wrong.
 
 ---
 
-*This ADR was proposed on 2026-09-25. To revise, create a new ADR with Status: Supersedes
+*This ADR was decided on 2026-09-25. To revise, create a new ADR with Status: Supersedes
 ADR-038.*
