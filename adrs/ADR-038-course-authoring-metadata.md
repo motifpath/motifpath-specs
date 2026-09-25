@@ -49,8 +49,8 @@ admin publishes them. The lifecycle becomes `draft → published ⇄ retired`.
 **3. Learning paths gain an authored level and a last-updated time, and the library can be
 filtered and sorted.**
 - `LearningPath.level` uses the same five-value difficulty rubric as courses and content
-  nodes. Create and replace require it. Paths created before this change have no level
-  (`null`) until they're next saved, and they never match a level filter.
+  nodes. Create and replace require it. Paths created before this change have no level (the
+  field is absent) until they're next saved, and they never match a level filter.
 - `LearningPath.updated_at` is set when a path is created and whenever it's replaced.
 - `GET /learning-paths` gains these parameters, all combining with AND:
   - `created_by`: paths created by that user;
