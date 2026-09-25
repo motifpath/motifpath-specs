@@ -277,10 +277,10 @@ Feature: Manage learning paths
 
   @wip
   Scenario: Replacing a learning path records when it was last updated
-    Given a learning path "beginner-guitar-path" exists with items "node-01", last updated on "2026-09-01"
+    Given a learning path "beginner-guitar-path" exists with items "node-01", last updated on "2026-08-01"
     And "bob" is authenticated as a teacher
     When "bob" replaces learning path "beginner-guitar-path" at level "beginner" with items in order: "node-02"
-    Then the learning path's last update is later than "2026-09-01"
+    Then the learning path's last update is later than "2026-08-01"
 
   # ── Library filters and sorting ───────────────────────────────────────────
 
