@@ -8,7 +8,9 @@
 - `Course.language`, and a `language` filter on both course lists;
 - `POST /courses/{course_id}/reactivate`;
 - `LearningPath.level` and `updated_at`;
-- `listLearningPaths` filters (`created_by`, `levels`, `skill_ids`, `concept_ids`) and `sort`.
+- `listLearningPaths` filters (`created_by`, `levels`, `skill_ids`, `concept_ids`) and `sort`;
+- `instrument_ids` and `thumbnail_url` on courses, learning paths and content nodes, an
+  `instrument_id` filter on their lists, and the `thumbnail` upload purpose.
 
 **Builds on:** the teacher Courses tab (`/teacher/courses`, from PB-32), ADR-029 (course
 versions), ADR-037 (authoring list is staff-only), ADR-038 (this item's API additions).
@@ -36,7 +38,10 @@ through the seeders or direct API calls.
 6. **The checkpoint picker filters and sorts the learning path library** by author, level,
    skills and concepts, sorted by title or by last update. A path's level is **authored on the
    path**, so the path builder gains a level field too.
-7. **All of it ships under PB-65**: spec, then core, then web.
+7. **Courses, paths and content nodes say which instruments they're for**, or that they suit
+   every instrument (music theory, for example).
+8. **Courses, paths and content nodes can have a thumbnail.**
+9. **All of it ships under PB-65**: spec, then core, then web.
 
 ## Pages and routes
 
@@ -69,6 +74,8 @@ the form, and a side panel (below the form on phones) holds status and actions.
 | Summary | Multi-line text | Required, not blank. Shown to learners in the catalog. |
 | Level | Segmented choice of the five levels (`beginner` … `expert`) | Required. Uses the same level labels as elsewhere (`levels.*`). |
 | Language | Single choice of the languages MotifPath offers, shown by name | Required, exactly one. A new course starts in the author's UI language. |
+| Instruments | Multi-select of the instruments, with an **Every instrument** option | Every instrument (an empty list) or one or more instruments. A new course starts at Every instrument. |
+| Thumbnail | Image upload with a preview, plus **Remove** | Optional. Uploaded through the `thumbnail` upload purpose; images only. |
 | Checkpoints | Ordered list (below) | At least one. |
 
 **Save** is disabled until every rule holds. It stays disabled while a save is running, and
@@ -87,9 +94,11 @@ Each checkpoint row shows:
 
 **Add checkpoint** opens a picker dialog listing the learning path library
 (`listLearningPaths`), paginated with **Load more** like the other library lists. Each
-result shows the path's title, author, level and when it was last updated. The picker
+result shows the path's thumbnail, title, author, level, instruments and when it was last
+updated. The picker
 narrows the library with:
 - a title search;
+- an instrument filter (a path for every instrument always matches);
 - an author filter (the same searchable teacher picker the course list uses);
 - a level filter (any of the five levels);
 - skill and concept filters (the same tree pickers the course filters use);
@@ -173,10 +182,16 @@ The course list shows each course's language, and its filters gain a language fi
 ## Changes outside the course pages
 
 - **Path builder (`/teacher/paths/new`, `/teacher/paths/:id/edit`):** gains a required
-  **Level** field, the same segmented choice as the course builder. Saving now sends it. A
-  path opened without a level shows the field empty and can't be saved until one is chosen.
-- **Learner catalog (`/courses`):** each course shows its language, and the filters gain a
-  language filter, defaulting to the learner's own language.
+  **Level** field (the same segmented choice as the course builder), plus the same
+  **Instruments** and **Thumbnail** fields. A path opened without a level shows the field empty
+  and can't be saved until one is chosen.
+- **Content authoring (`/teacher/content/...`):** gains the same **Instruments** and
+  **Thumbnail** fields. Publishing a content node publishes them too.
+- **Library lists (courses, paths, content):** each row shows its thumbnail and instruments,
+  and the filters gain an instrument filter.
+- **Learner catalog (`/courses`):** each course card shows its thumbnail, language and
+  instruments, and the filters gain a language filter (defaulting to the learner's own
+  language) and an instrument filter.
 
 ## Acceptance criteria
 
@@ -201,6 +216,10 @@ The course list shows each course's language, and its filters gain a language fi
 12. The checkpoint picker filters by author, level, skills and concepts, and sorts by title or
     by last update.
 13. The path builder requires a level.
+14. Courses, paths and content nodes can be tagged with instruments or marked for every
+    instrument, and every list can be filtered by instrument without losing items for every
+    instrument.
+15. Courses, paths and content nodes can be given, shown with, and cleared of a thumbnail.
 
 ## Out of scope and follow-ups
 
@@ -220,3 +239,7 @@ Still open. The defaults above are proposals:
    this today. If it's kept here, it could later be added to them too.
 4. **The learner catalog's language filter defaults to the learner's own language.** They
    can clear it to see every course.
+5. **"Every instrument" is the default** for new courses, paths and content nodes, and for
+   everything that exists today.
+6. **Items with no thumbnail show a neutral placeholder** in cards and lists, rather than
+   leaving a gap.
