@@ -152,6 +152,15 @@ paths:
               - advanced
               - expert
           description: When given, only content nodes at this difficulty level are returned.
+        - name: instrument_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: >-
+            Restricts the results to items for this instrument, or for
+            every instrument (an empty instrument_ids).
       responses:
         "200":
           description: One page of the matching content nodes, possibly empty.
@@ -219,6 +228,8 @@ paths:
                     concept_ids: ["7a2d9e10-4f3b-4c5a-8e6d-1b2c3d4e5f60"]
                     difficulty_level: beginner
                   media_url: "https://cdn.motifpath.io/videos/triad-shapes-intro.mp4"
+                  instrument_ids:
+                    - "5b1a2c3d-0000-0000-0000-000000000001"
                   language_codes:
                     - en
       responses:
@@ -2320,6 +2331,15 @@ paths:
           description: >-
             title orders by title, then id. updated orders by updated_at,
             most recent first, then id.
+        - name: instrument_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: >-
+            Restricts the results to items for this instrument, or for
+            every instrument (an empty instrument_ids).
       responses:
         "200":
           description: One page of the existing learning paths, possibly empty.
@@ -2370,6 +2390,7 @@ paths:
                 value:
                   title: "Beginner Guitar"
                   level: beginner
+                  instrument_ids: []
                   items:
                     - content_node_id: "c9d1e2f3-0000-0000-0000-000000000001"
                     - content_node_id: "c9d1e2f3-0000-0000-0000-000000000002"
@@ -2379,6 +2400,7 @@ paths:
                 value:
                   title: "Rhythm Foundations"
                   level: early_intermediate
+                  instrument_ids: []
                   items:
                     - content_node_id: "c9d1e2f3-0000-0000-0000-000000000001"
                       section_label: "Open chords"
@@ -2668,6 +2690,15 @@ paths:
           description: |
             Restricts the results to courses written in this language
             (a Language.code other than "any").
+        - name: instrument_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: >-
+            Restricts the results to items for this instrument, or for
+            every instrument (an empty instrument_ids).
       responses:
         "200":
           description: One page of the published catalog, possibly empty.
@@ -2838,6 +2869,15 @@ paths:
           description: |
             Restricts the results to courses written in this language
             (a Language.code other than "any").
+        - name: instrument_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: >-
+            Restricts the results to items for this instrument, or for
+            every instrument (an empty instrument_ids).
       responses:
         "200":
           description: One page of the courses the caller authors or manages, possibly empty.
@@ -2894,6 +2934,7 @@ paths:
                   summary: "From first fingerpicked chords to a full repertoire."
                   level: beginner
                   language: en
+                  instrument_ids: []
                   checkpoints:
                     - learning_path_id: "d4e5f6a7-0000-0000-0000-000000000001"
                       title: "Stage 1: Open chords"
@@ -3991,11 +4032,23 @@ components:
             codes in the same array. Must not be empty — a node must be
             explicitly tagged as either specific language(s) or
             language-agnostic, never left unclassified.
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+        thumbnail_url:
+          type: string
+          format: uri
+          description: >-
+            An image shown for this item in lists and cards, as an absolute
+            http or https URL (typically one returned by POST
+            /media/upload-url with purpose thumbnail). Omitted means no
+            thumbnail; on a replace or update, omitting it removes the
+            current one.
       required:
         - title
         - content_type
         - classification
         - language_codes
+        - instrument_ids
 
     ClassificationInput:
       type: object
@@ -4149,6 +4202,14 @@ components:
             ContentNodeVersion, or null if this node has never been
             published. A node with no published version cannot be
             copied into a StudentPathItem.
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+        thumbnail_url:
+          type: string
+          format: uri
+          description: >-
+            An image shown for this item in lists and cards. Absent when it
+            has none.
       required:
         - content_node_id
         - teacher
@@ -4157,6 +4218,7 @@ components:
         - classification
         - languages
         - created_at
+        - instrument_ids
 
     ContentNodeVersion:
       type: object
@@ -4197,6 +4259,18 @@ components:
           type: string
           format: date-time
           description: Timestamp at which this version was published.
+        instrument_ids_snapshot:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: >-
+            The instrument_ids at the moment of publishing; empty means
+            every instrument.
+        thumbnail_url_snapshot:
+          type: string
+          format: uri
+          description: The thumbnail_url at the moment of publishing; absent when there was none.
       required:
         - content_node_id
         - version_number
@@ -4204,6 +4278,7 @@ components:
         - classification_snapshot
         - languages_snapshot
         - published_at
+        - instrument_ids_snapshot
 
     UpdateContentNodeRequest:
       type: object
@@ -4248,10 +4323,22 @@ components:
             "any" marks the content as language-agnostic; "any" cannot be
             combined with other language codes in the same array. Must not
             be empty.
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+        thumbnail_url:
+          type: string
+          format: uri
+          description: >-
+            An image shown for this item in lists and cards, as an absolute
+            http or https URL (typically one returned by POST
+            /media/upload-url with purpose thumbnail). Omitted means no
+            thumbnail; on a replace or update, omitting it removes the
+            current one.
       required:
         - title
         - classification
         - language_codes
+        - instrument_ids
 
     Skill:
       type: object
@@ -5126,10 +5213,22 @@ components:
                   area — never a time period or schedule.
             required:
               - content_node_id
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+        thumbnail_url:
+          type: string
+          format: uri
+          description: >-
+            An image shown for this item in lists and cards, as an absolute
+            http or https URL (typically one returned by POST
+            /media/upload-url with purpose thumbnail). Omitted means no
+            thumbnail; on a replace or update, omitting it removes the
+            current one.
       required:
         - title
         - level
         - items
+        - instrument_ids
 
     LearningPathItem:
       type: object
@@ -5206,6 +5305,14 @@ components:
           description: >-
             Timestamp at which this learning path was last created or
             replaced.
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+        thumbnail_url:
+          type: string
+          format: uri
+          description: >-
+            An image shown for this item in lists and cards. Absent when it
+            has none.
       required:
         - learning_path_id
         - teacher
@@ -5213,6 +5320,7 @@ components:
         - items
         - created_at
         - updated_at
+        - instrument_ids
 
     ReplaceLearningPathRequest:
       type: object
@@ -5255,10 +5363,22 @@ components:
                   neighbors under a named section in the resulting path view.
             required:
               - content_node_id
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+        thumbnail_url:
+          type: string
+          format: uri
+          description: >-
+            An image shown for this item in lists and cards, as an absolute
+            http or https URL (typically one returned by POST
+            /media/upload-url with purpose thumbnail). Omitted means no
+            thumbnail; on a replace or update, omitting it removes the
+            current one.
       required:
         - title
         - level
         - items
+        - instrument_ids
 
     AssignLearningPathRequest:
       type: object
@@ -5489,12 +5609,24 @@ components:
                   chords").
             required:
               - learning_path_id
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+        thumbnail_url:
+          type: string
+          format: uri
+          description: >-
+            An image shown for this item in lists and cards, as an absolute
+            http or https URL (typically one returned by POST
+            /media/upload-url with purpose thumbnail). Omitted means no
+            thumbnail; on a replace or update, omitting it removes the
+            current one.
       required:
         - title
         - summary
         - level
         - language
         - checkpoints
+        - instrument_ids
 
     ReplaceCourseRequest:
       type: object
@@ -5540,12 +5672,24 @@ components:
                   the learning path's own title.
             required:
               - learning_path_id
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+        thumbnail_url:
+          type: string
+          format: uri
+          description: >-
+            An image shown for this item in lists and cards, as an absolute
+            http or https URL (typically one returned by POST
+            /media/upload-url with purpose thumbnail). Omitted means no
+            thumbnail; on a replace or update, omitting it removes the
+            current one.
       required:
         - title
         - summary
         - level
         - language
         - checkpoints
+        - instrument_ids
 
     CourseCheckpoint:
       type: object
@@ -5629,6 +5773,14 @@ components:
             version (or nothing has been published yet). Present only
             in the authoring list, GET /courses; GET /catalog/courses
             never returns it.
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+        thumbnail_url:
+          type: string
+          format: uri
+          description: >-
+            An image shown for this item in lists and cards. Absent when it
+            has none.
       required:
         - course_id
         - title
@@ -5638,6 +5790,7 @@ components:
         - created_by
         - status
         - published_at
+        - instrument_ids
 
     Course:
       type: object
@@ -5702,6 +5855,14 @@ components:
           description: The course's checkpoints, sorted by position ascending.
           items:
             $ref: '#/components/schemas/CourseCheckpoint'
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+        thumbnail_url:
+          type: string
+          format: uri
+          description: >-
+            An image shown for this item in lists and cards. Absent when it
+            has none.
       required:
         - course_id
         - title
@@ -5713,6 +5874,7 @@ components:
         - created_at
         - has_unpublished_changes
         - checkpoints
+        - instrument_ids
 
     CourseOutlineItem:
       type: object
@@ -5803,6 +5965,14 @@ components:
           description: The course's checkpoints, sorted by position ascending.
           items:
             $ref: '#/components/schemas/CourseOutlineCheckpoint'
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+        thumbnail_url:
+          type: string
+          format: uri
+          description: >-
+            An image shown for this item in lists and cards. Absent when it
+            has none.
       required:
         - course_id
         - title
@@ -5811,6 +5981,7 @@ components:
         - language
         - status
         - checkpoints
+        - instrument_ids
 
     CourseVersion:
       type: object
@@ -5856,6 +6027,18 @@ components:
             When false, this version can no longer be self-enrolled
             into, without retiring the course or requiring a newer
             version. Already-enrolled students are unaffected.
+        instrument_ids_snapshot:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: >-
+            The instrument_ids at the moment of publishing; empty means
+            every instrument.
+        thumbnail_url_snapshot:
+          type: string
+          format: uri
+          description: The thumbnail_url at the moment of publishing; absent when there was none.
       required:
         - course_id
         - version_number
@@ -5865,6 +6048,7 @@ components:
         - language_snapshot
         - published_at
         - available_for_new_enrollments
+        - instrument_ids_snapshot
 
     CreateCourseEnrollmentRequest:
       type: object
@@ -7043,17 +7227,20 @@ components:
           enum:
             - exercise_asset
             - library_asset
+            - thumbnail
           description: |
             What the uploaded object is for. exercise_asset requires
             exercise_id and stores the object under that exercise's prefix.
             library_asset stores the object under the shared, predefined
-            image-picker library's prefix.
+            image-picker library's prefix. thumbnail stores an image shown for
+            a course, learning path or content node in lists and cards; its
+            content_type must be image.
         exercise_id:
           type: string
           format: uuid
           description: |
             The exercise this upload belongs to. Required when purpose is
-            exercise_asset; must be absent when purpose is library_asset.
+            exercise_asset; must be absent otherwise.
         content_type:
           type: string
           enum:
@@ -7142,6 +7329,17 @@ components:
         minLength: 1
         maxLength: 200
         description: The text in the language its key names; not blank.
+
+    InstrumentIds:
+      type: array
+      description: |
+        The instruments this item is for, by Instrument.instrument_id. An
+        empty list means it suits every instrument (for example, music
+        theory). Every id must reference an existing instrument, and none
+        may repeat.
+      items:
+        type: string
+        format: uuid
 
     LocalizedMarkerLabel:
       type: object
