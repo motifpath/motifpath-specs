@@ -3,6 +3,7 @@
 **Status:** Accepted — 2026-09-22
 **Date:** 2026-09-21
 **Deciders:** Gilson Yamada (solo engineering at MVP)
+**Amended by:** ADR-037 (2026-09-25) — every user can self-enroll; the learner catalog moves to `GET /catalog/courses` and `GET /catalog/creators`, and `GET /courses` becomes authoring-only.
 
 ---
 
