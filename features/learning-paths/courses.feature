@@ -119,7 +119,6 @@ Feature: Author courses
     Then the response includes "fingerstyle-journey"
     And the response does not include "draft-only-course"
 
-  @wip
   Scenario: A teacher's course list includes their own courses of every status
     Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
     And a course "draft-only-course" exists as a draft with checkpoints "strumming-path", created by "bob"
@@ -127,7 +126,6 @@ Feature: Author courses
     When "bob" lists the courses they manage
     Then the response includes "fingerstyle-journey" and "draft-only-course"
 
-  @wip
   Scenario: A teacher browses the published catalog like any learner
     Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
     And a course "strumming-basics" exists, published, created by "carol", with checkpoints "strumming-path"
@@ -136,7 +134,6 @@ Feature: Author courses
     Then the response includes "strumming-basics"
     And the response does not include "fingerstyle-journey"
 
-  @wip
   Scenario: An admin browsing the catalog sees only published courses
     Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
     And a course "draft-only-course" exists as a draft with checkpoints "strumming-path"
@@ -145,7 +142,6 @@ Feature: Author courses
     Then the response includes "fingerstyle-journey"
     And the response does not include "draft-only-course"
 
-  @wip
   Scenario: A student cannot list the courses teachers manage
     Given "alice" is authenticated as a student
     When "alice" lists the courses they manage
@@ -167,7 +163,6 @@ Feature: Author courses
     When "alice" lists the course catalog
     Then the entry for "fingerstyle-journey" records "bob" as the creator
 
-  @wip
   Scenario: A teacher's course list is always limited to their own courses
     Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
     And a course "strumming-basics" exists as a draft, created by "carol", with checkpoints "strumming-path"
@@ -176,13 +171,11 @@ Feature: Author courses
     Then the response includes "fingerstyle-journey"
     And the response does not include "strumming-basics"
 
-  @wip
   Scenario: A teacher cannot list another teacher's courses
     Given "bob" is authenticated as a teacher
     When "bob" lists the courses they manage filtered by creator "carol"
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: An admin lists every creator's courses, or narrows to one
     Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
     And a course "strumming-basics" exists as a draft, created by "carol", with checkpoints "strumming-path"
@@ -219,7 +212,6 @@ Feature: Author courses
     When "alice" lists the course creators
     Then the creators returned do not include "bob"
 
-  @wip
   Scenario: The creators of a teacher's managed courses are only themselves
     Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
     And a course "strumming-basics" exists, published, created by "carol", with checkpoints "strumming-path"
@@ -227,7 +219,6 @@ Feature: Author courses
     When "bob" lists the creators of the courses they manage
     Then the creators returned are "bob", each with their display name
 
-  @wip
   Scenario: An admin lists the creator of every course they manage, whatever its status
     Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
     And a course "strumming-basics" exists, published, created by "carol", with checkpoints "strumming-path"
@@ -235,7 +226,6 @@ Feature: Author courses
     When "admin" lists the creators of the courses they manage
     Then the creators returned are "bob" and "carol", each with their display name
 
-  @wip
   Scenario: A teacher browsing the catalog sees the creator of every published course
     Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
     And a course "strumming-basics" exists, published, created by "carol", with checkpoints "strumming-path"
@@ -243,7 +233,6 @@ Feature: Author courses
     When "bob" lists the course creators
     Then the creators returned are "carol", each with their display name
 
-  @wip
   Scenario: A student cannot list the creators of the courses teachers manage
     Given "alice" is authenticated as a student
     When "alice" lists the creators of the courses they manage
@@ -358,7 +347,6 @@ Feature: Author courses
     When "alice" lists the course catalog filtered by skill "fingerpicking"
     Then the response does not include "fingerstyle-journey"
 
-  @wip
   Scenario: A teacher's classification filter matches the live draft
     Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
     And "bob" replaces the draft of "fingerstyle-journey" with checkpoints "open-chords-path", "strumming-path"

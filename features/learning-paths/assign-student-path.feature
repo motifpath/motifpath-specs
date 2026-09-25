@@ -49,7 +49,6 @@ Feature: Assign learning paths to students
     When "bob" assigns a learning path ID that does not exist to student "alice"
     Then the request is refused with a not-found error
 
-  @wip
   Scenario: A teacher can be assigned a path, like any learner
     Given "bob" is authenticated as a teacher
     And "carol" is registered as a teacher
