@@ -39,7 +39,6 @@ Feature: List a student's standalone paths
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher lists their own standalone paths, like any learner
     Given "bob" is authenticated as a teacher
     When "bob" attempts to list their standalone paths

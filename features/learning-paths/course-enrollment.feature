@@ -122,7 +122,6 @@ Feature: Student self-enrollment in courses
 
   # ── Authorisation failures ─────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher enrolls in a course as a learner, like any user
     Given "bob" is authenticated as a teacher
     When "bob" attempts to enroll in course "fingerstyle-journey"
