@@ -167,7 +167,6 @@ Feature: Author courses
 
   # ── Catalog creators (the creator filter's options) ───────────────────────
 
-  @wip
   Scenario: A student lists the creators of published courses only
     Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
     And a course "strumming-basics" exists, published, created by "carol", with checkpoints "strumming-path"
@@ -177,7 +176,6 @@ Feature: Author courses
     Then the creators returned are "bob" and "carol", each with their display name
     And the creators returned do not include "dave"
 
-  @wip
   Scenario: A creator with several published courses is listed once
     Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
     And a course "strumming-basics" exists, published, created by "bob", with checkpoints "strumming-path"
@@ -185,7 +183,6 @@ Feature: Author courses
     When "alice" lists the course creators
     Then the creators returned are "bob", each with their display name
 
-  @wip
   Scenario: A creator whose only course was retired is no longer listed to students
     Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
@@ -194,7 +191,6 @@ Feature: Author courses
     When "alice" lists the course creators
     Then the creators returned do not include "bob"
 
-  @wip
   Scenario: A teacher's course creators are limited to themselves
     Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
     And a course "strumming-basics" exists, published, created by "carol", with checkpoints "strumming-path"
@@ -202,7 +198,6 @@ Feature: Author courses
     When "bob" lists the course creators
     Then the creators returned are "bob", each with their display name
 
-  @wip
   Scenario: An admin lists the creator of every course, whatever its status
     Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
     And a course "strumming-basics" exists, published, created by "carol", with checkpoints "strumming-path"
@@ -210,7 +205,6 @@ Feature: Author courses
     When "admin" lists the course creators
     Then the creators returned are "bob" and "carol", each with their display name
 
-  @wip
   Scenario: Listing course creators without an authentication token is refused
     Given no authentication token is provided
     When an unauthenticated request attempts to list the course creators
