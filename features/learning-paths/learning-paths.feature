@@ -252,3 +252,103 @@ Feature: Manage learning paths
     Given "bob" is authenticated as a teacher
     When "bob" lists learning paths with limit 0
     Then the request is refused with a validation error
+
+  # ── Level and last update ─────────────────────────────────────────────────
+
+  @wip
+  Scenario: A teacher creates a learning path at a level
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a learning path titled "Beginner Guitar" at level "beginner" with items in order: "node-01", "node-02"
+    Then the learning path is created and assigned a stable identifier
+    And the learning path's level is "beginner"
+
+  @wip
+  Scenario: Creating a learning path without a level is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" submits a create learning path request with the level field omitted
+    Then the request is refused with a validation error
+
+  @wip
+  Scenario: A learning path created before levels were recorded has no level until it is saved again
+    Given a learning path "legacy-path" exists with items "node-01" and no level recorded
+    And "bob" is authenticated as a teacher
+    When "bob" retrieves the learning path "legacy-path"
+    Then the learning path has no level
+
+  @wip
+  Scenario: Replacing a learning path records when it was last updated
+    Given a learning path "beginner-guitar-path" exists with items "node-01", last updated on "2026-09-01"
+    And "bob" is authenticated as a teacher
+    When "bob" replaces learning path "beginner-guitar-path" at level "beginner" with items in order: "node-02"
+    Then the learning path's last update is later than "2026-09-01"
+
+  # ── Library filters and sorting ───────────────────────────────────────────
+
+  @wip
+  Scenario: A teacher narrows the library to paths created by one author
+    Given a learning path "bobs-path" exists with items "node-01", created by "bob"
+    And a learning path "carols-path" exists with items "node-02", created by "carol"
+    And "bob" is authenticated as a teacher
+    When "bob" lists learning paths filtered by creator "carol"
+    Then the response includes "carols-path"
+    And the response does not include "bobs-path"
+
+  @wip
+  Scenario: A teacher narrows the library to paths at any of several levels
+    Given a learning path "first-steps" exists with items "node-01", at level "beginner"
+    And a learning path "going-further" exists with items "node-02", at level "intermediate"
+    And a learning path "mastery" exists with items "node-03", at level "expert"
+    And "bob" is authenticated as a teacher
+    When "bob" lists learning paths filtered by levels "beginner", "intermediate"
+    Then the response includes "first-steps" and "going-further"
+    And the response does not include "mastery"
+
+  @wip
+  Scenario: A path with no level recorded never matches a level filter
+    Given a learning path "legacy-path" exists with items "node-01" and no level recorded
+    And "bob" is authenticated as a teacher
+    When "bob" lists learning paths filtered by levels "beginner"
+    Then the response does not include "legacy-path"
+
+  @wip
+  Scenario: A teacher narrows the library to paths teaching a skill
+    Given content node "node-01" is classified with skill "fingerpicking"
+    And a learning path "fingerpicking-path" exists with items "node-01"
+    And a learning path "other-path" exists with items "node-02"
+    And "bob" is authenticated as a teacher
+    When "bob" lists learning paths filtered by skill "fingerpicking"
+    Then the response includes "fingerpicking-path"
+    And the response does not include "other-path"
+
+  @wip
+  Scenario: A path matches a skill and concept filter only when one of its nodes has both
+    Given content node "node-01" is classified with skill "fingerpicking" and concept "syncopation"
+    And content node "node-02" is classified with skill "fingerpicking"
+    And a learning path "both-path" exists with items "node-01"
+    And a learning path "skill-only-path" exists with items "node-02"
+    And "bob" is authenticated as a teacher
+    When "bob" lists learning paths filtered by skill "fingerpicking" and concept "syncopation"
+    Then the response includes "both-path"
+    And the response does not include "skill-only-path"
+
+  @wip
+  Scenario: A teacher lists the most recently updated paths first
+    Given a learning path "Alpha Path" exists with items "node-01", last updated on "2026-09-01"
+    And a learning path "Beta Path" exists with items "node-02", last updated on "2026-09-20"
+    And "bob" is authenticated as a teacher
+    When "bob" lists learning paths sorted by most recently updated
+    Then the response lists "Beta Path" before "Alpha Path"
+
+  @wip
+  Scenario: The library is ordered by title unless another order is asked for
+    Given a learning path "Beta Path" exists with items "node-01", last updated on "2026-09-20"
+    And a learning path "Alpha Path" exists with items "node-02", last updated on "2026-09-01"
+    And "bob" is authenticated as a teacher
+    When "bob" lists all learning paths
+    Then the response lists "Alpha Path" before "Beta Path"
+
+  @wip
+  Scenario: An unknown sort order is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" lists learning paths sorted by "popularity"
+    Then the request is refused with a validation error
