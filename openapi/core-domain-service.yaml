@@ -2697,6 +2697,45 @@ paths:
               schema:
                 $ref: '#/components/schemas/ForbiddenError'
 
+  /courses/creators:
+    get:
+      operationId: listCourseCreators
+      summary: List the creators of the courses visible to the caller
+      description: |
+        Returns every distinct user who created at least one course the
+        caller would see in GET /courses, so a client can offer a
+        complete creator filter (the created_by parameter of GET
+        /courses) without paging through the whole catalog.
+
+        Visibility follows GET /courses exactly. A student gets the
+        creators of published courses only — a creator whose courses are
+        all drafts or retired is left out. A teacher gets at most
+        themselves, since their course list is always limited to their
+        own courses. An admin gets the creator of every course, whatever
+        its status.
+
+        The list is unpaginated: it is bounded by the number of teachers
+        and admins, not by the size of the catalog (ADR-031's small,
+        bounded reference lists). Results are ordered by display_name,
+        then user_id; an empty array means no course is visible.
+      tags:
+        - Courses
+      responses:
+        "200":
+          description: The creators of the courses visible to the caller, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRef'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
   /courses/{course_id}:
     get:
       operationId: getCourse
