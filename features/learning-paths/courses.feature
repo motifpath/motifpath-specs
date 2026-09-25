@@ -616,3 +616,70 @@ Feature: Author courses
     Given "admin" is authenticated as an admin
     When "admin" reactivates a course with an ID that does not exist
     Then the request is refused with a not-found error
+
+  # ── Instruments and thumbnail ─────────────────────────────────────────────
+
+  @wip
+  Scenario: A teacher creates a course for specific instruments
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "electric-guitar" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates a course titled "Blues Rhythm" for instruments "guitar", "electric-guitar" with checkpoints in order: "open-chords-path"
+    Then the course is created and assigned a stable identifier
+    And the course is for instruments "guitar", "electric-guitar"
+
+  @wip
+  Scenario: A course created with no instruments suits every instrument
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a course titled "Music Theory Basics" for every instrument with checkpoints in order: "theory-path"
+    Then the course is created and assigned a stable identifier
+    And the course is for every instrument
+
+  @wip
+  Scenario: Creating a course for an instrument that does not exist is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a course titled "Blues Rhythm" for instruments "banjo" with checkpoints in order: "open-chords-path"
+    Then the request is refused with a validation error
+
+  @wip
+  Scenario: The catalog's instrument filter keeps courses that suit every instrument
+    Given a fretted instrument "guitar" exists in the system
+    And a keyboard instrument "piano" exists in the system
+    And a course "blues-rhythm" exists, published for instruments "guitar", with checkpoints "open-chords-path"
+    And a course "music-theory-basics" exists, published for every instrument, with checkpoints "theory-path"
+    And a course "piano-chords" exists, published for instruments "piano", with checkpoints "strumming-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by instrument "guitar"
+    Then the response includes "blues-rhythm" and "music-theory-basics"
+    And the response does not include "piano-chords"
+
+  @wip
+  Scenario: The catalog's instrument filter ignores unpublished instrument changes
+    Given a fretted instrument "guitar" exists in the system
+    And a keyboard instrument "piano" exists in the system
+    And a course "blues-rhythm" exists, published for instruments "guitar", created by "bob", with checkpoints "open-chords-path"
+    And "bob" is authenticated as a teacher
+    And "bob" replaces course "blues-rhythm" setting its instruments to "piano"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog filtered by instrument "guitar"
+    Then the response includes "blues-rhythm"
+
+  @wip
+  Scenario: A course's thumbnail is published with it
+    Given a course "fingerstyle-journey" exists as a draft with thumbnail "https://cdn.motifpath.io/thumbnails/fingerstyle.png" and checkpoints "open-chords-path"
+    And "admin" is authenticated as an admin
+    When "admin" publishes course "fingerstyle-journey"
+    Then course version 1 records the thumbnail "https://cdn.motifpath.io/thumbnails/fingerstyle.png"
+
+  @wip
+  Scenario: Replacing a course without a thumbnail removes it
+    Given a course "fingerstyle-journey" exists as a draft with thumbnail "https://cdn.motifpath.io/thumbnails/fingerstyle.png" and checkpoints "open-chords-path"
+    And "bob" is authenticated as a teacher
+    When "bob" replaces course "fingerstyle-journey" without a thumbnail
+    Then the course has no thumbnail
+
+  @wip
+  Scenario: A course thumbnail that is not an http or https URL is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a course titled "Fingerstyle Journey" with thumbnail "ftp://files.example/fingerstyle.png" and checkpoints in order: "open-chords-path"
+    Then the request is refused with a validation error

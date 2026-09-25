@@ -338,3 +338,52 @@ Feature: Manage content nodes
       | 0     | 0      |
       | 101   | 0      |
       | 20    | -1     |
+
+  # ── Instruments and thumbnail ─────────────────────────────────────────────
+
+  @wip
+  Scenario: A teacher creates a content node for specific instruments
+    Given a fretted instrument "guitar" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates an article content node titled "Barre Chords" for instruments "guitar"
+    Then the content node is created and assigned a stable identifier
+    And the content node is for instruments "guitar"
+
+  @wip
+  Scenario: A content node created with no instruments suits every instrument
+    Given "bob" is authenticated as a teacher
+    When "bob" creates an article content node titled "Intervals Explained" for every instrument
+    Then the content node is for every instrument
+
+  @wip
+  Scenario: Creating a content node for an instrument that does not exist is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" creates an article content node titled "Barre Chords" for instruments "banjo"
+    Then the request is rejected as invalid
+
+  @wip
+  Scenario: The content node list's instrument filter keeps nodes that suit every instrument
+    Given a fretted instrument "guitar" exists in the system
+    And a keyboard instrument "piano" exists in the system
+    And a content node "barre-chords" exists for instruments "guitar"
+    And a content node "intervals-explained" exists for every instrument
+    And a content node "piano-voicings" exists for instruments "piano"
+    And "bob" is authenticated as a teacher
+    When "bob" lists content nodes filtered by instrument "guitar"
+    Then the response includes "barre-chords" and "intervals-explained"
+    And the response does not include "piano-voicings"
+
+  @wip
+  Scenario: A content node's instruments and thumbnail are published with it
+    Given a fretted instrument "guitar" exists in the system
+    And a content node "barre-chords" exists for instruments "guitar" with thumbnail "https://cdn.motifpath.io/thumbnails/barre.png"
+    And "bob" is authenticated as a teacher
+    When "bob" publishes content node "barre-chords"
+    Then the new content node version records instruments "guitar" and thumbnail "https://cdn.motifpath.io/thumbnails/barre.png"
+
+  @wip
+  Scenario: Updating a content node without a thumbnail removes it
+    Given a content node "barre-chords" exists with thumbnail "https://cdn.motifpath.io/thumbnails/barre.png"
+    And "bob" is authenticated as a teacher
+    When "bob" updates content node "barre-chords" without a thumbnail
+    Then the content node has no thumbnail

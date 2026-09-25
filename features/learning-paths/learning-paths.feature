@@ -352,3 +352,44 @@ Feature: Manage learning paths
     Given "bob" is authenticated as a teacher
     When "bob" lists learning paths sorted by "popularity"
     Then the request is refused with a validation error
+
+  # ── Instruments and thumbnail ─────────────────────────────────────────────
+
+  @wip
+  Scenario: A teacher creates a learning path for specific instruments
+    Given a fretted instrument "guitar" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates a learning path titled "Open Chords" for instruments "guitar" with items in order: "node-01"
+    Then the learning path is created and assigned a stable identifier
+    And the learning path is for instruments "guitar"
+
+  @wip
+  Scenario: Creating a learning path for an instrument that does not exist is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a learning path titled "Open Chords" for instruments "banjo" with items in order: "node-01"
+    Then the request is refused with a validation error
+
+  @wip
+  Scenario: The library's instrument filter keeps paths that suit every instrument
+    Given a fretted instrument "guitar" exists in the system
+    And a keyboard instrument "piano" exists in the system
+    And a learning path "guitar-path" exists with items "node-01", for instruments "guitar"
+    And a learning path "theory-path" exists with items "node-02", for every instrument
+    And a learning path "piano-path" exists with items "node-03", for instruments "piano"
+    And "bob" is authenticated as a teacher
+    When "bob" lists learning paths filtered by instrument "guitar"
+    Then the response includes "guitar-path" and "theory-path"
+    And the response does not include "piano-path"
+
+  @wip
+  Scenario: A teacher gives a learning path a thumbnail
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a learning path titled "Open Chords" with thumbnail "https://cdn.motifpath.io/thumbnails/open-chords.png" and items in order: "node-01"
+    Then the learning path's thumbnail is "https://cdn.motifpath.io/thumbnails/open-chords.png"
+
+  @wip
+  Scenario: Replacing a learning path without a thumbnail removes it
+    Given a learning path "open-chords-path" exists with items "node-01" and thumbnail "https://cdn.motifpath.io/thumbnails/open-chords.png"
+    And "bob" is authenticated as a teacher
+    When "bob" replaces learning path "open-chords-path" without a thumbnail
+    Then the learning path has no thumbnail

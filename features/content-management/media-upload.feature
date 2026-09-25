@@ -23,7 +23,27 @@ Feature: Request a presigned media upload URL
     Then a presigned upload URL is returned
     And the response includes the object's read URL and an expiry time
 
+  @wip
+  Scenario: A teacher requests an upload URL for a thumbnail
+    Given "bob" is authenticated as a teacher
+    When "bob" requests a media upload URL for purpose "thumbnail" with content type "image" and file name "open-chords.png"
+    Then a presigned upload URL is returned
+    And the response includes the object's read URL and an expiry time
+
   # ── Validation failures ────────────────────────────────────────────────────
+
+  @wip
+  Scenario: Requesting a thumbnail upload URL for audio is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" requests a media upload URL for purpose "thumbnail" with content type "audio" and file name "intro.mp3"
+    Then the request is refused with a validation error
+
+  @wip
+  Scenario: Requesting a thumbnail upload URL with an exercise_id is rejected
+    Given "bob" is authenticated as a teacher
+    And an exercise "triad-exercise-01" exists
+    When "bob" requests a media upload URL for purpose "thumbnail" on exercise "triad-exercise-01" with content type "image" and file name "cover.png"
+    Then the request is refused with a validation error
 
   Scenario: Requesting an exercise_asset upload URL without an exercise_id is rejected
     Given "bob" is authenticated as a teacher
