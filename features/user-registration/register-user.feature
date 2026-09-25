@@ -30,28 +30,24 @@ Feature: Register a MotifPath user
   # The name comes from the "name" claim of the Clerk session token, never from
   # the request body.
 
-  @wip
   Scenario: Registration records the name carried by the identity token
     Given a Clerk identity "alice" has not yet been registered
     And "alice" is named "Alice Martins"
     When "alice" registers with role "student"
     Then the response includes the display name "Alice Martins"
 
-  @wip
   Scenario: Surrounding whitespace is trimmed from the registered name
     Given a Clerk identity "alice" has not yet been registered
     And "alice" is named "  Alice Martins  "
     When "alice" registers with role "student"
     Then the response includes the display name "Alice Martins"
 
-  @wip
   Scenario: A name longer than 200 characters is cut to its first 200 characters
     Given a Clerk identity "alice" has not yet been registered
     And "alice" is named with 250 characters
     When "alice" registers with role "student"
     Then the response includes a display name of exactly 200 characters
 
-  @wip
   Scenario: A registered user's profile includes their display name
     Given "alice" has already registered as a student
     And "alice" is named "Alice Martins"
@@ -95,7 +91,6 @@ Feature: Register a MotifPath user
     Then the request is rejected as invalid
     And the rejection identifies "role" as the source of the error
 
-  @wip
   Scenario: Registration from an identity token without a name is rejected
     Given a Clerk identity "dora" has not yet been registered
     And the identity token of "dora" carries no name
@@ -104,7 +99,6 @@ Feature: Register a MotifPath user
     And the rejection identifies "name" as the source of the error
     And no user record exists for "dora"
 
-  @wip
   Scenario: Registration from an identity token with a blank name is rejected
     Given a Clerk identity "dora" has not yet been registered
     And "dora" is named "   "
