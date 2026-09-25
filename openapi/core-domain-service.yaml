@@ -2715,9 +2715,9 @@ paths:
         its status.
 
         The list is unpaginated: it is bounded by the number of teachers
-        and admins, not by the size of the catalog (ADR-031's small,
-        bounded reference lists). Results are ordered by display_name,
-        then user_id; an empty array means no course is visible.
+        and admins, not by the size of the catalog. Results are ordered
+        by display_name, then user_id; an empty array means no course is
+        visible.
       tags:
         - Courses
       responses:
