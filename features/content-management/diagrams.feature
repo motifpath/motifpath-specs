@@ -89,7 +89,6 @@ Feature: Manage prebuilt diagrams
     And the diagram's kind is "custom"
     And the diagram records "bob" as the creator
 
-  @wip
   Scenario: An admin creates a basic diagram
     Given "admin" is authenticated as an admin
     When "admin" creates a basic diagram named "C Major Scale" in English and "Escala de Dó maior" in Portuguese on instrument "guitar" classified under skills "major-scale", concepts "scale-construction" with fretted positions:
@@ -114,7 +113,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Names and languages ────────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher names a diagram in English and in Portuguese
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Minor Pentatonic" in English and "Pentatônica menor" in Portuguese on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -124,7 +122,6 @@ Feature: Manage prebuilt diagrams
     And the diagram's name in "pt_BR" is "Pentatônica menor"
     And the diagram's languages are "en, pt_BR"
 
-  @wip
   Scenario: A teacher's own diagram may be named in a single language other than English
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named only "Pentatônica menor" in Portuguese on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -133,7 +130,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram is created and assigned a stable identifier
     And the diagram's languages are "pt_BR"
 
-  @wip
   Scenario: A basic diagram named in only one language is rejected
     Given "admin" is authenticated as an admin
     When "admin" creates a basic diagram named only "C Major Scale" in English on instrument "guitar" classified under skills "major-scale", concepts "scale-construction" with fretted positions:
@@ -142,7 +138,6 @@ Feature: Manage prebuilt diagrams
     Then the request is rejected as invalid
     And the rejection identifies "names" as the source of the error
 
-  @wip
   Scenario: A diagram name for "any" language is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram with names "en" "Minor Pentatonic" and "any" "Minor Pentatonic" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -151,7 +146,6 @@ Feature: Manage prebuilt diagrams
     Then the request is rejected as invalid
     And the rejection identifies "names" as the source of the error
 
-  @wip
   Scenario: An admin renames a basic diagram in every language
     Given a basic diagram "major-scale-guitar" exists on instrument "guitar"
     And "admin" is authenticated as an admin
@@ -159,7 +153,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram's name in "en" is "Major Scale"
     And the diagram's name in "pt_BR" is "Escala maior"
 
-  @wip
   Scenario: Renaming a basic diagram without every language is rejected
     Given a basic diagram "major-scale-guitar" exists on instrument "guitar"
     And "admin" is authenticated as an admin
@@ -167,7 +160,6 @@ Feature: Manage prebuilt diagrams
     Then the request is rejected as invalid
     And the rejection identifies "names" as the source of the error
 
-  @wip
   Scenario: A teacher lists only the diagrams named in one language
     Given a custom diagram "bobs-english-only" exists on instrument "guitar", created by "bob", named only in "en"
     And a custom diagram "bobs-bilingual" exists on instrument "guitar", created by "bob", named in "en" and "pt_BR"
@@ -176,7 +168,6 @@ Feature: Manage prebuilt diagrams
     Then the response includes "bobs-bilingual"
     And the response does not include "bobs-english-only"
 
-  @wip
   Scenario: The diagram list is ordered by the names the caller reads
     Given a basic diagram "diagram-a" exists on instrument "guitar", named "Zebra" in English and "Arpejo" in Portuguese
     And a basic diagram "diagram-b" exists on instrument "guitar", named "Arpeggio" in English and "Zebra" in Portuguese
@@ -187,7 +178,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Interval and note codes ────────────────────────────────────────────────
 
-  @wip
   Scenario: A position with an interval outside the canonical codes is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Bad interval" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -196,7 +186,6 @@ Feature: Manage prebuilt diagrams
     Then the request is rejected as invalid
     And the rejection identifies "positions" as the source of the error
 
-  @wip
   Scenario: A position whose note name is not a letter name is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Bad note" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -205,7 +194,6 @@ Feature: Manage prebuilt diagrams
     Then the request is rejected as invalid
     And the rejection identifies "positions" as the source of the error
 
-  @wip
   Scenario: Enharmonic interval codes are kept as the author spelled them
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Blues" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -331,7 +319,6 @@ Feature: Manage prebuilt diagrams
     And the new diagram records "bob" as the creator
     And diagram "minor-pentatonic-guitar" is unchanged
 
-  @wip
   Scenario: An admin saves a copy of a teacher's custom diagram as a basic diagram
     Given a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
     And "admin" is authenticated as an admin
