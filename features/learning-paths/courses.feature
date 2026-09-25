@@ -644,14 +644,12 @@ Feature: Author courses
     When "alice" lists the course catalog filtered by instrument "guitar"
     Then the response includes "blues-rhythm"
 
-  @wip
   Scenario: A course's thumbnail is published with it
     Given a course "fingerstyle-journey" exists as a draft with thumbnail "https://cdn.motifpath.io/thumbnails/fingerstyle.png" and checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
     When "admin" publishes course "fingerstyle-journey"
     Then course version 1 records the thumbnail "https://cdn.motifpath.io/thumbnails/fingerstyle.png"
 
-  @wip
   Scenario: Replacing a course without a thumbnail removes it
     Given a course "fingerstyle-journey" exists as a draft with thumbnail "https://cdn.motifpath.io/thumbnails/fingerstyle.png" and checkpoints "open-chords-path"
     And "bob" is authenticated as a teacher
@@ -683,7 +681,6 @@ Feature: Author courses
     When "bob" replaces course "fingerstyle-journey" setting its thumbnail to "https://cdn.motifpath.io/thumbnails/fingerstyle.png"
     Then the course has unpublished changes
 
-  @wip
   Scenario: A course thumbnail that is not an http or https URL is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Fingerstyle Journey" with thumbnail "ftp://files.example/fingerstyle.png" and checkpoints in order: "open-chords-path"

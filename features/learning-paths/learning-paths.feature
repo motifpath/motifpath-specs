@@ -366,13 +366,11 @@ Feature: Manage learning paths
     Then the response includes "guitar-path" and "theory-path"
     And the response does not include "piano-path"
 
-  @wip
   Scenario: A teacher gives a learning path a thumbnail
     Given "bob" is authenticated as a teacher
     When "bob" creates a learning path titled "Open Chords" with thumbnail "https://cdn.motifpath.io/thumbnails/open-chords.png" and items in order: "node-01"
     Then the learning path's thumbnail is "https://cdn.motifpath.io/thumbnails/open-chords.png"
 
-  @wip
   Scenario: Replacing a learning path without a thumbnail removes it
     Given a learning path "open-chords-path" exists with items "node-01" and thumbnail "https://cdn.motifpath.io/thumbnails/open-chords.png"
     And "bob" is authenticated as a teacher

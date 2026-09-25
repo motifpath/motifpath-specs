@@ -369,7 +369,6 @@ Feature: Manage content nodes
     Then the response includes "barre-chords" and "intervals-explained"
     And the response does not include "piano-voicings"
 
-  @wip
   Scenario: A content node's instruments and thumbnail are published with it
     Given a fretted instrument "guitar" exists in the system
     And a content node "barre-chords" exists for instruments "guitar" with thumbnail "https://cdn.motifpath.io/thumbnails/barre.png"
@@ -377,7 +376,6 @@ Feature: Manage content nodes
     When "bob" publishes content node "barre-chords"
     Then the new content node version records instruments "guitar" and thumbnail "https://cdn.motifpath.io/thumbnails/barre.png"
 
-  @wip
   Scenario: Updating a content node without a thumbnail removes it
     Given a content node "barre-chords" exists with thumbnail "https://cdn.motifpath.io/thumbnails/barre.png"
     And "bob" is authenticated as a teacher
