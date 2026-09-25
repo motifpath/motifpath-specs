@@ -205,6 +205,45 @@ Feature: Author courses
     When "admin" lists the course creators
     Then the creators returned are "bob" and "carol", each with their display name
 
+  Scenario: Course creators are ordered by name, whatever order their courses were created in
+    Given a course "strumming-basics" exists, published, created by "carol", with checkpoints "strumming-path"
+    And a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course creators
+    Then the creators returned are "bob" and "carol", each with their display name
+
+  Scenario: Course creators are ordered by name ignoring case and accents
+    Given "bruno" is named "Bruno Lima"
+    And "alvaro" is named "álvaro Souza"
+    And a course "strumming-basics" exists, published, created by "bruno", with checkpoints "strumming-path"
+    And a course "fingerstyle-journey" exists, published, created by "alvaro", with checkpoints "open-chords-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course creators
+    Then the creators returned are "alvaro" and "bruno", each with their display name
+
+  Scenario: A student narrows the course creators by name
+    Given "bob" is named "Bob Martins"
+    And "carol" is named "Carol Dias"
+    And a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists, published, created by "carol", with checkpoints "strumming-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course creators whose name matches "dias"
+    Then the creators returned are "carol", each with their display name
+
+  Scenario: The creator name filter ignores case and accents
+    Given "jose" is named "José Almeida"
+    And a course "fingerstyle-journey" exists, published, created by "jose", with checkpoints "open-chords-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course creators whose name matches "JOSE"
+    Then the creators returned are "jose", each with their display name
+
+  Scenario: The creator name filter only narrows the creators the caller could already see
+    Given "dave" is named "Dave Rocha"
+    And a course "draft-only-course" exists as a draft, created by "dave", with checkpoints "theory-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course creators whose name matches "dave"
+    Then no creators are returned
+
   Scenario: Listing course creators without an authentication token is refused
     Given no authentication token is provided
     When an unauthenticated request attempts to list the course creators

@@ -2715,11 +2715,23 @@ paths:
         its status.
 
         The list is unpaginated: it is bounded by the number of teachers
-        and admins, not by the size of the catalog. Results are ordered
-        by display_name, then user_id; an empty array means no course is
-        visible.
+        and admins, not by the size of the catalog. Results are always
+        ordered by display_name, alphabetically as a person reads names —
+        ignoring case and accents, so "Álvaro" sorts with the A's — then
+        by user_id; an empty array means no creator matches.
       tags:
         - Courses
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+          description: >-
+            Restricts the results to creators whose display_name contains
+            this text, ignoring case and accents ("jose" matches "José").
       responses:
         "200":
           description: The creators of the courses visible to the caller, possibly empty.
