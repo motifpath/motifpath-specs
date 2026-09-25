@@ -577,6 +577,18 @@ Feature: Author courses
     And course "fingerstyle-journey" still has only course version 1
 
   @wip
+  Scenario: Reactivating a course with unpublished edits brings back its latest published version, not the edits
+    Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
+    And "bob" is authenticated as a teacher
+    And "bob" replaces course "fingerstyle-journey" with checkpoints in order: "strumming-path"
+    And "admin" is authenticated as an admin
+    And "admin" retires course "fingerstyle-journey"
+    When "admin" reactivates course "fingerstyle-journey"
+    Then the course's status becomes "published"
+    And the course has unpublished changes
+    And the published version of "fingerstyle-journey" still has checkpoints "open-chords-path"
+
+  @wip
   Scenario: A teacher cannot reactivate a course
     Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
     And "admin" is authenticated as an admin

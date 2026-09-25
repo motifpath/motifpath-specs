@@ -41,7 +41,10 @@ builder.
 **2. An admin can reactivate a retired course.** `POST /courses/{course_id}/reactivate` moves
 a `retired` course back to `published`, back in the catalog with its latest published version.
 It is admin-only, like publish and retire. It is refused for a course that isn't retired, and
-it never creates a version. The lifecycle becomes `draft → published ⇄ retired`.
+it never creates a version. Retiring never changes or removes published versions, so there is
+always one to return to. Unpublished draft edits stay unpublished: learners get the latest
+published version, and the course keeps showing that it has unpublished changes until an
+admin publishes them. The lifecycle becomes `draft → published ⇄ retired`.
 
 **3. Learning paths gain an authored level and a last-updated time, and the library can be
 filtered and sorted.**
