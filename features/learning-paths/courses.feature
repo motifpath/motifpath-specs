@@ -497,32 +497,27 @@ Feature: Author courses
 
   # ── Course language ───────────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher creates a course written in one language
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Violão Fingerstyle" in language "pt_BR" with checkpoints in order: "open-chords-path"
     Then the course is created and assigned a stable identifier
     And the course's language is "pt_BR"
 
-  @wip
   Scenario: Creating a course without a language is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create course request with the language field omitted
     Then the request is refused with a validation error
 
-  @wip
   Scenario: A course cannot be written in the language-agnostic marker
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Fingerstyle Journey" in language "any" with checkpoints in order: "open-chords-path"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: Creating a course in a language MotifPath does not offer is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Fingerstyle Journey" in language "xx" with checkpoints in order: "open-chords-path"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: A learner narrows the catalog to courses in one language
     Given a course "fingerstyle-journey" exists, published in language "en", with checkpoints "open-chords-path"
     And a course "violao-fingerstyle" exists, published in language "pt_BR", with checkpoints "strumming-path"
@@ -531,7 +526,6 @@ Feature: Author courses
     Then the response includes "violao-fingerstyle"
     And the response does not include "fingerstyle-journey"
 
-  @wip
   Scenario: The catalog's language filter ignores an unpublished change of language
     Given a course "fingerstyle-journey" exists, published in language "en", with checkpoints "open-chords-path"
     And "bob" is authenticated as a teacher
@@ -540,7 +534,6 @@ Feature: Author courses
     When "alice" lists the course catalog filtered by language "pt_BR"
     Then the response does not include "fingerstyle-journey"
 
-  @wip
   Scenario: A teacher's language filter matches the live draft
     Given a course "fingerstyle-journey" exists, published in language "en", created by "bob", with checkpoints "open-chords-path"
     And "bob" is authenticated as a teacher
@@ -548,7 +541,6 @@ Feature: Author courses
     When "bob" lists the courses they manage filtered by language "pt_BR"
     Then the response includes "fingerstyle-journey"
 
-  @wip
   Scenario: Publishing records the course's language in the new version
     Given a course "violao-fingerstyle" exists as a draft in language "pt_BR" with checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
