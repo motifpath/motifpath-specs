@@ -205,9 +205,9 @@ Feature: Author courses
     When "admin" lists the course creators
     Then the creators returned are "bob" and "carol", each with their display name
 
-  Scenario: Course creators are ordered by name, whatever order their courses were created in
-    Given a course "strumming-basics" exists, published, created by "carol", with checkpoints "strumming-path"
-    And a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
+  Scenario: Course creators are ordered by name, not by their courses' creation order or titles
+    Given a course "fingerstyle-journey" exists, published, created by "carol", with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists, published, created by "bob", with checkpoints "strumming-path"
     And "alice" is authenticated as a student
     When "alice" lists the course creators
     Then the creators returned are "bob" and "carol", each with their display name
@@ -215,8 +215,8 @@ Feature: Author courses
   Scenario: Course creators are ordered by name ignoring case and accents
     Given "bruno" is named "Bruno Lima"
     And "alvaro" is named "álvaro Souza"
-    And a course "strumming-basics" exists, published, created by "bruno", with checkpoints "strumming-path"
-    And a course "fingerstyle-journey" exists, published, created by "alvaro", with checkpoints "open-chords-path"
+    And a course "fingerstyle-journey" exists, published, created by "bruno", with checkpoints "open-chords-path"
+    And a course "strumming-basics" exists, published, created by "alvaro", with checkpoints "strumming-path"
     And "alice" is authenticated as a student
     When "alice" lists the course creators
     Then the creators returned are "alvaro" and "bruno", each with their display name
