@@ -3,6 +3,7 @@
 **Status:** Accepted — 2026-09-10
 **Date:** 2026-09-08
 **Deciders:** Gilson Yamada (solo engineering at MVP)
+**Amended by:** ADR-037 (2026-09-25) — learner state is no longer restricted to users with role student; every user can learn.
 
 ---
 
