@@ -1,11 +1,17 @@
 # PB-65 — Course builder (authoring UI)
 
-**Status:** Draft, awaiting PO review
-**Repos:** `motifpath-web` only. No API change: every call below already exists in
-`openapi/core-domain-service.yaml` (`createCourse`, `getCourse`, `replaceCourse`,
-`getPublishedCourse`, `publishCourse`, `retireCourse`, `listLearningPaths`).
+**Status:** Draft, revised after PO review (2026-09-25)
+**Repos:** `motifpath-specs` (ADR-038, OpenAPI 0.14.0, scenarios), `motifpath-core`,
+`motifpath-web`.
+**API:** the existing course calls (`createCourse`, `getCourse`, `replaceCourse`,
+`getPublishedCourse`, `publishCourse`, `retireCourse`), plus what ADR-038 adds:
+- `Course.language`, and a `language` filter on both course lists;
+- `POST /courses/{course_id}/reactivate`;
+- `LearningPath.level` and `updated_at`;
+- `listLearningPaths` filters (`created_by`, `levels`, `skill_ids`, `concept_ids`) and `sort`.
+
 **Builds on:** the teacher Courses tab (`/teacher/courses`, from PB-32), ADR-029 (course
-versions), ADR-037 (authoring list is staff-only).
+versions), ADR-037 (authoring list is staff-only), ADR-038 (this item's API additions).
 
 ## Problem
 
@@ -16,13 +22,21 @@ through the seeders or direct API calls.
 
 ## Decisions (PO, 2026-09-25)
 
-1. **Publishing and retiring stay admin-only**, as the API already enforces. A teacher builds
-   and edits drafts; an admin publishes them. The page tells a teacher this instead of
-   showing buttons they can't use.
+1. **Publishing, retiring and reactivating are admin-only.** A teacher builds and edits
+   drafts; an admin publishes them. The page tells a teacher this instead of showing buttons
+   they can't use.
 2. **Deleting a draft is out of scope.** No delete endpoint exists. It's filed as its own
    backlog item (see Follow-ups).
 3. **Clicking a course opens the builder**, loaded with the course's live draft. There is no
    separate read-only overview page.
+4. **A course has one language**, because the catalog lets learners filter by language and
+   courses aren't localized. It is never "any". Existing courses are backfilled to English.
+5. **A retired course can be reactivated**, through its own admin action rather than a status
+   field on the course update (see ADR-038's rationale).
+6. **The checkpoint picker filters and sorts the learning path library** by author, level,
+   skills and concepts, sorted by title or by last update. A path's level is **authored on the
+   path**, so the path builder gains a level field too.
+7. **All of it ships under PB-65**: spec, then core, then web.
 
 ## Pages and routes
 
@@ -54,6 +68,7 @@ the form, and a side panel (below the form on phones) holds status and actions.
 | Title | Large text input, like the diagram and path name inputs | Required, not blank. |
 | Summary | Multi-line text | Required, not blank. Shown to learners in the catalog. |
 | Level | Segmented choice of the five levels (`beginner` … `expert`) | Required. Uses the same level labels as elsewhere (`levels.*`). |
+| Language | Single choice of the languages MotifPath offers, shown by name | Required, exactly one. A new course starts in the author's UI language. |
 | Checkpoints | Ordered list (below) | At least one. |
 
 **Save** is disabled until every rule holds. It stays disabled while a save is running, and
@@ -71,9 +86,20 @@ Each checkpoint row shows:
 - a **Remove** button.
 
 **Add checkpoint** opens a picker dialog listing the learning path library
-(`listLearningPaths`): searchable by title, paginated with **Load more** like the other
-library lists. Picking a path adds it as the last checkpoint. The same learning path may
-appear in more than one checkpoint; the API allows it and the builder doesn't prevent it.
+(`listLearningPaths`), paginated with **Load more** like the other library lists. Each
+result shows the path's title, author, level and when it was last updated. The picker
+narrows the library with:
+- a title search;
+- an author filter (the same searchable teacher picker the course list uses);
+- a level filter (any of the five levels);
+- skill and concept filters (the same tree pickers the course filters use);
+- a sort toggle: **Title** (the default) or **Recently updated**.
+
+Paths with no level recorded (created before levels existed) still appear, marked "No
+level", but never match a level filter.
+
+Picking a path adds it as the last checkpoint. The same learning path may appear in more
+than one checkpoint; the API allows it and the builder doesn't prevent it.
 
 A checkpoint whose override is blank or whitespace sends no `title`, so the path's own title
 is used.
@@ -107,16 +133,17 @@ For an **admin**:
 - **Retire** (published courses only) asks for confirmation, explaining the course leaves the
   catalog for new enrollments and existing enrollments are unaffected. It calls
   `retireCourse`.
+- **Reactivate** (retired courses only) asks for confirmation, explaining the course returns
+  to the catalog with its latest published version. It calls `reactivateCourse`.
 
-For a **teacher**: no Publish or Retire buttons. A short note says an admin publishes
+For a **teacher**: no Publish, Retire or Reactivate buttons. A short note says an admin publishes
 courses, so the teacher knows the course isn't visible to learners yet.
 
 ### Retired courses
 
 A retired course opens read-only: the fields and checkpoints are shown but can't be changed,
-Save is hidden, and a notice explains the course is retired. (The API doesn't forbid editing
-a retired draft, but nothing can bring the course back to the catalog. Editing it would only
-be confusing.)
+Save is hidden, and a notice explains the course is retired. An admin sees **Reactivate** in
+the actions panel; once reactivated, the course is editable again.
 
 ### Who may open what
 
@@ -138,8 +165,18 @@ authoring pages:
 
 ### Language
 
-Courses aren't localized: title, summary and checkpoint overrides are single strings, as the
-API defines them. All labels on these pages are translated in `en` and `pt-BR`.
+Courses aren't localized: title, summary and checkpoint overrides are single strings, written
+in the course's language. All labels on these pages are translated in `en` and `pt-BR`.
+
+The course list shows each course's language, and its filters gain a language filter.
+
+## Changes outside the course pages
+
+- **Path builder (`/teacher/paths/new`, `/teacher/paths/:id/edit`):** gains a required
+  **Level** field, the same segmented choice as the course builder. Saving now sends it. A
+  path opened without a level shows the field empty and can't be saved until one is chosen.
+- **Learner catalog (`/courses`):** each course shows its language, and the filters gain a
+  language filter, defaulting to the learner's own language.
 
 ## Acceptance criteria
 
@@ -150,20 +187,25 @@ API defines them. All labels on these pages are translated in `en` and `pt-BR`.
 4. Checkpoints can be added from the learning path library, reordered by drag or by the
    move buttons, retitled, and removed. Saving sends them in the shown order, and a blank
    override is sent as no title.
-5. An admin sees Publish and, for a published course, Retire. Each asks for confirmation.
-   Publish saves first, and is disabled when there's nothing new to publish.
-6. A teacher sees neither button, and sees that an admin publishes courses.
+5. An admin sees Publish, Retire for a published course, and Reactivate for a retired one.
+   Each asks for confirmation. Publish saves first, and is disabled when there's nothing new
+   to publish.
+6. A teacher sees none of those buttons, and sees that an admin publishes courses.
 7. "See what learners see" shows the published outline and appears only for published
    courses.
-8. A retired course opens read-only.
+8. A retired course opens read-only, and an admin can reactivate it.
 9. Unsaved changes prompt before leaving the page.
 10. Loading, error and not-found states render with no broken UI, in both languages.
+11. A course can't be saved without a language, and both course lists can be filtered by
+    language.
+12. The checkpoint picker filters by author, level, skills and concepts, and sorts by title or
+    by last update.
+13. The path builder requires a level.
 
 ## Out of scope and follow-ups
 
 - **Deleting a never-published draft:** needs a new endpoint and scenarios. To be filed as
   its own backlog item.
-- **Un-retiring a course:** no endpoint exists. Not planned.
 - **A teacher requesting publication:** rejected for now; publishing stays an admin action.
 - **Toggling a version's `available_for_new_enrollments`:** no UI in this item.
 - **Localized course text:** not planned. It would need an API change like ADR-033's for
@@ -171,9 +213,10 @@ API defines them. All labels on these pages are translated in `en` and `pt-BR`.
 
 ## For the PO to confirm
 
-The API leaves two rules open, and one behavior is new to the authoring pages. The defaults
-above are proposals:
+Still open. The defaults above are proposals:
 1. Retired courses open **read-only** (see "Retired courses").
 2. **Publish is disabled** when a published course has no unpublished changes.
 3. **Leaving with unsaved changes asks for confirmation.** None of the other builders do
    this today. If it's kept here, it could later be added to them too.
+4. **The learner catalog's language filter defaults to the learner's own language.** They
+   can clear it to see every course.
