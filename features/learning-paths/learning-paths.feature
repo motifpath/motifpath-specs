@@ -343,7 +343,6 @@ Feature: Manage learning paths
 
   # ── Instruments and thumbnail ─────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher creates a learning path for specific instruments
     Given a fretted instrument "guitar" exists in the system
     And "bob" is authenticated as a teacher
@@ -351,13 +350,11 @@ Feature: Manage learning paths
     Then the learning path is created and assigned a stable identifier
     And the learning path is for instruments "guitar"
 
-  @wip
   Scenario: Creating a learning path for an instrument that does not exist is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a learning path titled "Open Chords" for instruments "banjo" with items in order: "node-01"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: The library's instrument filter keeps paths that suit every instrument
     Given a fretted instrument "guitar" exists in the system
     And a keyboard instrument "piano" exists in the system

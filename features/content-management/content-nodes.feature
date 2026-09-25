@@ -341,7 +341,6 @@ Feature: Manage content nodes
 
   # ── Instruments and thumbnail ─────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher creates a content node for specific instruments
     Given a fretted instrument "guitar" exists in the system
     And "bob" is authenticated as a teacher
@@ -349,19 +348,16 @@ Feature: Manage content nodes
     Then the content node is created and assigned a stable identifier
     And the content node is for instruments "guitar"
 
-  @wip
   Scenario: A content node created with no instruments suits every instrument
     Given "bob" is authenticated as a teacher
     When "bob" creates an article content node titled "Intervals Explained" for every instrument
     Then the content node is for every instrument
 
-  @wip
   Scenario: Creating a content node for an instrument that does not exist is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates an article content node titled "Barre Chords" for instruments "banjo"
     Then the request is rejected as invalid
 
-  @wip
   Scenario: The content node list's instrument filter keeps nodes that suit every instrument
     Given a fretted instrument "guitar" exists in the system
     And a keyboard instrument "piano" exists in the system

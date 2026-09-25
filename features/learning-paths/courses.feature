@@ -604,7 +604,6 @@ Feature: Author courses
 
   # ── Instruments and thumbnail ─────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher creates a course for specific instruments
     Given a fretted instrument "guitar" exists in the system
     And a fretted instrument "electric-guitar" exists in the system
@@ -613,20 +612,17 @@ Feature: Author courses
     Then the course is created and assigned a stable identifier
     And the course is for instruments "guitar", "electric-guitar"
 
-  @wip
   Scenario: A course created with no instruments suits every instrument
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Music Theory Basics" for every instrument with checkpoints in order: "theory-path"
     Then the course is created and assigned a stable identifier
     And the course is for every instrument
 
-  @wip
   Scenario: Creating a course for an instrument that does not exist is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Blues Rhythm" for instruments "banjo" with checkpoints in order: "open-chords-path"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: The catalog's instrument filter keeps courses that suit every instrument
     Given a fretted instrument "guitar" exists in the system
     And a keyboard instrument "piano" exists in the system
@@ -638,7 +634,6 @@ Feature: Author courses
     Then the response includes "blues-rhythm" and "music-theory-basics"
     And the response does not include "piano-chords"
 
-  @wip
   Scenario: The catalog's instrument filter ignores unpublished instrument changes
     Given a fretted instrument "guitar" exists in the system
     And a keyboard instrument "piano" exists in the system
