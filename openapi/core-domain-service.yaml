@@ -5779,8 +5779,9 @@ components:
           type: string
           format: uri
           description: >-
-            An image shown for this item in lists and cards. Absent when it
-            has none.
+            The course's thumbnail: the latest published version's in GET
+            /catalog/courses, the live draft's in GET /courses. Absent when
+            it has none.
       required:
         - course_id
         - title
@@ -6083,6 +6084,12 @@ components:
         course_title:
           type: string
           description: The course's title, as of the pinned version.
+        course_thumbnail_url:
+          type: string
+          format: uri
+          description: >-
+            The course's thumbnail, as of the pinned version. Absent when
+            that version had none.
         course_version_number:
           type: integer
           minimum: 1

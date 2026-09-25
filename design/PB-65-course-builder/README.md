@@ -187,6 +187,12 @@ The course list shows each course's language, and its filters gain a language fi
   and can't be saved until one is chosen.
 - **Content authoring (`/teacher/content/...`):** gains the same **Instruments** and
   **Thumbnail** fields. Publishing a content node publishes them too.
+- **Course pages show course thumbnails** (a neutral placeholder when there is none):
+  - **My courses (`/courses/mine`):** each enrollment shows the thumbnail of the version the
+    learner is enrolled in (`CourseEnrollment.course_thumbnail_url`), like its title.
+  - **Find a course (`/courses`):** each card shows the latest published thumbnail.
+  - **Courses, for teachers and admins (`/teacher/courses`):** each row shows the live
+    draft's thumbnail, so authors see a new picture as soon as they save it.
 - **Library lists (courses, paths, content):** each row shows its thumbnail and instruments,
   and the filters gain an instrument filter.
 - **Learner catalog (`/courses`):** each course card shows its thumbnail, language and
@@ -220,6 +226,8 @@ The course list shows each course's language, and its filters gain a language fi
     instrument, and every list can be filtered by instrument without losing items for every
     instrument.
 15. Courses, paths and content nodes can be given, shown with, and cleared of a thumbnail.
+16. My courses, Find a course and the teachers' Courses page all show course thumbnails: the
+    enrolled version's, the published one's and the draft's respectively.
 
 ## Out of scope and follow-ups
 
