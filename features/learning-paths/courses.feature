@@ -557,7 +557,6 @@ Feature: Author courses
 
   # ── Reactivating a retired course ─────────────────────────────────────────
 
-  @wip
   Scenario: An admin reactivates a retired course
     Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
@@ -565,7 +564,6 @@ Feature: Author courses
     When "admin" reactivates course "fingerstyle-journey"
     Then the course's status becomes "published"
 
-  @wip
   Scenario: A reactivated course is back in the catalog with its latest published version
     Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
@@ -576,7 +574,6 @@ Feature: Author courses
     Then the response includes "fingerstyle-journey"
     And course "fingerstyle-journey" still has only course version 1
 
-  @wip
   Scenario: Reactivating a course with unpublished edits brings back its latest published version, not the edits
     Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
     And "bob" is authenticated as a teacher
@@ -588,7 +585,6 @@ Feature: Author courses
     And the course has unpublished changes
     And the published version of "fingerstyle-journey" still has checkpoints "open-chords-path"
 
-  @wip
   Scenario: A teacher cannot reactivate a course
     Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
@@ -597,21 +593,18 @@ Feature: Author courses
     When "bob" attempts to reactivate course "fingerstyle-journey"
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: Reactivating a course that is not retired is rejected
     Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
     When "admin" reactivates course "fingerstyle-journey"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: Reactivating a draft course is rejected
     Given a course "draft-only-course" exists as a draft with checkpoints "strumming-path"
     And "admin" is authenticated as an admin
     When "admin" reactivates course "draft-only-course"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: Reactivating a course that does not exist returns not found
     Given "admin" is authenticated as an admin
     When "admin" reactivates a course with an ID that does not exist
