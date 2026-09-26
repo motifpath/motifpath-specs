@@ -94,6 +94,37 @@ added.
 In a flattened diagram, a position's `interval`/`note_name` are therefore relative to the root of
 the layer it was authored in. For every other diagram that is still `Diagram.root_note`.
 
+### Amendment (2026-09-26) — overlays flatten on an explicit "Merge layers" step
+
+Planning the web slice showed that flattening inside Save as can't satisfy ADR-034. When an
+overlay lacks one of the base's languages, the teacher has to fill that text in before saving,
+so the flattened result must be editable first. The product owner refined the stacking flow
+above:
+
+- **Overlays stay read-only until an explicit "Merge layers" action.** While overlays are present
+  and not merged, every save action is unavailable, so a teacher never saves the base alone while
+  looking at a stack. Merging opens a confirmation that carries ADR-034's "add a highlighted region
+  for each diagram" option, pre-selected. The merge then applies the flattening rules above and
+  loads the result into the editor as ordinary positions and regions, which the teacher can edit
+  like any others.
+- **Overlays work on any base, saved or not.** After a merge onto a diagram loaded from the
+  server, in-place Save is withheld and only Save as (and, for admins, Save as template) is
+  offered, so a source diagram is never modified. After a merge onto a new, unsaved diagram, the
+  plain Save creates it, since there's no source to protect.
+- **A merge can't be undone in the editor.** The source diagrams are untouched, so reopening the
+  base recovers it.
+- **An explicit root-note change after a merge recomputes every position**, merged ones included.
+  This narrows "intervals are not recomputed" above: the merge itself never recomputes, and each
+  position keeps its own layer's labels until the teacher deliberately picks a new root for the
+  whole diagram. That pick rewrites every interval and note name relative to the new root, as it
+  does for any diagram. It was chosen over locking the root after a merge, or recomputing only
+  positions placed afterwards, because a root pick has one meaning everywhere in the editor. The
+  cost is that one pick can overwrite what an overlay's author meant, and the teacher sees the new
+  labels on screen before saving.
+
+This changes no API. Flattening still composes the new diagram on the client and saves through
+`POST /diagrams`.
+
 ### The diagram selector is role-scoped, filterable and paginated
 
 `GET /diagrams` becomes available to teachers and admins only (403 for students, who never browse
