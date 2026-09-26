@@ -99,22 +99,64 @@ The rules of ADR-004 that are independent of the platform are kept:
 
 - manual `workflow_dispatch` trigger with the environment as input
 - images built once and tagged with the Git SHA
-- the **same image promoted** from staging to production
+- the **same image promoted** from staging to production for normal releases
 - backward-compatible (expand → migrate → contract) migrations
 - rollback by redeploying the previous image
 
-The mechanics change:
+#### Release branch: `stage`
 
-1. On merge to `dev`, GitHub Actions builds the `linux/arm64` images and pushes them to ECR. It
-   authenticates to AWS through **OIDC**, not static access keys.
-2. A deploy workflow sends an SSM Run Command to the VM:
-   `IMAGE_TAG=<sha> docker compose -p <env> pull && … up -d`. This replaces only that environment's
-   containers. Migrations run at `core-domain` startup (ADR-005) against that environment's
-   database.
-3. The SPA deploy builds the SPA with the environment's variables, syncs it to that environment's
-   bucket, and invalidates CloudFront.
-4. **Staging always deploys first.** A release reaches production only after its image has run its
-   migrations against staging and passed a manual check there.
+`dev` is the integration branch. It changes on every feature merge and is not always releasable,
+so building an image on each `dev` merge would produce many images that are never meant to be
+deployed. The deployable repositories (`motifpath-core` and `motifpath-web`) gain a protected
+**`stage`** branch between `dev` and `main`:
+
+```
+feat/…  →  dev  →  stage  →  main
+                    │         │
+                 staging   production
+
+hotfix/…  →  main  (then synced back to stage and dev)
+```
+
+- **`dev`:** feature integration. No images are built and nothing is deployed.
+- **`stage`:** a release candidate. Promoting `dev` to `stage` is a deliberate PR.
+- **`main`:** what runs in production.
+
+`motifpath-specs` and `motifpath-infra` do not get a `stage` branch. Specs are not deployed, and
+Terraform selects its environment by directory, not by branch.
+
+#### Normal release
+
+1. **Build.** On merge to `stage`, GitHub Actions builds the `linux/arm64` images, tags them with
+   the `stage` commit SHA, and pushes them to ECR. It authenticates to AWS through **OIDC**, not
+   static access keys.
+2. **Deploy to staging.** A deploy workflow sends an SSM Run Command to the VM:
+   `IMAGE_TAG=<sha> docker compose -p staging pull && … up -d`. This replaces only the staging
+   containers. Migrations run at `core-domain` startup (ADR-005) against the staging database.
+3. **Check staging.** The release is checked manually at `staging.motifpath.com`.
+4. **Promote.** `stage` is merged to `main`. The production deploy takes the **image tag that ran
+   in staging** as its input. It does not rebuild from `main`, because merging creates a new
+   commit SHA. The workflow refuses a tag whose commit is not already contained in `main`.
+
+The SPA follows the same path. It is built with each environment's variables, synced to that
+environment's bucket, and CloudFront is invalidated. The SPA bundle is built per environment
+because the API URLs and Clerk key are compiled into it, so for the SPA, "same image" means the
+same commit.
+
+#### Hotfix
+
+A hotfix may go **directly to production**. Staging-first is the rule for normal releases, not a
+hard gate:
+
+1. A `hotfix/BUG-NNN/…` branch from `main` is merged into `main`.
+2. On merge to `main` from a hotfix branch, the images are built and tagged with that commit's SHA.
+3. The production deploy runs with that tag.
+4. The existing sync workflow brings the fix back to `stage` and `dev`. The next staging deploy
+   then includes it.
+
+A hotfix **should avoid schema migrations**. Staging exists to rehearse migrations, and a hotfix
+skips it. If a hotfix needs a migration, deploying it to staging first is strongly recommended,
+even though it is not enforced.
 
 Each environment's containers are **replaced in place** (Compose recreate), not blue/green.
 
@@ -202,13 +244,23 @@ edge locations, so only API calls pay the ~120 ms round trip.
 - **Weaker isolation than separate accounts.** A mistake in an IAM policy or Terraform module can
   reach both environments. This is mitigated by per-environment state, naming and scoped instance
   permissions.
+- **One more long-lived branch to maintain.** Every release is two PRs (`dev → stage`,
+  `stage → main`). The main-to-dev sync workflow must also sync `main` into `stage`, or a hotfix
+  would be missing from the next release candidate.
+- **Hotfixes skip the migration rehearsal.** A hotfix that changes the schema reaches production
+  without having run against staging data, unless whoever ships it chooses to deploy it to staging
+  first.
 - **Build pipeline must target arm64.** Images are cross-built with `buildx`, and every
   third-party image used on the VM must publish an arm64 variant.
 
 ### Neutral
 
 - **Amends ADR-004.** Its EKS, blue/green and separate-account parts are replaced for the alpha.
-  Its trigger model, same-image promotion, migration discipline and rollback model stand.
+  Its trigger model, same-image promotion, migration discipline and rollback model stand. Its
+  branch model gains `stage`, and images are built on merge to `stage` (and on hotfix merges to
+  `main`) instead of on merge to `dev`.
+- **Amends the MotifPath branching convention** (the `git` skill and the core/web READMEs), which
+  currently know only `dev` and `main`. They are updated when the `stage` branch is created.
 - **Amends ADR-006.** The broker is self-hosted Redpanda instead of MSK. Topic, partitioning and
   consumer-group decisions are unchanged.
 - **Amends the `motifpath-infra` README and CLAUDE.md**, which describe EKS, Secrets Manager and
