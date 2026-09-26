@@ -70,8 +70,10 @@ stores and static hosting sit alongside the instance.
 
 ### DNS
 
-The `motifpath.com` zone is hosted in Route 53. If the domain is registered elsewhere, its
-nameservers are delegated to Route 53.
+The `motifpath.com` zone is hosted in Route 53. The domain stays registered at GoDaddy, which today
+also serves its DNS (`ns57`/`ns58.domaincontrol.com`). Terraform creates the Route 53 hosted zone,
+and then the domain's nameservers are switched **once, manually, in GoDaddy** to the four
+nameservers Route 53 assigns. From then on, every record is managed in Route 53 by Terraform.
 
 | Host | Serves |
 |---|---|
@@ -79,8 +81,21 @@ nameservers are delegated to Route 53.
 | `api.motifpath.com` / `api.staging.motifpath.com` | `core-domain` |
 | `events.motifpath.com` / `events.staging.motifpath.com` | `event-ingestion` |
 | `media.motifpath.com` / `media.staging.motifpath.com` | Media CloudFront |
+| `motifpath.com` / `www.motifpath.com` | Permanent redirect to `app.motifpath.com`, served by Caddy |
 
-The Clerk production instance's DNS records also live in this zone.
+The Clerk production instance's DNS records also live in this zone. Its DKIM records must exist
+before Clerk sends production email, because the domain's DMARC policy is `p=quarantine`.
+
+GoDaddy's existing records are handled as follows when the nameservers switch:
+
+- **A `@` (GoDaddy Website Builder):** dropped. Nothing is published there. The apex points to
+  the VM and redirects to the SPA.
+- **CNAME `www`:** replaced by the redirect above.
+- **TXT `_dmarc`:** kept, with `rua` reports sent to a MotifPath address instead of GoDaddy's.
+- **CNAME `_domainconnect`:** dropped. It only serves GoDaddy's own auto-configuration.
+- **NS and SOA:** replaced by Route 53's own.
+
+Nothing is live on the domain, so the switch causes no user-visible outage.
 
 ### Accounts, state and secrets
 
