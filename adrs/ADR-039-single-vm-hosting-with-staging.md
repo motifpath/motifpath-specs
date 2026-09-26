@@ -1,6 +1,6 @@
 # ADR-039: Single-VM cloud hosting with co-located staging and production
 
-**Status:** Proposed
+**Status:** Accepted — 2026-09-26
 **Date:** 2026-09-26
 **Deciders:** Gilson (PO), Claude Code
 
@@ -305,4 +305,4 @@ edge locations, so only API calls pay the ~120 ms round trip.
 
 ---
 
-*This ADR was proposed on 2026-09-26. To revise, create a new ADR with Status: Supersedes ADR-039.*
+*This ADR was decided on 2026-09-26. To revise, create a new ADR with Status: Supersedes ADR-039.*
