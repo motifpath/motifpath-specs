@@ -497,32 +497,27 @@ Feature: Author courses
 
   # ── Course language ───────────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher creates a course written in one language
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Violão Fingerstyle" in language "pt_BR" with checkpoints in order: "open-chords-path"
     Then the course is created and assigned a stable identifier
     And the course's language is "pt_BR"
 
-  @wip
   Scenario: Creating a course without a language is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create course request with the language field omitted
     Then the request is refused with a validation error
 
-  @wip
   Scenario: A course cannot be written in the language-agnostic marker
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Fingerstyle Journey" in language "any" with checkpoints in order: "open-chords-path"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: Creating a course in a language MotifPath does not offer is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Fingerstyle Journey" in language "xx" with checkpoints in order: "open-chords-path"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: A learner narrows the catalog to courses in one language
     Given a course "fingerstyle-journey" exists, published in language "en", with checkpoints "open-chords-path"
     And a course "violao-fingerstyle" exists, published in language "pt_BR", with checkpoints "strumming-path"
@@ -531,7 +526,6 @@ Feature: Author courses
     Then the response includes "violao-fingerstyle"
     And the response does not include "fingerstyle-journey"
 
-  @wip
   Scenario: The catalog's language filter ignores an unpublished change of language
     Given a course "fingerstyle-journey" exists, published in language "en", with checkpoints "open-chords-path"
     And "bob" is authenticated as a teacher
@@ -540,7 +534,6 @@ Feature: Author courses
     When "alice" lists the course catalog filtered by language "pt_BR"
     Then the response does not include "fingerstyle-journey"
 
-  @wip
   Scenario: A teacher's language filter matches the live draft
     Given a course "fingerstyle-journey" exists, published in language "en", created by "bob", with checkpoints "open-chords-path"
     And "bob" is authenticated as a teacher
@@ -548,7 +541,6 @@ Feature: Author courses
     When "bob" lists the courses they manage filtered by language "pt_BR"
     Then the response includes "fingerstyle-journey"
 
-  @wip
   Scenario: Publishing records the course's language in the new version
     Given a course "violao-fingerstyle" exists as a draft in language "pt_BR" with checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
@@ -557,7 +549,6 @@ Feature: Author courses
 
   # ── Reactivating a retired course ─────────────────────────────────────────
 
-  @wip
   Scenario: An admin reactivates a retired course
     Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
@@ -565,7 +556,6 @@ Feature: Author courses
     When "admin" reactivates course "fingerstyle-journey"
     Then the course's status becomes "published"
 
-  @wip
   Scenario: A reactivated course is back in the catalog with its latest published version
     Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
@@ -576,7 +566,6 @@ Feature: Author courses
     Then the response includes "fingerstyle-journey"
     And course "fingerstyle-journey" still has only course version 1
 
-  @wip
   Scenario: Reactivating a course with unpublished edits brings back its latest published version, not the edits
     Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
     And "bob" is authenticated as a teacher
@@ -588,7 +577,6 @@ Feature: Author courses
     And the course has unpublished changes
     And the published version of "fingerstyle-journey" still has checkpoints "open-chords-path"
 
-  @wip
   Scenario: A teacher cannot reactivate a course
     Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
@@ -597,21 +585,18 @@ Feature: Author courses
     When "bob" attempts to reactivate course "fingerstyle-journey"
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: Reactivating a course that is not retired is rejected
     Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
     When "admin" reactivates course "fingerstyle-journey"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: Reactivating a draft course is rejected
     Given a course "draft-only-course" exists as a draft with checkpoints "strumming-path"
     And "admin" is authenticated as an admin
     When "admin" reactivates course "draft-only-course"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: Reactivating a course that does not exist returns not found
     Given "admin" is authenticated as an admin
     When "admin" reactivates a course with an ID that does not exist
@@ -619,7 +604,6 @@ Feature: Author courses
 
   # ── Instruments and thumbnail ─────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher creates a course for specific instruments
     Given a fretted instrument "guitar" exists in the system
     And a fretted instrument "electric-guitar" exists in the system
@@ -628,20 +612,17 @@ Feature: Author courses
     Then the course is created and assigned a stable identifier
     And the course is for instruments "guitar", "electric-guitar"
 
-  @wip
   Scenario: A course created with no instruments suits every instrument
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Music Theory Basics" for every instrument with checkpoints in order: "theory-path"
     Then the course is created and assigned a stable identifier
     And the course is for every instrument
 
-  @wip
   Scenario: Creating a course for an instrument that does not exist is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Blues Rhythm" for instruments "banjo" with checkpoints in order: "open-chords-path"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: The catalog's instrument filter keeps courses that suit every instrument
     Given a fretted instrument "guitar" exists in the system
     And a keyboard instrument "piano" exists in the system
@@ -653,7 +634,6 @@ Feature: Author courses
     Then the response includes "blues-rhythm" and "music-theory-basics"
     And the response does not include "piano-chords"
 
-  @wip
   Scenario: The catalog's instrument filter ignores unpublished instrument changes
     Given a fretted instrument "guitar" exists in the system
     And a keyboard instrument "piano" exists in the system
@@ -664,14 +644,12 @@ Feature: Author courses
     When "alice" lists the course catalog filtered by instrument "guitar"
     Then the response includes "blues-rhythm"
 
-  @wip
   Scenario: A course's thumbnail is published with it
     Given a course "fingerstyle-journey" exists as a draft with thumbnail "https://cdn.motifpath.io/thumbnails/fingerstyle.png" and checkpoints "open-chords-path"
     And "admin" is authenticated as an admin
     When "admin" publishes course "fingerstyle-journey"
     Then course version 1 records the thumbnail "https://cdn.motifpath.io/thumbnails/fingerstyle.png"
 
-  @wip
   Scenario: Replacing a course without a thumbnail removes it
     Given a course "fingerstyle-journey" exists as a draft with thumbnail "https://cdn.motifpath.io/thumbnails/fingerstyle.png" and checkpoints "open-chords-path"
     And "bob" is authenticated as a teacher
@@ -680,14 +658,12 @@ Feature: Author courses
 
   # ── Unpublished changes to a course's language, instruments or thumbnail ──
 
-  @wip
   Scenario: Changing only a published course's language leaves it with unpublished changes
     Given a course "fingerstyle-journey" exists, published in language "en", created by "bob", with checkpoints "open-chords-path"
     And "bob" is authenticated as a teacher
     When "bob" replaces course "fingerstyle-journey" setting its language to "pt_BR"
     Then the course has unpublished changes
 
-  @wip
   Scenario: Changing only a published course's instruments leaves it with unpublished changes
     Given a fretted instrument "guitar" exists in the system
     And a keyboard instrument "piano" exists in the system
@@ -696,14 +672,12 @@ Feature: Author courses
     When "bob" replaces course "blues-rhythm" setting its instruments to "piano"
     Then the course has unpublished changes
 
-  @wip
   Scenario: Changing only a published course's thumbnail leaves it with unpublished changes
     Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
     And "bob" is authenticated as a teacher
     When "bob" replaces course "fingerstyle-journey" setting its thumbnail to "https://cdn.motifpath.io/thumbnails/fingerstyle.png"
     Then the course has unpublished changes
 
-  @wip
   Scenario: A course thumbnail that is not an http or https URL is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Fingerstyle Journey" with thumbnail "ftp://files.example/fingerstyle.png" and checkpoints in order: "open-chords-path"

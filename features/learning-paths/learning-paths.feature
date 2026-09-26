@@ -255,27 +255,23 @@ Feature: Manage learning paths
 
   # ── Level and last update ─────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher creates a learning path at a level
     Given "bob" is authenticated as a teacher
     When "bob" creates a learning path titled "Beginner Guitar" at level "beginner" with items in order: "node-01", "node-02"
     Then the learning path is created and assigned a stable identifier
     And the learning path's level is "beginner"
 
-  @wip
   Scenario: Creating a learning path without a level is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create learning path request with the level field omitted
     Then the request is refused with a validation error
 
-  @wip
   Scenario: A learning path created before levels were recorded has no level until it is saved again
     Given a learning path "legacy-path" exists with items "node-01" and no level recorded
     And "bob" is authenticated as a teacher
     When "bob" retrieves the learning path "legacy-path"
     Then the learning path has no level
 
-  @wip
   Scenario: Replacing a learning path records when it was last updated
     Given a learning path "beginner-guitar-path" exists with items "node-01", last updated on "2026-08-01"
     And "bob" is authenticated as a teacher
@@ -284,7 +280,6 @@ Feature: Manage learning paths
 
   # ── Library filters and sorting ───────────────────────────────────────────
 
-  @wip
   Scenario: A teacher narrows the library to paths created by one author
     Given a learning path "bobs-path" exists with items "node-01", created by "bob"
     And a learning path "carols-path" exists with items "node-02", created by "carol"
@@ -293,7 +288,6 @@ Feature: Manage learning paths
     Then the response includes "carols-path"
     And the response does not include "bobs-path"
 
-  @wip
   Scenario: A teacher narrows the library to paths at any of several levels
     Given a learning path "first-steps" exists with items "node-01", at level "beginner"
     And a learning path "going-further" exists with items "node-02", at level "intermediate"
@@ -303,14 +297,12 @@ Feature: Manage learning paths
     Then the response includes "first-steps" and "going-further"
     And the response does not include "mastery"
 
-  @wip
   Scenario: A path with no level recorded never matches a level filter
     Given a learning path "legacy-path" exists with items "node-01" and no level recorded
     And "bob" is authenticated as a teacher
     When "bob" lists learning paths filtered by levels "beginner"
     Then the response does not include "legacy-path"
 
-  @wip
   Scenario: A teacher narrows the library to paths teaching a skill
     Given content node "node-01" is classified with skill "fingerpicking"
     And a learning path "fingerpicking-path" exists with items "node-01"
@@ -320,7 +312,6 @@ Feature: Manage learning paths
     Then the response includes "fingerpicking-path"
     And the response does not include "other-path"
 
-  @wip
   Scenario: A path matches a skill and concept filter only when one of its nodes has both
     Given content node "node-01" is classified with skill "fingerpicking" and concept "syncopation"
     And content node "node-02" is classified with skill "fingerpicking"
@@ -331,7 +322,6 @@ Feature: Manage learning paths
     Then the response includes "both-path"
     And the response does not include "skill-only-path"
 
-  @wip
   Scenario: A teacher lists the most recently updated paths first
     Given a learning path "Alpha Path" exists with items "node-01", last updated on "2026-09-01"
     And a learning path "Beta Path" exists with items "node-02", last updated on "2026-09-20"
@@ -339,7 +329,6 @@ Feature: Manage learning paths
     When "bob" lists learning paths sorted by most recently updated
     Then the response lists "Beta Path" before "Alpha Path"
 
-  @wip
   Scenario: The library is ordered by title unless another order is asked for
     Given a learning path "Beta Path" exists with items "node-01", last updated on "2026-09-20"
     And a learning path "Alpha Path" exists with items "node-02", last updated on "2026-09-01"
@@ -347,7 +336,6 @@ Feature: Manage learning paths
     When "bob" lists all learning paths
     Then the response lists "Alpha Path" before "Beta Path"
 
-  @wip
   Scenario: An unknown sort order is rejected
     Given "bob" is authenticated as a teacher
     When "bob" lists learning paths sorted by "popularity"
@@ -355,7 +343,6 @@ Feature: Manage learning paths
 
   # ── Instruments and thumbnail ─────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher creates a learning path for specific instruments
     Given a fretted instrument "guitar" exists in the system
     And "bob" is authenticated as a teacher
@@ -363,13 +350,11 @@ Feature: Manage learning paths
     Then the learning path is created and assigned a stable identifier
     And the learning path is for instruments "guitar"
 
-  @wip
   Scenario: Creating a learning path for an instrument that does not exist is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a learning path titled "Open Chords" for instruments "banjo" with items in order: "node-01"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: The library's instrument filter keeps paths that suit every instrument
     Given a fretted instrument "guitar" exists in the system
     And a keyboard instrument "piano" exists in the system
@@ -381,13 +366,11 @@ Feature: Manage learning paths
     Then the response includes "guitar-path" and "theory-path"
     And the response does not include "piano-path"
 
-  @wip
   Scenario: A teacher gives a learning path a thumbnail
     Given "bob" is authenticated as a teacher
     When "bob" creates a learning path titled "Open Chords" with thumbnail "https://cdn.motifpath.io/thumbnails/open-chords.png" and items in order: "node-01"
     Then the learning path's thumbnail is "https://cdn.motifpath.io/thumbnails/open-chords.png"
 
-  @wip
   Scenario: Replacing a learning path without a thumbnail removes it
     Given a learning path "open-chords-path" exists with items "node-01" and thumbnail "https://cdn.motifpath.io/thumbnails/open-chords.png"
     And "bob" is authenticated as a teacher
