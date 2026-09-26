@@ -658,14 +658,12 @@ Feature: Author courses
 
   # ── Unpublished changes to a course's language, instruments or thumbnail ──
 
-  @wip
   Scenario: Changing only a published course's language leaves it with unpublished changes
     Given a course "fingerstyle-journey" exists, published in language "en", created by "bob", with checkpoints "open-chords-path"
     And "bob" is authenticated as a teacher
     When "bob" replaces course "fingerstyle-journey" setting its language to "pt_BR"
     Then the course has unpublished changes
 
-  @wip
   Scenario: Changing only a published course's instruments leaves it with unpublished changes
     Given a fretted instrument "guitar" exists in the system
     And a keyboard instrument "piano" exists in the system
@@ -674,7 +672,6 @@ Feature: Author courses
     When "bob" replaces course "blues-rhythm" setting its instruments to "piano"
     Then the course has unpublished changes
 
-  @wip
   Scenario: Changing only a published course's thumbnail leaves it with unpublished changes
     Given a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path"
     And "bob" is authenticated as a teacher
