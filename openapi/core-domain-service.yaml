@@ -5770,7 +5770,9 @@ components:
           type: boolean
           description: >-
             True when the live draft differs from the latest published
-            version (or nothing has been published yet). Present only
+            version in anything a version records (title, summary, level,
+            language, instruments, thumbnail or checkpoints), or nothing has
+            been published yet. Present only
             in the authoring list, GET /courses; GET /catalog/courses
             never returns it.
         instrument_ids:
@@ -5850,7 +5852,9 @@ components:
           type: boolean
           description: >-
             True when the live draft differs from the latest published
-            version (or nothing has been published yet).
+            version in anything a version records (title, summary, level,
+            language, instruments, thumbnail or checkpoints), or nothing has
+            been published yet.
         checkpoints:
           type: array
           description: The course's checkpoints, sorted by position ascending.

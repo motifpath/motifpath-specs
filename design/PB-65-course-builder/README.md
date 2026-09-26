@@ -36,7 +36,8 @@ through the seeders or direct API calls.
 5. **A retired course can be reactivated**, through its own admin action rather than a status
    field on the course update (see ADR-038's rationale).
 6. **The checkpoint picker filters and sorts the learning path library** by author, level,
-   skills and concepts, sorted by title or by last update. A path's level is **authored on the
+   skills and concepts, sorted by title or by last update. The author filter narrows the
+   library to the signed-in author's own paths (see "Checkpoints"). A path's level is **authored on the
    path**, so the path builder gains a level field too.
 7. **Courses, paths and content nodes say which instruments they're for**, or that they suit
    every instrument (music theory, for example).
@@ -99,7 +100,9 @@ updated. The picker
 narrows the library with:
 - a title search;
 - an instrument filter (a path for every instrument always matches);
-- an author filter (the same searchable teacher picker the course list uses);
+- an **Only my paths** toggle, narrowing the library to the signed-in author's own paths
+  (`created_by`). No endpoint lists the library's authors, so a searchable picker of every
+  author would need one first;
 - a level filter (any of the five levels);
 - skill and concept filters (the same tree pickers the course filters use);
 - a sort toggle: **Title** (the default) or **Recently updated**.
@@ -129,7 +132,8 @@ is used.
 Always shown for a saved course:
 - **Status:** Draft, Published (with the version number, "v3") or Retired.
 - **Unpublished changes** badge when the live draft differs from the latest published version
-  (`has_unpublished_changes`).
+  (`has_unpublished_changes`), in any field a version records: title, summary, level,
+  language, instruments, thumbnail or checkpoints.
 - **See what learners see** opens the published outline (`getPublishedCourse`) in a dialog:
   each checkpoint's title and its items grouped by section. Shown only once the course has
   been published.
@@ -141,7 +145,8 @@ For an **admin**:
   enroll from now on get this version, and people already enrolled keep theirs.
 - **Retire** (published courses only) asks for confirmation, explaining the course leaves the
   catalog for new enrollments and existing enrollments are unaffected. It calls
-  `retireCourse`.
+  `retireCourse`. It is disabled while the form has unsaved changes, since
+  a retired course is read-only and those changes could no longer be saved.
 - **Reactivate** (retired courses only) asks for confirmation, explaining the course returns
   to the catalog with its latest published version. It calls `reactivateCourse`.
 
@@ -219,7 +224,7 @@ The course list shows each course's language, and its filters gain a language fi
 10. Loading, error and not-found states render with no broken UI, in both languages.
 11. A course can't be saved without a language, and both course lists can be filtered by
     language.
-12. The checkpoint picker filters by author, level, skills and concepts, and sorts by title or
+12. The checkpoint picker filters by the author's own paths, level, skills and concepts, and sorts by title or
     by last update.
 13. The path builder requires a level.
 14. Courses, paths and content nodes can be tagged with instruments or marked for every
