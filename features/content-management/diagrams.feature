@@ -206,7 +206,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Marker labels and notes ───────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher gives a position a custom label and a note
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Avoid Notes" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -218,7 +217,6 @@ Feature: Manage prebuilt diagrams
     And position 2's note in "en" is "Avoid holding this over Am7"
     And position 1 has no custom label or note
 
-  @wip
   Scenario: A custom label longer than two characters is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Long label" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -227,14 +225,12 @@ Feature: Manage prebuilt diagrams
     Then the request is rejected as invalid
     And the rejection identifies "positions" as the source of the error
 
-  @wip
   Scenario: A note longer than 280 characters is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Long note" on instrument "guitar" with one position whose note is 281 characters long
     Then the request is rejected as invalid
     And the rejection identifies "positions" as the source of the error
 
-  @wip
   Scenario: A note in fewer languages than the diagram's name is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Minor Pentatonic" in English and "Pentatônica menor" in Portuguese on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -245,7 +241,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Highlighted regions ────────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher highlights fret ranges on a fretted diagram
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Two Boxes" on instrument "guitar" with one position and regions:
@@ -259,7 +254,6 @@ Feature: Manage prebuilt diagrams
     And region 2's description in "en" is "Box 2"
     And region 2 has color "#22C55E"
 
-  @wip
   Scenario: A teacher highlights a key range on a keyboard diagram
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Middle C Octave" on instrument "piano" with one position and keyboard regions:
@@ -268,7 +262,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram is created and assigned a stable identifier
     And region 1 spans keys "C4" to "B4"
 
-  @wip
   Scenario Outline: An invalid region is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Bad region" on instrument "guitar" with one position and regions:
@@ -285,7 +278,6 @@ Feature: Manage prebuilt diagrams
       | 5          | 8        | 1            |            | Only one string bound                                         |
       | 5          | 8        |              |            | A caption much longer than the sixty characters a region gets |
 
-  @wip
   Scenario: A keyboard range on a fretted diagram is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Wrong shape" on instrument "guitar" with one position and keyboard regions:
@@ -294,14 +286,12 @@ Feature: Manage prebuilt diagrams
     Then the request is rejected as invalid
     And the rejection identifies "regions" as the source of the error
 
-  @wip
   Scenario: Updating a diagram without regions keeps its regions
     Given a custom diagram "bobs-box" exists on instrument "guitar", created by "bob", with a region spanning frets 5 to 8
     And "bob" is authenticated as a teacher
     When "bob" updates diagram "bobs-box" setting root note "A" and label display "note"
     Then the diagram has 1 region
 
-  @wip
   Scenario: Updating a diagram with an empty region list removes its regions
     Given a custom diagram "bobs-box" exists on instrument "guitar", created by "bob", with a region spanning frets 5 to 8
     And "bob" is authenticated as a teacher
