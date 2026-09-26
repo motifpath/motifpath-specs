@@ -89,6 +89,15 @@ Feature: Student self-enrollment in courses
 
   # ── Conflicts ─────────────────────────────────────────────────────────────
 
+  @wip
+  Scenario: A student's enrollments show the thumbnail of the version they enrolled in
+    Given a course "fingerstyle-journey" exists, published with thumbnail "https://cdn.motifpath.io/thumbnails/v1.png", with checkpoints "open-chords-path"
+    And student "alice" is enrolled in "fingerstyle-journey"
+    And the course "fingerstyle-journey" is republished with thumbnail "https://cdn.motifpath.io/thumbnails/v2.png"
+    And "alice" is authenticated as a student
+    When "alice" lists her course enrollments
+    Then the enrollment in "fingerstyle-journey" shows the thumbnail "https://cdn.motifpath.io/thumbnails/v1.png"
+
   Scenario: A student cannot self-enroll in a course they are already actively enrolled in
     Given "alice" is authenticated as a student
     And "alice" is already enrolled in "fingerstyle-journey" as her current course
