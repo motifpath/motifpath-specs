@@ -125,6 +125,25 @@ above:
 This changes no API. Flattening still composes the new diagram on the client and saves through
 `POST /diagrams`.
 
+### Amendment (2026-09-26, after the first manual test) — overlays are composed in a modal
+
+The first build drew overlays read-only on the authoring fretboard. The product owner's first
+manual test found it hard to use: nothing in an overlay could be edited, the merge action sat far
+below the fretboard, and the preview didn't show the regions a merge would add. This replaces the
+first bullet of the amendment above. The other bullets still hold.
+
+- **"Overlay diagram…" opens a modal, and overlays exist only inside it.** The teacher picks one
+  or more diagrams (same instrument). The modal shows a full-size preview of the base and every
+  overlay flattened together, exactly as a merge would produce it. ADR-034's "add a highlighted
+  region for each diagram" option sits in the modal, pre-selected, and the preview follows it.
+- **The modal ends in Discard or Merge.** Discard closes it and leaves the editor untouched.
+  Merge applies the flattening rules above and loads the result into the editor as ordinary
+  positions and regions, which the teacher can edit like any others.
+- **The editor never holds unmerged overlays.** So it no longer draws read-only layers, blocks
+  saving or locks the instrument while overlays are pending.
+
+This changes no API.
+
 ### The diagram selector is role-scoped, filterable and paginated
 
 `GET /diagrams` becomes available to teachers and admins only (403 for students, who never browse
