@@ -393,14 +393,12 @@ Feature: Manage prebuilt diagrams
     Then the response includes "carols-arpeggio"
     And the response does not include "bobs-pentatonic"
 
-  @wip
   Scenario: A teacher filtering by another teacher gets none of that teacher's custom diagrams
     Given a custom diagram "carols-arpeggio" exists on instrument "guitar", created by "carol"
     And "bob" is authenticated as a teacher
     When "bob" lists diagrams filtered by creator "carol"
     Then the response contains 0 items
 
-  @wip
   Scenario: A teacher narrows the diagram list to the basic diagrams one admin created
     Given a basic diagram "major-scale-guitar" exists on instrument "guitar", created by "admin"
     And a basic diagram "minor-pentatonic-guitar" exists on instrument "guitar", created by "dora"
@@ -411,7 +409,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Listing — filtering and pagination ────────────────────────────────────
 
-  @wip
   Scenario: A teacher searches diagrams by a name in any language, ignoring case and accents
     Given a basic diagram "diagram-a" exists on instrument "guitar", named "Ionian Mode" in English and "Modo Jônico" in Portuguese
     And a basic diagram "diagram-b" exists on instrument "guitar", named "Dorian Mode" in English and "Modo Dórico" in Portuguese
@@ -421,7 +418,6 @@ Feature: Manage prebuilt diagrams
     Then the response includes "diagram-a"
     And the response does not include "diagram-b"
 
-  @wip
   Scenario: A teacher filters diagrams by root note
     Given a basic diagram "a-minor-pentatonic" exists on instrument "guitar" with root note "A"
     And a basic diagram "e-minor-pentatonic" exists on instrument "guitar" with root note "E"
@@ -431,7 +427,6 @@ Feature: Manage prebuilt diagrams
     Then the response includes "a-minor-pentatonic"
     And the response does not include "e-minor-pentatonic" or "unrooted-shape"
 
-  @wip
   Scenario: Diagram filters combine
     Given a basic diagram "a-minor-pentatonic" exists on instrument "guitar", named "Minor Pentatonic" in English and "Pentatônica Menor" in Portuguese, with root note "A"
     And a basic diagram "e-minor-pentatonic" exists on instrument "guitar", named "Minor Pentatonic" in English and "Pentatônica Menor" in Portuguese, with root note "E"
@@ -441,7 +436,6 @@ Feature: Manage prebuilt diagrams
     Then the response includes "a-minor-pentatonic"
     And the response does not include "e-minor-pentatonic" or "bobs-a-pentatonic"
 
-  @wip
   Scenario Outline: An out-of-range diagram name search or root note is rejected
     Given "bob" is authenticated as a teacher
     When "bob" lists diagrams with <parameter> set to a value of <length> characters
@@ -503,7 +497,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Diagram creators (the creator filter's options) ────────────────────────
 
-  @wip
   Scenario: A teacher lists the creators of the basic diagrams and their own
     Given a basic diagram "major-scale-guitar" exists on instrument "guitar", created by "admin"
     And a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
@@ -513,14 +506,12 @@ Feature: Manage prebuilt diagrams
     Then the creators returned are "admin" and "bob", each with their display name
     And the creators returned do not include "carol"
 
-  @wip
   Scenario: A teacher with no custom diagram of their own is not a listed creator
     Given a basic diagram "major-scale-guitar" exists on instrument "guitar", created by "admin"
     And "bob" is authenticated as a teacher
     When "bob" lists the diagram creators
     Then the creators returned are "admin", each with their display name
 
-  @wip
   Scenario: An admin lists the creator of every diagram, each once
     Given a basic diagram "major-scale-guitar" exists on instrument "guitar", created by "admin"
     And a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
@@ -530,7 +521,6 @@ Feature: Manage prebuilt diagrams
     When "admin" lists the diagram creators
     Then the creators returned are "admin", "bob" and "carol", each with their display name
 
-  @wip
   Scenario: Diagram creators are searched by display name, ignoring case and accents
     Given "bob" is named "Bob Ferreira"
     And "carol" is named "Carol Souza"
@@ -540,7 +530,6 @@ Feature: Manage prebuilt diagrams
     When "admin" lists the diagram creators matching "FÉRR"
     Then the creators returned are "bob", each with their display name
 
-  @wip
   Scenario: A student cannot list diagram creators
     Given "alice" is authenticated as a student
     When "alice" lists the diagram creators
