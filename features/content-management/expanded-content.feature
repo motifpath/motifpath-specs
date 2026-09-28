@@ -102,6 +102,42 @@ Feature: Manage expanded content
     Then the expanded content item is created and assigned a stable identifier
     And the item's diagram stack has 2 layers
 
+  # ── Diagram content — playback ────────────────────────────────────────────────
+
+  @wip
+  Scenario: A teacher adds a diagram that plays with its own voice, tempo and looping
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with a 3-step sequence at 90 BPM
+    And "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" adds diagram "minor-pentatonic-guitar" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165, playing reversed and looping at 60 BPM with voice "acoustic-guitar"
+    Then the expanded content item is created and assigned a stable identifier
+    And the item's diagram plays reversed and looping at 60 BPM with voice "acoustic-guitar"
+
+  @wip
+  Scenario: A diagram's playback defaults to the authored order, the diagram's tempo and the instrument's voice
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with a 3-step sequence at 90 BPM
+    And "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" adds diagram "minor-pentatonic-guitar" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165, playing with no overrides
+    Then the item's diagram plays as authored, not looping, with no tempo or voice of its own
+
+  @wip
+  Scenario Outline: An invalid diagram playback is rejected
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with a 3-step sequence at 90 BPM
+    And "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" adds diagram "minor-pentatonic-guitar" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165, playing <playback>
+    Then the request is rejected as invalid
+    And the rejection identifies "diagram_ref" as the source of the error
+
+    Examples:
+      | playback                  |
+      | with voice "piano"        |
+      | with voice "banjo"        |
+      | at 19 BPM                 |
+      | at 301 BPM                |
+      | in direction "shuffled"   |
+
   # ── Diagram content — validation failures ─────────────────────────────────────
 
   Scenario: Adding a diagram stack from two different instruments is rejected
