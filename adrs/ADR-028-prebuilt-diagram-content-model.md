@@ -28,8 +28,8 @@
 > **2026-09-28:** [ADR-041](./ADR-041-diagram-audio-playback.md) (Proposed) replaces
 > `DiagramPosition.sequence_index` with an ordered list of rhythmic steps on the `Diagram`
 > (`tempo_bpm`, `beat_unit`, `sequence`), and replaces `diagram_ref.playback`'s `step_ms` with tempo,
-> voice, direction and loop overrides. `Instrument.tuning` gains octaves, and each instrument gets a
-> default `Voice` (sampled timbre). Audio-synced highlighting stays in SVG; the Canvas note under
+> voice, direction and loop overrides. `Instrument.tuning` gains octaves, each instrument gets a
+> default `Voice` (sampled timbre), and a `Diagram` can record its `mode`. Audio-synced highlighting stays in SVG; the Canvas note under
 > Neutral no longer applies.
 
 ---

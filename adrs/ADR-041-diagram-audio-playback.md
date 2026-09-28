@@ -66,6 +66,7 @@ keep highlights in sync, and whether SVG keeps up.
 ```
 Diagram {
   ...                                   // unchanged
+  mode: Mode | null                     // the key's mode, see below; null = no key
   tempo_bpm: int | null                 // default tempo; null = no playback authored
   time_signature: TimeSignature         // default 4/4
   sequence: SequenceStep[]              // ordered; empty = the diagram doesn't play
@@ -124,6 +125,34 @@ NoteValue { num: int >= 1, den: int >= 1 }   // a fraction of a whole note
 - Existing instruments are migrated by adding the octaves of their standard tuning. Creating an
   instrument without octaves is rejected.
 - A `diagram_ref`'s `root_override` transposes the sound exactly as it transposes the drawing.
+
+### The diagram records its mode, so a key signature can be derived
+
+```
+Mode = "major" | "minor" | "dorian" | "phrygian" | "lydian" | "mixolydian" | "locrian"
+```
+
+- `Diagram.mode` is optional. With `root_note` it names the diagram's key: A + `minor` is A minor,
+  D + `dorian` is D Dorian. It describes the key the material belongs to, not the scale's exact
+  notes: an A minor pentatonic box and an A blues lick are both `minor`.
+- A `mode` requires a `root_note`. A diagram with no key (a chromatic run, a diminished arpeggio, a
+  lone chord shape) leaves it null.
+- **The key signature is derived, never stored.** It is the signature of the major key that
+  contains the mode: `major` = the root's own, `minor` = 3 semitones up (A minor → C major, no
+  accidentals), `dorian` = 2 semitones down (D Dorian → C major), `phrygian` = 4 down, `lydian` =
+  5 down, `mixolydian` = 7 down, `locrian` = 1 up. The root's spelling decides sharps vs flats
+  (F♯ major has six sharps, G♭ major six flats). A key needing more than 7 accidentals uses its
+  enharmonic equivalent (D♯ major → E♭ major).
+- `root_override` keeps the mode: an A minor diagram shown in E is in E minor, and its signature
+  follows.
+- Mode has no effect on sound. It is the musical context that notation (PB-72) and labels such as
+  "A minor" read.
+- "Save as" copies the mode. A diagram flattened from a stack starts with no mode, because its
+  sources can be in different keys.
+- Harmonic and melodic minor use the `minor` signature. Their raised notes appear as accidentals,
+  which is how they are written in standard notation. A per-usage signature override, for
+  teachers who write modes with accidentals on the parallel major or minor signature, is additive
+  later.
 
 ### A voice is the timbre, chosen separately from the instrument's layout
 
@@ -227,6 +256,14 @@ additive field on steps.
 strummed chords, short licks) doesn't need them, and each is an additive field later. Adding a
 whole notation model now would be building ahead of the content.
 
+**Mode, not a stored key signature.** A key signature alone is ambiguous: no sharps or flats is
+C major, A minor, D Dorian or E Phrygian. The root is what intervals, note spelling and
+transposition are computed from, so it has to stay, and root plus mode determines the signature
+exactly. Storing the signature as well would give two fields that could contradict each other.
+The mode is added now, though only notation reads it, because every existing diagram will need
+one once notation ships. Adding it after authors have built the library would mean revisiting
+every diagram.
+
 **Voice separate from Instrument.** Diagram positions depend only on the layout, so guitar-family
 voices can share every guitar diagram. Making "electric guitar" an instrument would duplicate every
 diagram per timbre. A voice has a `family`, not a list of instruments, so a future 7-string guitar
@@ -301,6 +338,11 @@ inside a stack keeps the schema unchanged and leaves the choice open.
 - A student's tempo choice is not stored, so it isn't progress data and emits no events.
 - The Play control appears only where a diagram has a sequence and its usage sets `playback`.
   Every existing embed stays silent until an author opts in.
+- **Additive by design.** Notation-oriented features that are left out stay additive, with a
+  default that keeps every existing diagram valid: a pickup bar (a leading `NoteValue`, default
+  none), independent parts such as a bass held under a melody (a `voice` number per step, default
+  1, with each voice's steps sequential on their own), articulation, dynamics, grouping of
+  irregular meters, and a key signature override.
 - **Revisit trigger:** content that needs grouped irregular meters, a pickup bar, dynamics,
   articulation, stacked playback, or notes longer than a voice's samples; a voice whose
   3-semitone repitch is audibly wrong; or a smplr regression that the adapter can't absorb.
@@ -319,11 +361,12 @@ inside a stack keeps the schema unchanged and leaves the choice open.
 
 ## Follow-up work (not part of this ADR)
 
-- **Specs:** OpenAPI changes to `Diagram` (`tempo_bpm`, `time_signature`, `sequence`), `DiagramPosition`
+- **Specs:** OpenAPI changes to `Diagram` (`mode`, `tempo_bpm`, `time_signature`, `sequence`), `DiagramPosition`
   (drop `sequence_index`), `Instrument` (octave tuning, `default_voice_id`), `DiagramRef.playback`,
   and a new `Voice` schema with `GET /voices`. Gherkin for authoring a sequence (chord, rest,
   strum, tuplet, reused position, invalid position id, missing tempo), for voice/family
-  validation, and for the pulse of simple, compound and irregular time signatures.
+  validation, for the pulse of simple, compound and irregular time signatures, and for a mode
+  without a root being rejected. The diagram list may also filter by mode.
 - **motifpath-core:** schema and migration, validation, voice seed data, and the voice sample
   upload in the seed/dev tooling.
 - **motifpath-web (PB-71):** the smplr adapter and one-note test, the timeline (starting from the
