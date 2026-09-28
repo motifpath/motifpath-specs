@@ -1964,10 +1964,11 @@ paths:
         themselves, never another teacher's custom diagrams. An admin sees
         every diagram.
 
-        The created_by filter is role-scoped. A teacher may pass only their
-        own user_id; passing any other created_by is refused with 403. An
-        admin may pass any created_by, or omit it for every creator's
-        diagrams.
+        Filters only ever narrow what the caller can see. created_by may
+        name any user: a teacher who passes another teacher's user_id gets
+        none of that teacher's custom diagrams, but does get the basic
+        diagrams that user created. GET /diagrams/creators lists the
+        creators to offer.
 
         Results are paginated in a {items, total, limit, offset} envelope,
         ordered by the name the caller sees — the diagram's name in the
@@ -2007,8 +2008,31 @@ paths:
             type: string
             format: uuid
           description: |
-            Restricts the results to diagrams created by this user. A
-            teacher may pass only their own user_id.
+            Restricts the results to diagrams created by this user, among
+            those the caller can see.
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+          description: |
+            Restricts the results to diagrams with a name containing this
+            text, in any of the diagram's languages, ignoring case and
+            accents ("escala" matches "Escala Maior", "jonico" matches
+            "Jônico").
+        - name: root_note
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 3
+          description: |
+            Restricts the results to diagrams recorded with exactly this
+            root note (e.g. "A", "F#", "Bb"), as spelled by their author. A
+            diagram with no recorded root never matches.
         - name: instrument_id
           in: query
           required: false
@@ -2038,7 +2062,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedDiagrams'
         "400":
-          description: limit, offset, kind or language is out of range.
+          description: limit, offset, kind, language, name or root_note is out of range.
           content:
             application/json:
               schema:
@@ -2050,9 +2074,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "403":
-          description: |
-            The caller is a student, or a teacher passed a created_by other
-            than their own user_id.
+          description: The caller is a student.
           content:
             application/json:
               schema:
@@ -2136,6 +2158,66 @@ paths:
             The authenticated user does not have permission to create this
             diagram. Only teachers and admins may create a diagram, and only
             an admin may create a basic one.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /diagrams/creators:
+    get:
+      operationId: listDiagramCreators
+      summary: List the creators of the diagrams the caller can see
+      description: |
+        Returns every distinct user who created at least one diagram the
+        caller can see in GET /diagrams, so a picker can offer a complete
+        creator filter (its created_by parameter) without paging. A teacher
+        gets the creators of basic diagrams, plus themselves once they have
+        a custom diagram of their own — never another teacher who has only
+        custom diagrams. An admin gets the creator of every diagram. A
+        student is refused with 403, since students never browse the
+        library.
+
+        The list is unpaginated: it is bounded by the number of teachers
+        and admins, not by the number of diagrams. Results are always
+        ordered by display_name, alphabetically as a person reads names —
+        ignoring case and accents, so "Álvaro" sorts with the A's — then
+        by user_id; an empty array means no creator matches.
+      tags:
+        - Content
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+          description: >-
+            Restricts the results to creators whose display_name contains
+            this text, ignoring case and accents ("jose" matches "José").
+      responses:
+        "200":
+          description: The creators of the diagrams the caller can see, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRef'
+        "400":
+          description: q is out of range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is a student.
           content:
             application/json:
               schema:
