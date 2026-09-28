@@ -58,12 +58,19 @@
 
 - Feature/fix/chore branches target `dev`; only `hotfix/BUG-NNN/...` branches from `main` directly.
   (`motifpath-core/CLAUDE.md` — Branching, mirrors the `git` skill)
-- `make generate` (API stubs) and `make migrate:diff` (Atlas migration from `ent` schema diff,
-  ADR-010) are separate commits from business logic, per the `git` skill's atomic-commit rule.
+- `make generate` (oapi-codegen API stubs) is always its own `chore(codegen)` commit, separate from
+  business logic, per the `git` skill's atomic-commit rule.
+- **Practiced divergence (confirmed 2026-09-28, core#58 review):** an `ent` schema change ships in
+  one commit together with its regenerated `ent` code, its `make migrate:diff` migration (ADR-010),
+  and the repository code and integration test that use it (e.g. `dbdbd8f`, `dc75172`, `47df522`
+  on `dev`). Don't flag that bundle as a mixed commit; do flag a schema/migration change bundled
+  with application or handler logic.
 
 ## Bootstrap notes
 
-Seeded from `motifpath-core/CLAUDE.md` on 2026-08-25 — not yet confirmed against a live review. On
+Seeded from `motifpath-core/CLAUDE.md` on 2026-08-25. First live review: core#58 (2026-09-28) —
+the migration-commit norm was checked against `dev` history and corrected above; the rest is still
+unconfirmed. On
 first real review in this repo, walk the Bootstrap steps in `_TEMPLATE.md` (read 2–3 files per
 layer, read a mature module's tests, check recent merge history) and update this table with any
 divergence between the documented and the practiced pattern.
