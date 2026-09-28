@@ -1,6 +1,6 @@
 # ADR-041: Diagram audio playback — a rhythmic step sequence on the Diagram, sampled voices, and audio-clock highlighting
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-28
 **Deciders:** Gilson (Product Owner)
 **Partially supersedes:** ADR-028's `DiagramPosition.sequence_index` and `diagram_ref.playback`

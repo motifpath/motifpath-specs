@@ -25,7 +25,7 @@
 > into one name per language and adds an admin-only endpoint to update an instrument's names.
 > `family` and the string/key shape stay immutable.
 
-> **2026-09-28:** [ADR-041](./ADR-041-diagram-audio-playback.md) (Proposed) replaces
+> **2026-09-28:** [ADR-041](./ADR-041-diagram-audio-playback.md) (Accepted) replaces
 > `DiagramPosition.sequence_index` with an ordered list of rhythmic steps on the `Diagram`
 > (`tempo_bpm`, `beat_unit`, `sequence`), and replaces `diagram_ref.playback`'s `step_ms` with tempo,
 > voice, direction and loop overrides. `Instrument.tuning` gains octaves, each instrument gets a
