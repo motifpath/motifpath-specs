@@ -30,11 +30,10 @@ that note) and piano (octaves 2–5).
 
 **Recommendations:**
 
-1. **Don't adopt Tone.js or smplr. Write a thin in-house sampler on plain Web Audio**: nearest
-   sample, `playbackRate`, gain envelope. It schedules sample-accurately and weighs **0.5 kB
-   gzip**, against 60 kB for Tone and 21 kB for smplr. We can't use either library's timing
-   callbacks anyway (Finding 1), and smplr 1.0.1 has three traps that make it play nothing,
-   silently (Finding 4).
+1. **Adopt smplr** (1.0.1, pinned exactly), behind one small adapter of our own that applies its
+   three workarounds (Finding 4) and is loaded only when a diagram plays. It sounded best in
+   Gilson's listening test and is 21 kB gzip, against 60 kB for Tone.js. Use it only to *play*
+   notes: never use its `onStart` callback for visuals (Finding 1).
 2. **Drive highlights from the audio output clock in a `requestAnimationFrame` loop.** Never use
    `setTimeout` or library callbacks. Measured error: 0 to +17 ms (within one frame), p95 ≤ 29 ms
    under 6× CPU throttling, and no drift.
@@ -46,16 +45,16 @@ that note) and piano (octaves 2–5).
 5. **Data model:** the tempo math holds. But one `sequence_index` per position can't express a
    chord that is strummed and then arpeggiated, and `Instrument.tuning` has no octaves (Finding 7).
 
-Still to check by ear and on real devices (can't be done headless): see "Manual checks left".
+Listening and iPhone results are in "Manual check results" at the end.
 
 | Question (from the PB-70 card) | Answer |
 |---|---|
-| 1. Library | Neither. An in-house Web Audio sampler (0.5 kB). smplr only if we later need velocity layers or round-robin |
+| 1. Library | smplr, pinned, behind an adapter that applies its three workarounds. Best sound by ear; 21 kB, loaded on demand |
 | 2. Sample grid | Every 3 semitones means at most ±1 of repitch. Every 4 (±2) is objectively close; decide by ear |
 | 3. Storage & size | Trimmed 3 s mono MP3 96k: guitar 430 kB (12 files), piano 574 kB (16). Key by MIDI pitch; load the whole voice on first play |
 | 4. Source & license | tonejs-instruments, CC-BY 3.0 (attribution required). Provenance of each voice still to confirm |
 | 5. Sync | Audio-clock rAF: 0–17 ms typical, no drift. Callbacks are 33–230 ms early. SVG is fine |
-| 6. Polyphony & strum | 5-voice strums at 200 BPM under 6× throttle: fine. Real-phone audio thread still to check |
+| 6. Polyphony & strum | 5-voice strums at 200 BPM under 6× throttle: fine. Played well on an iPhone |
 | 7. Tempo model | Validated. It needs explicit steps (reuse of positions), rests, a beat unit and a gate |
 | 8. Mobile | Resume the context inside the Play tap (done). No Karplus-Strong fallback; show a loading state instead. iOS still to check |
 
@@ -183,14 +182,22 @@ the throw happens inside its scheduler:
    numeric keys. Only note-name keys (`{ A2: url }`) work.
 3. A note given a `duration` throws in `Voice.stop` unless `ampRelease` is passed explicitly.
 
-smplr 1.0 is a recent major rewrite, and this is a maturity signal. Tone is mature but large, and
-we'd use about 2% of it.
+smplr 1.0 is a recent major rewrite, and these traps are a maturity signal. That is why the
+recommendation is an exact version pin and an adapter: the adapter always passes `detune: 0`,
+note-name keys and `ampRelease`, and a test that plays one note offline catches a regression when
+we bump the version. Tone is mature but large, and we'd use about 2% of it.
 
-What the in-house sampler needs to do: decode buffers, pick the nearest recorded pitch, set
-`playbackRate = 2^(Δ/12)`, and apply a gain envelope (hold, then an exponential release). The
-spike's version is about 60 lines. For production it would also schedule in a short lookahead
-window (say the next 1 s) rather than all notes at once, which keeps long sequences cheap and
-makes Stop and tempo changes immediate.
+**The in-house sampler was not a fair comparison, so its ear test result doesn't count against
+the approach.** After the listening test I traced its two faults to the spike's own code:
+
+- **Guitar and piano mixed:** its `load()` never cleared previously loaded buffers. After a voice
+  switch, notes played whichever recording was nearest in pitch, whether guitar or piano.
+- **Poor timbre:** every voice played at full gain, with no master volume. Rendered offline, a
+  5-string strum peaked at **1.28, clipping 109 samples**. smplr's peak for the same strum is
+  **0.35**, about 9 dB of headroom.
+
+Both faults are fixable, but we'd then own mixing and envelopes, the very part the spike just got
+wrong. For about 20 kB (loaded on demand), smplr is the better trade.
 
 ## Finding 5 — Polyphony and strum
 
@@ -247,7 +254,18 @@ The existing proposal still stands: a timbre (sample voice) chosen separately fr
 *layout*, so guitar and electric guitar share a diagram, and a BPM default on the diagram that the
 DiagramRef and then the student can override.
 
-## Manual checks left (need ears or a real device)
+## Manual check results (Gilson, 2026-09-28)
+
+- **Sound:** smplr sounded best. The in-house sampler sounded poor and sometimes mixed piano and
+  guitar, which traces to two spike bugs (Finding 4).
+- **Timing:** acceptable on all the engines tested.
+- **iPhone (Safari):** everything worked well.
+
+Not reported separately, and to settle in the ADR or during PB-71: 3- vs 4-semitone grid (keep 3
+for now), trimmed vs original files, strum width, Bluetooth headphones, and the samples' license
+provenance.
+
+## How to rerun the spike
 
 Run the spike locally:
 
