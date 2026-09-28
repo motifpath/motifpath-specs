@@ -67,9 +67,11 @@ keep highlights in sync, and whether SVG keeps up.
 Diagram {
   ...                                   // unchanged
   tempo_bpm: int | null                 // default tempo; null = no playback authored
-  beat_unit: NoteValue                  // what one BPM beat is; default 1/4
+  time_signature: TimeSignature         // default 4/4
   sequence: SequenceStep[]              // ordered; empty = the diagram doesn't play
 }
+
+TimeSignature { beats: int 1..16, beat_value: 1 | 2 | 4 | 8 | 16 | 32 }   // 4/4, 3/4, 6/8, 7/8, ...
 
 SequenceStep {
   position_ids: uuid[]                  // positions that sound together; empty = a rest
@@ -80,20 +82,39 @@ SequenceStep {
 NoteValue { num: int >= 1, den: int >= 1 }   // a fraction of a whole note
 ```
 
-- A step's duration in seconds is `(value / beat_unit) × 60 / BPM`. 1/4 is a quarter, 3/8 a
-  dotted quarter, 1/12 an eighth-note triplet, 1/16 a sixteenth. A `beat_unit` of 3/8 counts a
-  6/8 bar in two.
+- The author picks the **time signature**. Whether it is simple or compound is derived from it,
+  and that decides what one BPM beat (the *pulse*) is:
+  - **Compound** when `beats` is 6, 9, 12 or 15 and `beat_value` is 4 or shorter. The pulse is a
+    dotted note: `3 / beat_value`. 6/8 counts two dotted quarters per bar, 12/8 four, and 6/4 two
+    dotted halves.
+  - **Simple** otherwise (2/4, 3/4, 4/4, 2/2, …). The pulse is `1 / beat_value`.
+  - **Irregular** meters (5/8, 7/8, …) count in `1 / beat_value` for now. Grouping them (2+3,
+    2+2+3) is additive later.
+- A step's duration in seconds is `(value / pulse) × 60 / BPM`. 1/4 is a quarter, 3/8 a dotted
+  quarter, 1/16 a sixteenth.
+- **Tuplets need no extra field.** A tuplet of *n* notes in the time of *m* notes of value 1/*d*
+  gives each note the value `m / (n × d)`. An eighth-note triplet is `1/12` (three fill a quarter),
+  a quarter-note triplet `1/6`, a sixteenth-note sextuplet `1/24` (six fill a quarter), and a
+  quintuplet of sixteenths `1/20`. The editor offers "triplet", "sextuplet", etc. as a modifier on
+  the note value and stores the reduced fraction. `den` is limited to 1–128 so exotic values stay
+  bounded.
+- The editor draws bar lines by adding up step values against the bar length
+  (`beats / beat_value`). The sequence doesn't have to fill whole bars, and a note may cross a bar
+  line; a pickup (anacrusis) is additive later.
 - A position may appear in any number of steps, and any number of positions may share a step (a
   chord). Every `position_id` must belong to the diagram. A step with no positions is a rest.
 - `strum: down` sounds the lowest pitch first, `up` the highest first, with a fixed per-note offset
-  chosen by `motifpath-web` (starting at 18 ms). The offset is not stored.
-- There is no time signature, bar line or articulation field. Every note sounds for its full value
-  and releases into the next. These are additive later if real content needs them.
+  chosen by `motifpath-web` (starting at 18 ms). The offset is not stored. The first note of the
+  strum lands on the beat.
+- There is no articulation field (staccato, legato). Every note sounds for its full value and
+  releases into the next. It is additive later if real content needs it.
 - `tempo_bpm` is required as soon as `sequence` is non-empty, within 20–300.
-- `DiagramPosition.sequence_index` is removed. Existing indices migrate into steps: positions with
-  the same index become one step, in index order, each an eighth note (1/8) at 90 BPM.
-- "Save as" (ADR-032) copies the sequence with position ids remapped. A diagram flattened from a
-  stack starts with an empty sequence, because its sources' rhythms don't combine into one.
+- `DiagramPosition.sequence_index` is removed. Only seed data uses it today. Existing indices
+  migrate into steps: positions with the same index become one step, in index order, each an
+  eighth note (1/8) in 4/4 at 90 BPM.
+- "Save as" (ADR-032) copies the sequence and time signature with position ids remapped.
+- A diagram flattened from a stack is an ordinary diagram and can play. It starts with an empty
+  sequence (its sources' rhythms don't combine into one), and its author gives it its own.
 
 ### Pitch comes from the instrument, transposed by the usage
 
@@ -128,6 +149,10 @@ Instrument { ...; default_voice_id: string }
   repitched more than ±1 semitone; mono MP3 at 96 kbps, trimmed to 3 s with a 0.6 s fade. A note
   longer than its sample simply decays to silence, which is natural for plucked and struck
   instruments. A 3 s guitar voice is 12 files and about 430 kB.
+- The sample length belongs to the voice's files, not to any schema. Longer notes later need no
+  model change: re-export a voice with longer samples (about +30% size per extra second), or, for
+  sustaining voices (organ, strings, pads), give the voice loop points so a note holds as long as
+  its value.
 - The first voices are tonejs-instruments' acoustic guitar and piano, under CC-BY 3.0. Their
   upstream provenance must be confirmed and credited before production.
 
@@ -146,6 +171,9 @@ playback: {
   student's tempo is a local player control (a tempo slider), never saved.
 - The effective voice is: `playback.voice_id` > `Instrument.default_voice_id`. The voice's
   `family` must match the diagram's instrument family.
+- Students can't switch voices yet. The model already allows it: a later student voice choice is a
+  local player control, like the tempo, limited to the voices of the diagram's family, and it
+  takes precedence over both.
 - `reversed` plays the steps in reverse order. Each step keeps its own value and strum.
 - `step_ms` is removed.
 - A diagram whose `sequence` is empty has no Play control, whatever its `diagram_ref` says.
@@ -184,9 +212,20 @@ per-use render config.
 and the fraction `{num, den}` covers dotted notes and tuplets without special cases. `step_ms`
 couldn't express either and had to be re-tuned by hand whenever the tempo changed.
 
-**No time signature, articulation or per-step dynamics yet.** The first material (scales,
-arpeggios, strummed chords, short licks) doesn't need them, and each is an additive field later.
-Adding a whole notation model now would be building ahead of the content.
+**A time signature the author picks; simple or compound derived from it.** The meter decides
+what a "beat" is: a 6/8 lick at 60 BPM means 60 dotted quarters a minute, not 60 eighths. Deriving
+simple/compound from the signature (as musicians read it) means an author picks one familiar
+thing, "6/8", instead of a signature *and* a separate beat unit that could contradict it. The
+signature also gives the editor bar lines and a sensible default note value.
+
+**Tuplets as plain fractions, not a tuplet object.** For sound, a triplet eighth is simply a note
+one twelfth of a whole note long, so `{1, 12}` is all the player needs. A bracketed tuplet group
+only matters for printed notation, which we don't render. If we ever do, a group marker is an
+additive field on steps.
+
+**No articulation, per-step dynamics or pickup bar yet.** The first material (scales, arpeggios,
+strummed chords, short licks) doesn't need them, and each is an additive field later. Adding a
+whole notation model now would be building ahead of the content.
 
 **Voice separate from Instrument.** Diagram positions depend only on the layout, so guitar-family
 voices can share every guitar diagram. Making "electric guitar" an instrument would duplicate every
@@ -262,9 +301,9 @@ inside a stack keeps the schema unchanged and leaves the choice open.
 - A student's tempo choice is not stored, so it isn't progress data and emits no events.
 - The Play control appears only where a diagram has a sequence and its usage sets `playback`.
   Every existing embed stays silent until an author opts in.
-- **Revisit trigger:** content that needs bars, dynamics, articulation, or stacked playback; a
-  voice whose 3-semitone repitch is audibly wrong; or a smplr regression that the adapter can't
-  absorb.
+- **Revisit trigger:** content that needs grouped irregular meters, a pickup bar, dynamics,
+  articulation, stacked playback, or notes longer than a voice's samples; a voice whose
+  3-semitone repitch is audibly wrong; or a smplr regression that the adapter can't absorb.
 
 ## Related ADRs
 
@@ -280,10 +319,11 @@ inside a stack keeps the schema unchanged and leaves the choice open.
 
 ## Follow-up work (not part of this ADR)
 
-- **Specs:** OpenAPI changes to `Diagram` (`tempo_bpm`, `beat_unit`, `sequence`), `DiagramPosition`
+- **Specs:** OpenAPI changes to `Diagram` (`tempo_bpm`, `time_signature`, `sequence`), `DiagramPosition`
   (drop `sequence_index`), `Instrument` (octave tuning, `default_voice_id`), `DiagramRef.playback`,
   and a new `Voice` schema with `GET /voices`. Gherkin for authoring a sequence (chord, rest,
-  strum, reused position, invalid position id, missing tempo) and for voice/family validation.
+  strum, tuplet, reused position, invalid position id, missing tempo), for voice/family
+  validation, and for the pulse of simple, compound and irregular time signatures.
 - **motifpath-core:** schema and migration, validation, voice seed data, and the voice sample
   upload in the seed/dev tooling.
 - **motifpath-web (PB-71):** the smplr adapter and one-note test, the timeline (starting from the
