@@ -393,7 +393,67 @@ Feature: Manage prebuilt diagrams
     Then the response includes "carols-arpeggio"
     And the response does not include "bobs-pentatonic"
 
+  @wip
+  Scenario: A teacher filtering by another teacher gets none of that teacher's custom diagrams
+    Given a custom diagram "carols-arpeggio" exists on instrument "guitar", created by "carol"
+    And "bob" is authenticated as a teacher
+    When "bob" lists diagrams filtered by creator "carol"
+    Then the response contains 0 items
+
+  @wip
+  Scenario: A teacher narrows the diagram list to the basic diagrams one admin created
+    Given a basic diagram "major-scale-guitar" exists on instrument "guitar", created by "admin"
+    And a basic diagram "minor-pentatonic-guitar" exists on instrument "guitar", created by "dora"
+    And "bob" is authenticated as a teacher
+    When "bob" lists diagrams filtered by creator "admin"
+    Then the response includes "major-scale-guitar"
+    And the response does not include "minor-pentatonic-guitar"
+
   # ── Listing — filtering and pagination ────────────────────────────────────
+
+  @wip
+  Scenario: A teacher searches diagrams by a name in any language, ignoring case and accents
+    Given a basic diagram "diagram-a" exists on instrument "guitar", named "Ionian Mode" in English and "Modo Jônico" in Portuguese
+    And a basic diagram "diagram-b" exists on instrument "guitar", named "Dorian Mode" in English and "Modo Dórico" in Portuguese
+    And "bob" is authenticated as a teacher
+    And "bob" has locale "en"
+    When "bob" lists diagrams whose name contains "jonico"
+    Then the response includes "diagram-a"
+    And the response does not include "diagram-b"
+
+  @wip
+  Scenario: A teacher filters diagrams by root note
+    Given a basic diagram "a-minor-pentatonic" exists on instrument "guitar" with root note "A"
+    And a basic diagram "e-minor-pentatonic" exists on instrument "guitar" with root note "E"
+    And a basic diagram "unrooted-shape" exists on instrument "guitar" with no root note
+    And "bob" is authenticated as a teacher
+    When "bob" lists diagrams with root note "A"
+    Then the response includes "a-minor-pentatonic"
+    And the response does not include "e-minor-pentatonic" or "unrooted-shape"
+
+  @wip
+  Scenario: Diagram filters combine
+    Given a basic diagram "a-minor-pentatonic" exists on instrument "guitar", named "Minor Pentatonic" in English and "Pentatônica Menor" in Portuguese, with root note "A"
+    And a basic diagram "e-minor-pentatonic" exists on instrument "guitar", named "Minor Pentatonic" in English and "Pentatônica Menor" in Portuguese, with root note "E"
+    And a custom diagram "bobs-a-pentatonic" exists on instrument "guitar", created by "bob", named "Minor Pentatonic" in English, with root note "A"
+    And "bob" is authenticated as a teacher
+    When "bob" lists diagrams of kind "basic" whose name contains "pentatonic" with root note "A"
+    Then the response includes "a-minor-pentatonic"
+    And the response does not include "e-minor-pentatonic" or "bobs-a-pentatonic"
+
+  @wip
+  Scenario Outline: An out-of-range diagram name search or root note is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" lists diagrams with <parameter> set to a value of <length> characters
+    Then the request is refused with a validation error
+
+    Examples:
+      | parameter | length |
+      | name      | 0      |
+      | name      | 201    |
+      | root_note | 0      |
+      | root_note | 4      |
+
 
   Scenario: A teacher filters diagrams by instrument
     Given a basic diagram "minor-pentatonic-guitar" exists on instrument "guitar"
@@ -440,6 +500,51 @@ Feature: Manage prebuilt diagrams
       | 0     | 0      |
       | 101   | 0      |
       | 20    | -1     |
+
+  # ── Diagram creators (the creator filter's options) ────────────────────────
+
+  @wip
+  Scenario: A teacher lists the creators of the basic diagrams and their own
+    Given a basic diagram "major-scale-guitar" exists on instrument "guitar", created by "admin"
+    And a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
+    And a custom diagram "carols-arpeggio" exists on instrument "guitar", created by "carol"
+    And "bob" is authenticated as a teacher
+    When "bob" lists the diagram creators
+    Then the creators returned are "admin" and "bob", each with their display name
+    And the creators returned do not include "carol"
+
+  @wip
+  Scenario: A teacher with no custom diagram of their own is not a listed creator
+    Given a basic diagram "major-scale-guitar" exists on instrument "guitar", created by "admin"
+    And "bob" is authenticated as a teacher
+    When "bob" lists the diagram creators
+    Then the creators returned are "admin", each with their display name
+
+  @wip
+  Scenario: An admin lists the creator of every diagram, each once
+    Given a basic diagram "major-scale-guitar" exists on instrument "guitar", created by "admin"
+    And a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
+    And a custom diagram "bobs-arpeggio" exists on instrument "guitar", created by "bob"
+    And a custom diagram "carols-arpeggio" exists on instrument "guitar", created by "carol"
+    And "admin" is authenticated as an admin
+    When "admin" lists the diagram creators
+    Then the creators returned are "admin", "bob" and "carol", each with their display name
+
+  @wip
+  Scenario: Diagram creators are searched by display name, ignoring case and accents
+    Given "bob" is named "Bob Ferreira"
+    And "carol" is named "Carol Souza"
+    And a custom diagram "bobs-pentatonic" exists on instrument "guitar", created by "bob"
+    And a custom diagram "carols-arpeggio" exists on instrument "guitar", created by "carol"
+    And "admin" is authenticated as an admin
+    When "admin" lists the diagram creators matching "FÉRR"
+    Then the creators returned are "bob", each with their display name
+
+  @wip
+  Scenario: A student cannot list diagram creators
+    Given "alice" is authenticated as a student
+    When "alice" lists the diagram creators
+    Then the request is refused with a forbidden error
 
   # ── Retrieving ─────────────────────────────────────────────────────────────
 
@@ -530,11 +635,6 @@ Feature: Manage prebuilt diagrams
   Scenario: A student cannot list diagrams
     Given "alice" is authenticated as a student
     When "alice" lists all diagrams
-    Then the request is refused with a forbidden error
-
-  Scenario: A teacher cannot list another teacher's diagrams
-    Given "bob" is authenticated as a teacher
-    When "bob" lists diagrams filtered by creator "carol"
     Then the request is refused with a forbidden error
 
   Scenario: Creating a diagram without an authentication token is refused
