@@ -47,7 +47,36 @@ Feature: Manage exercises
 
   # ── Happy path — diagram-driven exercises ─────────────────────────────────────
 
-  Scenario: A teacher creates an image_recognition exercise from a diagram, with no hand-drawn regions
+  @wip
+  Scenario: A diagram exercise's options are every fretboard cell in view, correct only where the author marked a position
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with positions:
+      | interval | note_name | string | fret |
+      | R        | A         | 6      | 5    |
+      | R        | A         | 4      | 7    |
+      | b3       | C         | 6      | 8    |
+    And "bob" is authenticated as a teacher
+    When "bob" creates an image_recognition exercise titled "Find the roots" from diagram "minor-pentatonic-guitar" with the positions at string 6 fret 5 and string 4 fret 7 correct, hiding the position at string 6 fret 5
+    Then the exercise is created and assigned a stable identifier
+    And the exercise has 30 options, one per cell from fret 5 to fret 9 on each of 6 strings
+    And the only correct options are the cells at string 6 fret 5 and string 4 fret 7
+    And the option at string 6 fret 8 names its diagram position and is not correct
+    And no option is an open string
+
+  @wip
+  Scenario: Open strings are answer cells when the window reaches the nut
+    Given a diagram "e-major-open" exists on instrument "guitar" with positions:
+      | interval | note_name | string | fret |
+      | R        | E         | 6      | 0    |
+      | 5        | B         | 5      | 2    |
+      | R        | E         | 4      | 2    |
+      | 3        | G#        | 3      | 1    |
+    And "bob" is authenticated as a teacher
+    When "bob" creates an image_recognition exercise titled "Find the open root" from diagram "e-major-open" with the position at string 6 fret 0 correct
+    Then the exercise has 24 options, one per cell from fret 0 to fret 3 on each of 6 strings
+    And the only correct options are the cells at string 6 fret 0
+
+  @wip
+  Scenario: A diagram exercise given the older correct intervals is stored with the matching drawn positions
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with positions:
       | interval | note_name | string | fret |
       | R        | A         | 6      | 5    |
@@ -56,9 +85,34 @@ Feature: Manage exercises
     And "bob" is authenticated as a teacher
     When "bob" creates an image_recognition exercise titled "Tap every root note" with prompt "Tap every root note in this pattern" from diagram "minor-pentatonic-guitar" showing only interval "R" as the correct answer
     Then the exercise is created and assigned a stable identifier
-    And the exercise's options are derived from diagram "minor-pentatonic-guitar"
-    And the exercise has 2 options, one per visible root position
-    And every option derived from the diagram is marked correct
+    And the exercise has 30 options, one per cell from fret 5 to fret 9 on each of 6 strings
+    And the only correct options are the cells at string 6 fret 5 and string 4 fret 7
+    And the exercise's stimulus records the positions at string 6 fret 5 and string 4 fret 7 as correct
+
+  @wip
+  Scenario: A diagram exercise's stimulus keeps its label mode and hidden positions
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with positions:
+      | interval | note_name | string | fret |
+      | R        | A         | 6      | 5    |
+      | b3       | C         | 6      | 8    |
+    And "bob" is authenticated as a teacher
+    When "bob" creates an image_recognition exercise titled "Name the notes" from diagram "minor-pentatonic-guitar" labelled by "note" with the position at string 6 fret 5 correct, hiding the position at string 6 fret 5
+    Then the exercise's stimulus is labelled by "note" and hides the position at string 6 fret 5
+
+  @wip
+  Scenario Outline: A diagram exercise with unusable correct positions is rejected
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with positions:
+      | interval | note_name | string | fret |
+      | R        | A         | 6      | 5    |
+    And "bob" is authenticated as a teacher
+    When "bob" creates an image_recognition exercise from diagram "minor-pentatonic-guitar" with <correct positions>
+    Then the request is rejected as invalid
+    And the rejection identifies "diagram_ref" as the source of the error
+
+    Examples:
+      | correct positions                        |
+      | no correct position                      |
+      | a correct position not in the diagram    |
 
   Scenario: A teacher creates an image_choice exercise whose options are diagram thumbnails
     Given a diagram "c-major-scale-guitar" exists on instrument "guitar"
