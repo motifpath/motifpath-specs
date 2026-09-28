@@ -47,7 +47,6 @@ Feature: Manage exercises
 
   # ── Happy path — diagram-driven exercises ─────────────────────────────────────
 
-  @wip
   Scenario: A diagram exercise's options are every fretboard cell in view, correct only where the author marked a position
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with positions:
       | interval | note_name | string | fret |
@@ -62,7 +61,6 @@ Feature: Manage exercises
     And the option at string 6 fret 8 names its diagram position and is not correct
     And no option is an open string
 
-  @wip
   Scenario: Open strings are answer cells when the window reaches the nut
     Given a diagram "e-major-open" exists on instrument "guitar" with positions:
       | interval | note_name | string | fret |
@@ -75,7 +73,6 @@ Feature: Manage exercises
     Then the exercise has 24 options, one per cell from fret 0 to fret 3 on each of 6 strings
     And the only correct options are the cells at string 6 fret 0
 
-  @wip
   Scenario: A diagram exercise given the older correct intervals is stored with the matching drawn positions
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with positions:
       | interval | note_name | string | fret |
@@ -89,7 +86,6 @@ Feature: Manage exercises
     And the only correct options are the cells at string 6 fret 5 and string 4 fret 7
     And the exercise's stimulus records the positions at string 6 fret 5 and string 4 fret 7 as correct
 
-  @wip
   Scenario: A diagram exercise's stimulus keeps its label mode and hidden positions
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with positions:
       | interval | note_name | string | fret |
@@ -99,7 +95,6 @@ Feature: Manage exercises
     When "bob" creates an image_recognition exercise titled "Name the notes" from diagram "minor-pentatonic-guitar" labelled by "note" with the position at string 6 fret 5 correct, hiding the position at string 6 fret 5
     Then the exercise's stimulus is labelled by "note" and hides the position at string 6 fret 5
 
-  @wip
   Scenario Outline: A diagram exercise with unusable correct positions is rejected
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with positions:
       | interval | note_name | string | fret |
