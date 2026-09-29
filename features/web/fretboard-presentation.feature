@@ -474,6 +474,12 @@ Feature: Fretboard presentation
       And a board wider than the screen scrolls on its own
       And tapping an empty cell on any fret places a position there
 
+    Scenario: The editor offers each region's information control as the student view does
+      Given the teacher is editing a diagram with a region described "Box 1" in the language being edited
+      Then the region has one information control near its last fret, colored like the region
+      And opening the control shows "Box 1" next to it
+      And tapping inside the region still places a position rather than opening its description
+
     Scenario: Sequence recording keeps its step highlights on the new board
       Given the teacher is recording a sequence in the diagram editor
       When the teacher selects a recorded step
