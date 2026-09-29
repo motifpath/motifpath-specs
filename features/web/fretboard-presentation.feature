@@ -48,10 +48,20 @@ Feature: Fretboard presentation
       When the student views the diagram
       Then the board starts at the nut and shows 3 fret spaces
 
-    Scenario: A hidden position neither widens nor reveals the window for a student
-      Given a diagram with drawn positions on frets 5 to 8 and a hidden position on fret 12
+    Scenario: A hidden position does not widen a diagram the student only reads
+      Given a lesson diagram with drawn positions on frets 5 to 8 and a hidden position on fret 12
+      And the diagram offers no answer cells
       When the student views the diagram
       Then the board shows fret spaces 5 to 8
+
+    Scenario: A hidden answer widens the window so it can be selected
+      Given an image-recognition exercise whose diagram has drawn positions on frets 5 to 8
+      And the correct position is hidden on fret 12
+      And the diagram offers answer cells
+      When the student views the exercise
+      Then the board shows fret space 12
+      And the answer cell on fret 12 can be selected
+      And that cell looks the same as every other empty answer cell
 
     Scenario: An author's preview widens the window to reveal hidden positions
       Given a diagram with drawn positions on frets 5 to 8 and a hidden position on fret 12
