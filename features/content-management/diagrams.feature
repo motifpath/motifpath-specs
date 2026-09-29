@@ -320,7 +320,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Key ─────────────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher records the key of a diagram
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Minor Pentatonic — Position 1" on instrument "guitar" with root note "A" and mode "minor" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -330,7 +329,6 @@ Feature: Manage prebuilt diagrams
     And the diagram's root note is "A"
     And the diagram's mode is "minor"
 
-  @wip
   Scenario: A diagram created without a mode has no key
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Chromatic Run" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -339,21 +337,18 @@ Feature: Manage prebuilt diagrams
     Then the diagram is created and assigned a stable identifier
     And the diagram has no mode
 
-  @wip
   Scenario: A mode without a root note is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create diagram request on instrument "guitar" with mode "dorian" and no root note
     Then the request is rejected as invalid
     And the rejection identifies "mode" as the source of the error
 
-  @wip
   Scenario: An unrecognised mode is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create diagram request on instrument "guitar" with root note "A" and mode "blues"
     Then the request is rejected as invalid
     And the rejection identifies "mode" as the source of the error
 
-  @wip
   Scenario: A teacher clears the mode of their own diagram
     Given a custom diagram "minor-pentatonic-guitar" exists on instrument "guitar", created by "bob", with root note "A" and mode "minor"
     And "bob" is authenticated as a teacher
@@ -363,7 +358,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Playback sequence ───────────────────────────────────────────────────────
 
-  @wip
   Scenario: A diagram created without a sequence has no playback and a 4/4 time signature
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "No Playback" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -374,7 +368,6 @@ Feature: Manage prebuilt diagrams
     And the diagram has no tempo
     And the diagram's time signature is "4/4"
 
-  @wip
   Scenario: A teacher gives a diagram a sequence of single notes
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "A5 Arpeggio" on instrument "guitar" at 90 BPM in "4/4" with fretted positions:
@@ -396,7 +389,6 @@ Feature: Manage prebuilt diagrams
       | 2         | 1/8   | none  |
       | 3         | 1/4   | none  |
 
-  @wip
   Scenario: A step with several positions sounds them together as a chord, optionally strummed
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "A5 Chord" on instrument "guitar" at 90 BPM in "4/4" with fretted positions:
@@ -415,7 +407,6 @@ Feature: Manage prebuilt diagrams
       | 1, 2, 3   | 1/4   | up    |
       | 1, 2, 3   | 1/2   | none  |
 
-  @wip
   Scenario: A position can sound in more than one step
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Strum Then Arpeggiate" on instrument "guitar" at 90 BPM in "4/4" with fretted positions:
@@ -431,7 +422,6 @@ Feature: Manage prebuilt diagrams
       | 3         | 1/4   |       |
     Then position 1 sounds in steps 1 and 2
 
-  @wip
   Scenario: A step with no positions is a rest
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "With a Rest" on instrument "guitar" at 90 BPM in "4/4" with fretted positions:
@@ -446,7 +436,6 @@ Feature: Manage prebuilt diagrams
       | 2         | 1/2   |
     Then step 2 of the diagram's sequence is a rest of 1/4
 
-  @wip
   Scenario: Tuplets are kept as the fractions the author gave
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Triplet Run" on instrument "guitar" at 90 BPM in "4/4" with fretted positions:
@@ -467,7 +456,6 @@ Feature: Manage prebuilt diagrams
       | 3         | 1/24  |
     Then the diagram's step values are "1/12, 1/12, 1/12, 1/24, 1/24, 1/24, 1/24, 1/24, 1/24"
 
-  @wip
   Scenario: A teacher records a compound time signature
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Jig" on instrument "guitar" at 60 BPM in "6/8" with fretted positions:
@@ -483,7 +471,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram's time signature is "6/8"
     And the diagram's tempo is 60 BPM
 
-  @wip
   Scenario Outline: An invalid sequence is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create diagram request on instrument "guitar" with <problem>
@@ -505,7 +492,6 @@ Feature: Manage prebuilt diagrams
       | a time signature of "17/4"                                | time_signature |
       | a time signature of "0/4"                                 | time_signature |
 
-  @wip
   Scenario: A teacher replaces the sequence of their own diagram
     Given a custom diagram "a5-arpeggio" exists on instrument "guitar", created by "bob", with a 3-step sequence at 90 BPM
     And "bob" is authenticated as a teacher
@@ -517,14 +503,12 @@ Feature: Manage prebuilt diagrams
       | 1, 2, 3   | 1/1   | down  |
     And the diagram's tempo is 90 BPM
 
-  @wip
   Scenario: Updating a diagram without a sequence keeps its sequence
     Given a custom diagram "a5-arpeggio" exists on instrument "guitar", created by "bob", with a 3-step sequence at 90 BPM
     And "bob" is authenticated as a teacher
     When "bob" updates diagram "a5-arpeggio" setting root note "A" and label display "note"
     Then the diagram's sequence has 3 steps
 
-  @wip
   Scenario: A teacher removes the playback of their own diagram
     Given a custom diagram "a5-arpeggio" exists on instrument "guitar", created by "bob", with a 3-step sequence at 90 BPM
     And "bob" is authenticated as a teacher
@@ -532,7 +516,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram has an empty sequence
     And the diagram has no tempo
 
-  @wip
   Scenario: Removing a position that plays, without resending the sequence, is rejected
     Given a custom diagram "a5-arpeggio" exists on instrument "guitar", created by "bob", with a 3-step sequence at 90 BPM
     And "bob" is authenticated as a teacher
@@ -541,7 +524,6 @@ Feature: Manage prebuilt diagrams
     And the rejection identifies "sequence" as the source of the error
     And diagram "a5-arpeggio" is unchanged
 
-  @wip
   Scenario: A student retrieves a diagram with its sequence
     Given a custom diagram "a5-arpeggio" exists on instrument "guitar", created by "bob", with a 3-step sequence at 90 BPM
     And "alice" is authenticated as a student

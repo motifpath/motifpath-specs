@@ -88,7 +88,6 @@ Feature: Manage instruments
 
   # ── Tuning and default voice ───────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher creates a fretted instrument with a default voice
     Given "bob" is authenticated as a teacher
     When "bob" creates a fretted instrument named "Guitar" in English and "Violão" in Portuguese with 6 strings tuned "E2, A2, D3, G3, B3, E4" and default voice "acoustic-guitar"
@@ -96,35 +95,30 @@ Feature: Manage instruments
     And the instrument's tuning is "E2, A2, D3, G3, B3, E4"
     And the instrument's default voice is "acoustic-guitar"
 
-  @wip
   Scenario: Creating a fretted instrument whose tuning has no octaves is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a fretted instrument named "Guitar" in English and "Violão" in Portuguese with 6 strings tuned "E, A, D, G, B, E"
     Then the request is rejected as invalid
     And the rejection identifies "tuning" as the source of the error
 
-  @wip
   Scenario: Creating an instrument without a default voice is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create instrument request for a fretted instrument with the default_voice_id field omitted
     Then the request is rejected as invalid
     And the rejection identifies "default_voice_id" as the source of the error
 
-  @wip
   Scenario: Creating an instrument whose default voice plays another family is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a fretted instrument named "Guitar" in English and "Violão" in Portuguese with 6 strings tuned "E2, A2, D3, G3, B3, E4" and default voice "piano"
     Then the request is rejected as invalid
     And the rejection identifies "default_voice_id" as the source of the error
 
-  @wip
   Scenario: Creating an instrument with a default voice that does not exist is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a fretted instrument named "Guitar" in English and "Violão" in Portuguese with 6 strings tuned "E2, A2, D3, G3, B3, E4" and default voice "banjo"
     Then the request is rejected as invalid
     And the rejection identifies "default_voice_id" as the source of the error
 
-  @wip
   Scenario: An admin changes an instrument's default voice
     Given a fretted instrument "guitar" exists in the system
     And the platform provides a fretted voice "nylon-guitar"
@@ -133,7 +127,6 @@ Feature: Manage instruments
     Then the instrument's default voice is "nylon-guitar"
     And the instrument's tuning is unchanged
 
-  @wip
   Scenario: Changing an instrument's default voice to another family's voice is rejected
     Given a fretted instrument "guitar" exists in the system
     And "admin" is authenticated as an admin

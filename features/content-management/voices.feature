@@ -1,4 +1,3 @@
-@wip
 Feature: List voices
   As the MotifPath platform
   I want every user to see the sampled sounds diagrams can be played with
