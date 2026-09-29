@@ -104,7 +104,6 @@ Feature: Manage expanded content
 
   # ── Diagram content — playback ────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher adds a diagram that plays with its own voice, tempo and looping
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with a 3-step sequence at 90 BPM
     And "bob" is authenticated as a teacher
@@ -113,7 +112,6 @@ Feature: Manage expanded content
     Then the expanded content item is created and assigned a stable identifier
     And the item's diagram plays reversed and looping at 60 BPM with voice "acoustic-guitar"
 
-  @wip
   Scenario: A diagram's playback defaults to the authored order, the diagram's tempo and the instrument's voice
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with a 3-step sequence at 90 BPM
     And "bob" is authenticated as a teacher
@@ -121,7 +119,6 @@ Feature: Manage expanded content
     When "bob" adds diagram "minor-pentatonic-guitar" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165, playing with no overrides
     Then the item's diagram plays as authored, not looping, with no tempo or voice of its own
 
-  @wip
   Scenario Outline: An invalid diagram playback is rejected
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with a 3-step sequence at 90 BPM
     And "bob" is authenticated as a teacher
