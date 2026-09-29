@@ -1,5 +1,15 @@
 # PR Review — Changelog
 
+## [1.4.0] — 2026-09-29
+
+### Added
+- New Axis A / item 23 in `HEURISTICS.md`: flags state that points into a collection by
+  position (a selection, cursor, focus, pagination offset) while other code can reorder, insert
+  or remove items, which leaves the pointer on a different item. Activated for changes that touch
+  ordering and for user-facing changes. It came from the motifpath-web#61 review, where a
+  sequence editor's selected-step index drifted when another step moved or when the form dropped
+  a step.
+
 ## [1.3.0] — 2026-09-13
 
 ### Added
