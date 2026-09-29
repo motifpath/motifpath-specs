@@ -9,6 +9,11 @@
   ordering and for user-facing changes. It came from the motifpath-web#61 review, where a
   sequence editor's selected-step index drifted when another step moved or when the form dropped
   a step.
+- New Axis B / item 24 in `HEURISTICS.md`: flags a tick-driven loop (animation frame, timer,
+  poller, scheduled job) that assumes its ticks arrive on time, so after a long gap it schedules
+  work into the past or replays every missed tick at once. Activated for changes that run on a
+  tick. It came from the PB-71 diagram player review, where a looping run replayed every missed
+  pass in one burst after a background tab. The checklist is now at its 24-item cap.
 
 ## [1.3.0] — 2026-09-13
 

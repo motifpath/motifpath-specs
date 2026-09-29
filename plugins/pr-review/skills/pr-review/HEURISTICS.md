@@ -10,7 +10,7 @@ reprocessing — not just steady-state).
 
 ## Activation
 
-23 items is too many for every review. Classify the change and walk only the activated subset —
+24 items is too many for every review. Classify the change and walk only the activated subset —
 plus the five always-on items.
 
 | If the change… | activates |
@@ -24,6 +24,7 @@ plus the five always-on items.
 | carries external content into render/query/exec | 15, 16, 2 |
 | touches configuration, migration, or rollout | 7, 14, 2 |
 | is user-facing (motifpath-web) | 12, 18, 14, 23 |
+| runs on a tick (animation frame, timer, poller, scheduled job) | 24, 7 |
 | **always** | **17, 19, 20, 21, 22** |
 
 ---
@@ -70,6 +71,14 @@ plus the five always-on items.
    truncation/hash with no dedup at the destination.
 9. **Sentinel value inside the deterministic space.** Does the "unknown" fallback share the same
    key space as real values? — *Smell:* a sentinel producing a stable key that never invalidates.
+
+24. **Missed ticks.** Does a loop driven by ticks (an animation frame, a timer, a poller, a cron
+    job) assume they arrive on time? After a long gap (a background tab, a sleeping laptop, a
+    stalled worker), does it schedule the next piece of work into the past, or replay every missed
+    tick at once? — *Smell:* the next run computed from the previous run's end rather than from
+    now, with no catch-up rule. (Came from the motifpath-web diagram player: a looping run
+    re-scheduled each missed pass at the previous pass's end after a background tab, so they all
+    sounded at once.)
 
 ## Axis C — The nature of the change
 
