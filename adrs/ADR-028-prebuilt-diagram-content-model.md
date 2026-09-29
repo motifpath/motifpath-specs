@@ -1,6 +1,6 @@
 # ADR-028: Diagram becomes a first-class, reusable content entity — polymorphic per-instrument-family positions, and render-time layer, styling, and playback config
 
-**Status:** Accepted (partially superseded by ADR-030, ADR-032 and ADR-033; extended by ADR-034)
+**Status:** Accepted (partially superseded by ADR-030, ADR-032, ADR-033, ADR-040 and ADR-041; extended by ADR-034)
 **Date:** 2026-09-20
 **Deciders:** Gilson (Product Owner)
 
@@ -24,6 +24,13 @@
 > **2026-09-24:** [ADR-036](./ADR-036-localized-catalog-names.md) (Accepted) turns `Instrument.name`
 > into one name per language and adds an admin-only endpoint to update an instrument's names.
 > `family` and the string/key shape stay immutable.
+
+> **2026-09-28:** [ADR-041](./ADR-041-diagram-audio-playback.md) (Accepted) replaces
+> `DiagramPosition.sequence_index` with an ordered list of rhythmic steps on the `Diagram`
+> (`tempo_bpm`, `beat_unit`, `sequence`), and replaces `diagram_ref.playback`'s `step_ms` with tempo,
+> voice, direction and loop overrides. `Instrument.tuning` gains octaves, each instrument gets a
+> default `Voice` (sampled timbre), and a `Diagram` can record its `mode`. Audio-synced highlighting stays in SVG; the Canvas note under
+> Neutral no longer applies.
 
 ---
 
