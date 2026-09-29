@@ -1,5 +1,14 @@
 # PR Review — Changelog
 
+## [1.3.1] — 2026-09-29
+
+### Changed
+- `HEURISTICS.md` item 18 (Test the real path): the smell now also covers tests that fire only part
+  of a gesture the platform delivers as several events, e.g. a scroll without the press a swipe
+  starts with. A review of a region-description popover found that tests dispatching only a
+  `scroll` let a close-on-press bug through: a real swipe begins with a `pointerdown` the tests never
+  sent.
+
 ## [1.3.0] — 2026-09-13
 
 ### Added
