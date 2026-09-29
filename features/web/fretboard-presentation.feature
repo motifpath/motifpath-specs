@@ -465,7 +465,14 @@ Feature: Fretboard presentation
     Scenario: The editor and the student view agree on the board
       Given a diagram with positions, regions and authored shapes
       When the teacher edits it and then previews it as a student
-      Then both show the same fret window, fret positions, materials and marker shapes
+      Then both show the same fret spacing, string spacing, materials and marker shapes
+      And the preview shows the student's fret window
+
+    Scenario: The editor shows the whole neck so any fret can be placed
+      Given the teacher is editing a diagram whose positions use frets 5 to 8
+      Then the editor board spans every fret from the nut to fret 24
+      And a board wider than the screen scrolls on its own
+      And tapping an empty cell on any fret places a position there
 
     Scenario: Sequence recording keeps its step highlights on the new board
       Given the teacher is recording a sequence in the diagram editor
