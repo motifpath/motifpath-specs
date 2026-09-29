@@ -3,6 +3,8 @@
 **Status:** Accepted
 **Date:** 2026-09-28
 **Deciders:** Gilson (Product Owner)
+**Amended:** 2026-09-29 — existing `sequence_index` values are dropped, not migrated into steps
+(see the `sequence_index` bullet under Decision).
 **Partially supersedes:** ADR-028's `DiagramPosition.sequence_index` and `diagram_ref.playback`
 (`direction`, `step_ms`), and the ADR-027/ADR-028 note that sends audio-synced highlighting to
 Canvas. Everything else in ADR-028 stands.
@@ -110,9 +112,12 @@ NoteValue { num: int >= 1, den: int >= 1 }   // a fraction of a whole note
 - There is no articulation field (staccato, legato). Every note sounds for its full value and
   releases into the next. It is additive later if real content needs it.
 - `tempo_bpm` is required as soon as `sequence` is non-empty, within 20–300.
-- `DiagramPosition.sequence_index` is removed. Only seed data uses it today. Existing indices
-  migrate into steps: positions with the same index become one step, in index order, each an
-  eighth note (1/8) in 4/4 at 90 BPM.
+- `DiagramPosition.sequence_index` is removed, and existing values are dropped: every existing
+  diagram starts with an empty sequence. The diagram editor gave every position an index in the
+  order it was placed, so the indices record clicking order, not a sequence anyone authored.
+  Converting them would make every saved scale and chord play note by note, and would block
+  removing a note from any of them until the editor can edit sequences. Diagrams that should play
+  are given a sequence by their author (or by the seed data).
 - "Save as" (ADR-032) copies the sequence and time signature with position ids remapped.
 - A diagram flattened from a stack is an ordinary diagram and can play. It starts with an empty
   sequence (its sources' rhythms don't combine into one), and its author gives it its own.
@@ -315,9 +320,8 @@ inside a stack keeps the schema unchanged and leaves the choice open.
 
 - **Breaking schema change**, on already-shipped resources: `sequence_index` and `step_ms` are
   removed, `tuning` changes format, and `Instrument` gains `default_voice_id`. `motifpath-core`
-  needs a migration that converts existing indices into steps and adds octaves to tunings, and
-  both clients regenerate. There is no production data yet, so the migration only has to cover
-  seeded data.
+  needs a migration that drops existing indices and adds octaves to tunings, and both clients
+  regenerate. There is no production data yet, so the migration only has to cover seeded data.
 - **Authoring gets harder.** The diagram editor needs a sequence editor (steps, note values, rests,
   strums) on top of the position editor. The current editor derives `sequence_index` from the
   position order, and that shortcut is gone.
