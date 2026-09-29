@@ -7049,10 +7049,13 @@ components:
         under text and any inline marks under marks. attrs holds
         type-specific attributes (e.g. heading's level, paragraph/heading's
         text alignment, image's src and alt, audio/video's src, diagram's
-        diagram_ref or diagram_stack_ref (the same shapes DiagramRef/
-        DiagramStackRef carry elsewhere in this spec), table cell's colspan,
-        rowspan, backgroundColor, and borderColor) and is validated by the
-        authoring editor, not by this schema.
+        diagramRef or diagramStackRef, table cell's colspan, rowspan,
+        backgroundColor, and borderColor) and is validated by the authoring
+        editor, not by this schema. attrs keys are camelCase (the rich-text
+        editor's convention), so a diagram node's keys are diagramRef and
+        diagramStackRef — not diagram_ref/diagram_stack_ref. Their values
+        are the DiagramRef/DiagramStackRef shapes defined elsewhere in this
+        spec, whose own fields stay snake_case (diagram_id, layers, …).
       properties:
         type:
           type: string
