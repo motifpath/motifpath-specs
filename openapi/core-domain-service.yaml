@@ -6241,6 +6241,20 @@ components:
             The course's thumbnail: the latest published version's in GET
             /catalog/courses, the live draft's in GET /courses. Absent when
             it has none.
+        checkpoint_count:
+          type: integer
+          minimum: 1
+          description: >-
+            Number of checkpoints in the course version shown: the latest
+            published version in GET /catalog/courses, or the live draft in
+            GET /courses.
+        lesson_count:
+          type: integer
+          minimum: 0
+          description: >-
+            Number of content nodes across the learning paths in the course
+            version shown. This is a lesson count, not an estimated duration:
+            videos do not yet carry authoritative duration metadata.
       required:
         - course_id
         - title
@@ -6251,6 +6265,8 @@ components:
         - status
         - published_at
         - instrument_ids
+        - checkpoint_count
+        - lesson_count
 
     Course:
       type: object
@@ -6380,10 +6396,9 @@ components:
     CourseDetail:
       type: object
       description: |
-        A single course's detail. For a student, this is always the
-        latest published version's snapshot, rendered as an outline. For
-        a teacher or admin, this is the live draft with its checkpoints'
-        full outlines resolved.
+        A single published course's learner-facing detail. It is always the
+        latest published version's snapshot, rendered as an outline, so
+        unpublished draft edits never change what a prospective learner sees.
       properties:
         course_id:
           type: string
@@ -6407,6 +6422,8 @@ components:
         language:
           type: string
           description: The language the course is written in, as a Language.code.
+        created_by:
+          $ref: '#/components/schemas/UserRef'
         status:
           type: string
           enum:
@@ -6435,15 +6452,28 @@ components:
           description: >-
             An image shown for this item in lists and cards. Absent when it
             has none.
+        checkpoint_count:
+          type: integer
+          minimum: 1
+          description: Number of checkpoints in this published course version.
+        lesson_count:
+          type: integer
+          minimum: 0
+          description: >-
+            Number of content nodes across this published course version's
+            checkpoint learning paths. This is not an estimated duration.
       required:
         - course_id
         - title
         - summary
         - level
         - language
+        - created_by
         - status
         - checkpoints
         - instrument_ids
+        - checkpoint_count
+        - lesson_count
 
     CourseVersion:
       type: object
@@ -6545,6 +6575,24 @@ components:
         course_title:
           type: string
           description: The course's title, as of the pinned version.
+        course_summary:
+          type: string
+          description: The course's summary, as of the pinned version.
+        course_level:
+          type: string
+          enum:
+            - beginner
+            - early_intermediate
+            - intermediate
+            - advanced
+            - expert
+          description: The course's level, as of the pinned version.
+        course_created_by:
+          $ref: '#/components/schemas/UserRef'
+        checkpoint_count:
+          type: integer
+          minimum: 1
+          description: Number of checkpoints in the pinned course version.
         course_thumbnail_url:
           type: string
           format: uri
@@ -6585,6 +6633,10 @@ components:
         - student
         - course_id
         - course_title
+        - course_summary
+        - course_level
+        - course_created_by
+        - checkpoint_count
         - course_version_number
         - status
         - active_checkpoint_student_path_id
