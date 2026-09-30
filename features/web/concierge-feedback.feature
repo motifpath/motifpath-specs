@@ -25,7 +25,8 @@
 # stay resolvable.
 #
 # Out of scope: sending media through the platform (graduates to ADR-021's presigned upload),
-# the WhatsApp Cloud API, and tracking the tap as a learning event.
+# the WhatsApp Cloud API, tracking the tap as a learning event, and routing the message to
+# the authoring teacher's own business number (PB-82; the concierge number stays the fallback).
 
 Feature: Send to your teacher
   As a student who is stuck on a lesson or an exercise
