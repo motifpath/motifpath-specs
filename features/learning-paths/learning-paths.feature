@@ -45,7 +45,6 @@ Feature: Manage learning paths
     When "bob" lists all learning paths
     Then the response includes "beginner-guitar-path" and "advanced-path"
 
-  @wip
   Scenario: A teacher's library leaves out other authors' paths
     Given a learning path "bobs-path" exists with items "node-01", created by "bob"
     And a learning path "carols-path" exists with items "node-02", created by "carol"
@@ -54,7 +53,6 @@ Feature: Manage learning paths
     Then the response includes "bobs-path"
     And the response does not include "carols-path"
 
-  @wip
   Scenario: A teacher cannot list another author's learning paths
     Given a learning path "carols-path" exists with items "node-02", created by "carol"
     And "bob" is authenticated as a teacher
@@ -466,7 +464,6 @@ Feature: Manage learning paths
 
   # ── Library creators (the authoring creator filter's options) ─────────────
 
-  @wip
   Scenario: A teacher is the only creator in their own library
     Given a learning path "open-chords-path" exists as a draft, created by "bob"
     And a learning path "strumming-path" exists, published, created by "carol"
@@ -474,7 +471,6 @@ Feature: Manage learning paths
     When "bob" lists the creators of the learning path library
     Then the creators returned are "bob", each with their display name
 
-  @wip
   Scenario: An admin lists the creator of every path in the library, drafts included
     Given a learning path "open-chords-path" exists as a draft, created by "bob"
     And a learning path "strumming-path" exists, published, created by "carol"
@@ -482,7 +478,6 @@ Feature: Manage learning paths
     When "admin" lists the creators of the learning path library
     Then the creators returned are "bob" and "carol", each with their display name
 
-  @wip
   Scenario: A creator with several paths in the library is listed once
     Given a learning path "open-chords-path" exists as a draft, created by "bob"
     And a learning path "strumming-path" exists, published, created by "bob"
@@ -490,27 +485,23 @@ Feature: Manage learning paths
     When "admin" lists the creators of the learning path library
     Then the creators returned are "bob", each with their display name
 
-  @wip
   Scenario: Library creators are ordered by name ignoring case and accents
     Given learning paths exist, published, created by "Zé", "álvaro" and "Bruna"
     And "admin" is authenticated as an admin
     When "admin" lists the creators of the learning path library
     Then the creators returned are "álvaro", "Bruna" and "Zé", in that order
 
-  @wip
   Scenario: An admin narrows the library creators by name, ignoring case and accents
     Given learning paths exist, published, created by "José" and "Bruna"
     And "admin" is authenticated as an admin
     When "admin" lists the creators of the learning path library matching "jose"
     Then the creators returned are "José", each with their display name
 
-  @wip
   Scenario: A student cannot list the creators of the learning path library
     Given "alice" is authenticated as a student
     When "alice" lists the creators of the learning path library
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: Listing the library creators without an authentication token is refused
     Given no authentication token is provided
     When an unauthenticated request attempts to list the creators of the learning path library

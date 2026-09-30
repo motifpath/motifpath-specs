@@ -30,14 +30,12 @@ Feature: Author courses
     When "admin" creates a course titled "Mixed Journey" with checkpoints in order: "open-chords-path", "carols-path"
     Then the course is created and assigned a stable identifier
 
-  @wip
   Scenario: A teacher cannot build a course on another author's path
     Given a learning path "carols-path" exists, published, created by "carol"
     And "bob" is authenticated as a teacher
     When "bob" creates a course titled "Borrowed Journey" with checkpoints in order: "open-chords-path", "carols-path"
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: A teacher cannot add another author's path to their course draft
     Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
     And a learning path "carols-path" exists, published, created by "carol"
@@ -45,7 +43,6 @@ Feature: Author courses
     When "bob" replaces course "fingerstyle-journey" with checkpoints in order: "open-chords-path", "carols-path"
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: An admin cannot add another author's path to a teacher's course
     Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
     And a learning path "carols-path" exists, published, created by "carol"
