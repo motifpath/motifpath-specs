@@ -38,8 +38,24 @@ Feature: Assign learning paths to students
     Then "beginner-guitar-path" and any other student's copy of it are unchanged
 
   @wip
-  Scenario: Staff can assign a draft path that isn't in the path catalog
+  Scenario: Assigning a draft path is refused
     Given a learning path "concierge-path" exists as a draft
+    And "bob" is authenticated as a teacher
+    When "bob" assigns "concierge-path" to student "alice"
+    Then the request is refused with a conflict error
+    And "alice" has no copy of "concierge-path"
+
+  @wip
+  Scenario: An admin cannot assign a draft path either
+    Given a learning path "concierge-path" exists as a draft
+    And "admin" is authenticated as an admin
+    When "admin" assigns "concierge-path" to student "alice"
+    Then the request is refused with a conflict error
+
+  @wip
+  Scenario: A path can be assigned once it is published
+    Given a learning path "concierge-path" exists as a draft
+    And "admin" publishes learning path "concierge-path"
     And "bob" is authenticated as a teacher
     When "bob" assigns "concierge-path" to student "alice"
     Then a student path is created and returned, copied from "concierge-path"

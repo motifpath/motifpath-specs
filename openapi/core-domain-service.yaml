@@ -3850,10 +3850,11 @@ paths:
         archived or abandoned. A student may hold many StudentPaths at
         once. Every content node the template's items reference must
         have at least one published version; each item's copy resolves
-        to that node's latest published version at this instant. The
-        template may be a draft: staff can assign paths that aren't
-        offered in the path catalog. The copy records the template's
-        summary, level, thumbnail and creator as they are at this instant.
+        to that node's latest published version at this instant. Only a
+        published template can be assigned — the same paths learners find
+        in the path catalog; assigning a draft is refused. The copy records
+        the template's summary, level, thumbnail and creator as they are at
+        this instant.
       tags:
         - Learning Paths
       parameters:
@@ -3909,6 +3910,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: The learning path is a draft. Only published paths can be assigned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
 
   /students/me/path:
     get:
@@ -6333,7 +6340,7 @@ components:
         learning_path_id:
           type: string
           format: uuid
-          description: The ID of the learning path to assign. Must exist in the system.
+          description: The ID of the learning path to assign. Must exist in the system and be published.
       required:
         - learning_path_id
 

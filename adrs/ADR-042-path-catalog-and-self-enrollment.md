@@ -3,6 +3,7 @@
 **Status:** Accepted
 **Date:** 2026-09-30
 **Deciders:** Gilson (Product Owner)
+**Revised:** 2026-09-30, in spec review. Staff may assign only published paths.
 **Amends:** ADR-029 (standalone paths are staff-assigned only) and ADR-017 (what a `StudentPath`
 records at copy time). It extends ADR-038's filterable path library and reuses PB-68's course
 presentation.
@@ -91,8 +92,10 @@ caller, whatever their role:
   (200) instead of creating a second one. Otherwise it creates the copy (201). An archived copy
   isn't reused: enrolling again creates a fresh copy.
 - A draft or unknown path is 404. Any user may enroll, whatever their role (ADR-037).
-- Staff assignment (`POST /students/{student_id}/student-paths`) is unchanged. It can still assign a
-  draft path, because the concierge works with paths that aren't offered publicly.
+- **Staff can assign only published paths** (`POST /students/{student_id}/student-paths`). Assigning a
+  draft path is refused (409). Otherwise assignment is unchanged: it still sets the path as current
+  unconditionally. A path a learner is asked to follow must meet the same bar as a path a learner
+  finds for themselves. A draft path is unfinished whoever hands it out.
 
 **A `StudentPath` records its presentation at copy time.** On every copy (standalone or course
 checkpoint, self-enrolled or staff-assigned), the `StudentPath` gains snapshots of the template's
@@ -155,6 +158,9 @@ that failure with course drafts (core 299bdfc). The snapshot is four small colum
   switch visible (enrolling in a path lands the learner on it).
 - Existing paths have no summary or language. They must be completed before an admin can publish
   them, and older `StudentPath`s show a title-only card.
+- Every existing path starts as a draft, and staff can assign only published paths. Until an admin
+  completes and publishes a path, no one can assign it. The concierge must publish before
+  assigning, and a path meant for one student only is still visible in the catalog once published.
 - Two catalogs mean two creator lists and two filter sets to keep in step.
 
 ### Neutral
