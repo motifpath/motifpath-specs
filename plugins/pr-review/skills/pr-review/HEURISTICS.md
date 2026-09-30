@@ -122,8 +122,10 @@ plus the five always-on items.
     code.
 18. **Test the real path.** When the claim depends on runtime behavior, exercise it through the path
     a real caller/user takes — test shortcuts that inject state internally bypass the actual
-    mechanism. — *Smell:* a suite that only manipulates internal state and never fires the real
-    event (e.g. never actually emits `lesson.completed`).
+    mechanism, and so does firing only part of the real gesture. — *Smell:* a suite that only
+    manipulates internal state and never fires the real event (e.g. never actually emits
+    `lesson.completed`), or fires one event of a gesture the platform delivers as several (a scroll
+    without the press a swipe starts with, a click without its pointerdown).
 19. **Existing discussion is context.** List **all** discussion (bot, human, prior rounds, resolved
     and open), actually paginated, and dedupe before drafting. The criterion is "thread without a
     reply," never "recent comment." — *Smell:* a draft proposing something a thread on this same PR

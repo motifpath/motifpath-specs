@@ -87,6 +87,22 @@ Feature: Student self-enrollment in courses
     When "alice" lists her course enrollments
     Then the response includes both the completed "fingerstyle-journey" enrollment and the active "rhythm-mastery" enrollment
 
+  Scenario: An enrollment carries the presentation information of its pinned course version
+    Given a course "fingerstyle-journey" exists, published at level "beginner", created by "bob", with checkpoints "open-chords-path", "strumming-path"
+    And "alice" is enrolled in "fingerstyle-journey"
+    And "alice" is authenticated as a student
+    When "alice" lists her course enrollments
+    Then the enrollment in "fingerstyle-journey" includes its pinned summary, level, and creator "bob"
+    And the enrollment in "fingerstyle-journey" reports 2 checkpoints
+
+  Scenario: An enrollment keeps its presentation when a course is republished
+    Given a course "fingerstyle-journey" exists, published at level "beginner", created by "bob", with checkpoints "open-chords-path", "strumming-path"
+    And "alice" is enrolled in "fingerstyle-journey"
+    And the course "fingerstyle-journey" is republished with a new summary and level "advanced"
+    And "alice" is authenticated as a student
+    When "alice" lists her course enrollments
+    Then the enrollment in "fingerstyle-journey" still shows its original pinned summary and level "beginner"
+
   # ── Conflicts ─────────────────────────────────────────────────────────────
 
   Scenario: A student's enrollments show the thumbnail of the version they enrolled in
