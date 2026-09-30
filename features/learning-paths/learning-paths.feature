@@ -58,26 +58,34 @@ Feature: Manage learning paths
 
   # ── Happy path — replacing a learning path ────────────────────────────────────
 
+  @wip
   Scenario: A teacher reorders a learning path's items
     Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And learning path "beginner-guitar-path" is a draft
     And "bob" is authenticated as a teacher
     When "bob" replaces learning path "beginner-guitar-path" with items in order: "node-02", "node-01", "node-03"
     Then the items are returned with positions 1, 2, and 3 in the order "node-02", "node-01", "node-03"
 
+  @wip
   Scenario: A teacher adds an item to an existing learning path
     Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02"
+    And learning path "beginner-guitar-path" is a draft
     And "bob" is authenticated as a teacher
     When "bob" replaces learning path "beginner-guitar-path" with items in order: "node-01", "node-02", "node-03"
     Then the learning path has 3 items
 
+  @wip
   Scenario: A teacher removes an item from an existing learning path
     Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And learning path "beginner-guitar-path" is a draft
     And "bob" is authenticated as a teacher
     When "bob" replaces learning path "beginner-guitar-path" with items in order: "node-01", "node-03"
     Then the learning path has 2 items
 
+  @wip
   Scenario: A teacher relabels a learning path's sections
     Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And learning path "beginner-guitar-path" is a draft
     And "bob" is authenticated as a teacher
     When "bob" replaces learning path "beginner-guitar-path" with items in order: "node-01" in section "Open chords, revised", "node-02" in section "Open chords, revised", "node-03"
     Then "node-01" and "node-02" are returned with section_label "Open chords, revised"
@@ -172,23 +180,29 @@ Feature: Manage learning paths
 
   # ── Deleting a learning path ────────────────────────────────────────────────
 
+  @wip
   Scenario: A teacher deletes a learning path that is not used by any course
     Given "bob" is authenticated as a teacher
     And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And learning path "beginner-guitar-path" is a draft
     When "bob" deletes the learning path "beginner-guitar-path"
     Then the learning path is deleted
 
+  @wip
   Scenario: Deleting a learning path does not affect students who already copied it
     Given "bob" is authenticated as a teacher
     And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
     And student "alice" has "beginner-guitar-path" assigned as a standalone path
+    And "admin" unpublishes learning path "beginner-guitar-path"
     When "bob" deletes the learning path "beginner-guitar-path"
     Then the learning path is deleted
     And "alice"'s copy of the path is unaffected
 
+  @wip
   Scenario: An admin deletes a learning path created by a teacher
     Given "bob" is authenticated as a teacher
     And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And learning path "beginner-guitar-path" is a draft
     And "admin" is authenticated as an admin
     When "admin" deletes the learning path "beginner-guitar-path"
     Then the learning path is deleted
@@ -214,9 +228,11 @@ Feature: Manage learning paths
     When "bob" attempts to delete the learning path "beginner-guitar-path"
     Then the request is refused with a conflict error
 
+  @wip
   Scenario: Deleting a learning path referenced only by an unpublished course draft is allowed
     Given "bob" is authenticated as a teacher
     And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
+    And learning path "beginner-guitar-path" is a draft
     And a course "fingerstyle-journey" exists as a draft with checkpoints "beginner-guitar-path"
     When "bob" deletes the learning path "beginner-guitar-path"
     Then the learning path is deleted
@@ -272,8 +288,10 @@ Feature: Manage learning paths
     When "bob" retrieves the learning path "legacy-path"
     Then the learning path has no level
 
+  @wip
   Scenario: Replacing a learning path records when it was last updated
     Given a learning path "beginner-guitar-path" exists with items "node-01", last updated on "2026-08-01"
+    And learning path "beginner-guitar-path" is a draft
     And "bob" is authenticated as a teacher
     When "bob" replaces learning path "beginner-guitar-path" at level "beginner" with items in order: "node-02"
     Then the learning path's last update is later than "2026-08-01"
@@ -371,8 +389,79 @@ Feature: Manage learning paths
     When "bob" creates a learning path titled "Open Chords" with thumbnail "https://cdn.motifpath.io/thumbnails/open-chords.png" and items in order: "node-01"
     Then the learning path's thumbnail is "https://cdn.motifpath.io/thumbnails/open-chords.png"
 
+  @wip
   Scenario: Replacing a learning path without a thumbnail removes it
     Given a learning path "open-chords-path" exists with items "node-01" and thumbnail "https://cdn.motifpath.io/thumbnails/open-chords.png"
+    And learning path "open-chords-path" is a draft
     And "bob" is authenticated as a teacher
     When "bob" replaces learning path "open-chords-path" without a thumbnail
     Then the learning path has no thumbnail
+
+  # ── Summary, language and publishing status ───────────────────────────────
+
+  @wip
+  Scenario: A teacher gives a learning path a summary and a language
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a learning path titled "Acordes Abertos" with summary "Seus primeiros acordes" in language "pt_BR" with items in order: "node-01"
+    Then the learning path's summary is "Seus primeiros acordes"
+    And the learning path's language is "pt_BR"
+
+  @wip
+  Scenario: A learning path can be created without a summary or a language
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a learning path titled "Open Chords" at level "beginner" with items in order: "node-01"
+    Then the learning path is created and assigned a stable identifier
+    And the learning path has no summary and no language
+
+  @wip
+  Scenario: A learning path cannot be written in the language-agnostic marker
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a learning path titled "Open Chords" in language "any" with items in order: "node-01"
+    Then the request is refused with a validation error
+
+  @wip
+  Scenario: Creating a learning path in a language MotifPath does not offer is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a learning path titled "Open Chords" in language "xx" with items in order: "node-01"
+    Then the request is refused with a validation error
+
+  @wip
+  Scenario: Replacing a draft learning path without a summary removes it
+    Given a learning path "open-chords-path" exists as a draft with items "node-01" and summary "Your first chords"
+    And "bob" is authenticated as a teacher
+    When "bob" replaces learning path "open-chords-path" without a summary
+    Then the learning path has no summary
+
+  @wip
+  Scenario: Every learning path in the library reports its publishing status
+    Given a learning path "open-chords-path" exists, published
+    And a learning path "strumming-path" exists as a draft
+    And "bob" is authenticated as a teacher
+    When "bob" lists all learning paths
+    Then the entry for "open-chords-path" reports status "published"
+    And the entry for "strumming-path" reports status "draft"
+
+  @wip
+  Scenario: A teacher narrows the library to published paths
+    Given a learning path "open-chords-path" exists, published
+    And a learning path "strumming-path" exists as a draft
+    And "bob" is authenticated as a teacher
+    When "bob" lists learning paths filtered by status "published"
+    Then the response includes "open-chords-path"
+    And the response does not include "strumming-path"
+
+  @wip
+  Scenario: A teacher narrows the library to paths in one language
+    Given a learning path "open-chords-path" exists with items "node-01", in language "en"
+    And a learning path "acordes-abertos" exists with items "node-02", in language "pt_BR"
+    And a learning path "legacy-path" exists with items "node-03" and no language recorded
+    And "bob" is authenticated as a teacher
+    When "bob" lists learning paths filtered by language "pt_BR"
+    Then the response includes "acordes-abertos"
+    And the response does not include "open-chords-path" or "legacy-path"
+
+  @wip
+  Scenario: An unknown publishing status filter is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" lists learning paths filtered by status "archived"
+    Then the request is refused with a validation error

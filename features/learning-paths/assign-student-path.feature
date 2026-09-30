@@ -37,6 +37,61 @@ Feature: Assign learning paths to students
     When "bob" edits "alice"'s copy of the path
     Then "beginner-guitar-path" and any other student's copy of it are unchanged
 
+  @wip
+  Scenario: Assigning a draft path is refused
+    Given a learning path "concierge-path" exists as a draft
+    And "bob" is authenticated as a teacher
+    When "bob" assigns "concierge-path" to student "alice"
+    Then the request is refused with a conflict error
+    And "alice" has no copy of "concierge-path"
+
+  @wip
+  Scenario: An admin cannot assign a draft path either
+    Given a learning path "concierge-path" exists as a draft
+    And "admin" is authenticated as an admin
+    When "admin" assigns "concierge-path" to student "alice"
+    Then the request is refused with a conflict error
+
+  @wip
+  Scenario: A path can be assigned once it is published
+    Given a learning path "concierge-path" exists as a draft
+    And "admin" publishes learning path "concierge-path"
+    And "bob" is authenticated as a teacher
+    When "bob" assigns "concierge-path" to student "alice"
+    Then a student path is created and returned, copied from "concierge-path"
+
+  @wip
+  Scenario: An assigned copy records the path's presentation at assignment
+    Given learning path "beginner-guitar-path" has a summary, level "beginner", a thumbnail and was created by "carol"
+    And "bob" is authenticated as a teacher
+    When "bob" assigns "beginner-guitar-path" to student "alice"
+    Then the student path records the summary, level "beginner", thumbnail and creator "carol" of "beginner-guitar-path"
+
+  @wip
+  Scenario: Assigning a path the student already holds reuses their active copy
+    Given "alice" already has "beginner-guitar-path" assigned as her current path
+    And "alice" has since switched her current path to another path
+    And "bob" is authenticated as a teacher
+    When "bob" assigns "beginner-guitar-path" to student "alice"
+    Then "alice"'s existing copy of "beginner-guitar-path" is returned and no new copy is created
+    And "alice"'s existing copy of "beginner-guitar-path" becomes her current path
+
+  @wip
+  Scenario: Assigning a path the student enrolled in themselves reuses that copy
+    Given "alice" has enrolled in learning path "beginner-guitar-path"
+    And "bob" is authenticated as a teacher
+    When "bob" assigns "beginner-guitar-path" to student "alice"
+    Then "alice"'s existing copy of "beginner-guitar-path" is returned and no new copy is created
+
+  @wip
+  Scenario: Assigning a path again after the student archived it creates a fresh copy
+    Given "alice" already has "beginner-guitar-path" assigned as her current path
+    And "alice" has archived her copy of "beginner-guitar-path"
+    And "bob" is authenticated as a teacher
+    When "bob" assigns "beginner-guitar-path" to student "alice"
+    Then a new student path is returned, copied from "beginner-guitar-path"
+    And "alice"'s archived copy of "beginner-guitar-path" stays archived
+
   # ── Not found ─────────────────────────────────────────────────────────────
 
   Scenario: Assigning a path to a non-existent student returns not found

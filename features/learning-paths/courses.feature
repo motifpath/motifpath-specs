@@ -699,3 +699,41 @@ Feature: Author courses
     Given "bob" is authenticated as a teacher
     When "bob" creates a course titled "Fingerstyle Journey" with thumbnail "ftp://files.example/fingerstyle.png" and checkpoints in order: "open-chords-path"
     Then the request is refused with a validation error
+
+  # ── Courses publish only with published paths ─────────────────────────────
+
+  @wip
+  Scenario: A course draft can use draft learning paths while it is being built
+    Given a learning path "new-path" exists as a draft
+    And "bob" is authenticated as a teacher
+    When "bob" creates a course titled "Fingerstyle Journey" with checkpoints in order: "open-chords-path", "new-path"
+    Then the course is created and assigned a stable identifier
+
+  @wip
+  Scenario: Publishing a course with a draft checkpoint path is refused and names the path
+    Given a learning path "new-path" exists as a draft
+    And a course "fingerstyle-journey" exists as a draft with checkpoints "open-chords-path", "new-path"
+    And "admin" is authenticated as an admin
+    When "admin" publishes course "fingerstyle-journey"
+    Then the request is refused with a conflict error
+    And the refusal names "new-path" as a draft learning path
+    And course "fingerstyle-journey" is still a draft
+
+  @wip
+  Scenario: Republishing a course after adding a draft checkpoint path is refused
+    Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And a learning path "new-path" exists as a draft
+    And the draft of course "fingerstyle-journey" adds checkpoint "new-path"
+    And "admin" is authenticated as an admin
+    When "admin" publishes course "fingerstyle-journey"
+    Then the request is refused with a conflict error
+    And learners still see the course's earlier published version
+
+  @wip
+  Scenario: A course can be published once every checkpoint path is published
+    Given a learning path "new-path" exists as a draft
+    And a course "fingerstyle-journey" exists as a draft with checkpoints "open-chords-path", "new-path"
+    And "admin" publishes learning path "new-path"
+    And "admin" is authenticated as an admin
+    When "admin" publishes course "fingerstyle-journey"
+    Then a new course version is created

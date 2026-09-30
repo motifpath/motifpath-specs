@@ -3,6 +3,9 @@
 **Status:** Accepted
 **Date:** 2026-09-30
 **Deciders:** Gilson (Product Owner)
+**Revised:** 2026-09-30, in spec review. Staff may assign only published paths, a course may
+publish only with published paths, and a learner never holds two active standalone copies of one
+path.
 **Amends:** ADR-029 (standalone paths are staff-assigned only) and ADR-017 (what a `StudentPath`
 records at copy time). It extends ADR-038's filterable path library and reuses PB-68's course
 presentation.
@@ -20,8 +23,8 @@ ADR-029 rules that out today. Only staff can start a standalone `StudentPath`, b
 paths only through `GET /students/me/path`, and `GET /learning-paths` is an authoring listing that
 learners can't call. The template itself isn't ready to be shown to a learner:
 
-1. **No published state.** Every path in the library is visible to staff: half-built paths, and
-   paths that exist only to fill a course checkpoint. Nothing marks a path as offered to learners.
+1. **No published state.** Every path in the library is visible to staff, half-built ones included.
+   Nothing marks a path as finished and offered to learners.
 2. **Nothing to sell it with.** A `LearningPath` has a title, a level, instruments and a thumbnail,
    but no summary and no language, the two fields the course card and the language filter rely on.
 3. **Nothing to show it with once enrolled.** A `StudentPath` copies only the title. "My courses"
@@ -30,8 +33,7 @@ learners can't call. The template itself isn't ready to be shown to a learner:
 
 We considered three ways to decide what a learner sees:
 
-- **List every path in the library.** No new state, but learners would see drafts and
-  checkpoint-only paths.
+- **List every path in the library.** No new state, but learners would see half-built paths.
 - **Course-style versioning:** draft/published plus an immutable `PathVersion` snapshot per
   publish, like `CourseVersion`. Authors could keep editing without learners seeing it.
 - **A published flag without versions.** Only published paths are listed; edits to a published
@@ -58,7 +60,15 @@ kinds of result in one list is hard to follow, and paths have no checkpoints to 
   summary or its last item) is refused (409).
 - A published path can't be deleted (409). Unpublish it first. The existing rule still applies:
   a path used by any published course version can never be deleted.
-- A path can be published standalone and also used as a course checkpoint. The two are unrelated.
+- **A course may publish only with published paths.** A course's live draft may use draft paths
+  at every checkpoint while it's being built. Publishing the course is refused (409), naming the
+  checkpoint paths that are still drafts, until every one is published.
+- **A path used by a published course can't be unpublished** (409). The rule covers any published
+  `CourseVersion`, including one of a since-retired course, the same reach as the delete rule. A
+  learner enrolled in that version still unlocks its later checkpoints and copies their paths.
+  A path used only by a course draft can be unpublished.
+- As a result, every path a course uses is also in the path catalog. A learner can take it on its
+  own (see enrollment below).
 
 **A learner catalog for paths, parallel to the course catalog (ADR-037).** The same for every
 caller, whatever their role:
@@ -86,13 +96,20 @@ caller, whatever their role:
   appears as a checkpoint of one of the learner's courses can be enrolled in directly. Progress is
   kept per content node, not per copy, so lessons already finished show as completed in the new
   copy, and finishing them there counts in the course too.
-- **Re-enrolling reuses the active copy.** If the learner already holds a non-archived standalone
-  `StudentPath` copied from the same template, enrolling makes that copy current and returns it
-  (200) instead of creating a second one. Otherwise it creates the copy (201). An archived copy
-  isn't reused: enrolling again creates a fresh copy.
+- **A learner never holds two active standalone copies of the same path.** At most one
+  non-archived standalone `StudentPath` exists per learner and template. Enrolling while one exists
+  makes that copy current and returns it (200) instead of creating a second one. Otherwise it
+  creates the copy (201). **To take a newer version of a path, the learner archives the previous
+  copy first.** An archived copy isn't reused, so enrolling again then creates a fresh copy of the
+  path as it is now. The rule covers standalone copies only: a course checkpoint's copy of the same
+  path is part of its enrollment and doesn't count.
 - A draft or unknown path is 404. Any user may enroll, whatever their role (ADR-037).
-- Staff assignment (`POST /students/{student_id}/student-paths`) is unchanged. It can still assign a
-  draft path, because the concierge works with paths that aren't offered publicly.
+- **Staff can assign only published paths** (`POST /students/{student_id}/student-paths`). Assigning a
+  draft path is refused (409). Assignment follows the one-active-copy rule too: if the student
+  already holds an active standalone copy of the path, that copy is made current and returned (200)
+  instead of a new one. Otherwise assignment is unchanged: it still sets the path as current
+  unconditionally. A path a learner is asked to follow must meet the same bar as a path a learner
+  finds for themselves. A draft path is unfinished whoever hands it out.
 
 **A `StudentPath` records its presentation at copy time.** On every copy (standalone or course
 checkpoint, self-enrolled or staff-assigned), the `StudentPath` gains snapshots of the template's
@@ -113,11 +130,19 @@ Enrolling copies the whole path at once, and each item pins its content node's p
 (ADR-017). Later edits to the template never reach an existing learner. The only thing a version
 would protect is the catalog entry between edits, and replace-in-one-step already covers that. A
 `PathVersion` table, a version-pinned read model and a publish-snapshot flow would cost a lot for
-that one benefit. We rejected "list everything" because learners must never see drafts or
-checkpoint-only paths.
+that one benefit. We rejected "list everything" because learners must never see half-built
+paths.
 
 **Admin-only publishing** follows ADR-029's reason: publishing exposes a path to every learner for
 the first time. The concierge team stays the gatekeeper at MVP.
+
+**One bar for every way a learner reaches a path.** A learner meets a path in three ways: finding
+it in the catalog, having staff assign it, or reaching it as a course checkpoint. A draft is
+unfinished in all three cases. So "published" is the one test a path must pass before any learner
+copies it. Checking a course at publish time, and then keeping its paths from being unpublished,
+holds that line for the life of every enrollment, including checkpoints unlocked weeks later. We
+rejected checking only at copy time: a learner could then hit an error in the middle of a course,
+long after the admin who caused it moved on.
 
 **Always current, unlike courses.** We accept the difference in behavior. Choosing a path from the
 catalog is a deliberate "start this now", the same act as a teacher assigning one, so it gets the
@@ -129,11 +154,14 @@ Their other enrollments keep their progress, and "My learning" switches back in 
 A learner who wants one path from a course can go straight to it. Refusing enrollment, as ADR-029
 does for a second active enrollment in the same course, would protect nothing. Progress is per
 content node, so a node finished in one path is finished in every path that contains it. We rejected
-a 409 on a second active copy for that reason. **Reusing the active copy** on re-enrollment is only
-about tidiness: a double click, or a learner who forgot, lands on the path they already have instead
-of listing the same path twice in "My learning". The trade-off is that the reused copy keeps the
-items it was copied with, even if the template has changed since. A learner who wants the current
-version archives the old copy and enrolls again.
+a 409 on a second active copy for that reason. **One active copy per path** keeps "My learning"
+unambiguous: a double click, a learner who forgot, or a teacher assigning a path the learner already
+took all land on the one copy the learner has, instead of listing the same path twice with progress
+views that could disagree. Enrollment and staff assignment both reuse it, so no way of starting a
+path can create a second one. The trade-off is that the reused copy keeps the items it was copied
+with, even if the template has changed since. Getting the new version is an explicit step: the
+learner archives the old copy and enrolls again. Upgrading a copy in place is a separate backlog
+item.
 
 **Snapshot presentation on the copy** keeps ADR-017's promise that a copy is independent of its
 template: the template can be edited or deleted without touching any student's path. Reading the
@@ -155,6 +183,17 @@ that failure with course drafts (core 299bdfc). The snapshot is four small colum
   switch visible (enrolling in a path lands the learner on it).
 - Existing paths have no summary or language. They must be completed before an admin can publish
   them, and older `StudentPath`s show a title-only card.
+- Paths that exist only to serve a course must be published too, so they appear in the path
+  catalog. We accept that: a course is a guided order through paths learners may also take on their
+  own.
+- An admin who wants to retire a path that published courses use can't unpublish it. The path stays
+  in the catalog for as long as any published course version references it.
+- Courses published before this change may use paths that are still drafts. MotifPath has no
+  production data yet, so no backfill runs: the development seed publishes its paths before its
+  courses.
+- Every existing path starts as a draft, and staff can assign only published paths. Until an admin
+  completes and publishes a path, no one can assign it. The concierge must publish before
+  assigning, and a path meant for one student only is still visible in the catalog once published.
 - Two catalogs mean two creator lists and two filter sets to keep in step.
 
 ### Neutral
