@@ -41,8 +41,9 @@ Feature: Send to your teacher
 
   # ── Where the button appears ─────────────────────────────────────────────────
   #
-  # The button is a floating WhatsApp icon in the bottom-right corner of the screen, named
-  # "Send to your teacher" for assistive technology. It carries no visible text of its own.
+  # The button is a floating WhatsApp icon, named "Send to your teacher" for assistive
+  # technology. It carries no visible text of its own. It starts in the bottom-right corner, and
+  # the student can drag it elsewhere when it covers something.
 
   Rule: The button appears on every unlocked lesson and on its practice
 
@@ -58,6 +59,7 @@ Feature: Send to your teacher
     Scenario: The button never covers the practice's Next control
       When the student is on exercise 2 of the practice for "Shuffle in E"
       Then the floating WhatsApp icon sits above the bar holding the "Next" control
+      And the student cannot drag it below that bar
 
     Scenario Outline: No button when there is no lesson to talk about
       When the lesson screen for "Shuffle in E" is in the "<state>" state
@@ -77,6 +79,44 @@ Feature: Send to your teacher
       When the student opens the lesson "Shuffle in E"
       Then no "Send to your teacher" button is shown
       And the practice screen for "Shuffle in E" shows no "Send to your teacher" button either
+
+  Rule: The student can drag the button out of the way
+
+    Scenario: A drag moves the button, which settles on the nearest side edge
+      Given the floating WhatsApp icon is in the bottom-right corner
+      When the student drags it to the left half of the screen and lets go
+      Then the icon settles against the left edge, at the height where it was let go
+      And WhatsApp does not open
+
+    Scenario: A tap still opens WhatsApp
+      When the student taps the floating WhatsApp icon without moving it
+      Then WhatsApp opens with the prefilled message
+
+    Scenario: A slight wobble during a tap is not a drag
+      When the student taps the floating WhatsApp icon and it moves only a few pixels
+      Then the icon stays where it was
+      And WhatsApp opens with the prefilled message
+
+    Scenario: The button cannot leave the screen
+      When the student drags the floating WhatsApp icon past the top of the screen
+      Then the icon stays entirely visible, below the app bar
+
+    Scenario: The button's place is remembered on this device
+      Given the student dragged the floating WhatsApp icon to the left edge
+      When the student opens another lesson, the practice screen, or reloads the page
+      Then the icon is at the left edge, at the same height
+
+    Scenario: A remembered place that no longer fits the screen is brought back into view
+      Given the student left the floating WhatsApp icon near the top of a tall window
+      When the window becomes shorter
+      Then the icon is moved down just enough to be entirely visible
+
+    Scenario: Without a remembered place the button starts in the bottom-right corner
+      Given this device cannot remember the icon's place
+      When the student opens the lesson "Shuffle in E"
+      Then the floating WhatsApp icon is in the bottom-right corner
+
+    # The icon is dragged with a pointer only. Keyboard users reach and open it as before.
 
   Rule: A tooltip explains the button on mouse hover or keyboard focus only
 
