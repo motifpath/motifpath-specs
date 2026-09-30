@@ -82,9 +82,14 @@ caller, whatever their role:
 - **The new path always becomes current**, the same as a staff assignment. Enrolling is an explicit
   "start this now". Course enrollment differs on purpose: it sets current only when nothing is set
   (ADR-029). The course-or-path the learner was on keeps its progress and is one switch away.
-- **One active copy per template.** Enrolling while the learner already holds a non-archived
-  standalone `StudentPath` copied from the same template is a conflict (409). An archived copy
-  doesn't block enrolling again: a fresh copy starts from the first item.
+- **Enrolling is never refused because of what the learner already holds.** A path that also
+  appears as a checkpoint of one of the learner's courses can be enrolled in directly. Progress is
+  kept per content node, not per copy, so lessons already finished show as completed in the new
+  copy, and finishing them there counts in the course too.
+- **Re-enrolling reuses the active copy.** If the learner already holds a non-archived standalone
+  `StudentPath` copied from the same template, enrolling makes that copy current and returns it
+  (200) instead of creating a second one. Otherwise it creates the copy (201). An archived copy
+  isn't reused: enrolling again creates a fresh copy.
 - A draft or unknown path is 404. Any user may enroll, whatever their role (ADR-037).
 - Staff assignment (`POST /students/{student_id}/student-paths`) is unchanged. It can still assign a
   draft path, because the concierge works with paths that aren't offered publicly.
@@ -118,15 +123,21 @@ the first time. The concierge team stays the gatekeeper at MVP.
 catalog is a deliberate "start this now", the same act as a teacher assigning one, so it gets the
 same effect. ADR-029 protected a learner mid-course from being switched away, but that was about
 enrolling in *another course* from the congrats page. Here the learner is choosing a path directly.
-Their other enrollments keep their progress, and "My courses" switches back in one click.
+Their other enrollments keep their progress, and "My learning" switches back in one click.
 
-**One active copy per template** stops a double click, or a learner who forgot, from creating
-parallel copies of the same path with progress split between them. The catalog detail can show
-"Continue" instead. This mirrors ADR-029's rule of one active enrollment per course.
+**No refusal on overlap.** A course is a guide: a structured order through paths that are shared.
+A learner who wants one path from a course can go straight to it. Refusing enrollment, as ADR-029
+does for a second active enrollment in the same course, would protect nothing. Progress is per
+content node, so a node finished in one path is finished in every path that contains it. We rejected
+a 409 on a second active copy for that reason. **Reusing the active copy** on re-enrollment is only
+about tidiness: a double click, or a learner who forgot, lands on the path they already have instead
+of listing the same path twice in "My learning". The trade-off is that the reused copy keeps the
+items it was copied with, even if the template has changed since. A learner who wants the current
+version archives the old copy and enrolls again.
 
 **Snapshot presentation on the copy** keeps ADR-017's promise that a copy is independent of its
 template: the template can be edited or deleted without touching any student's path. Reading the
-card live from the template would break "My courses" when a template is deleted. PB-68 hit exactly
+card live from the template would break "My learning" when a template is deleted. PB-68 hit exactly
 that failure with course drafts (core 299bdfc). The snapshot is four small columns, written once.
 
 ## Consequences
@@ -135,7 +146,7 @@ that failure with course drafts (core 299bdfc). The snapshot is four small colum
 - Learners have a second way in, which targets the PB-32 "what's next" hypothesis without a teacher,
   in line with the platform-first premise.
 - The web reuses PB-68's card, detail layout, filters and catalog-return behavior for paths.
-- "My courses" can show courses and standalone paths on the same card.
+- "My courses", renamed "My learning", shows courses and standalone paths on the same card.
 
 ### Negative / Trade-offs
 - An admin who edits a published path changes what the next enrollee copies, immediately. There's
