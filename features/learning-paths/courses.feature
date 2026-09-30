@@ -163,6 +163,14 @@ Feature: Author courses
     When "alice" lists the course catalog
     Then the entry for "fingerstyle-journey" records "bob" as the creator
 
+  Scenario: A catalog entry tells a learner how much course content it contains
+    Given learning path "open-chords-path" contains 2 lessons
+    And learning path "strumming-path" contains 3 lessons
+    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path", "strumming-path"
+    And "alice" is authenticated as a student
+    When "alice" lists the course catalog
+    Then the entry for "fingerstyle-journey" reports 2 checkpoints and 5 lessons
+
   Scenario: A teacher's course list is always limited to their own courses
     Given a course "fingerstyle-journey" exists as a draft, created by "bob", with checkpoints "open-chords-path"
     And a course "strumming-basics" exists as a draft, created by "carol", with checkpoints "strumming-path"
@@ -362,6 +370,15 @@ Feature: Author courses
     Then the response includes each checkpoint's title and its ordered item titles
     And the response does not include any item's lesson content
     And the response does not include any checkpoint's learning_path_id
+
+  Scenario: A published course detail names its teacher and reports its scope
+    Given learning path "open-chords-path" contains 2 lessons
+    And learning path "strumming-path" contains 3 lessons
+    And a course "fingerstyle-journey" exists, published, created by "bob", with checkpoints "open-chords-path", "strumming-path"
+    And "alice" is authenticated as a student
+    When "alice" retrieves the published version of course "fingerstyle-journey"
+    Then the response identifies "bob" as the course creator
+    And the response reports 2 checkpoints and 5 lessons
 
   Scenario: A teacher or admin previewing the published version never sees unpublished draft edits
     Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path", "strumming-path"
