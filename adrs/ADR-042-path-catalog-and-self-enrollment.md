@@ -1,6 +1,6 @@
 # ADR-042: A published path catalog with learner self-enrollment
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-30
 **Deciders:** Gilson (Product Owner)
 **Amends:** ADR-029 (standalone paths are staff-assigned only) and ADR-017 (what a `StudentPath`
@@ -178,4 +178,4 @@ that failure with course drafts (core 299bdfc). The snapshot is four small colum
 
 ---
 
-*This ADR was proposed on 2026-09-30. To revise, create a new ADR with Status: Supersedes ADR-042.*
+*This ADR was accepted on 2026-09-30. To revise, create a new ADR with Status: Supersedes ADR-042.*
