@@ -172,7 +172,6 @@ Feature: Manage exercises
     Then the response includes "chord-name-01"
     And the response does not include "triad-exercise-01"
 
-  @wip
   Scenario: A teacher searches the exercise list by title, ignoring case
     Given an exercise "triad-exercise-01" exists titled "Major Triad Shapes"
     And an exercise "picking-drill-01" exists titled "Alternate picking drill"
@@ -181,7 +180,6 @@ Feature: Manage exercises
     Then the response includes "triad-exercise-01"
     And the response does not include "picking-drill-01"
 
-  @wip
   Scenario: A teacher filters the exercise list by concept
     Given an exercise "triad-exercise-01" exists with concepts "major-triad"
     And an exercise "interval-drill-01" exists with concepts "perfect-fifth"
@@ -190,7 +188,6 @@ Feature: Manage exercises
     Then the response includes "interval-drill-01"
     And the response does not include "triad-exercise-01"
 
-  @wip
   Scenario: A teacher filters the exercise list by language
     Given an exercise "triad-exercise-01" exists in language "en"
     And an exercise "triade-exercicio-01" exists in language "pt"
@@ -199,7 +196,6 @@ Feature: Manage exercises
     Then the response includes "triade-exercicio-01"
     And the response does not include "triad-exercise-01"
 
-  @wip
   Scenario: A teacher filters the exercise list by creator
     Given an exercise "bobs-drill" exists, created by "bob"
     And an exercise "carols-drill" exists, created by "carol"
@@ -210,7 +206,6 @@ Feature: Manage exercises
     And the response does not include "bobs-drill"
     And the response does not include "legacy-drill"
 
-  @wip
   Scenario: Exercise list filters combine
     Given an exercise "carols-triad" exists titled "Triad shapes", created by "carol"
     And an exercise "carols-picking" exists titled "Picking drill", created by "carol"
@@ -221,12 +216,10 @@ Feature: Manage exercises
     And the response does not include "carols-picking"
     And the response does not include "bobs-triad"
 
-  @wip
   Scenario: A created exercise records its creator
-    Given "bob" is authenticated as a teacher
-    And "bob" is named "Bob Ferreira"
+    Given "bob" is named "Bob Ferreira"
+    And "bob" is authenticated as a teacher
     When "bob" creates a text_response exercise titled "Chord name" with prompt "Name this chord" and one correct option
-    And "bob" retrieves the exercise "Chord name"
     Then the exercise's creator is "bob", named "Bob Ferreira"
 
   Scenario: Listing exercises when none exist returns an empty list
@@ -721,7 +714,6 @@ Feature: Manage exercises
 
   # ── Exercise creators (the creator filter's options) ──────────────────────
 
-  @wip
   Scenario: A teacher lists every exercise creator, each once
     Given an exercise "bobs-drill" exists, created by "bob"
     And an exercise "bobs-quiz" exists, created by "bob"
@@ -731,7 +723,6 @@ Feature: Manage exercises
     When "bob" lists the exercise creators
     Then the creators returned are "bob" and "carol", each with their display name
 
-  @wip
   Scenario: Exercise creators are searched by display name, ignoring case and accents
     Given "bob" is named "Bob Ferreira"
     And "carol" is named "Carol Souza"
@@ -741,7 +732,6 @@ Feature: Manage exercises
     When "admin" lists the exercise creators matching "FÉRR"
     Then the creators returned are "bob", each with their display name
 
-  @wip
   Scenario: A student cannot list exercise creators
     Given "alice" is authenticated as a student
     When "alice" lists the exercise creators
