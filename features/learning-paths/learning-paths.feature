@@ -465,3 +465,55 @@ Feature: Manage learning paths
     Given "bob" is authenticated as a teacher
     When "bob" lists learning paths filtered by status "archived"
     Then the request is refused with a validation error
+
+  # ── Library creators (the authoring creator filter's options) ─────────────
+
+  @wip
+  Scenario: A teacher lists the creator of every path in the library, drafts included
+    Given a learning path "open-chords-path" exists as a draft, created by "bob"
+    And a learning path "strumming-path" exists, published, created by "carol"
+    And "dave" is authenticated as a teacher
+    When "dave" lists the creators of the learning path library
+    Then the creators returned are "bob" and "carol", each with their display name
+
+  @wip
+  Scenario: An admin lists the creator of every path in the library
+    Given a learning path "open-chords-path" exists as a draft, created by "bob"
+    And a learning path "strumming-path" exists, published, created by "carol"
+    And "admin" is authenticated as an admin
+    When "admin" lists the creators of the learning path library
+    Then the creators returned are "bob" and "carol", each with their display name
+
+  @wip
+  Scenario: A creator with several paths in the library is listed once
+    Given a learning path "open-chords-path" exists as a draft, created by "bob"
+    And a learning path "strumming-path" exists, published, created by "bob"
+    And "admin" is authenticated as an admin
+    When "admin" lists the creators of the learning path library
+    Then the creators returned are "bob", each with their display name
+
+  @wip
+  Scenario: Library creators are ordered by name ignoring case and accents
+    Given learning paths exist, published, created by "Zé", "álvaro" and "Bruna"
+    And "admin" is authenticated as an admin
+    When "admin" lists the creators of the learning path library
+    Then the creators returned are "álvaro", "Bruna" and "Zé", in that order
+
+  @wip
+  Scenario: An admin narrows the library creators by name, ignoring case and accents
+    Given learning paths exist, published, created by "José" and "Bruna"
+    And "admin" is authenticated as an admin
+    When "admin" lists the creators of the learning path library matching "jose"
+    Then the creators returned are "José", each with their display name
+
+  @wip
+  Scenario: A student cannot list the creators of the learning path library
+    Given "alice" is authenticated as a student
+    When "alice" lists the creators of the learning path library
+    Then the request is refused with a forbidden error
+
+  @wip
+  Scenario: Listing the library creators without an authentication token is refused
+    Given no authentication token is provided
+    When an unauthenticated request attempts to list the creators of the learning path library
+    Then the request is refused with an authentication error
