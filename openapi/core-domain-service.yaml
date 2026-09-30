@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.16.0
+  version: 0.17.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -2393,7 +2393,10 @@ paths:
         recorded never matches it. status matches a path's publishing
         status.
 
-        Teachers and admins may list learning paths; students may not
+        A teacher's library is always only the paths they created: a
+        created_by naming anyone else is refused with 403 (their own
+        user_id is accepted). An admin's library holds every author's
+        paths, and created_by narrows it to one author. Students may not
         browse the authoring library — they browse published paths
         through GET /catalog/paths and follow their own through
         GET /students/me/path.
@@ -2512,7 +2515,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "403":
-          description: Students may not list learning paths directly.
+          description: |
+            Students may not list learning paths directly, and a teacher
+            may not list another author's paths (created_by naming
+            anyone else).
           content:
             application/json:
               schema:
@@ -2593,6 +2599,64 @@ paths:
               schema:
                 $ref: '#/components/schemas/ForbiddenError'
 
+  /learning-paths/creators:
+    get:
+      operationId: listLearningPathCreators
+      summary: List the creators of the learning paths in the authoring library
+      description: |
+        Returns every distinct user who created at least one learning path
+        in the caller's authoring library (GET /learning-paths), whatever
+        its status, so an authoring screen can offer a complete creator
+        filter (the library's created_by parameter) without paging. A
+        teacher gets at most themselves, since their library is only their
+        own paths. An admin gets every author in the library. A student is
+        refused with 403; learners use GET /catalog/path-creators.
+
+        The list is unpaginated: it is bounded by the number of teachers
+        and admins, not by the number of paths. Results are always
+        ordered by display_name, alphabetically as a person reads names —
+        ignoring case and accents, so "Álvaro" sorts with the A's — then
+        by user_id; an empty array means no creator matches.
+      tags:
+        - Learning Paths
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+          description: >-
+            Restricts the results to creators whose display_name contains
+            this text, ignoring case and accents ("jose" matches "José").
+      responses:
+        "200":
+          description: The creators of the learning paths in the caller's library, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRef'
+        "400":
+          description: q is empty or longer than 200 characters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is a student; only teachers and admins browse the authoring library.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
   /learning-paths/{learning_path_id}:
     get:
       operationId: getLearningPath
@@ -3425,7 +3489,10 @@ paths:
         are specified in the desired order; the service assigns each a
         1-based position. All learning_path_ids must exist in the
         system. A course must contain at least one checkpoint. Only
-        teachers and admins may create courses.
+        teachers and admins may create courses. The caller becomes the
+        course's author: a teacher may use only learning paths they
+        created, and a checkpoint naming another author's path is
+        refused with 403. An admin may use any author's paths.
       tags:
         - Courses
       requestBody:
@@ -3470,7 +3537,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "403":
-          description: Only teachers and admins may create courses.
+          description: |
+            Only teachers and admins may create courses, and a teacher may
+            use only their own learning paths as checkpoints. The message
+            says which rule refused the request.
           content:
             application/json:
               schema:
@@ -3592,7 +3662,12 @@ paths:
         changes what students following an already-published version
         see; it only takes effect for new enrollments and future
         checkpoint advances once separately published. Only the
-        creating teacher or an admin may replace a course.
+        creating teacher or an admin may replace a course. The course's
+        author decides which paths it may use, whoever replaces it: a
+        course a teacher authored may use only that teacher's paths, so
+        a checkpoint naming another author's path is refused with 403
+        even when an admin sends it. A course an admin authored may use
+        any author's paths.
       tags:
         - Courses
       parameters:
@@ -3635,7 +3710,9 @@ paths:
           description: |
             The authenticated user does not have permission to replace
             this course. Only the creating teacher or an admin may
-            replace it.
+            replace it, and a course a teacher authored may use only that
+            teacher's learning paths as checkpoints. The message says
+            which rule refused the request.
           content:
             application/json:
               schema:

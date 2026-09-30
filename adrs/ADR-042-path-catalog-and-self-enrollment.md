@@ -5,7 +5,9 @@
 **Deciders:** Gilson (Product Owner)
 **Revised:** 2026-09-30, in spec review. Staff may assign only published paths, a course may
 publish only with published paths, and a learner never holds two active standalone copies of one
-path.
+path. Later that day, in web review: a teacher works only with their own paths in the authoring
+library, and a teacher's course uses only that teacher's paths, whoever edits it; only an admin
+works across authors, in the library and in courses of their own.
 **Amends:** ADR-029 (standalone paths are staff-assigned only) and ADR-017 (what a `StudentPath`
 records at copy time). It extends ADR-038's filterable path library and reuses PB-68's course
 presentation.
@@ -121,6 +123,21 @@ path's own items. A path copied before this change has no snapshots and shows on
 entry reports its `status`. That way the teacher's path list offers the same filters as "Find a
 path", plus the publishing state.
 
+**A teacher works only with their own paths; an admin works across authors.** This mirrors the
+authoring course list (ADR-038):
+
+- A teacher's library (`GET /learning-paths`) lists only the paths they created. A `created_by`
+  naming anyone else is refused (403). An admin's library lists every author's paths and may narrow
+  to one author.
+- `GET /learning-paths/creators` feeds the library's creator filter. A teacher gets at most
+  themselves; an admin gets every author in the library, whatever the path's status.
+- A course authored by a teacher may use only that teacher's paths as checkpoints, whoever saves
+  it: `POST /courses` and `PUT /courses/{id}` refuse (403) a checkpoint on another author's path,
+  even when an admin edits the teacher's course. A course an admin authored may use any author's
+  paths.
+
+Learners are unaffected: the path catalog shows every published path, whoever wrote it.
+
 ## Rationale
 
 **A published flag, not versions.** Course versions exist because a course is a sequence that
@@ -195,6 +212,11 @@ that failure with course drafts (core 299bdfc). The snapshot is four small colum
   completes and publishes a path, no one can assign it. The concierge must publish before
   assigning, and a path meant for one student only is still visible in the catalog once published.
 - Two catalogs mean two creator lists and two filter sets to keep in step.
+- A teacher can't reuse a colleague's path in their own course, and an admin can't add one to it
+  either; a course that combines several authors' paths has to be an admin's own course. We chose
+  this over a shared library because authors should see and use only their own work, and a
+  teacher's course stays entirely theirs, while an admin curates across authors in courses of
+  their own.
 
 ### Neutral
 - `StudentPath` gains four nullable snapshot columns, written on every copy, including course
