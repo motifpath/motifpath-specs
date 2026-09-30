@@ -3866,7 +3866,11 @@ paths:
         student has is left untouched — including whichever was current
         before this call — and remains reachable unless separately
         archived or abandoned. A student may hold many StudentPaths at
-        once. Every content node the template's items reference must
+        once, but never two non-archived standalone copies of the same
+        template: if the student already holds one, that copy is made
+        current and returned (200) instead of creating another. To give
+        the student a newer version, the existing copy must be archived
+        first. Every content node the template's items reference must
         have at least one published version; each item's copy resolves
         to that node's latest published version at this instant. Only a
         published template can be assigned — the same paths learners find
@@ -3895,6 +3899,14 @@ paths:
                 value:
                   learning_path_id: "d4e5f6a7-0000-0000-0000-000000000001"
       responses:
+        "200":
+          description: >-
+            The student already held an active standalone copy of this path.
+            Returns that copy, now the student's current path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentPath'
         "201":
           description: Path assigned. Returns the new StudentPath.
           content:
@@ -4021,9 +4033,12 @@ paths:
         holds, including a course whose checkpoints contain this path.
         Progress is kept per content node, so lessons already completed
         anywhere show as completed in the copy. If the caller already
-        holds a non-archived standalone StudentPath copied from this path,
-        that copy is made current and returned (200) instead of creating a
-        second one. An archived copy is not reused. Any user may enroll,
+        holds a non-archived standalone StudentPath copied from this path
+        (there is never more than one), that copy is made current and
+        returned (200) instead of creating a second one. To take a newer
+        version of the path, the caller archives that copy first: an
+        archived copy is not reused, so enrolling again creates a fresh
+        copy. Any user may enroll,
         whatever their role.
       tags:
         - Learning Paths

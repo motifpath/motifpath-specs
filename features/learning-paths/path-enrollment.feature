@@ -83,6 +83,24 @@ Feature: Enroll in a published learning path
     Then her existing copy of "open-chords-path" is returned and no new copy is created
 
   @wip
+  Scenario: A learner never ends up with two active copies of the same path
+    Given "alice" has enrolled in learning path "open-chords-path"
+    And "bob" has assigned "open-chords-path" to student "alice"
+    And "alice" is authenticated as a student
+    When "alice" enrolls in learning path "open-chords-path"
+    And "alice" lists their standalone paths
+    Then exactly one active copy of "open-chords-path" is listed
+
+  @wip
+  Scenario: Archiving a copy and enrolling again picks up the path's latest version
+    Given "alice" has enrolled in learning path "open-chords-path"
+    And "bob" has since added a published lesson "node-04" to learning path "open-chords-path"
+    And "alice" has archived her copy of "open-chords-path"
+    And "alice" is authenticated as a student
+    When "alice" enrolls in learning path "open-chords-path"
+    Then her new copy of "open-chords-path" includes "node-04"
+
+  @wip
   Scenario: Enrolling again after archiving a path creates a fresh copy
     Given "alice" has enrolled in learning path "open-chords-path"
     And "alice" has archived her copy of "open-chords-path"

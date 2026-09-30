@@ -67,6 +67,31 @@ Feature: Assign learning paths to students
     When "bob" assigns "beginner-guitar-path" to student "alice"
     Then the student path records the summary, level "beginner", thumbnail and creator "carol" of "beginner-guitar-path"
 
+  @wip
+  Scenario: Assigning a path the student already holds reuses their active copy
+    Given "alice" already has "beginner-guitar-path" assigned as her current path
+    And "alice" has since switched her current path to another path
+    And "bob" is authenticated as a teacher
+    When "bob" assigns "beginner-guitar-path" to student "alice"
+    Then "alice"'s existing copy of "beginner-guitar-path" is returned and no new copy is created
+    And "alice"'s existing copy of "beginner-guitar-path" becomes her current path
+
+  @wip
+  Scenario: Assigning a path the student enrolled in themselves reuses that copy
+    Given "alice" has enrolled in learning path "beginner-guitar-path"
+    And "bob" is authenticated as a teacher
+    When "bob" assigns "beginner-guitar-path" to student "alice"
+    Then "alice"'s existing copy of "beginner-guitar-path" is returned and no new copy is created
+
+  @wip
+  Scenario: Assigning a path again after the student archived it creates a fresh copy
+    Given "alice" already has "beginner-guitar-path" assigned as her current path
+    And "alice" has archived her copy of "beginner-guitar-path"
+    And "bob" is authenticated as a teacher
+    When "bob" assigns "beginner-guitar-path" to student "alice"
+    Then a new student path is returned, copied from "beginner-guitar-path"
+    And "alice"'s archived copy of "beginner-guitar-path" stays archived
+
   # ── Not found ─────────────────────────────────────────────────────────────
 
   Scenario: Assigning a path to a non-existent student returns not found

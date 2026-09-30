@@ -3,8 +3,9 @@
 **Status:** Accepted
 **Date:** 2026-09-30
 **Deciders:** Gilson (Product Owner)
-**Revised:** 2026-09-30, in spec review. Staff may assign only published paths, and a course may
-publish only with published paths.
+**Revised:** 2026-09-30, in spec review. Staff may assign only published paths, a course may
+publish only with published paths, and a learner never holds two active standalone copies of one
+path.
 **Amends:** ADR-029 (standalone paths are staff-assigned only) and ADR-017 (what a `StudentPath`
 records at copy time). It extends ADR-038's filterable path library and reuses PB-68's course
 presentation.
@@ -95,13 +96,18 @@ caller, whatever their role:
   appears as a checkpoint of one of the learner's courses can be enrolled in directly. Progress is
   kept per content node, not per copy, so lessons already finished show as completed in the new
   copy, and finishing them there counts in the course too.
-- **Re-enrolling reuses the active copy.** If the learner already holds a non-archived standalone
-  `StudentPath` copied from the same template, enrolling makes that copy current and returns it
-  (200) instead of creating a second one. Otherwise it creates the copy (201). An archived copy
-  isn't reused: enrolling again creates a fresh copy.
+- **A learner never holds two active standalone copies of the same path.** At most one
+  non-archived standalone `StudentPath` exists per learner and template. Enrolling while one exists
+  makes that copy current and returns it (200) instead of creating a second one. Otherwise it
+  creates the copy (201). **To take a newer version of a path, the learner archives the previous
+  copy first.** An archived copy isn't reused, so enrolling again then creates a fresh copy of the
+  path as it is now. The rule covers standalone copies only: a course checkpoint's copy of the same
+  path is part of its enrollment and doesn't count.
 - A draft or unknown path is 404. Any user may enroll, whatever their role (ADR-037).
 - **Staff can assign only published paths** (`POST /students/{student_id}/student-paths`). Assigning a
-  draft path is refused (409). Otherwise assignment is unchanged: it still sets the path as current
+  draft path is refused (409). Assignment follows the one-active-copy rule too: if the student
+  already holds an active standalone copy of the path, that copy is made current and returned (200)
+  instead of a new one. Otherwise assignment is unchanged: it still sets the path as current
   unconditionally. A path a learner is asked to follow must meet the same bar as a path a learner
   finds for themselves. A draft path is unfinished whoever hands it out.
 
@@ -148,11 +154,14 @@ Their other enrollments keep their progress, and "My learning" switches back in 
 A learner who wants one path from a course can go straight to it. Refusing enrollment, as ADR-029
 does for a second active enrollment in the same course, would protect nothing. Progress is per
 content node, so a node finished in one path is finished in every path that contains it. We rejected
-a 409 on a second active copy for that reason. **Reusing the active copy** on re-enrollment is only
-about tidiness: a double click, or a learner who forgot, lands on the path they already have instead
-of listing the same path twice in "My learning". The trade-off is that the reused copy keeps the
-items it was copied with, even if the template has changed since. A learner who wants the current
-version archives the old copy and enrolls again.
+a 409 on a second active copy for that reason. **One active copy per path** keeps "My learning"
+unambiguous: a double click, a learner who forgot, or a teacher assigning a path the learner already
+took all land on the one copy the learner has, instead of listing the same path twice with progress
+views that could disagree. Enrollment and staff assignment both reuse it, so no way of starting a
+path can create a second one. The trade-off is that the reused copy keeps the items it was copied
+with, even if the template has changed since. Getting the new version is an explicit step: the
+learner archives the old copy and enrolls again. Upgrading a copy in place is a separate backlog
+item.
 
 **Snapshot presentation on the copy** keeps ADR-017's promise that a copy is independent of its
 template: the template can be edited or deleted without touching any student's path. Reading the
