@@ -36,7 +36,7 @@ Feature: Send to your teacher
     Given the concierge WhatsApp number is "+55 11 91234-5678"
     And the student "Ana Souza" follows the path "Blues Basics"
     And the path has the lesson "Shuffle in E" with content node id "3eb9ccc1-102f-81ee-8405-dc6fdbc5211b"
-    And the lesson's practice has 5 exercises, the second with exercise id "5c20a7e4-9b1d-4f0e-a3c2-7d8e9f001122"
+    And the lesson's practice shows the exercise with id "5c20a7e4-9b1d-4f0e-a3c2-7d8e9f001122" second
 
   # ── Where the button appears ─────────────────────────────────────────────────
 
@@ -96,13 +96,13 @@ Feature: Send to your teacher
         My question or recording:
         """
 
-    Scenario: The practice message names the exercise on screen and its reference
+    Scenario: The practice message identifies the exercise on screen through its reference only
       When the student taps "Send to your teacher" on exercise 2 of the practice for "Shuffle in E"
       Then the prefilled message is:
         """
         Hi! I'm Ana Souza.
         Path: Blues Basics
-        Lesson: Shuffle in E (practice, exercise 2 of 5)
+        Lesson: Shuffle in E
         Ref: X-3eb9ccc1/5c20a7e4
 
         My question or recording:
@@ -113,6 +113,7 @@ Feature: Send to your teacher
       When the student moves on to exercise 3, whose exercise id is "9f00aa11-0000-4000-8000-000000000003"
       And taps "Send to your teacher"
       Then the prefilled message's reference is "X-3eb9ccc1/9f00aa11"
+      And the message states no exercise position or count
 
     Scenario: A student without a display name is not greeted by an empty name
       Given the student has no display name
