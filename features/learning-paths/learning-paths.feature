@@ -45,7 +45,6 @@ Feature: Manage learning paths
     When "bob" lists all learning paths
     Then the response includes "beginner-guitar-path" and "advanced-path"
 
-  @wip
   Scenario: A teacher's library leaves out other authors' paths
     Given a learning path "bobs-path" exists with items "node-01", created by "bob"
     And a learning path "carols-path" exists with items "node-02", created by "carol"
@@ -54,7 +53,6 @@ Feature: Manage learning paths
     Then the response includes "bobs-path"
     And the response does not include "carols-path"
 
-  @wip
   Scenario: A teacher cannot list another author's learning paths
     Given a learning path "carols-path" exists with items "node-02", created by "carol"
     And "bob" is authenticated as a teacher
@@ -75,7 +73,6 @@ Feature: Manage learning paths
 
   # ── Happy path — replacing a learning path ────────────────────────────────────
 
-  @wip
   Scenario: A teacher reorders a learning path's items
     Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
     And learning path "beginner-guitar-path" is a draft
@@ -83,7 +80,6 @@ Feature: Manage learning paths
     When "bob" replaces learning path "beginner-guitar-path" with items in order: "node-02", "node-01", "node-03"
     Then the items are returned with positions 1, 2, and 3 in the order "node-02", "node-01", "node-03"
 
-  @wip
   Scenario: A teacher adds an item to an existing learning path
     Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02"
     And learning path "beginner-guitar-path" is a draft
@@ -91,7 +87,6 @@ Feature: Manage learning paths
     When "bob" replaces learning path "beginner-guitar-path" with items in order: "node-01", "node-02", "node-03"
     Then the learning path has 3 items
 
-  @wip
   Scenario: A teacher removes an item from an existing learning path
     Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
     And learning path "beginner-guitar-path" is a draft
@@ -99,7 +94,6 @@ Feature: Manage learning paths
     When "bob" replaces learning path "beginner-guitar-path" with items in order: "node-01", "node-03"
     Then the learning path has 2 items
 
-  @wip
   Scenario: A teacher relabels a learning path's sections
     Given a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
     And learning path "beginner-guitar-path" is a draft
@@ -197,7 +191,6 @@ Feature: Manage learning paths
 
   # ── Deleting a learning path ────────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher deletes a learning path that is not used by any course
     Given "bob" is authenticated as a teacher
     And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
@@ -205,7 +198,6 @@ Feature: Manage learning paths
     When "bob" deletes the learning path "beginner-guitar-path"
     Then the learning path is deleted
 
-  @wip
   Scenario: Deleting a learning path does not affect students who already copied it
     Given "bob" is authenticated as a teacher
     And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
@@ -215,7 +207,6 @@ Feature: Manage learning paths
     Then the learning path is deleted
     And "alice"'s copy of the path is unaffected
 
-  @wip
   Scenario: An admin deletes a learning path created by a teacher
     Given "bob" is authenticated as a teacher
     And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
@@ -245,7 +236,6 @@ Feature: Manage learning paths
     When "bob" attempts to delete the learning path "beginner-guitar-path"
     Then the request is refused with a conflict error
 
-  @wip
   Scenario: Deleting a learning path referenced only by an unpublished course draft is allowed
     Given "bob" is authenticated as a teacher
     And a learning path "beginner-guitar-path" exists with items "node-01", "node-02", "node-03"
@@ -305,7 +295,6 @@ Feature: Manage learning paths
     When "bob" retrieves the learning path "legacy-path"
     Then the learning path has no level
 
-  @wip
   Scenario: Replacing a learning path records when it was last updated
     Given a learning path "beginner-guitar-path" exists with items "node-01", last updated on "2026-08-01"
     And learning path "beginner-guitar-path" is a draft
@@ -406,7 +395,6 @@ Feature: Manage learning paths
     When "bob" creates a learning path titled "Open Chords" with thumbnail "https://cdn.motifpath.io/thumbnails/open-chords.png" and items in order: "node-01"
     Then the learning path's thumbnail is "https://cdn.motifpath.io/thumbnails/open-chords.png"
 
-  @wip
   Scenario: Replacing a learning path without a thumbnail removes it
     Given a learning path "open-chords-path" exists with items "node-01" and thumbnail "https://cdn.motifpath.io/thumbnails/open-chords.png"
     And learning path "open-chords-path" is a draft
@@ -416,40 +404,34 @@ Feature: Manage learning paths
 
   # ── Summary, language and publishing status ───────────────────────────────
 
-  @wip
   Scenario: A teacher gives a learning path a summary and a language
     Given "bob" is authenticated as a teacher
     When "bob" creates a learning path titled "Acordes Abertos" with summary "Seus primeiros acordes" in language "pt_BR" with items in order: "node-01"
     Then the learning path's summary is "Seus primeiros acordes"
     And the learning path's language is "pt_BR"
 
-  @wip
   Scenario: A learning path can be created without a summary or a language
     Given "bob" is authenticated as a teacher
     When "bob" creates a learning path titled "Open Chords" at level "beginner" with items in order: "node-01"
     Then the learning path is created and assigned a stable identifier
     And the learning path has no summary and no language
 
-  @wip
   Scenario: A learning path cannot be written in the language-agnostic marker
     Given "bob" is authenticated as a teacher
     When "bob" creates a learning path titled "Open Chords" in language "any" with items in order: "node-01"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: Creating a learning path in a language MotifPath does not offer is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates a learning path titled "Open Chords" in language "xx" with items in order: "node-01"
     Then the request is refused with a validation error
 
-  @wip
   Scenario: Replacing a draft learning path without a summary removes it
     Given a learning path "open-chords-path" exists as a draft with items "node-01" and summary "Your first chords"
     And "bob" is authenticated as a teacher
     When "bob" replaces learning path "open-chords-path" without a summary
     Then the learning path has no summary
 
-  @wip
   Scenario: Every learning path in the library reports its publishing status
     Given a learning path "open-chords-path" exists, published
     And a learning path "strumming-path" exists as a draft
@@ -458,7 +440,6 @@ Feature: Manage learning paths
     Then the entry for "open-chords-path" reports status "published"
     And the entry for "strumming-path" reports status "draft"
 
-  @wip
   Scenario: A teacher narrows the library to published paths
     Given a learning path "open-chords-path" exists, published
     And a learning path "strumming-path" exists as a draft
@@ -467,7 +448,6 @@ Feature: Manage learning paths
     Then the response includes "open-chords-path"
     And the response does not include "strumming-path"
 
-  @wip
   Scenario: A teacher narrows the library to paths in one language
     Given a learning path "open-chords-path" exists with items "node-01", in language "en"
     And a learning path "acordes-abertos" exists with items "node-02", in language "pt_BR"
@@ -477,7 +457,6 @@ Feature: Manage learning paths
     Then the response includes "acordes-abertos"
     And the response does not include "open-chords-path" or "legacy-path"
 
-  @wip
   Scenario: An unknown publishing status filter is rejected
     Given "bob" is authenticated as a teacher
     When "bob" lists learning paths filtered by status "archived"
@@ -485,7 +464,6 @@ Feature: Manage learning paths
 
   # ── Library creators (the authoring creator filter's options) ─────────────
 
-  @wip
   Scenario: A teacher is the only creator in their own library
     Given a learning path "open-chords-path" exists as a draft, created by "bob"
     And a learning path "strumming-path" exists, published, created by "carol"
@@ -493,7 +471,6 @@ Feature: Manage learning paths
     When "bob" lists the creators of the learning path library
     Then the creators returned are "bob", each with their display name
 
-  @wip
   Scenario: An admin lists the creator of every path in the library, drafts included
     Given a learning path "open-chords-path" exists as a draft, created by "bob"
     And a learning path "strumming-path" exists, published, created by "carol"
@@ -501,7 +478,6 @@ Feature: Manage learning paths
     When "admin" lists the creators of the learning path library
     Then the creators returned are "bob" and "carol", each with their display name
 
-  @wip
   Scenario: A creator with several paths in the library is listed once
     Given a learning path "open-chords-path" exists as a draft, created by "bob"
     And a learning path "strumming-path" exists, published, created by "bob"
@@ -509,27 +485,23 @@ Feature: Manage learning paths
     When "admin" lists the creators of the learning path library
     Then the creators returned are "bob", each with their display name
 
-  @wip
   Scenario: Library creators are ordered by name ignoring case and accents
     Given learning paths exist, published, created by "Zé", "álvaro" and "Bruna"
     And "admin" is authenticated as an admin
     When "admin" lists the creators of the learning path library
     Then the creators returned are "álvaro", "Bruna" and "Zé", in that order
 
-  @wip
   Scenario: An admin narrows the library creators by name, ignoring case and accents
     Given learning paths exist, published, created by "José" and "Bruna"
     And "admin" is authenticated as an admin
     When "admin" lists the creators of the learning path library matching "jose"
     Then the creators returned are "José", each with their display name
 
-  @wip
   Scenario: A student cannot list the creators of the learning path library
     Given "alice" is authenticated as a student
     When "alice" lists the creators of the learning path library
     Then the request is refused with a forbidden error
 
-  @wip
   Scenario: Listing the library creators without an authentication token is refused
     Given no authentication token is provided
     When an unauthenticated request attempts to list the creators of the learning path library
