@@ -6,7 +6,8 @@
 **Revised:** 2026-09-30, in spec review. Staff may assign only published paths, a course may
 publish only with published paths, and a learner never holds two active standalone copies of one
 path. Later that day, in web review: a teacher works only with their own paths in the authoring
-library and in course checkpoints; only an admin works across authors.
+library, and a teacher's course uses only that teacher's paths, whoever edits it; only an admin
+works across authors, in the library and in courses of their own.
 **Amends:** ADR-029 (standalone paths are staff-assigned only) and ADR-017 (what a `StudentPath`
 records at copy time). It extends ADR-038's filterable path library and reuses PB-68's course
 presentation.
@@ -130,9 +131,10 @@ authoring course list (ADR-038):
   to one author.
 - `GET /learning-paths/creators` feeds the library's creator filter. A teacher gets at most
   themselves; an admin gets every author in the library, whatever the path's status.
-- A teacher's course draft may use only the teacher's own paths as checkpoints.
-  `POST /courses` and `PUT /courses/{id}` refuse (403) a teacher's request naming another
-  author's path. An admin may build any course from any author's paths.
+- A course authored by a teacher may use only that teacher's paths as checkpoints, whoever saves
+  it: `POST /courses` and `PUT /courses/{id}` refuse (403) a checkpoint on another author's path,
+  even when an admin edits the teacher's course. A course an admin authored may use any author's
+  paths.
 
 Learners are unaffected: the path catalog shows every published path, whoever wrote it.
 
@@ -210,11 +212,11 @@ that failure with course drafts (core 299bdfc). The snapshot is four small colum
   completes and publishes a path, no one can assign it. The concierge must publish before
   assigning, and a path meant for one student only is still visible in the catalog once published.
 - Two catalogs mean two creator lists and two filter sets to keep in step.
-- A teacher can't reuse a colleague's path in their own course; they ask an admin to build or
-  extend that course. And if an admin puts another author's path into a teacher's course, the
-  teacher can't save that course again until the checkpoint is removed or an admin saves it.
-  We chose this over a shared library because authors should see and use only their own work,
-  and an admin, not a teacher, curates across authors.
+- A teacher can't reuse a colleague's path in their own course, and an admin can't add one to it
+  either; a course that combines several authors' paths has to be an admin's own course. We chose
+  this over a shared library because authors should see and use only their own work, and a
+  teacher's course stays entirely theirs, while an admin curates across authors in courses of
+  their own.
 
 ### Neutral
 - `StudentPath` gains four nullable snapshot columns, written on every copy, including course
