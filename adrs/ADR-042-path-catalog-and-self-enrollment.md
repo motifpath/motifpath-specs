@@ -3,7 +3,8 @@
 **Status:** Accepted
 **Date:** 2026-09-30
 **Deciders:** Gilson (Product Owner)
-**Revised:** 2026-09-30, in spec review. Staff may assign only published paths.
+**Revised:** 2026-09-30, in spec review. Staff may assign only published paths, and a course may
+publish only with published paths.
 **Amends:** ADR-029 (standalone paths are staff-assigned only) and ADR-017 (what a `StudentPath`
 records at copy time). It extends ADR-038's filterable path library and reuses PB-68's course
 presentation.
@@ -21,8 +22,8 @@ ADR-029 rules that out today. Only staff can start a standalone `StudentPath`, b
 paths only through `GET /students/me/path`, and `GET /learning-paths` is an authoring listing that
 learners can't call. The template itself isn't ready to be shown to a learner:
 
-1. **No published state.** Every path in the library is visible to staff: half-built paths, and
-   paths that exist only to fill a course checkpoint. Nothing marks a path as offered to learners.
+1. **No published state.** Every path in the library is visible to staff, half-built ones included.
+   Nothing marks a path as finished and offered to learners.
 2. **Nothing to sell it with.** A `LearningPath` has a title, a level, instruments and a thumbnail,
    but no summary and no language, the two fields the course card and the language filter rely on.
 3. **Nothing to show it with once enrolled.** A `StudentPath` copies only the title. "My courses"
@@ -31,8 +32,7 @@ learners can't call. The template itself isn't ready to be shown to a learner:
 
 We considered three ways to decide what a learner sees:
 
-- **List every path in the library.** No new state, but learners would see drafts and
-  checkpoint-only paths.
+- **List every path in the library.** No new state, but learners would see half-built paths.
 - **Course-style versioning:** draft/published plus an immutable `PathVersion` snapshot per
   publish, like `CourseVersion`. Authors could keep editing without learners seeing it.
 - **A published flag without versions.** Only published paths are listed; edits to a published
@@ -59,7 +59,15 @@ kinds of result in one list is hard to follow, and paths have no checkpoints to 
   summary or its last item) is refused (409).
 - A published path can't be deleted (409). Unpublish it first. The existing rule still applies:
   a path used by any published course version can never be deleted.
-- A path can be published standalone and also used as a course checkpoint. The two are unrelated.
+- **A course may publish only with published paths.** A course's live draft may use draft paths
+  at every checkpoint while it's being built. Publishing the course is refused (409), naming the
+  checkpoint paths that are still drafts, until every one is published.
+- **A path used by a published course can't be unpublished** (409). The rule covers any published
+  `CourseVersion`, including one of a since-retired course, the same reach as the delete rule. A
+  learner enrolled in that version still unlocks its later checkpoints and copies their paths.
+  A path used only by a course draft can be unpublished.
+- As a result, every path a course uses is also in the path catalog. A learner can take it on its
+  own (see enrollment below).
 
 **A learner catalog for paths, parallel to the course catalog (ADR-037).** The same for every
 caller, whatever their role:
@@ -116,11 +124,19 @@ Enrolling copies the whole path at once, and each item pins its content node's p
 (ADR-017). Later edits to the template never reach an existing learner. The only thing a version
 would protect is the catalog entry between edits, and replace-in-one-step already covers that. A
 `PathVersion` table, a version-pinned read model and a publish-snapshot flow would cost a lot for
-that one benefit. We rejected "list everything" because learners must never see drafts or
-checkpoint-only paths.
+that one benefit. We rejected "list everything" because learners must never see half-built
+paths.
 
 **Admin-only publishing** follows ADR-029's reason: publishing exposes a path to every learner for
 the first time. The concierge team stays the gatekeeper at MVP.
+
+**One bar for every way a learner reaches a path.** A learner meets a path in three ways: finding
+it in the catalog, having staff assign it, or reaching it as a course checkpoint. A draft is
+unfinished in all three cases. So "published" is the one test a path must pass before any learner
+copies it. Checking a course at publish time, and then keeping its paths from being unpublished,
+holds that line for the life of every enrollment, including checkpoints unlocked weeks later. We
+rejected checking only at copy time: a learner could then hit an error in the middle of a course,
+long after the admin who caused it moved on.
 
 **Always current, unlike courses.** We accept the difference in behavior. Choosing a path from the
 catalog is a deliberate "start this now", the same act as a teacher assigning one, so it gets the
@@ -158,6 +174,14 @@ that failure with course drafts (core 299bdfc). The snapshot is four small colum
   switch visible (enrolling in a path lands the learner on it).
 - Existing paths have no summary or language. They must be completed before an admin can publish
   them, and older `StudentPath`s show a title-only card.
+- Paths that exist only to serve a course must be published too, so they appear in the path
+  catalog. We accept that: a course is a guided order through paths learners may also take on their
+  own.
+- An admin who wants to retire a path that published courses use can't unpublish it. The path stays
+  in the catalog for as long as any published course version references it.
+- Courses published before this change may use paths that are still drafts. MotifPath has no
+  production data yet, so no backfill runs: the development seed publishes its paths before its
+  courses.
 - Every existing path starts as a draft, and staff can assign only published paths. Until an admin
   completes and publishes a path, no one can assign it. The concierge must publish before
   assigning, and a path meant for one student only is still visible in the catalog once published.

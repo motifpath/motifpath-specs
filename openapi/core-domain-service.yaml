@@ -2848,7 +2848,11 @@ paths:
         and no one else can enroll in it. Every StudentPath already copied
         from it is its own snapshot and is unaffected, including whichever
         is a learner's current path. Unpublishing a draft path returns it
-        unchanged. Only admins may unpublish a learning path.
+        unchanged. Refused while a checkpoint of any published
+        CourseVersion uses the path, even a version of a since-retired
+        course: learners enrolled in that version still reach its later
+        checkpoints. A path used only by a course draft can be
+        unpublished. Only admins may unpublish a learning path.
       tags:
         - Learning Paths
       parameters:
@@ -2890,6 +2894,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: A checkpoint of at least one published CourseVersion uses this path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
 
   /catalog/courses:
     get:
@@ -3695,7 +3705,9 @@ paths:
         publication. Every already-enrolled student is unaffected — they
         keep progressing on the version their enrollment is pinned to.
         Admin-only, because publishing exposes the draft to students for
-        the first time.
+        the first time. Refused while any checkpoint's learning path is a
+        draft: every path a published course uses must itself be
+        published. The response names the draft paths.
       tags:
         - Courses
       parameters:
@@ -3731,6 +3743,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: At least one checkpoint's learning path is a draft. The response names them.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseNotPublishableError'
 
   /courses/{course_id}/retire:
     post:
@@ -6355,6 +6373,26 @@ components:
       required:
         - learning_path_id
 
+    CourseNotPublishableError:
+      type: object
+      description: >-
+        Returned when a course can't be published because a checkpoint
+        uses a learning path that is still a draft.
+      properties:
+        message:
+          type: string
+          description: Human-readable reason for the refusal.
+        draft_learning_path_ids:
+          type: array
+          minItems: 1
+          description: The checkpoints' learning paths that are still drafts, in checkpoint order.
+          items:
+            type: string
+            format: uuid
+      required:
+        - message
+        - draft_learning_path_ids
+
     LearningPathNotPublishableError:
       type: object
       description: >-
@@ -6640,7 +6678,11 @@ components:
               learning_path_id:
                 type: string
                 format: uuid
-                description: The learning path template at this checkpoint. Must exist in the system.
+                description: >-
+                  The learning path template at this checkpoint. Must exist
+                  in the system. It may be a draft while the course is being
+                  built, but the course can't be published until it is
+                  published.
               title:
                 type: string
                 description: >-
@@ -6704,7 +6746,11 @@ components:
               learning_path_id:
                 type: string
                 format: uuid
-                description: The learning path template at this checkpoint. Must exist in the system.
+                description: >-
+                  The learning path template at this checkpoint. Must exist
+                  in the system. It may be a draft while the course is being
+                  built, but the course can't be published until it is
+                  published.
               title:
                 type: string
                 description: >-

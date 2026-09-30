@@ -148,6 +148,34 @@ Feature: Publish learning paths to the path catalog
     When "bob" deletes learning path "open-chords-path"
     Then the learning path is deleted
 
+  # ── Paths used by courses ──────────────────────────────────────────────────
+
+  @wip
+  Scenario: Unpublishing a learning path used by a published course is refused
+    Given learning path "open-chords-path" is published
+    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And "admin" is authenticated as an admin
+    When "admin" unpublishes learning path "open-chords-path"
+    Then the request is refused with a conflict error
+    And the learning path's status is still "published"
+
+  @wip
+  Scenario: Unpublishing a learning path used by a retired course's published version is still refused
+    Given learning path "open-chords-path" is published
+    And a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
+    And course "fingerstyle-journey" has been retired
+    And "admin" is authenticated as an admin
+    When "admin" unpublishes learning path "open-chords-path"
+    Then the request is refused with a conflict error
+
+  @wip
+  Scenario: Unpublishing a learning path used only by a course draft is allowed
+    Given learning path "open-chords-path" is published
+    And a course "fingerstyle-journey" exists as a draft with checkpoints "open-chords-path"
+    And "admin" is authenticated as an admin
+    When "admin" unpublishes learning path "open-chords-path"
+    Then the learning path's status is "draft"
+
   # ── Authorisation failures ─────────────────────────────────────────────────
 
   @wip
