@@ -1,5 +1,19 @@
 # PR Review — Changelog
 
+## [1.4.0] — 2026-09-29
+
+### Added
+- New Axis A / item 23 in `HEURISTICS.md`: flags state that points into a collection by
+  position (a selection, cursor, focus, pagination offset) while other code can reorder, insert
+  or remove items, which leaves the pointer on a different item. Activated for changes that touch
+  ordering and for user-facing changes. It came from the motifpath-web#61 review, where a
+  sequence editor's selected-step index drifted when another step moved or when the form dropped
+  a step.
+- New Axis B / item 24 in `HEURISTICS.md`: flags a tick-driven loop (animation frame, timer,
+  poller, scheduled job) that assumes its ticks arrive on time, so after a long gap it schedules
+  work into the past or replays every missed tick at once. Activated for changes that run on a
+  tick. It came from the PB-71 diagram player review, where a looping run replayed every missed
+  pass in one burst after a background tab. The checklist is now at its 24-item cap.
 ## [1.3.1] — 2026-09-29
 
 ### Changed

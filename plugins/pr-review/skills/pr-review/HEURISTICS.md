@@ -10,20 +10,21 @@ reprocessing — not just steady-state).
 
 ## Activation
 
-22 items is too many for every review. Classify the change and walk only the activated subset —
+24 items is too many for every review. Classify the change and walk only the activated subset —
 plus the five always-on items.
 
 | If the change… | activates |
 |---|---|
 | alters behavior that already exists | 10, 11, 12, 13, 4 |
 | creates a new entry point or a new output | 1, 15, 7, 14 |
-| touches ordering, filtering, scoring, or aggregation | 10, 5, 6 |
+| touches ordering, filtering, scoring, or aggregation | 10, 5, 6, 23 |
 | touches an identifier, key, name, or path | 8, 9 |
 | reuses an existing routine in a new context | 3, 5, 6 |
 | adds validation or a constraint | 11, 12, 13 |
 | carries external content into render/query/exec | 15, 16, 2 |
 | touches configuration, migration, or rollout | 7, 14, 2 |
-| is user-facing (motifpath-web) | 12, 18, 14 |
+| is user-facing (motifpath-web) | 12, 18, 14, 23 |
+| runs on a tick (animation frame, timer, poller, scheduled job) | 24, 7 |
 | **always** | **17, 19, 20, 21, 22** |
 
 ---
@@ -46,6 +47,13 @@ plus the five always-on items.
    `motifpath-core` this is explicitly the monorepo boundary: does a change quietly make
    `core-domain` and `event-ingestion` depend on each other?
 
+23. **A pointer into a collection that someone else can change.** Does state that points at an item
+    (a selection, cursor, focus, "current" item, pagination offset) hold its *position*, while
+    other code can reorder, insert into, or remove from that collection? The pointer then lands on
+    a different item, and the next action on "the selected one" silently edits the wrong thing. —
+    *Smell:* an index kept beside a list whose mutations happen in more than one place, adjusted
+    only for the one mutation its owner performs.
+
 ## Axis B — Real data
 
 5. **Distribution, not example.** What's the real volume and shape of the data in production
@@ -63,6 +71,14 @@ plus the five always-on items.
    truncation/hash with no dedup at the destination.
 9. **Sentinel value inside the deterministic space.** Does the "unknown" fallback share the same
    key space as real values? — *Smell:* a sentinel producing a stable key that never invalidates.
+
+24. **Missed ticks.** Does a loop driven by ticks (an animation frame, a timer, a poller, a cron
+    job) assume they arrive on time? After a long gap (a background tab, a sleeping laptop, a
+    stalled worker), does it schedule the next piece of work into the past, or replay every missed
+    tick at once? — *Smell:* the next run computed from the previous run's end rather than from
+    now, with no catch-up rule. (Came from the motifpath-web diagram player: a looping run
+    re-scheduled each missed pass at the previous pass's end after a background tab, so they all
+    sounded at once.)
 
 ## Axis C — The nature of the change
 
