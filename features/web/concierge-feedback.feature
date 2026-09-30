@@ -40,16 +40,24 @@ Feature: Send to your teacher
     And the lesson's practice shows the exercise with id "5c20a7e4-9b1d-4f0e-a3c2-7d8e9f001122" second
 
   # ── Where the button appears ─────────────────────────────────────────────────
+  #
+  # The button is a floating WhatsApp icon in the bottom-right corner of the screen, named
+  # "Send to your teacher" for assistive technology. It carries no visible text of its own.
 
   Rule: The button appears on every unlocked lesson and on its practice
 
-    Scenario: The lesson screen offers the button
+    Scenario: The lesson screen offers a floating WhatsApp button
       When the student opens the lesson "Shuffle in E"
-      Then the student sees a "Send to your teacher" button
+      Then the student sees a floating WhatsApp icon named "Send to your teacher"
+      And it stays in the bottom-right corner while the student scrolls
 
     Scenario: The practice screen offers the button while an exercise is shown
       When the student is on exercise 2 of the practice for "Shuffle in E"
-      Then the student sees a "Send to your teacher" button
+      Then the student sees a floating WhatsApp icon named "Send to your teacher"
+
+    Scenario: The button never covers the practice's Next control
+      When the student is on exercise 2 of the practice for "Shuffle in E"
+      Then the floating WhatsApp icon sits above the bar holding the "Next" control
 
     Scenario Outline: No button when there is no lesson to talk about
       When the lesson screen for "Shuffle in E" is in the "<state>" state
@@ -70,11 +78,24 @@ Feature: Send to your teacher
       Then no "Send to your teacher" button is shown
       And the practice screen for "Shuffle in E" shows no "Send to your teacher" button either
 
-  Rule: The student knows where the message goes before tapping
+  Rule: A tooltip explains the button on mouse hover or keyboard focus only
 
-    Scenario: A hint names WhatsApp and the MotifPath team
+    Scenario: Hovering the button shows its tooltip
+      When the student rests the mouse pointer on the floating WhatsApp icon
+      Then a tooltip reads "Send to your teacher"
+      And the tooltip adds "Opens WhatsApp. Your message goes to the MotifPath team."
+
+    Scenario: Focusing the button from the keyboard shows the same tooltip
+      When the student moves keyboard focus to the floating WhatsApp icon
+      Then the tooltip reading "Send to your teacher" is shown
+
+    Scenario: The tooltip is hidden otherwise
       When the student opens the lesson "Shuffle in E"
-      Then the button is accompanied by the hint "Opens WhatsApp. Your message goes to the MotifPath team."
+      And neither hovers nor focuses the floating WhatsApp icon
+      Then no tooltip is shown
+
+    # A touch screen has no hover: a tap opens WhatsApp straight away, and the WhatsApp icon
+    # itself says where the tap leads. The tooltip's hint is not shown there.
 
   # ── What the button opens ────────────────────────────────────────────────────
 
@@ -127,7 +148,7 @@ Feature: Send to your teacher
     Scenario: A Portuguese interface writes the message in Portuguese
       Given the student's interface language is "pt-BR"
       When the student taps "Send to your teacher" on the lesson "Shuffle in E"
-      Then the button reads "Enviar ao professor"
+      Then the floating WhatsApp icon is named "Enviar ao professor"
       And the prefilled message is:
         """
         Olá! Sou Ana Souza.
