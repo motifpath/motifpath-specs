@@ -30,6 +30,57 @@ Feature: List a student's standalone paths
     When "alice" lists their standalone paths
     Then the response does not include "strumming-path"
 
+  # ── Presentation ───────────────────────────────────────────────────────────
+
+  @wip
+  Scenario: A standalone path shows the presentation recorded when it was copied
+    Given a learning path "open-chords-path" exists, created by "bob", with a summary, level "beginner" and a thumbnail
+    And "alice" holds a standalone path copied from "open-chords-path"
+    And "alice" is authenticated as a student
+    When "alice" lists their standalone paths
+    Then her copy of "open-chords-path" reports the summary, level "beginner", thumbnail and creator "bob" it was copied with
+
+  @wip
+  Scenario: A copy's presentation does not change when the template is edited
+    Given a learning path "open-chords-path" exists with summary "Your first chords"
+    And "alice" holds a standalone path copied from "open-chords-path"
+    And "bob" replaces learning path "open-chords-path" with summary "Open chords, reworked"
+    And "alice" is authenticated as a student
+    When "alice" lists their standalone paths
+    Then her copy of "open-chords-path" still reports summary "Your first chords"
+
+  @wip
+  Scenario: A copy keeps its presentation after the template is deleted
+    Given a learning path "open-chords-path" exists with summary "Your first chords"
+    And "alice" holds a standalone path copied from "open-chords-path"
+    And learning path "open-chords-path" has been deleted
+    And "alice" is authenticated as a student
+    When "alice" lists their standalone paths
+    Then her copy of "open-chords-path" still reports summary "Your first chords"
+
+  @wip
+  Scenario: A path copied before presentations were recorded shows only its title
+    Given "alice" holds a standalone path "strumming-path" copied before presentations were recorded
+    And "alice" is authenticated as a student
+    When "alice" lists their standalone paths
+    Then her copy of "strumming-path" reports its title and no summary, level, thumbnail or creator
+
+  @wip
+  Scenario: A standalone path reports how many of its lessons the student has completed
+    Given "alice" holds a standalone path "open-chords-path" with 4 lessons
+    And "alice" has completed 3 of those lessons
+    And "alice" is authenticated as a student
+    When "alice" lists their standalone paths
+    Then her copy of "open-chords-path" reports 4 lessons and 3 completed
+
+  @wip
+  Scenario: A lesson completed in another path counts toward a standalone path
+    Given "alice" holds a standalone path "open-chords-path" whose first lesson also appears in course "fingerstyle-journey"
+    And "alice" has completed that lesson in "fingerstyle-journey"
+    And "alice" is authenticated as a student
+    When "alice" lists their standalone paths
+    Then her copy of "open-chords-path" reports 1 completed
+
   # ── Empty ──────────────────────────────────────────────────────────────────
 
   Scenario: A student with no standalone paths gets an empty list

@@ -376,3 +376,72 @@ Feature: Manage learning paths
     And "bob" is authenticated as a teacher
     When "bob" replaces learning path "open-chords-path" without a thumbnail
     Then the learning path has no thumbnail
+
+  # ── Summary, language and publishing status ───────────────────────────────
+
+  @wip
+  Scenario: A teacher gives a learning path a summary and a language
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a learning path titled "Acordes Abertos" with summary "Seus primeiros acordes" in language "pt_BR" with items in order: "node-01"
+    Then the learning path's summary is "Seus primeiros acordes"
+    And the learning path's language is "pt_BR"
+
+  @wip
+  Scenario: A learning path can be created without a summary or a language
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a learning path titled "Open Chords" at level "beginner" with items in order: "node-01"
+    Then the learning path is created and assigned a stable identifier
+    And the learning path has no summary and no language
+
+  @wip
+  Scenario: A learning path cannot be written in the language-agnostic marker
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a learning path titled "Open Chords" in language "any" with items in order: "node-01"
+    Then the request is refused with a validation error
+
+  @wip
+  Scenario: Creating a learning path in a language MotifPath does not offer is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a learning path titled "Open Chords" in language "xx" with items in order: "node-01"
+    Then the request is refused with a validation error
+
+  @wip
+  Scenario: Replacing a draft learning path without a summary removes it
+    Given a learning path "open-chords-path" exists as a draft with items "node-01" and summary "Your first chords"
+    And "bob" is authenticated as a teacher
+    When "bob" replaces learning path "open-chords-path" without a summary
+    Then the learning path has no summary
+
+  @wip
+  Scenario: Every learning path in the library reports its publishing status
+    Given a learning path "open-chords-path" exists, published
+    And a learning path "strumming-path" exists as a draft
+    And "bob" is authenticated as a teacher
+    When "bob" lists all learning paths
+    Then the entry for "open-chords-path" reports status "published"
+    And the entry for "strumming-path" reports status "draft"
+
+  @wip
+  Scenario: A teacher narrows the library to published paths
+    Given a learning path "open-chords-path" exists, published
+    And a learning path "strumming-path" exists as a draft
+    And "bob" is authenticated as a teacher
+    When "bob" lists learning paths filtered by status "published"
+    Then the response includes "open-chords-path"
+    And the response does not include "strumming-path"
+
+  @wip
+  Scenario: A teacher narrows the library to paths in one language
+    Given a learning path "open-chords-path" exists with items "node-01", in language "en"
+    And a learning path "acordes-abertos" exists with items "node-02", in language "pt_BR"
+    And a learning path "legacy-path" exists with items "node-03" and no language recorded
+    And "bob" is authenticated as a teacher
+    When "bob" lists learning paths filtered by language "pt_BR"
+    Then the response includes "acordes-abertos"
+    And the response does not include "open-chords-path" or "legacy-path"
+
+  @wip
+  Scenario: An unknown publishing status filter is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" lists learning paths filtered by status "archived"
+    Then the request is refused with a validation error

@@ -37,6 +37,20 @@ Feature: Assign learning paths to students
     When "bob" edits "alice"'s copy of the path
     Then "beginner-guitar-path" and any other student's copy of it are unchanged
 
+  @wip
+  Scenario: Staff can assign a draft path that isn't in the path catalog
+    Given a learning path "concierge-path" exists as a draft
+    And "bob" is authenticated as a teacher
+    When "bob" assigns "concierge-path" to student "alice"
+    Then a student path is created and returned, copied from "concierge-path"
+
+  @wip
+  Scenario: An assigned copy records the path's presentation at assignment
+    Given learning path "beginner-guitar-path" has a summary, level "beginner", a thumbnail and was created by "carol"
+    And "bob" is authenticated as a teacher
+    When "bob" assigns "beginner-guitar-path" to student "alice"
+    Then the student path records the summary, level "beginner", thumbnail and creator "carol" of "beginner-guitar-path"
+
   # ── Not found ─────────────────────────────────────────────────────────────
 
   Scenario: Assigning a path to a non-existent student returns not found
