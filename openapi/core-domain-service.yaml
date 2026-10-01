@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.17.0
+  version: 0.18.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -687,10 +687,13 @@ paths:
         returned in a {items, total, limit, offset} envelope. An offset
         past the end returns an empty items array, not an error.
         Only teachers and admins may list exercises; the pool is an
-        authoring surface, not a student-facing catalog.
+        authoring surface, not a student-facing catalog. Every teacher sees
+        the whole pool, whoever created each exercise.
+        Every filter below is optional and they combine with AND.
       tags:
         - Content
       parameters:
+        - $ref: '#/components/parameters/SearchText'
         - $ref: '#/components/parameters/Limit'
         - $ref: '#/components/parameters/Offset'
         - name: skill_id
@@ -702,6 +705,34 @@ paths:
           description: |
             When given, only exercises linked to this exact skill id are
             returned.
+        - name: concept_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: |
+            When given, only exercises linked to this exact concept id are
+            returned.
+        - name: language
+          in: query
+          required: false
+          schema:
+            type: string
+          description: |
+            Restricts the results to exercises written in this language (a
+            Language.code other than "any").
+        - name: created_by
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: |
+            Restricts the results to exercises created by this user. An
+            exercise with no recorded creator (created before creators were
+            recorded) never matches. GET /exercises/creators lists the
+            creators to offer.
         - name: exercise_type
           in: query
           required: false
@@ -1502,6 +1533,63 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+
+  /exercises/creators:
+    get:
+      operationId: listExerciseCreators
+      summary: List the creators of the exercises in the pool
+      description: |
+        Returns every distinct user who created at least one exercise, so a
+        picker can offer a complete creator filter (the created_by
+        parameter of GET /exercises) without paging. Exercises with no
+        recorded creator contribute nobody. Only teachers and admins may
+        list exercise creators, as with the pool itself.
+
+        The list is unpaginated: it is bounded by the number of teachers
+        and admins, not by the number of exercises. Results are always
+        ordered by display_name, alphabetically as a person reads names —
+        ignoring case and accents, so "Álvaro" sorts with the A's — then
+        by user_id; an empty array means no creator matches.
+      tags:
+        - Content
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+          description: >-
+            Restricts the results to creators whose display_name contains
+            this text, ignoring case and accents ("jose" matches "José").
+      responses:
+        "200":
+          description: The creators of the exercises in the pool, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRef'
+        "400":
+          description: q is out of range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is a student.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
 
   /exercises/{exercise_id}:
     get:
@@ -8424,6 +8512,12 @@ components:
             node's languages — an exercise can be reused across multiple
             content nodes and so has no single parent to inherit a language
             from.
+        created_by:
+          $ref: '#/components/schemas/UserRef'
+          description: |
+            The user who created the exercise, recorded from the caller of
+            POST /exercises. Absent on exercises created before creators
+            were recorded.
         created_at:
           type: string
           format: date-time
