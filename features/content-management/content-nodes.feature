@@ -401,6 +401,29 @@ Feature: Manage content nodes
     Then the request is rejected as invalid
     And the rejection identifies "skill_ids" as the source of the error
 
+  @wip
+  Scenario: Changing a content node's instruments so a linked exercise no longer suits it is refused
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a content node "root-notes" exists for instruments "bass"
+    And a challenge "root-notes-check" exists for content node "root-notes"
+    And an exercise "bass-roots" for instruments "bass" exists in the system
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "bass-roots" to "root-notes-check"
+    When "bob" updates content node "root-notes" to be for instruments "guitar"
+    Then the request is refused with a conflict error
+
+  @wip
+  Scenario: Changing a content node's instruments while its exercises still suit it succeeds
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a content node "root-notes" exists for instruments "bass"
+    And an exercise "bass-roots" for instruments "guitar", "bass" exists in the system
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "bass-roots" to content node "root-notes" as a path exercise
+    When "bob" updates content node "root-notes" to be for instruments "guitar"
+    Then the content node is for instruments "guitar"
+
   Scenario: Creating a content node for an instrument that does not exist is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates an article content node titled "Barre Chords" for instruments "banjo"

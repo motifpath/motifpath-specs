@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.19.1
+  version: 0.20.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -358,6 +358,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: |
+            The new instrument_ids would leave an exercise linked to this
+            node — as a path exercise or through one of its challenges —
+            unsuited to it (see Exercise.instrument_ids). Unlink it first, or
+            keep an instrument the exercise is for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
 
   /content-nodes/{content_node_id}/publish:
     post:
@@ -745,6 +755,21 @@ paths:
               - image_choice
               - audio_selection
           description: When given, only exercises of this type are returned.
+        - name: instrument_id
+          in: query
+          required: false
+          style: form
+          explode: true
+          description: |
+            Return only exercises for at least one of these instruments —
+            those that list any of them in instrument_ids, plus those for
+            every instrument (an empty instrument_ids). Repeat the parameter
+            for several instruments. Omit for exercises of every scope.
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
       responses:
         "200":
           description: One page of the matching exercises, possibly empty.
@@ -753,7 +778,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedExercises'
         "400":
-          description: limit or offset is out of range.
+          description: |
+            limit or offset is out of range, or an instrument_id is not a
+            valid uuid.
           content:
             application/json:
               schema:
@@ -838,8 +865,11 @@ paths:
                 $ref: '#/components/schemas/Exercise'
         "400":
           description: |
-            The request body failed schema validation, or no option has
-            is_correct set to true.
+            The request body failed schema validation, no option has
+            is_correct set to true, an instrument_ids entry does not
+            reference an existing instrument, or a skill or concept does not
+            suit the exercise's instruments (see CreateExerciseRequest) —
+            reported against skill_ids or concept_ids.
           content:
             application/json:
               schema:
@@ -1023,7 +1053,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
         "409":
-          description: The exercise is already linked to this challenge.
+          description: |
+            The exercise is already linked to this challenge, or it does not
+            suit the instruments of the challenge's content node (see
+            Exercise.instrument_ids).
           content:
             application/json:
               schema:
@@ -1176,7 +1209,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
         "409":
-          description: The exercise is already linked to this content node.
+          description: |
+            The exercise is already linked to this content node, or it does
+            not suit the node's instruments (see Exercise.instrument_ids).
           content:
             application/json:
               schema:
@@ -1666,8 +1701,12 @@ paths:
                 $ref: '#/components/schemas/Exercise'
         "400":
           description: |
-            The request body failed schema validation, or no option has
-            is_correct set to true.
+            The request body failed schema validation, no option has
+            is_correct set to true, an instrument_ids entry does not
+            reference an existing instrument, or a skill or concept does not
+            suit the instruments the exercise has after the update (see
+            UpdateExerciseRequest) — reported against skill_ids or
+            concept_ids.
           content:
             application/json:
               schema:
@@ -1692,6 +1731,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: |
+            The new instrument_ids would leave the exercise unsuited to a
+            content node it is linked to, as a path exercise or through one
+            of the node's challenges (see Exercise.instrument_ids). Unlink it
+            first, or keep an instrument the node is for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
 
   /media/upload-url:
     post:
@@ -1974,8 +2023,8 @@ paths:
           description: |
             The new parent is the node itself or one of its descendants, so
             the move would create a cycle; or the new instrument_ids would
-            leave out an instrument of content or a diagram classified under
-            this node, or of one of its children.
+            leave out an instrument of content, an exercise or a diagram
+            classified under this node, or of one of its children.
           content:
             application/json:
               schema:
@@ -8580,7 +8629,14 @@ components:
 
     CreateExerciseRequest:
       type: object
-      description: Payload for creating a standalone, reusable exercise.
+      description: |
+        Payload for creating a standalone, reusable exercise.
+        Every skill and concept must suit the exercise's instruments: it is
+        for every instrument, or for at least one of the exercise's
+        instrument_ids. An exercise for every instrument (empty
+        instrument_ids) may use only nodes for every instrument. A violation
+        is rejected with the offending skill_ids or concept_ids identified —
+        the same rule content nodes and diagrams follow (ADR-043).
       properties:
         title:
           type: string
@@ -8759,6 +8815,15 @@ components:
         creation. options fully replaces the exercise's current options, the
         same way CreateExerciseRequest.options establishes them initially; a
         caller that only wants to change one option must resend the full set.
+        Every skill and concept must suit the exercise's instruments: it is
+        for every instrument, or for at least one of the exercise's
+        instrument_ids. An exercise for every instrument (empty
+        instrument_ids) may use only nodes for every instrument. A violation
+        is rejected with the offending skill_ids or concept_ids identified —
+        the same rule content nodes and diagrams follow (ADR-043).
+        The rule is checked against the instruments the exercise has after
+        the update — the current ones when instrument_ids is omitted — so
+        changing only the instruments can be rejected too.
       properties:
         title:
           type: string
@@ -8993,7 +9058,19 @@ components:
             from.
         instrument_ids:
           $ref: '#/components/schemas/InstrumentIds'
-          description: The instruments this exercise is for. Empty means every instrument.
+          description: |
+            The instruments this exercise is for. Empty means every
+            instrument. An exercise suits a content node when the exercise
+            is for every instrument, or the node is for specific instruments
+            and the exercise is for at least one of them: a node for guitar
+            and bass takes a guitar-only exercise, and a node for every
+            instrument takes only exercises for every instrument. The rule
+            holds for every link between them (a path exercise, or an
+            exercise in one of the node's challenges) and for every write
+            that could break it: linking, changing the exercise's
+            instruments, and changing the node's instruments. Choosing a
+            student's exercises by the student's own instrument is left to
+            practice sessions (PB-22).
         created_by:
           $ref: '#/components/schemas/UserRef'
           description: |
