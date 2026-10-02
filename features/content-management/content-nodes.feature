@@ -401,7 +401,6 @@ Feature: Manage content nodes
     Then the request is rejected as invalid
     And the rejection identifies "skill_ids" as the source of the error
 
-  @wip
   Scenario: Changing a content node's instruments so a linked exercise no longer suits it is refused
     Given a fretted instrument "guitar" exists in the system
     And a fretted instrument "bass" exists in the system
@@ -413,7 +412,6 @@ Feature: Manage content nodes
     When "bob" updates content node "root-notes" to be for instruments "guitar"
     Then the request is refused with a conflict error
 
-  @wip
   Scenario: Changing a content node's instruments while its exercises still suit it succeeds
     Given a fretted instrument "guitar" exists in the system
     And a fretted instrument "bass" exists in the system
