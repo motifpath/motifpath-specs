@@ -103,6 +103,12 @@ KnowledgeNode {
   - "Every instrument" (an empty list) includes instruments added later, so it is kept for
     instrument-independent nodes (theory, ear, time).
   - A technique shared by guitars and bass lists those instruments explicitly.
+- **Content must suit the nodes it is classified under.**
+  - A content node or diagram may use a node that is for every instrument, or a node that is
+    for at least one of the content's instruments.
+  - Content for every instrument may use only nodes for every instrument.
+  - A node's instruments can't be narrowed while content outside the new scope uses it.
+  - Exercises carry no instruments yet, so the rule reaches them when they do.
 - **Level is not a node property**, because it varies by instrument: hammer-ons are a
   beginner technique on guitar and an early-intermediate one on bass.
 
@@ -195,7 +201,9 @@ production included, so it is not seed data.
   `requires` and advanced placeholders.
 - **Core installs it with a frozen data migration**, the way the basic guitar diagram catalog
   ships.
-  - IDs are derived from each key, so every environment holds the same IDs.
+  - Every pre-loaded row has a fixed ID, identical in dev, staging and production: a UUID v5
+    of its type and key (`catalogs/reference-data.md`). This covers languages,
+    instruments, nodes, edges and diagrams.
   - Reference data installs after the schema, in this order: catalog instruments (including
     Electric bass), the knowledge map, then the diagram catalog, which classifies its
     diagrams by map key.
