@@ -796,6 +796,15 @@ Feature: Manage prebuilt diagrams
     Then the request is rejected as invalid
     And the rejection identifies "skill_ids" as the source of the error
 
+  @wip
+  Scenario: A diagram cannot use a skill that is for none of its instruments
+    Given a fretted instrument "bass" exists in the system
+    And a root skill "palm-muting" for instrument "guitar" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" submits a create diagram request on instrument "bass" classified under skill "palm-muting"
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
+
   Scenario: Creating a diagram against an instrument that does not exist is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create diagram request with an instrument id that does not exist

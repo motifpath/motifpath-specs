@@ -6,6 +6,16 @@
 **Revised:** 2026-10-01, in review. `prerequisite_of` ("learn this first") is replaced by `requires`
 with a mastery level, between any two nodes, skills and concepts alike. One vertical relation can't
 express that improvising needs fluency in scale positions; a leveled, cross-branch dependency can.
+**Revised:** 2026-10-02, decided by Gilson after challenging the spec with the electric-guitar
+research map. Three changes:
+- Nodes carry an instrument scope.
+- The reviewed map is production reference data installed by migration, replacing "no migration".
+- `applies` stays independent of `requires`.
+
+Same day, after a second research pass on electric bass and acoustic guitar/violão:
+- The map covers three instruments.
+- A `requires` edge counts per instrument.
+- The reference data is installed in a fixed order on a database recreated from empty.
 **Partially supersedes:** ADR-026's model of Skill and Concept as two separate trees with a single
 `name` string, and its rule that no prerequisite relation exists. Everything else in ADR-026 stands:
 content, exercises and diagrams referencing nodes by id; a challenge's subject; the five difficulty
@@ -80,8 +90,28 @@ KnowledgeNode {
   descriptions: LocalizedNames|null // optional, same per-language rule when present
   languages: string[]               // derived from names, as ADR-036 defines
   parent_id: uuid | null            // the part_of tree; null for a root
+  instrument_ids: uuid[]            // the instruments it is for; empty = every instrument
 }
 ```
+
+- **A node has an instrument scope**, with the same convention content and diagrams use: an
+  empty list means every instrument. Most concepts suit every instrument ("Major scale"); many
+  skills don't ("Palm mute", "Play E-shape barre chords"). Without a scope, a piano teacher's
+  picker would offer palm muting, and practice and recommendations would mix instruments.
+  Lists filter by one or more instruments and return nodes for any of them plus nodes for
+  every instrument.
+  - "Every instrument" (an empty list) includes instruments added later, so it is kept for
+    instrument-independent nodes (theory, ear, time).
+  - A technique shared by guitars and bass lists those instruments explicitly.
+- **Content must suit the nodes it is classified under.**
+  - A content node or diagram may use a node that is for every instrument, or a node that is
+    for at least one of the content's instruments.
+  - Content for every instrument may use only nodes for every instrument.
+  - A node's instruments can't be narrowed while content outside the new scope uses it.
+  - Exercises carry instruments too (stored now, while the schema is being rebuilt). Applying
+    this rule to exercises, filtering by instrument, and the editor follow in their own item.
+- **Level is not a node property**, because it varies by instrument: hammer-ons are a
+  beginner technique on guitar and an early-intermediate one on bass.
 
 - **A skill is something a student can do** and is named as an action ("Play open chords",
   "Change chords smoothly"). **A concept is something true or known** ("Open chord shapes",
@@ -119,6 +149,9 @@ KnowledgeEdge {
 - **Levels reuse the practice mastery scale** (`accurate < fluent < retained`). "Learn it first"
   is `requires … accurate`.
 - **`requires` may not form a cycle**; a write that would create one is refused.
+- **A `requires` edge counts for an instrument only when both nodes are for that instrument.**
+  "Improvise over a blues" (every instrument) requires "Play minor pentatonic position 1"
+  (guitars) for a guitarist's readiness, not a bassist's.
 - **`requires` informs; it never gates.** The practice-session composer uses it for "stretch" items,
   recommendations use it for ordering, and it yields a **readiness** measure per node (how many of
   its requirements the student meets at the required level). It doesn't lock content, block
@@ -128,6 +161,13 @@ KnowledgeEdge {
   `fluent`" needs one. The rule that rolls item states up into a node level belongs to the PB-22
   practice ADR. This ADR only requires that one exists and is derived, never stored by hand.
 - **Edges are filled in gradually.** A node with no edges is valid.
+- **`applies` never implies `requires`.**
+  - We rejected the research map's rule that an applied concept counts as "requires
+    (accurate)", because applies links are looser than needs: "Palm mute" applies "Tab
+    technique symbols", yet palm muting doesn't need tab.
+  - Readiness counts only explicit `requires` edges, which keeps that set sparse and sourced.
+  - The same pair may carry both edges, for example "Improvise over a diatonic progression"
+    applies "Diatonic chords" and requires it at `fluent`.
 
 ### Content links are unchanged in shape
 
@@ -149,16 +189,32 @@ graph node, and songs and repertoire stay content.
 - **Reads are open to every signed-in user**, since the student-facing skill map and dashboard
   read the graph.
 
-### No migration: the dev database is dropped and reseeded
+### The knowledge map is production reference data, installed by migration
 
-There is no production database yet, so no data migration is written. The Skill, Concept and
-classification tables are replaced outright (a fresh schema migration, not a data transform), and
-every dev environment drops its databases and reseeds.
+The schema change itself has no data to carry: Skill, Concept and the classification tables are
+replaced outright, and development databases drop and reseed. **The reviewed knowledge map is
+different.** It is the platform's curriculum backbone and must exist in every environment,
+production included, so it is not seed data.
 
-- `seed-full` is rewritten to the reviewed guitar knowledge map: bilingual names, the trees,
-  `applies` and `requires` with their levels, and seed content linked to the new nodes. The first
-  draft of that map was reviewed with the PO on 2026-10-01.
-- The `TaxonomyNode` and `TaxonomyEdge` schema files are deleted in the spec slice.
+- **The map lives in specs as a catalog** (`catalogs/knowledge-map.md` and `.yaml`): the
+  2026-10-02 research maps for electric guitar, acoustic guitar and electric bass, reviewed
+  with the PO. It includes bilingual names, instrument scopes, the trees, `applies`,
+  `requires` and advanced placeholders.
+- **Core installs it with a frozen data migration**, the way the basic guitar diagram catalog
+  ships.
+  - Every pre-loaded row has a fixed ID, identical in dev, staging and production: a UUID v5
+    of its type and key (`catalogs/reference-data.md`). This covers languages,
+    instruments, nodes, edges and diagrams.
+  - Reference data installs after the schema, in this order: catalog instruments (including
+    Electric bass), the knowledge map, then the diagram catalog, which classifies its
+    diagrams by map key.
+  - Seeds run only after every migration and never create reference rows.
+  - Until production exists, these migrations are regenerated in place and development
+    databases are recreated from empty. From the first production install they are
+    append-only.
+- **After installation the database is the source of truth**, edited by admins through the API.
+  A later catalog change ships as a migration that applies only that change.
+- **The `TaxonomyNode` and `TaxonomyEdge` schema files are deleted** in the spec slice.
 
 ## Rationale
 
@@ -211,6 +267,8 @@ every dev environment drops its databases and reseeds.
 - **A breaking API change:** `/skills` and `/concepts` go away, so the SPA's tree picker,
   classification forms and filters must move to `/knowledge-nodes` in the same release, and every
   dev database is dropped and reseeded. This is acceptable only because nothing is in production.
+- **The map ships as a migration, not a seed.** Changing the installed map later means
+  writing a migration for that change, not editing the catalog and reseeding.
 - **Every node needs every language on write,** so adding a node costs a translation. It's
   deliberate, as for instruments, but it slows ad-hoc authoring.
 - **Teachers can no longer create nodes from the tree picker** until a proposal flow exists. A

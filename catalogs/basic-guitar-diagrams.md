@@ -1,7 +1,7 @@
 # Basic guitar diagram catalog
 
-All three catalog tiers cover 12 tonic pitch classes on standard six-string Guitar
-and Electric guitar, strings numbered 1 (E4) through 6 (E2), frets 0–12. Each
+All three catalog tiers cover 12 tonic pitch classes on standard six-string Acoustic
+guitar and Electric guitar, strings numbered 1 (E4) through 6 (E2), frets 0–12. Each
 musical diagram is stored once and linked to both instruments. Stored text uses `en` and
 `pt_BR`; Portuguese tonic names use Dó/Ré/Mi/Fá/Sol/Lá/Si, with sustenido/bemol
 where appropriate. Note tokens remain language-independent letter spellings.
@@ -16,8 +16,23 @@ model. No nullable owner, catalog CRUD entity or additional MIDI field is introd
 
 Names, marker notes and region descriptions are localized together. SQL includes
 stable diagram/position UUIDs, canonical spelled notes and intervals, not SVGs.
-Published migration files are append-only. Existing diagrams, copies, exercises and
-position references are never overwritten by a regeneration or a seed run.
+Until production exists, the catalog migration may be regenerated in place and development
+databases are recreated from empty; from the first production install, migration files are
+append-only. Existing diagrams, copies, exercises and position references are never
+overwritten by a seed run.
+
+The catalog installs after the catalog instruments and the knowledge map
+(`knowledge-map.md`), and classifies each diagram by map key, never by creating skills or
+concepts of its own:
+
+| Diagram family | Skill key | Concept key |
+|---|---|---|
+| Scale maps and windows (incl. modes, 3NPS, substitutions) | `play-scale-positions` | `scales` |
+| Pentatonic and blues boxes | `play-pentatonic-positions` | `pentatonic-shapes` |
+| CAGED grips | `map-fretboard-caged` | `caged-system` |
+| Triad and seventh-chord arpeggio maps | `play-arpeggios` | `chords` |
+| Chromatic and root maps | `find-notes` | `notes-fretboard` |
+| Structures for improvisation (quartal, triad pairs, 1-2-3-5 patterns) | `improvisation` | `scales` |
 
 ## Coverage
 
@@ -60,6 +75,6 @@ existing position. No removed `sequence_index` field may be emitted.
 - Fresh schema installs with the fixed system catalog profile and no human admin; an incompatible
   pre-existing reserved profile fails atomically.
 - Repeat Atlas apply is a no-op. Colliding IDs fail; existing diagrams are preserved.
-- Local demonstration seeds reuse the installed Guitar and classification nodes without
+- Local demonstration seeds reuse the installed Acoustic guitar and classification nodes without
   duplicating the canonical data; demo-only shapes remain explicit.
 - The generated payload passes the current Go domain constructors before release.
