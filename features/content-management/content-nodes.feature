@@ -237,7 +237,6 @@ Feature: Manage content nodes
     Then the request is rejected as invalid
     And the rejection identifies "concept_ids" as the source of the error
 
-  @wip
   Scenario: Creating a content node with a concept listed among its skills is rejected
     Given a root concept "chords" exists in the system
     And "bob" is authenticated as a teacher
@@ -245,7 +244,6 @@ Feature: Manage content nodes
     Then the request is rejected as invalid
     And the rejection identifies "skill_ids" as the source of the error
 
-  @wip
   Scenario: Creating a content node with a skill listed among its concepts is rejected
     Given a root skill "fretting" exists in the system
     And "bob" is authenticated as a teacher
@@ -369,7 +367,6 @@ Feature: Manage content nodes
     When "bob" creates an article content node titled "Intervals Explained" for every instrument
     Then the content node is for every instrument
 
-  @wip
   Scenario: A content node for one instrument may use a skill for every instrument
     Given a fretted instrument "guitar" exists in the system
     And a root skill "read-chord-charts" exists in the system
@@ -377,7 +374,6 @@ Feature: Manage content nodes
     When "bob" creates an article content node titled "Reading Charts" for instruments "guitar" classified under skill "read-chord-charts"
     Then the content node is created and assigned a stable identifier
 
-  @wip
   Scenario: A content node cannot use a skill that is for none of its instruments
     Given a fretted instrument "guitar" exists in the system
     And a fretted instrument "bass" exists in the system
@@ -387,7 +383,6 @@ Feature: Manage content nodes
     Then the request is rejected as invalid
     And the rejection identifies "skill_ids" as the source of the error
 
-  @wip
   Scenario: A content node for every instrument cannot use an instrument-specific skill
     Given a fretted instrument "guitar" exists in the system
     And a root skill "palm-muting" for instrument "guitar" exists in the system
@@ -396,7 +391,6 @@ Feature: Manage content nodes
     Then the request is rejected as invalid
     And the rejection identifies "skill_ids" as the source of the error
 
-  @wip
   Scenario: Changing a content node's instruments so a skill no longer suits them is rejected
     Given a fretted instrument "guitar" exists in the system
     And a fretted instrument "bass" exists in the system

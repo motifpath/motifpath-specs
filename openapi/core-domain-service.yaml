@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.19.0
+  version: 0.19.1
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -1853,8 +1853,11 @@ paths:
             lowercase kebab-case, names or descriptions missing a language,
             carrying "any" or an unknown language code, or holding a blank
             value, a parent_id that does not reference an existing node or
-            references a node of the other kind, or an instrument_ids entry
-            that does not reference an existing instrument or repeats.
+            references a node of the other kind, an instrument_ids entry
+            that does not reference an existing instrument or repeats, or
+            instrument_ids wider than the parent's (a child is never for an
+            instrument its parent is not for; a child of a parent for
+            specific instruments cannot be for every instrument).
           content:
             application/json:
               schema:
@@ -1941,8 +1944,10 @@ paths:
             descriptions missing a language, carrying "any" or an unknown
             language code, or holding a blank value, a parent_id that does
             not reference an existing node or references a node of the other
-            kind, or an instrument_ids entry that does not reference an
-            existing instrument or repeats.
+            kind, an instrument_ids entry that does not reference an
+            existing instrument or repeats, or a result where the node is
+            wider than its parent — reported against instrument_ids when the
+            request changes them, otherwise against parent_id.
           content:
             application/json:
               schema:
@@ -1970,7 +1975,7 @@ paths:
             The new parent is the node itself or one of its descendants, so
             the move would create a cycle; or the new instrument_ids would
             leave out an instrument of content or a diagram classified under
-            this node.
+            this node, or of one of its children.
           content:
             application/json:
               schema:

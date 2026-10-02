@@ -1,4 +1,3 @@
-@wip
 Feature: Manage knowledge nodes
   As the MotifPath team
   I want admins to curate one localized graph of skills and concepts, and any authenticated user to read it
@@ -266,6 +265,38 @@ Feature: Manage knowledge nodes
     Then the request is rejected as invalid
     And the rejection identifies "parent_id" as the source of the error
 
+  Scenario: Creating a node for every instrument under a parent for specific instruments is rejected
+    Given a fretted instrument "guitar" exists in the system
+    And a root skill "palm-muting" for instrument "guitar" exists in the system
+    And "admin" is authenticated as an admin
+    When "admin" creates a skill with key "palm-mute-chugs" named "Palm-muted chugs" in English and "Chugs com palm mute" in Portuguese under skill "palm-muting"
+    Then the request is rejected as invalid
+    And the rejection identifies "instrument_ids" as the source of the error
+
+  Scenario: Widening a child beyond its parent's instruments is rejected
+    Given a fretted instrument "guitar" exists in the system
+    And a root skill "palm-muting" for instrument "guitar" exists in the system
+    And a skill "palm-mute-chugs" for instrument "guitar" exists under skill "palm-muting"
+    And "admin" is authenticated as an admin
+    When "admin" makes skill "palm-mute-chugs" for every instrument
+    Then the request is rejected as invalid
+    And the rejection identifies "instrument_ids" as the source of the error
+
+  Scenario: Moving a node under a parent narrower than it is rejected
+    Given a fretted instrument "guitar" exists in the system
+    And a root skill "palm-muting" for instrument "guitar" exists in the system
+    And a root skill "read-chord-charts" exists in the system
+    And "admin" is authenticated as an admin
+    When "admin" moves skill "read-chord-charts" under skill "palm-muting"
+    Then the request is rejected as invalid
+    And the rejection identifies "parent_id" as the source of the error
+
+  Scenario: Listing knowledge nodes of an unknown kind is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" lists the knowledge nodes of kind "topic"
+    Then the request is rejected as invalid
+    And the rejection identifies "kind" as the source of the error
+
   # ── Conflicts ──────────────────────────────────────────────────────────────
 
   Scenario: Creating a node with a key already in use is refused
@@ -286,6 +317,15 @@ Feature: Manage knowledge nodes
     And a skill "e-shape-barre" exists under skill "barre-chords"
     And "admin" is authenticated as an admin
     When "admin" moves skill "fretting" under skill "e-shape-barre"
+    Then the request is refused with a conflict error
+
+  Scenario: Narrowing a node while a child is for an instrument outside the new scope is refused
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a root skill "hammer-ons" for instruments "guitar" and "bass" exists in the system
+    And a skill "bass-hammer-on-grooves" for instrument "bass" exists under skill "hammer-ons"
+    And "admin" is authenticated as an admin
+    When "admin" makes skill "hammer-ons" for instrument "guitar" only
     Then the request is refused with a conflict error
 
   Scenario: Deleting a node that has children is refused
