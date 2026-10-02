@@ -62,9 +62,12 @@ plus the five always-on items.
 6. **Amplification and cost.** 1 event/request → how many operations? Multiply by fan-out **and**
    by the trigger's frequency (e.g. one `exercise.answer_sent` event fanning out to a threshold
    check per node). — *Smell:* a serial loop calling something with N round trips, no limit.
-7. **Absence and transitional state.** What if the input is empty/null/duplicated? And **during**
-   rollout (field not yet migrated, event not yet reprocessed, an old client version still in
-   flight)? — *Smell:* only the happy path covered; no "doesn't exist yet" case.
+7. **Absence and transitional state.** What if the input is empty/null/duplicated? Does "empty"
+   mean "not set yet" or a deliberate value ("every instrument", "no limit"), and does code that
+   fills in a default tell the two apart? And **during** rollout (field not yet migrated, event not
+   yet reprocessed, an old client version still in flight)? — *Smell:* only the happy path
+   covered; no "doesn't exist yet" case; a default applied to any empty value, including one a
+   user saved on purpose.
 8. **Normalization destroys uniqueness and information.** Shortened/normalized/hashed an
    identifier: what guaranteed uniqueness before, and what guarantees it now? Does the destination
    accept a duplicate **silently**? What does whoever operates it lose for debugging? — *Smell:*
@@ -98,8 +101,11 @@ plus the five always-on items.
     half the rule while the other half stays duplicated elsewhere.
 13. **Same rule, two sides.** A rule computed in two layers (client and server, cache and origin —
     e.g. threshold logic duplicated in `motifpath-web` and `motifpath-core`) diverges in some
-    scenario: a config read failure, a different default, a limit applied on one side only? —
-    *Smell:* two defaults for the same rule, in different files.
+    scenario: a config read failure, a different default, a limit applied on one side only? Do
+    both sides feed it the **same inputs** — or does the client check unsaved form state while the
+    server checks the saved record? — *Smell:* two defaults for the same rule, in different files;
+    a client-side filter reading the form while the request it guards is validated against what
+    was last saved.
 14. **Surface beyond the code.** Do docs, runbooks, migrations, config, and operator communication
     belong to this change? — *Smell:* new behavior with no trace outside the code.
 
