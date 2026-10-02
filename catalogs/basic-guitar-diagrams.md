@@ -6,11 +6,11 @@ strings numbered 1 (E4) through 6 (E2), frets 0–24. Stored text uses `en` and
 where appropriate. Note tokens remain language-independent letter spellings.
 
 Generation is deterministic, offline and validated. Production installs frozen SQL
-through a separate Atlas data-migration directory after schema migrations and
-bootstrap-admin provisioning. The earliest registered admin owns the basic rows.
-Missing admin, ambiguous standard-guitar layouts or missing offered-language
-translations abort installation; never invent a production user or silently skip
-content. The catalog uses the accepted octave tuning, voice, mode and sequence
+through a separate Atlas data-migration directory after schema migrations. The
+catalog migration creates a fixed `system:catalog` system profile, which owns every
+basic row and cannot authenticate through Clerk. Ambiguous standard-guitar layouts
+or missing offered-language translations abort installation; never invent a production
+user or silently skip content. The catalog uses the accepted octave tuning, voice, mode and sequence
 model. No nullable owner, catalog CRUD entity or additional MIDI field is introduced.
 
 Names, marker notes and region descriptions are localized together. SQL includes
@@ -56,7 +56,8 @@ existing position. No removed `sequence_index` field may be emitted.
 - All names and non-null prose annotations contain complete en/pt_BR text.
 - Full chromatic maps contain 150 unique cells each; pentatonic boxes contain 12;
   3NPS patterns contain 18. No coordinate lies outside the defined instrument.
-- Fresh schema + real bootstrap admin installs; no-admin installation fails atomically.
+- Fresh schema installs with the fixed system catalog profile and no human admin; an incompatible
+  pre-existing reserved profile fails atomically.
 - Repeat Atlas apply is a no-op. Colliding IDs fail; existing diagrams are preserved.
 - Local demonstration seeds reuse the installed standard guitar and classification
   nodes without duplicating the canonical data; demo-only shapes remain explicit.
