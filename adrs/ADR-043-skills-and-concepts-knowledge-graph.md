@@ -11,6 +11,11 @@ research map. Three changes:
 - Nodes carry an instrument scope.
 - The reviewed map is production reference data installed by migration, replacing "no migration".
 - `applies` stays independent of `requires`.
+
+Same day, after a second research pass on electric bass and acoustic guitar/violão:
+- The map covers three instruments.
+- A `requires` edge counts per instrument.
+- The reference data is installed in a fixed order on a database recreated from empty.
 **Partially supersedes:** ADR-026's model of Skill and Concept as two separate trees with a single
 `name` string, and its rule that no prerequisite relation exists. Everything else in ADR-026 stands:
 content, exercises and diagrams referencing nodes by id; a challenge's subject; the five difficulty
@@ -93,8 +98,13 @@ KnowledgeNode {
   empty list means every instrument. Most concepts suit every instrument ("Major scale"); many
   skills don't ("Palm mute", "Play E-shape barre chords"). Without a scope, a piano teacher's
   picker would offer palm muting, and practice and recommendations would mix instruments.
-  Lists filter by instrument and return nodes for that instrument plus nodes for every
-  instrument.
+  Lists filter by one or more instruments and return nodes for any of them plus nodes for
+  every instrument.
+  - "Every instrument" (an empty list) includes instruments added later, so it is kept for
+    instrument-independent nodes (theory, ear, time).
+  - A technique shared by guitars and bass lists those instruments explicitly.
+- **Level is not a node property**, because it varies by instrument: hammer-ons are a
+  beginner technique on guitar and an early-intermediate one on bass.
 
 - **A skill is something a student can do** and is named as an action ("Play open chords",
   "Change chords smoothly"). **A concept is something true or known** ("Open chord shapes",
@@ -132,6 +142,9 @@ KnowledgeEdge {
 - **Levels reuse the practice mastery scale** (`accurate < fluent < retained`). "Learn it first"
   is `requires … accurate`.
 - **`requires` may not form a cycle**; a write that would create one is refused.
+- **A `requires` edge counts for an instrument only when both nodes are for that instrument.**
+  "Improvise over a blues" (every instrument) requires "Play minor pentatonic position 1"
+  (guitars) for a guitarist's readiness, not a bassist's.
 - **`requires` informs; it never gates.** The practice-session composer uses it for "stretch" items,
   recommendations use it for ordering, and it yields a **readiness** measure per node (how many of
   its requirements the student meets at the required level). It doesn't lock content, block
@@ -176,15 +189,20 @@ replaced outright, and development databases drop and reseed. **The reviewed kno
 different.** It is the platform's curriculum backbone and must exist in every environment,
 production included, so it is not seed data.
 
-- **The map lives in specs as a catalog** (`catalogs/guitar-knowledge-map.md` and `.yaml`): the
-  2026-10-02 electric-guitar research map, reviewed with the PO, with bilingual names,
-  instrument scopes, the trees, `applies` and `requires`.
+- **The map lives in specs as a catalog** (`catalogs/knowledge-map.md` and `.yaml`): the
+  2026-10-02 research maps for electric guitar, acoustic guitar and electric bass, reviewed
+  with the PO. It includes bilingual names, instrument scopes, the trees, `applies`,
+  `requires` and advanced placeholders.
 - **Core installs it with a frozen data migration**, the way the basic guitar diagram catalog
   ships.
   - IDs are derived from each key, so every environment holds the same IDs.
-  - Migration files are append-only.
-  - Skills and concepts the diagram catalog created earlier are mapped onto map nodes, and
-    their diagram links move with them.
+  - Reference data installs after the schema, in this order: catalog instruments (including
+    Electric bass), the knowledge map, then the diagram catalog, which classifies its
+    diagrams by map key.
+  - Seeds run only after every migration and never create reference rows.
+  - Until production exists, these migrations are regenerated in place and development
+    databases are recreated from empty. From the first production install they are
+    append-only.
 - **After installation the database is the source of truth**, edited by admins through the API.
   A later catalog change ships as a migration that applies only that change.
 - **The `TaxonomyNode` and `TaxonomyEdge` schema files are deleted** in the spec slice.
