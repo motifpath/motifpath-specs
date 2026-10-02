@@ -46,6 +46,19 @@ Feature: Manage knowledge nodes
     Then the knowledge node is created and assigned a stable identifier
     And the knowledge node has no description
 
+  Scenario: A node created without instruments is for every instrument
+    Given "admin" is authenticated as an admin
+    When "admin" creates a concept with key "major-scale" named "Major scale" in English and "Escala maior" in Portuguese
+    Then the knowledge node is created and assigned a stable identifier
+    And the knowledge node is for every instrument
+
+  Scenario: An admin creates a skill for specific instruments
+    Given a fretted instrument "guitar" exists in the system
+    And "admin" is authenticated as an admin
+    When "admin" creates a skill with key "palm-muting" named "Palm mute" in English and "Palm mute (abafamento com a palma)" in Portuguese for instrument "guitar"
+    Then the knowledge node is created and assigned a stable identifier
+    And the knowledge node's instruments are "guitar"
+
   Scenario: Two nodes may share a name when their keys differ
     Given a root skill "picking" exists in the system
     And "admin" is authenticated as an admin
@@ -71,6 +84,18 @@ Feature: Manage knowledge nodes
     When "alice" lists the knowledge nodes of kind "skill"
     Then the response includes skill "fretting" with no parent
     And the response does not include concept "chords"
+
+  Scenario: Listing the nodes for an instrument includes nodes for every instrument
+    Given a fretted instrument "guitar" exists in the system
+    And a keyboard instrument "piano" exists in the system
+    And a root skill "palm-muting" for instrument "guitar" exists in the system
+    And a root skill "pedal-sustain" for instrument "piano" exists in the system
+    And a root concept "major-scale" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" lists the knowledge nodes for instrument "piano"
+    Then the response includes skill "pedal-sustain" with no parent
+    And the response includes concept "major-scale" with no parent
+    And the response does not include skill "palm-muting"
 
   Scenario: Listing knowledge nodes when none exist returns an empty list
     Given "bob" is authenticated as a teacher
@@ -123,6 +148,13 @@ Feature: Manage knowledge nodes
     When "admin" moves skill "barre-chords" to the root
     Then the knowledge node has no parent
 
+  Scenario: An admin changes a node's instruments
+    Given a fretted instrument "guitar" exists in the system
+    And a root skill "read-chord-charts" for instrument "guitar" exists in the system
+    And "admin" is authenticated as an admin
+    When "admin" makes skill "read-chord-charts" for every instrument
+    Then the knowledge node is for every instrument
+
   Scenario: An admin removes a node's description
     Given a root concept "blues-form" with a description exists in the system
     And "admin" is authenticated as an admin
@@ -170,6 +202,12 @@ Feature: Manage knowledge nodes
       | play open chords |
       | play--open       |
       | -play            |
+
+  Scenario: Creating a node for an instrument that does not exist is rejected
+    Given "admin" is authenticated as an admin
+    When "admin" submits a create knowledge node request with an instrument id that does not exist
+    Then the request is rejected as invalid
+    And the rejection identifies "instrument_ids" as the source of the error
 
   Scenario: Creating a node without a kind is rejected
     Given "admin" is authenticated as an admin

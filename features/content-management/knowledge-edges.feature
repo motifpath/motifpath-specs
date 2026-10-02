@@ -8,7 +8,7 @@ Feature: Link knowledge nodes
   # requires: a node needs another at a mastery level — accurate, fluent or
   # retained — between any two nodes, skills and concepts alike. requires edges
   # never form a cycle. They inform practice and recommendations; they never
-  # gate content.
+  # gate content. applies never implies requires.
 
   Background:
     Given the Core Domain Service is operational and ready to accept requests
@@ -44,10 +44,10 @@ Feature: Link knowledge nodes
       | concept "blues-form"             | concept "minor-pentatonic-scale"    |
       | concept "minor-pentatonic-scale" | skill "play-pentatonic-positions"   |
 
-  Scenario: The same two nodes may be linked by both applies and requires
+  Scenario: A skill may both apply a concept and require it at a level
     Given skill "improvise-over-a-blues" applies concept "blues-form"
     And "admin" is authenticated as an admin
-    When "admin" links skill "improvise-over-a-blues" to concept "blues-form" with "requires" at level "accurate"
+    When "admin" links skill "improvise-over-a-blues" to concept "blues-form" with "requires" at level "fluent"
     Then the knowledge edge is created and assigned a stable identifier
 
   Scenario: An admin changes the level a requires edge asks for
