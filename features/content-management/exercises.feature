@@ -378,6 +378,14 @@ Feature: Manage exercises
     Then the request is rejected as invalid
     And the rejection identifies "skill_ids" as the source of the error
 
+  @wip
+  Scenario: Creating an exercise with a concept listed among its skills is rejected
+    Given a root concept "chords" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" submits a create exercise request with concept "chords" in its skill ids
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
+
   Scenario: Creating an exercise with an unstructured prompt is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create exercise request whose prompt is a plain string instead of a structured document

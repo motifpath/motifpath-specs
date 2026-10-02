@@ -237,6 +237,22 @@ Feature: Manage content nodes
     Then the request is rejected as invalid
     And the rejection identifies "concept_ids" as the source of the error
 
+  @wip
+  Scenario: Creating a content node with a concept listed among its skills is rejected
+    Given a root concept "chords" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" submits a create content node request with concept "chords" in its skill ids
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
+
+  @wip
+  Scenario: Creating a content node with a skill listed among its concepts is rejected
+    Given a root skill "fretting" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" submits a create content node request with skill "fretting" in its concept ids
+    Then the request is rejected as invalid
+    And the rejection identifies "concept_ids" as the source of the error
+
   Scenario: A content node can be classified at a specific leaf skill rather than its root
     Given a root skill "guitar-technique" exists in the system
     And a skill "alternate-picking" exists under skill "guitar-technique"
