@@ -13,7 +13,6 @@ Feature: List voices
     Then the voices include "acoustic-guitar" for fretted instruments
     And the voices include "piano" for keyboard instruments
 
-  @wip
   Scenario: Voices are listed in order of their identifiers
     Given "bob" is authenticated as a teacher
     When "bob" lists the voices
@@ -30,7 +29,6 @@ Feature: List voices
     When "alice" lists the voices
     Then every voice has a non-empty attribution
 
-  @wip
   Scenario: The electric bass voice reaches the bass's lowest string
     Given "alice" is authenticated as a student
     When "alice" lists the voices

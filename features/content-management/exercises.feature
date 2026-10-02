@@ -372,7 +372,6 @@ Feature: Manage exercises
     Then the request is rejected as invalid
     And the rejection identifies "concept_ids" as the source of the error
 
-  @wip
   Scenario: A teacher creates an exercise for specific instruments
     Given a fretted instrument "bass" exists in the system
     And "bob" is authenticated as a teacher
@@ -380,14 +379,12 @@ Feature: Manage exercises
     Then the exercise is created and assigned a stable identifier
     And the exercise is for instruments "bass"
 
-  @wip
   Scenario: An exercise created with no instruments suits every instrument
     Given "bob" is authenticated as a teacher
     When "bob" creates an exercise titled "Name the interval" for every instrument
     Then the exercise is created and assigned a stable identifier
     And the exercise is for every instrument
 
-  @wip
   Scenario: Updating an exercise without instruments keeps its instruments
     Given a fretted instrument "bass" exists in the system
     And an exercise "Root notes on the E string" for instruments "bass" exists in the system
@@ -395,7 +392,6 @@ Feature: Manage exercises
     When "bob" updates exercise "Root notes on the E string" with title "Roots on the E string" and the instrument_ids field omitted
     Then the exercise is for instruments "bass"
 
-  @wip
   Scenario: Creating an exercise for an instrument that does not exist is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates an exercise titled "Root notes on the E string" for instruments "banjo"
@@ -408,7 +404,6 @@ Feature: Manage exercises
     Then the request is rejected as invalid
     And the rejection identifies "skill_ids" as the source of the error
 
-  @wip
   Scenario: Creating an exercise with a concept listed among its skills is rejected
     Given a root concept "chords" exists in the system
     And "bob" is authenticated as a teacher

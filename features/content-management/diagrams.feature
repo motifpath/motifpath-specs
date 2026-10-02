@@ -796,7 +796,6 @@ Feature: Manage prebuilt diagrams
     Then the request is rejected as invalid
     And the rejection identifies "skill_ids" as the source of the error
 
-  @wip
   Scenario: A diagram cannot use a skill that is for none of its instruments
     Given a fretted instrument "bass" exists in the system
     And a root skill "palm-muting" for instrument "guitar" exists in the system

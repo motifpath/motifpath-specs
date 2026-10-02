@@ -1,4 +1,3 @@
-@wip
 Feature: Manage knowledge nodes
   As the MotifPath team
   I want admins to curate one localized graph of skills and concepts, and any authenticated user to read it

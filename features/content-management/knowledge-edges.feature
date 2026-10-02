@@ -1,4 +1,3 @@
-@wip
 Feature: Link knowledge nodes
   As the MotifPath team
   I want admins to record which concepts a skill uses and what each node needs, and how well
