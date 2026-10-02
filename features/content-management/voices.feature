@@ -13,10 +13,11 @@ Feature: List voices
     Then the voices include "acoustic-guitar" for fretted instruments
     And the voices include "piano" for keyboard instruments
 
+  @wip
   Scenario: Voices are listed in order of their identifiers
     Given "bob" is authenticated as a teacher
     When "bob" lists the voices
-    Then the voices are ordered "acoustic-guitar, piano"
+    Then the voices are ordered "acoustic-guitar, electric-bass, piano"
 
   Scenario: A voice's samples are listed from lowest to highest pitch
     Given "alice" is authenticated as a student

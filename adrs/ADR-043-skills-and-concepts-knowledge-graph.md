@@ -108,7 +108,8 @@ KnowledgeNode {
     for at least one of the content's instruments.
   - Content for every instrument may use only nodes for every instrument.
   - A node's instruments can't be narrowed while content outside the new scope uses it.
-  - Exercises carry no instruments yet, so the rule reaches them when they do.
+  - Exercises carry instruments too (stored now, while the schema is being rebuilt). Applying
+    this rule to exercises, filtering by instrument, and the editor follow in their own item.
 - **Level is not a node property**, because it varies by instrument: hammer-ons are a
   beginner technique on guitar and an early-intermediate one on bass.
 

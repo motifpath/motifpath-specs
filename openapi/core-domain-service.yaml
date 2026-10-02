@@ -8698,6 +8698,12 @@ components:
             codes in the same array. Must not be empty. Tagged independently
             of any content node's own language tagging, since an exercise
             can be reused across multiple content nodes.
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+          description: |
+            The instruments this exercise is for. Omit or leave empty for
+            every instrument (for example, a theory or ear-training
+            question).
       required:
         - title
         - prompt
@@ -8845,6 +8851,12 @@ components:
             "any" marks the exercise as language-agnostic; "any" cannot be
             combined with other language codes in the same array. Must not
             be empty.
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+          description: |
+            The instruments this exercise is for, replacing the current set.
+            Omit to keep the current set; send an empty list for every
+            instrument.
       required:
         - title
         - prompt
@@ -8974,6 +8986,9 @@ components:
             node's languages — an exercise can be reused across multiple
             content nodes and so has no single parent to inherit a language
             from.
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+          description: The instruments this exercise is for. Empty means every instrument.
         created_by:
           $ref: '#/components/schemas/UserRef'
           description: |
@@ -8985,6 +9000,7 @@ components:
           format: date-time
           description: Timestamp at which the exercise was created.
       required:
+        - instrument_ids
         - exercise_id
         - title
         - prompt
