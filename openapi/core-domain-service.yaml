@@ -1786,6 +1786,16 @@ paths:
           description: Return only nodes of this kind. Omit for both kinds.
           schema:
             $ref: '#/components/schemas/KnowledgeNodeKind'
+        - name: instrument_id
+          in: query
+          required: false
+          description: |
+            Return only nodes for this instrument — those that list it in
+            instrument_ids and those for every instrument (an empty
+            instrument_ids). Omit for nodes of every scope.
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: The matching knowledge nodes, possibly empty.
@@ -1796,7 +1806,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/KnowledgeNode'
         "400":
-          description: kind is not a recognised KnowledgeNodeKind.
+          description: kind is not a recognised KnowledgeNodeKind, or instrument_id is not a UUID.
           content:
             application/json:
               schema:
@@ -1836,8 +1846,9 @@ paths:
             The request body failed validation — including a key that is not
             lowercase kebab-case, names or descriptions missing a language,
             carrying "any" or an unknown language code, or holding a blank
-            value, or a parent_id that does not reference an existing node
-            or references a node of the other kind.
+            value, a parent_id that does not reference an existing node or
+            references a node of the other kind, or an instrument_ids entry
+            that does not reference an existing instrument or repeats.
           content:
             application/json:
               schema:
@@ -1922,9 +1933,10 @@ paths:
           description: |
             The request body failed validation — including names or
             descriptions missing a language, carrying "any" or an unknown
-            language code, or holding a blank value, or a parent_id that
-            does not reference an existing node or references a node of the
-            other kind.
+            language code, or holding a blank value, a parent_id that does
+            not reference an existing node or references a node of the other
+            kind, or an instrument_ids entry that does not reference an
+            existing instrument or repeats.
           content:
             application/json:
               schema:
@@ -5461,6 +5473,12 @@ components:
           type: [string, "null"]
           format: uuid
           description: The parent node's id (always of the same kind), or null for a root.
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+          description: |
+            The instruments this node is for. Empty means every instrument —
+            typical for concepts such as a scale, while a technique such as
+            palm muting lists the instruments it applies to.
       required:
         - node_id
         - kind
@@ -5469,6 +5487,7 @@ components:
         - descriptions
         - languages
         - parent_id
+        - instrument_ids
 
     CreateKnowledgeNodeRequest:
       type: object
@@ -5495,6 +5514,9 @@ components:
           description: |
             The parent node's id. Omit to create a root. Must reference an
             existing node of the same kind.
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+          description: The instruments this node is for. Omit or leave empty for every instrument.
       required:
         - kind
         - key
@@ -5524,6 +5546,9 @@ components:
             The new parent's id, which must be an existing node of the same
             kind outside this node's subtree, or null to make the node a
             root.
+        instrument_ids:
+          $ref: '#/components/schemas/InstrumentIds'
+          description: The instruments this node is for, replacing the current set. Empty means every instrument.
 
     KnowledgeEdgeType:
       type: string
@@ -5535,7 +5560,8 @@ components:
         concept, never with a level. requires — from needs to at level or
         above; any kind to any kind, always with a level, and requires edges
         never form a cycle. requires informs practice and recommendations;
-        it never locks content or blocks practice.
+        it never locks content or blocks practice. An applies edge never
+        implies a requirement; the same two nodes may carry both.
 
     KnowledgeEdge:
       type: object
