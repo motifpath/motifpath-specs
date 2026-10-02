@@ -1,6 +1,6 @@
 # PB-85 Phase 4 — Knowledge map editor (admin)
 
-**Status:** Draft for PO review (2026-10-02)
+**Status:** Approved by the PO (2026-10-02)
 **Repos:** `motifpath-specs` (this note, `features/web/knowledge-map-editor.feature`),
 `motifpath-web`. No API change: the editor uses the knowledge-node and knowledge-edge calls
 that Phase 1 specified and Phase 2 shipped (`listKnowledgeNodes`, `createKnowledgeNode`,
@@ -17,7 +17,7 @@ creation was removed for everyone, and the picker only says "Missing one? Ask th
 The map (340 nodes, 335 applies, 136 requires) can change only through a data migration or
 raw API calls. Admins need one screen to grow and correct it.
 
-## Decisions (proposed; PO to confirm)
+## Decisions (PO, 2026-10-02)
 
 1. **Admin-only.** One route, `/admin/knowledge-map`, reachable from a "Knowledge map" nav
    section shown only to admins. Teachers and students never see it, and the router sends
@@ -150,7 +150,9 @@ tree and every link list stay consistent.
 
 ## Open questions
 
-| # | Question | Recommendation |
+Resolved with the spec's approval (2026-10-02): each recommendation below was accepted.
+
+| # | Question | Decision |
 |---|---|---|
 | 1 | Let teachers open the map read-only? | Not now. They already browse it through the picker. Revisit with the proposal flow. |
 | 2 | Edits made in the editor aren't written back to `catalogs/knowledge-map.yaml`, so a dev DB rebuilt from migrations loses them. Accept that until prod exists? | Yes. Until there's a prod DB, any edit worth keeping also goes into the YAML and a regenerated migration. The editor is for trying changes and for prod later. |
