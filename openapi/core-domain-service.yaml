@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.18.0
+  version: 0.19.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -510,7 +510,7 @@ paths:
       description: |
         Creates a new challenge attached to the specified content node. A challenge
         is the assessment unit for a class — it groups exercises and carries the
-        subject (a Skill or Concept reference) and pass threshold used by the
+        subject (a skill- or concept-kind KnowledgeNode) and pass threshold used by the
         rules-based recommendation engine, plus an optional, purely informational
         time threshold.
 
@@ -890,7 +890,7 @@ paths:
           schema:
             type: string
             format: uuid
-          description: The Skill to select exercises for.
+          description: The skill-kind KnowledgeNode to select exercises for.
         - name: count
           in: query
           required: false
@@ -1767,27 +1767,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
-  /skills:
+  /knowledge-nodes:
     get:
-      operationId: listSkills
-      summary: List all known skills
+      operationId: listKnowledgeNodes
+      summary: List knowledge nodes
       description: |
-        Returns every Skill currently known to the system as a flat list
-        (id, name, parent_id), sorted by name within each level — the shape
-        a client needs both to render the tree for browsing and to resolve
-        any node's breadcrumb by walking parent_id. Any authenticated user
-        may list skills.
+        Returns every KnowledgeNode (skill or concept) as a flat list,
+        sorted by key — the shape a client needs both to render each kind's
+        tree and to resolve any node's breadcrumb by walking parent_id.
+        Clients sort siblings by the name they display, since names are
+        localized. Any authenticated user may list knowledge nodes.
       tags:
         - Content
+      parameters:
+        - name: kind
+          in: query
+          required: false
+          description: Return only nodes of this kind. Omit for both kinds.
+          schema:
+            $ref: '#/components/schemas/KnowledgeNodeKind'
       responses:
         "200":
-          description: All known skills, possibly empty.
+          description: The matching knowledge nodes, possibly empty.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Skill'
+                  $ref: '#/components/schemas/KnowledgeNode'
+        "400":
+          description: kind is not a recognised KnowledgeNodeKind.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
         "401":
           description: Missing or invalid Bearer token.
           content:
@@ -1796,12 +1809,13 @@ paths:
                 $ref: '#/components/schemas/UnauthorizedError'
 
     post:
-      operationId: createSkill
-      summary: Create a skill node
+      operationId: createKnowledgeNode
+      summary: Create a knowledge node
       description: |
-        Creates a new skill, either as a root (parent_id omitted) or as a
-        child of an existing skill. Only teachers and admins may create a
-        skill — the tree is an authoring surface.
+        Creates a skill or concept, either as a root (parent_id omitted) or
+        under an existing node of the same kind. Only admins may create a
+        node: the team curates the knowledge graph, and teachers classify
+        content by picking existing nodes.
       tags:
         - Content
       requestBody:
@@ -1809,16 +1823,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateSkillRequest'
+              $ref: '#/components/schemas/CreateKnowledgeNodeRequest'
       responses:
         "201":
-          description: Skill created.
+          description: Knowledge node created.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Skill'
+                $ref: '#/components/schemas/KnowledgeNode'
         "400":
-          description: The request body failed schema validation, or parent_id does not reference an existing skill.
+          description: |
+            The request body failed validation — including a key that is not
+            lowercase kebab-case, names or descriptions missing a language,
+            carrying "any" or an unknown language code, or holding a blank
+            value, or a parent_id that does not reference an existing node
+            or references a node of the other kind.
           content:
             application/json:
               schema:
@@ -1830,47 +1849,60 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "403":
-          description: The authenticated user does not have permission to create a skill. Only teachers and admins may.
+          description: The authenticated user does not have permission to create a knowledge node. Only admins may.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForbiddenError'
+        "409":
+          description: Another knowledge node already has this key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
 
-  /concepts:
+  /knowledge-nodes/{node_id}:
+    parameters:
+      - name: node_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
     get:
-      operationId: listConcepts
-      summary: List all known concepts
-      description: |
-        Returns every Concept currently known to the system as a flat list
-        (id, name, parent_id), sorted by name within each level — the shape
-        a client needs both to render the tree for browsing and to resolve
-        any node's breadcrumb by walking parent_id. Any authenticated user
-        may list concepts.
+      operationId: getKnowledgeNode
+      summary: Get a knowledge node
+      description: Returns one knowledge node. Any authenticated user may read it.
       tags:
         - Content
       responses:
         "200":
-          description: All known concepts, possibly empty.
+          description: The knowledge node.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Concept'
+                $ref: '#/components/schemas/KnowledgeNode'
         "401":
           description: Missing or invalid Bearer token.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No knowledge node exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
 
-    post:
-      operationId: createConcept
-      summary: Create a concept node
+    patch:
+      operationId: updateKnowledgeNode
+      summary: Rename, describe or move a knowledge node
       description: |
-        Creates a new concept, either as a root (parent_id omitted) or as a
-        child of an existing concept. Only teachers and admins may create a
-        concept — the tree is an authoring surface.
+        Changes a node's names, descriptions or parent. A field left out is
+        unchanged. kind and key never change. Moving a node takes its whole
+        subtree with it, and is refused when the new parent is the node
+        itself or one of its descendants. Only admins may update a node.
       tags:
         - Content
       requestBody:
@@ -1878,16 +1910,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateConceptRequest'
+              $ref: '#/components/schemas/UpdateKnowledgeNodeRequest'
       responses:
-        "201":
-          description: Concept created.
+        "200":
+          description: Knowledge node updated.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Concept'
+                $ref: '#/components/schemas/KnowledgeNode'
         "400":
-          description: The request body failed schema validation, or parent_id does not reference an existing concept.
+          description: |
+            The request body failed validation — including names or
+            descriptions missing a language, carrying "any" or an unknown
+            language code, or holding a blank value, or a parent_id that
+            does not reference an existing node or references a node of the
+            other kind.
           content:
             application/json:
               schema:
@@ -1899,11 +1936,252 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "403":
-          description: The authenticated user does not have permission to create a concept. Only teachers and admins may.
+          description: The authenticated user does not have permission to update a knowledge node. Only admins may.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No knowledge node exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: The new parent is the node itself or one of its descendants, so the move would create a cycle.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+
+    delete:
+      operationId: deleteKnowledgeNode
+      summary: Delete a knowledge node
+      description: |
+        Deletes a node that nothing depends on. The delete is refused while
+        the node has children, takes part in any knowledge edge, classifies
+        any content node, exercise or diagram, or is the subject of a
+        challenge — remove those first. Only admins may delete a node.
+      tags:
+        - Content
+      responses:
+        "204":
+          description: Knowledge node deleted.
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user does not have permission to delete a knowledge node. Only admins may.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No knowledge node exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: |
+            The node is still in use — it has children, takes part in a
+            knowledge edge, classifies content, an exercise or a diagram, or
+            is a challenge's subject. The message says which.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+
+  /knowledge-edges:
+    get:
+      operationId: listKnowledgeEdges
+      summary: List knowledge edges
+      description: |
+        Returns the knowledge edges matching every filter given, or all of
+        them when none is. Any authenticated user may list edges.
+      tags:
+        - Content
+      parameters:
+        - name: type
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/KnowledgeEdgeType'
+        - name: from_id
+          in: query
+          required: false
+          description: Only edges leaving this node.
+          schema:
+            type: string
+            format: uuid
+        - name: to_id
+          in: query
+          required: false
+          description: Only edges arriving at this node.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: The matching knowledge edges, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KnowledgeEdge'
+        "400":
+          description: type is not a recognised KnowledgeEdgeType, or from_id/to_id is not a UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
+    post:
+      operationId: createKnowledgeEdge
+      summary: Link two knowledge nodes
+      description: |
+        Creates an applies edge (a skill uses a concept) or a requires edge
+        (a node needs another at a mastery level). Only admins may create
+        an edge.
+      tags:
+        - Content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKnowledgeEdgeRequest'
+      responses:
+        "201":
+          description: Knowledge edge created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeEdge'
+        "400":
+          description: |
+            The request body failed validation — including from_id or to_id
+            not referencing an existing node, from_id equal to to_id, an
+            applies edge that is not skill → concept, an applies edge with a
+            level, or a requires edge without one.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user does not have permission to create a knowledge edge. Only admins may.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "409":
+          description: |
+            An edge of this type already links these two nodes in this
+            direction, or the requires edge would close a cycle of requires
+            edges.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+
+  /knowledge-edges/{edge_id}:
+    parameters:
+      - name: edge_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateKnowledgeEdge
+      summary: Change a requires edge's level
+      description: |
+        Changes the mastery level a requires edge asks for. The nodes and
+        type of an edge never change — delete it and create another. Only
+        admins may update an edge.
+      tags:
+        - Content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKnowledgeEdgeRequest'
+      responses:
+        "200":
+          description: Knowledge edge updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeEdge'
+        "400":
+          description: The level is not a recognised MasteryLevel, or the edge is an applies edge, which has no level.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user does not have permission to update a knowledge edge. Only admins may.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No knowledge edge exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+    delete:
+      operationId: deleteKnowledgeEdge
+      summary: Delete a knowledge edge
+      description: Removes the edge. Only admins may delete an edge.
+      tags:
+        - Content
+      responses:
+        "204":
+          description: Knowledge edge deleted.
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user does not have permission to delete a knowledge edge. Only admins may.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No knowledge edge exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
 
   /instruments:
     get:
@@ -2277,7 +2555,7 @@ paths:
             backwards or past the instrument's strings, per-language text
             (custom_label, note, region description) not keyed by exactly
             the languages of names, or a skill_ids/concept_ids entry that
-            does not reference an existing skill or concept.
+            does not reference an existing node of the matching kind.
           content:
             application/json:
               schema:
@@ -4834,9 +5112,9 @@ components:
         The three mandatory classification dimensions for a content node.
         These dimensions are the minimum semantic layer required for gap
         detection and the rules-based recommendation engine to function.
-        skill_ids/concept_ids reference existing Skill/Concept tree nodes —
-        create one first via POST /skills or POST /concepts if the one you
-        need doesn't exist yet.
+        skill_ids/concept_ids reference existing KnowledgeNodes of kind
+        skill and concept respectively. Only admins create nodes; a teacher
+        who needs a missing one asks the team.
       properties:
         skill_ids:
           type: array
@@ -4845,10 +5123,10 @@ components:
             type: string
             format: uuid
           description: |
-            The id(s) of the Skill tree node(s) this content teaches — may
+            The id(s) of the skill node(s) this content teaches — may
             be a root, a leaf, or a mix of nodes at different depths,
             whichever set actually fits this content's scope. Must not be
-            empty; each id must reference an existing skill.
+            empty; each id must reference an existing skill-kind node.
         concept_ids:
           type: array
           minItems: 1
@@ -4856,9 +5134,9 @@ components:
             type: string
             format: uuid
           description: |
-            The id(s) of the Concept tree node(s) this content addresses —
+            The id(s) of the concept node(s) this content addresses —
             same depth/mix rules as skill_ids. Must not be empty; each id
-            must reference an existing concept.
+            must reference an existing concept-kind node.
         difficulty_level:
           type: string
           enum:
@@ -4879,8 +5157,8 @@ components:
       type: object
       description: |
         The classification of a content node as returned by the API —
-        skills/concepts are embedded in full (id, name, parent_id) rather
-        than left as bare ids, so a client can render each one's position
+        skills/concepts are embedded as full KnowledgeNodes rather than
+        left as bare ids, so a client can render each one's position
         in the tree without a follow-up lookup per id. Includes review
         state: all classifications start as pending and must be confirmed
         by an admin before the content node is considered fully ready.
@@ -4889,14 +5167,14 @@ components:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/Skill'
-          description: The Skill tree node(s) this content teaches, in full.
+            $ref: '#/components/schemas/KnowledgeNode'
+          description: The skill node(s) this content teaches, in full.
         concepts:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/Concept'
-          description: The Concept tree node(s) this content addresses, in full.
+            $ref: '#/components/schemas/KnowledgeNode'
+          description: The concept node(s) this content addresses, in full.
         difficulty_level:
           type: string
           enum:
@@ -5118,96 +5396,209 @@ components:
         - language_codes
         - instrument_ids
 
-    Skill:
+    KnowledgeNodeKind:
+      type: string
+      enum:
+        - skill
+        - concept
+      description: |
+        skill — something a student can do, named as an action ("Play open
+        chords"). concept — something true or known ("Open chord shapes").
+        The naming convention is documented, not enforced.
+
+    MasteryLevel:
+      type: string
+      enum:
+        - accurate
+        - fluent
+        - retained
+      description: |
+        The practice mastery scale, ordered accurate < fluent < retained. A
+        requires edge asks for its target at this level or above.
+
+    KnowledgeNode:
       type: object
       description: |
-        An observable, practicable skill a content node can teach. Skills
-        form a tree — parent_id null means a root skill; any skill may have
-        children, to any depth. A node's name is unique among its siblings
-        (including other roots), not globally, so two different branches may
-        contain a same-named skill.
+        A skill or concept in the knowledge graph. Each kind forms
+        a strict tree through parent_id — at most one parent, always of the
+        same kind — which says where a node lives. What a node uses or needs
+        across the tree is a KnowledgeEdge. Content, exercises and diagrams
+        link to nodes by id; they are never nodes themselves.
       properties:
-        skill_id:
+        node_id:
           type: string
           format: uuid
-          description: Stable identifier for this skill.
-        name:
+          description: Stable identifier for this node.
+        kind:
+          $ref: '#/components/schemas/KnowledgeNodeKind'
+        key:
           type: string
+          pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+          maxLength: 100
           description: |
-            Short kebab-case tag naming the skill (e.g. triad-shapes,
-            sweep-picking).
+            Stable handle for code and seed scripts (e.g.
+            play-open-chords) — lowercase kebab-case, unique across both
+            kinds, and never changed after creation. Not for display: show
+            names instead.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: The node's name in every language MotifPath offers.
+        descriptions:
+          oneOf:
+            - $ref: '#/components/schemas/LocalizedDescription'
+            - type: "null"
+          description: |
+            An optional explanation of the node, in every language MotifPath
+            offers, or null when there is none.
+        languages:
+          type: array
+          items:
+            type: string
+          description: |
+            The Language.code of every language this node has a name in —
+            the keys of names, sorted.
         parent_id:
           type: [string, "null"]
           format: uuid
-          description: The parent skill's id, or null if this is a root skill.
+          description: The parent node's id (always of the same kind), or null for a root.
       required:
-        - skill_id
-        - name
+        - node_id
+        - kind
+        - key
+        - names
+        - descriptions
+        - languages
         - parent_id
 
-    CreateSkillRequest:
+    CreateKnowledgeNodeRequest:
       type: object
-      description: |
-        Payload for creating a new skill node. There is no update or delete
-        endpoint yet — re-parenting, renaming, or deleting a skill that
-        already has links is a deliberately open question.
+      description: Payload for creating a skill or concept.
       properties:
-        name:
+        kind:
+          $ref: '#/components/schemas/KnowledgeNodeKind'
+        key:
           type: string
-          description: Short kebab-case tag naming the skill.
+          pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+          maxLength: 100
+          description: The node's key — lowercase kebab-case, unique across both kinds. Cannot be changed later.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: The node's names — one for every language MotifPath offers.
+        descriptions:
+          $ref: '#/components/schemas/LocalizedDescription'
+          description: |
+            Optional. When given, one description for every language
+            MotifPath offers.
         parent_id:
           type: string
           format: uuid
           description: |
-            The parent skill's id. Omit to create a root skill. Must
-            reference an existing skill if given.
+            The parent node's id. Omit to create a root. Must reference an
+            existing node of the same kind.
       required:
-        - name
+        - kind
+        - key
+        - names
 
-    Concept:
+    UpdateKnowledgeNodeRequest:
       type: object
       description: |
-        An intellectual concept a content node can address. Concepts form a
-        tree the same way Skills do — parent_id null means a root concept;
-        any concept may have children, to any depth. A node's name is unique
-        among its siblings (including other roots), not globally.
+        Payload for changing a node. Every field is optional; a field left
+        out is unchanged.
+      minProperties: 1
       properties:
-        concept_id:
-          type: string
-          format: uuid
-          description: Stable identifier for this concept.
-        name:
-          type: string
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: The node's names, replacing the current set — one for every language MotifPath offers.
+        descriptions:
+          oneOf:
+            - $ref: '#/components/schemas/LocalizedDescription'
+            - type: "null"
           description: |
-            Short kebab-case tag naming the concept (e.g. chord-theory,
-            interval-recognition).
+            The node's descriptions, replacing the current set — one for
+            every language MotifPath offers — or null to remove them.
         parent_id:
           type: [string, "null"]
           format: uuid
-          description: The parent concept's id, or null if this is a root concept.
-      required:
-        - concept_id
-        - name
-        - parent_id
+          description: |
+            The new parent's id, which must be an existing node of the same
+            kind outside this node's subtree, or null to make the node a
+            root.
 
-    CreateConceptRequest:
+    KnowledgeEdgeType:
+      type: string
+      enum:
+        - applies
+        - requires
+      description: |
+        applies — the skill (from) uses the concept (to); only skill →
+        concept, never with a level. requires — from needs to at level or
+        above; any kind to any kind, always with a level, and requires edges
+        never form a cycle. requires informs practice and recommendations;
+        it never locks content or blocks practice.
+
+    KnowledgeEdge:
       type: object
       description: |
-        Payload for creating a new concept node. There is no update or
-        delete endpoint yet — re-parenting, renaming, or deleting a concept
-        that already has links is a deliberately open question.
+        A typed link between two knowledge nodes. At most one edge of each
+        type links the same two nodes in the same direction.
       properties:
-        name:
-          type: string
-          description: Short kebab-case tag naming the concept.
-        parent_id:
+        edge_id:
           type: string
           format: uuid
-          description: |
-            The parent concept's id. Omit to create a root concept. Must
-            reference an existing concept if given.
+          description: Stable identifier for this edge.
+        from_id:
+          type: string
+          format: uuid
+          description: The node the edge leaves.
+        to_id:
+          type: string
+          format: uuid
+          description: The node the edge arrives at.
+        type:
+          $ref: '#/components/schemas/KnowledgeEdgeType'
+        level:
+          oneOf:
+            - $ref: '#/components/schemas/MasteryLevel'
+            - type: "null"
+          description: The level a requires edge asks for; null for an applies edge.
       required:
-        - name
+        - edge_id
+        - from_id
+        - to_id
+        - type
+        - level
+
+    CreateKnowledgeEdgeRequest:
+      type: object
+      description: Payload for linking two knowledge nodes.
+      properties:
+        from_id:
+          type: string
+          format: uuid
+          description: The node the edge leaves. For applies, a skill.
+        to_id:
+          type: string
+          format: uuid
+          description: The node the edge arrives at. For applies, a concept. Never the same node as from_id.
+        type:
+          $ref: '#/components/schemas/KnowledgeEdgeType'
+        level:
+          $ref: '#/components/schemas/MasteryLevel'
+          description: Required for requires; must be absent for applies.
+      required:
+        - from_id
+        - to_id
+        - type
+
+    UpdateKnowledgeEdgeRequest:
+      type: object
+      description: Payload for changing the level of a requires edge.
+      properties:
+        level:
+          $ref: '#/components/schemas/MasteryLevel'
+      required:
+        - level
 
     Instrument:
       type: object
@@ -5543,7 +5934,7 @@ components:
       type: object
       description: |
         Classification for a new or updated Diagram. Diagrams share the
-        exact Skill/Concept tree ContentNode and Exercise use (see
+        exact knowledge graph ContentNode and Exercise use (see
         ClassificationInput) — not a separate tagging scheme — but carry no
         difficulty_level; a diagram is a reusable shape, not a leveled
         piece of content.
@@ -5555,8 +5946,8 @@ components:
             type: string
             format: uuid
           description: |
-            The id(s) of the Skill tree node(s) this diagram illustrates.
-            Must not be empty; each id must reference an existing skill.
+            The id(s) of the skill node(s) this diagram illustrates.
+            Must not be empty; each id must reference an existing skill-kind node.
         concept_ids:
           type: array
           minItems: 1
@@ -5564,8 +5955,8 @@ components:
             type: string
             format: uuid
           description: |
-            The id(s) of the Concept tree node(s) this diagram addresses.
-            Must not be empty; each id must reference an existing concept.
+            The id(s) of the concept node(s) this diagram addresses.
+            Must not be empty; each id must reference an existing concept-kind node.
       required:
         - skill_ids
         - concept_ids
@@ -5574,21 +5965,21 @@ components:
       type: object
       description: |
         A Diagram's classification as returned by the API — skills/concepts
-        embedded in full (id, name, parent_id), the same convention
+        embedded as full KnowledgeNodes, the same convention
         Classification uses for ContentNode.
       properties:
         skills:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/Skill'
-          description: The Skill tree node(s) this diagram illustrates, in full.
+            $ref: '#/components/schemas/KnowledgeNode'
+          description: The skill node(s) this diagram illustrates, in full.
         concepts:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/Concept'
-          description: The Concept tree node(s) this diagram addresses, in full.
+            $ref: '#/components/schemas/KnowledgeNode'
+          description: The concept node(s) this diagram addresses, in full.
       required:
         - skills
         - concepts
@@ -7856,7 +8247,7 @@ components:
           type: string
           format: uuid
           description: |
-            The Skill this challenge assesses. Must be one of the parent
+            The skill-kind KnowledgeNode this challenge assesses. Must be one of the parent
             content node's linked skill_ids. Exactly one of
             subject_skill_id/subject_concept_id must be set — the subject is
             the minimum required for gap detection, a challenge without one
@@ -7865,7 +8256,7 @@ components:
           type: string
           format: uuid
           description: |
-            The Concept this challenge assesses. Must be one of the parent
+            The concept-kind KnowledgeNode this challenge assesses. Must be one of the parent
             content node's linked concept_ids. Exactly one of
             subject_skill_id/subject_concept_id must be set.
         pass_threshold:
@@ -7910,7 +8301,7 @@ components:
       type: object
       description: |
         A challenge is the assessment unit for a content node. It groups
-        exercises and carries the subject (a Skill or Concept reference) and
+        exercises and carries the subject (a skill- or concept-kind KnowledgeNode) and
         threshold rules used by the recommendation engine. Its ID is carried
         in exercise-family tracking events as challenge_id inside
         trigger_context.
@@ -7926,11 +8317,11 @@ components:
         subject_skill_id:
           type: string
           format: uuid
-          description: The Skill this challenge assesses. Exactly one of subject_skill_id/subject_concept_id is set.
+          description: The skill-kind KnowledgeNode this challenge assesses. Exactly one of subject_skill_id/subject_concept_id is set.
         subject_concept_id:
           type: string
           format: uuid
-          description: The Concept this challenge assesses. Exactly one of subject_skill_id/subject_concept_id is set.
+          description: The concept-kind KnowledgeNode this challenge assesses. Exactly one of subject_skill_id/subject_concept_id is set.
         pass_threshold:
           type: integer
           minimum: 1
@@ -7980,11 +8371,11 @@ components:
         subject_skill_id:
           type: string
           format: uuid
-          description: The Skill this challenge assesses. Must be one of the parent content node's linked skill_ids.
+          description: The skill-kind KnowledgeNode this challenge assesses. Must be one of the parent content node's linked skill_ids.
         subject_concept_id:
           type: string
           format: uuid
-          description: The Concept this challenge assesses. Must be one of the parent content node's linked concept_ids.
+          description: The concept-kind KnowledgeNode this challenge assesses. Must be one of the parent content node's linked concept_ids.
         pass_threshold:
           type: integer
           minimum: 1
@@ -8170,10 +8561,10 @@ components:
             type: string
             format: uuid
           description: |
-            The id(s) of the Skill tree node(s) this exercise targets,
+            The id(s) of the skill node(s) this exercise targets,
             independent of any challenge or content node it may also be
             linked to. Must not be empty; each id must reference an
-            existing skill.
+            existing skill-kind node.
         concept_ids:
           type: array
           minItems: 1
@@ -8181,8 +8572,8 @@ components:
             type: string
             format: uuid
           description: |
-            The id(s) of the Concept tree node(s) this exercise addresses.
-            Must not be empty; each id must reference an existing concept.
+            The id(s) of the concept node(s) this exercise addresses.
+            Must not be empty; each id must reference an existing concept-kind node.
         image_url:
           type: string
           format: uri
@@ -8325,9 +8716,9 @@ components:
             type: string
             format: uuid
           description: |
-            The id(s) of the Skill tree node(s) this exercise targets,
+            The id(s) of the skill node(s) this exercise targets,
             replacing its current set. Must not be empty; each id must
-            reference an existing skill.
+            reference an existing skill-kind node.
         concept_ids:
           type: array
           minItems: 1
@@ -8335,9 +8726,9 @@ components:
             type: string
             format: uuid
           description: |
-            The id(s) of the Concept tree node(s) this exercise addresses,
+            The id(s) of the concept node(s) this exercise addresses,
             replacing its current set. Must not be empty; each id must
-            reference an existing concept.
+            reference an existing concept-kind node.
         image_url:
           type: string
           format: uri
@@ -8425,7 +8816,7 @@ components:
     Exercise:
       type: object
       description: |
-        A reusable, standalone practice item classified by Skill/Concept
+        A reusable, standalone practice item classified by skill/concept
         tree references and independent of any single challenge. The
         exercise_id is the value the SPA supplies in exercise-family
         tracking events. An exercise is checked by option selection: the
@@ -8453,13 +8844,13 @@ components:
         skills:
           type: array
           items:
-            $ref: '#/components/schemas/Skill'
-          description: The Skill tree node(s) this exercise targets, in full.
+            $ref: '#/components/schemas/KnowledgeNode'
+          description: The skill node(s) this exercise targets, in full.
         concepts:
           type: array
           items:
-            $ref: '#/components/schemas/Concept'
-          description: The Concept tree node(s) this exercise addresses, in full.
+            $ref: '#/components/schemas/KnowledgeNode'
+          description: The concept node(s) this exercise addresses, in full.
         image_url:
           type: string
           format: uri
@@ -8578,7 +8969,7 @@ components:
         skill_id:
           type: string
           format: uuid
-          description: The Skill this session was generated for.
+          description: The skill-kind KnowledgeNode this session was generated for.
         exercises:
           type: array
           items:
@@ -8874,6 +9265,18 @@ components:
         minLength: 1
         maxLength: 280
         description: The note in the language its key names; not blank.
+
+    LocalizedDescription:
+      type: object
+      description: |
+        A description in one or more languages, keyed by Language.code
+        (never "any").
+      minProperties: 1
+      additionalProperties:
+        type: string
+        minLength: 1
+        maxLength: 1000
+        description: The description in the language its key names; not blank.
 
     LocalizedCaption:
       type: object
