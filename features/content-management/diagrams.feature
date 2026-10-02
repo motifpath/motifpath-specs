@@ -800,7 +800,7 @@ Feature: Manage prebuilt diagrams
     Given "bob" is authenticated as a teacher
     When "bob" submits a create diagram request with an instrument id that does not exist
     Then the request is rejected as invalid
-    And the rejection identifies "instrument_id" as the source of the error
+    And the rejection identifies "instrument_ids" as the source of the error
 
   # ── Not found ──────────────────────────────────────────────────────────────
 
