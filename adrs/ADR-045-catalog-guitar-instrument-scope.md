@@ -14,55 +14,54 @@ changes timbre without changing a diagram's geometry.
 
 The basic-diagram catalog is also browsed and filtered by `Instrument`. The
 production data now has two independently selectable instruments: `Guitar`
-(`Violão`) and `Electric guitar` (`Guitarra elétrica`). A `Diagram` has one
-`instrument_id`; it cannot belong to both records. Sharing one catalog row
-would therefore make one instrument's catalog incomplete, while adding a
-many-to-many relationship would enlarge the content schema for this specific
-catalog concern.
+(`Violão`) and `Electric guitar` (`Guitarra elétrica`). Their standard tuning
+and fretboard geometry are identical, so duplicating each musical diagram
+would create two mutable copies of the same content.
 
 ## Decision
 
-MotifPath will generate an equivalent basic-diagram catalog for each of the
-two existing standard-tuned six-string instrument records: Guitar and Electric
-guitar. Each generated row is associated with exactly one of those records and
-has a stable id derived from its instrument and musical template.
+MotifPath will store each basic musical diagram once. Its existing
+`instrument_id` remains the immutable layout instrument that defines position
+coordinates and the fallback playback voice. A new `diagram_instruments` join
+links it to every instrument for which that layout is valid. The catalog links
+every basic guitar diagram to both Guitar and Electric guitar.
 
-Both instruments use `E2 A2 D3 G3 B3 E4`, have the same 0–12-fret catalog
-coverage, and continue to use the current acoustic-guitar default voice until
-a distinct electric-guitar voice is supplied. This decision supersedes
-ADR-041 only where it says that Electric guitar is not a new instrument. Its
-layout-versus-voice model remains in effect for playback.
+Every linked instrument must have the same coordinate geometry as the layout
+instrument: family, and for fretted instruments, string count and tuning (or
+the equivalent keyboard range). Both catalog instruments use `E2 A2 D3 G3 B3
+E4`, have the same 0–12-fret coverage, and retain the current acoustic-guitar
+fallback voice until a distinct electric-guitar voice is supplied.
 
 ## Rationale
 
-Duplicating the deterministic catalog rows keeps instrument filtering correct
-without changing the Diagram schema or hiding catalog content behind a voice
-selection. It also preserves the localised product names that users already
-recognise: Guitar/Violão and Electric guitar/Guitarra elétrica.
+The join keeps instrument filtering correct without copying the content or
+hiding availability behind a voice selection. It preserves the localised
+product names that users already recognise: Guitar/Violão and Electric
+guitar/Guitarra elétrica.
 
-Using one Guitar record for both would contradict the required instrument
-association. A join table was rejected because the identical-geometry case
-does not justify a broader authoring and API contract now.
+Using only one Guitar record would contradict the required instrument
+association. Duplicating diagrams was rejected because corrections and
+translations could diverge between two rows that represent the same pattern.
 
 ## Consequences
 
 ### Positive
 
 - Both instruments expose the complete basic catalog in instrument-scoped views.
-- Generated diagrams retain a single, unambiguous `instrument_id`.
-- The catalog remains deterministic and needs no Diagram schema migration.
+- A correction or translation changes one diagram, for both instruments.
+- The catalog remains deterministic and records compatible instruments explicitly.
 
 ### Negative / Trade-offs
 
-- The catalog stores two rows for each shared musical template.
-- A future change to shared musical content must regenerate both instrument variants.
-- Electric guitar initially plays through the acoustic-guitar voice.
+- The additional join table and compatibility checks add persistence complexity.
+- An incompatible layout cannot share a diagram even when its musical idea is similar.
+- Electric guitar initially plays through the acoustic-guitar fallback voice.
 
 ### Neutral
 
 - The two records share tuning and fretboard geometry.
 - A dedicated electric-guitar voice can later become the Electric guitar default
-  without changing catalog diagram ownership.
+  without changing catalog diagram ownership or associations.
 
 ## Related ADRs
 

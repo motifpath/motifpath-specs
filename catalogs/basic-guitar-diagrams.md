@@ -1,7 +1,8 @@
 # Basic guitar diagram catalog
 
 All three catalog tiers cover 12 tonic pitch classes on standard six-string Guitar
-and Electric guitar, strings numbered 1 (E4) through 6 (E2), frets 0–12. Stored text uses `en` and
+and Electric guitar, strings numbered 1 (E4) through 6 (E2), frets 0–12. Each
+musical diagram is stored once and linked to both instruments. Stored text uses `en` and
 `pt_BR`; Portuguese tonic names use Dó/Ré/Mi/Fá/Sol/Lá/Si, with sustenido/bemol
 where appropriate. Note tokens remain language-independent letter spellings.
 
@@ -39,7 +40,7 @@ mode field uses an accepted diatonic enum or null, never an invented enum value.
 
 The 12th fret is the catalog boundary: it is the octave of the open string, and
 the catalog deliberately does not duplicate the same templates at higher frets.
-Position IDs derive from diagram key, instrument and physical cell, not array order.
+Position IDs derive from diagram key and physical cell, not array order.
 Scale windows are explicitly named windows, not claimed to be ergonomic fingerings.
 Chord shapes are limited to CAGED grips and full-range arpeggio maps; there are no
 three-string triad/tetrad, shell or drop-voicing templates.
