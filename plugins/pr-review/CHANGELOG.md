@@ -1,5 +1,13 @@
 # PR Review — Changelog
 
+## [1.4.1] — 2026-09-30
+
+### Fixed
+- `profiles/motifpath-specs.md` Delivery: spec, ADR and chore branches are cut from and target
+  `main`, because motifpath-specs has no `dev` branch. The profile had said they target `dev`,
+  which would have turned every correctly targeted spec PR into a false finding. Found during the
+  specs#147 review.
+
 ## [1.4.0] — 2026-09-29
 
 ### Added

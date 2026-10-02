@@ -54,8 +54,10 @@
 
 ## Delivery
 
-- Feature/spec/chore branches target `dev`; only `hotfix/BUG-NNN/...` branches from `main` directly,
-  per the `git` skill.
+- Every branch (spec, ADR, chore) is cut from and targets `main`: this repo has no `dev` branch
+  (`git branch -r` lists only `origin/main` plus feature branches; specs#145, #146 and #147 all
+  merged into `main`). Don't flag a spec PR for targeting `main`, even though the `git` skill's
+  dev-branch flow applies to the service repos.
 - A spec change that isn't yet consumed by any other repo's PR is normal, not a finding — Phase 4d
   only applies once a consumer actually exists in the same review session.
 
