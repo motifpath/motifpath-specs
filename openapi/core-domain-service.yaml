@@ -1789,13 +1789,19 @@ paths:
         - name: instrument_id
           in: query
           required: false
+          style: form
+          explode: true
           description: |
-            Return only nodes for this instrument — those that list it in
-            instrument_ids and those for every instrument (an empty
-            instrument_ids). Omit for nodes of every scope.
+            Return only nodes for at least one of these instruments — those
+            that list any of them in instrument_ids, plus those for every
+            instrument (an empty instrument_ids). Repeat the parameter for
+            several instruments, as an authoring screen does for content
+            meant for more than one. Omit for nodes of every scope.
           schema:
-            type: string
-            format: uuid
+            type: array
+            items:
+              type: string
+              format: uuid
       responses:
         "200":
           description: The matching knowledge nodes, possibly empty.
@@ -1806,7 +1812,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/KnowledgeNode'
         "400":
-          description: kind is not a recognised KnowledgeNodeKind, or instrument_id is not a UUID.
+          description: kind is not a recognised KnowledgeNodeKind, or an instrument_id is not a UUID.
           content:
             application/json:
               schema:
@@ -5476,9 +5482,11 @@ components:
         instrument_ids:
           $ref: '#/components/schemas/InstrumentIds'
           description: |
-            The instruments this node is for. Empty means every instrument —
-            typical for concepts such as a scale, while a technique such as
-            palm muting lists the instruments it applies to.
+            The instruments this node is for. Empty means every instrument,
+            including instruments added later — for nodes that don't depend
+            on the instrument, such as a scale or reading a chord chart. A
+            physical technique lists the instruments it applies to, even
+            when that is every fretted instrument.
       required:
         - node_id
         - kind
@@ -5560,8 +5568,10 @@ components:
         concept, never with a level. requires — from needs to at level or
         above; any kind to any kind, always with a level, and requires edges
         never form a cycle. requires informs practice and recommendations;
-        it never locks content or blocks practice. An applies edge never
-        implies a requirement; the same two nodes may carry both.
+        it never locks content or blocks practice. A requires edge counts
+        for an instrument only when both of its nodes are for that
+        instrument. An applies edge never implies a requirement; the same
+        two nodes may carry both.
 
     KnowledgeEdge:
       type: object

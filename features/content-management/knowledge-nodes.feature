@@ -97,6 +97,19 @@ Feature: Manage knowledge nodes
     And the response includes concept "major-scale" with no parent
     And the response does not include skill "palm-muting"
 
+  Scenario: Listing the nodes for several instruments includes the nodes for any of them
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a keyboard instrument "piano" exists in the system
+    And a root skill "palm-muting" for instrument "guitar" exists in the system
+    And a root skill "slap" for instrument "bass" exists in the system
+    And a root skill "pedal-sustain" for instrument "piano" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" lists the knowledge nodes for instruments "guitar" and "bass"
+    Then the response includes skill "palm-muting" with no parent
+    And the response includes skill "slap" with no parent
+    And the response does not include skill "pedal-sustain"
+
   Scenario: Listing knowledge nodes when none exist returns an empty list
     Given "bob" is authenticated as a teacher
     When "bob" lists all knowledge nodes
