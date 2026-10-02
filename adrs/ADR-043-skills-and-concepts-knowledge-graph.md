@@ -1,6 +1,6 @@
 # ADR-043: Skills and concepts form one localized knowledge graph
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-01
 **Deciders:** Gilson (Product Owner)
 **Revised:** 2026-10-01, in review. `prerequisite_of` ("learn this first") is replaced by `requires`
@@ -45,8 +45,8 @@ five node types (concept, skill, shape, resource, repertoire) and six edge types
 lifecycle. Nothing implements or references it. It treats content (resources, repertoire) as graph
 nodes, which would duplicate every content table inside the graph.
 
-The data is small: about 7 skills and 10 concepts, all roots, in seed data only, with nothing in
-production. Changing the model now costs almost nothing. Changing it after content authoring at
+The data is small: about 7 skills and 10 concepts, all roots, in seed data only, and there is no
+production database. Changing the model now costs a reseed. Changing it after content authoring at
 scale would mean migrating every classification.
 
 Alternatives considered:
@@ -149,14 +149,15 @@ graph node, and songs and repertoire stay content.
 - **Reads are open to every signed-in user**, since the student-facing skill map and dashboard
   read the graph.
 
-### Migration and seed
+### No migration: the dev database is dropped and reseeded
 
-- Each existing skill and concept becomes a `KnowledgeNode` of its kind. `name` moves to `names.en`,
-  and `key` is derived from it.
-- Existing content links keep their ids.
+There is no production database yet, so no data migration is written. The Skill, Concept and
+classification tables are replaced outright (a fresh schema migration, not a data transform), and
+every dev environment drops its databases and reseeds.
+
 - `seed-full` is rewritten to the reviewed guitar knowledge map: bilingual names, the trees,
-  `applies` and `requires` with their levels, with seed content re-linked. The first draft of that map was
-  reviewed with the PO on 2026-10-01.
+  `applies` and `requires` with their levels, and seed content linked to the new nodes. The first
+  draft of that map was reviewed with the PO on 2026-10-01.
 - The `TaxonomyNode` and `TaxonomyEdge` schema files are deleted in the spec slice.
 
 ## Rationale
@@ -208,8 +209,8 @@ graph node, and songs and repertoire stay content.
 ### Negative / Trade-offs
 
 - **A breaking API change:** `/skills` and `/concepts` go away, so the SPA's tree picker,
-  classification forms and filters must move to `/knowledge-nodes` in the same release. This is
-  acceptable only because nothing is in production.
+  classification forms and filters must move to `/knowledge-nodes` in the same release, and every
+  dev database is dropped and reseeded. This is acceptable only because nothing is in production.
 - **Every node needs every language on write,** so adding a node costs a translation. It's
   deliberate, as for instruments, but it slows ad-hoc authoring.
 - **Teachers can no longer create nodes from the tree picker** until a proposal flow exists. A
@@ -242,4 +243,4 @@ graph node, and songs and repertoire stay content.
 
 ---
 
-*This ADR was proposed on 2026-10-01. To revise, create a new ADR with Status: Supersedes ADR-043.*
+*This ADR was decided on 2026-10-01. To revise, create a new ADR with Status: Supersedes ADR-043.*
