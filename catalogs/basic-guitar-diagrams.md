@@ -21,7 +21,7 @@ position references are never overwritten by a regeneration or a seed run.
 
 ## Coverage
 
-A: chromatic/root/interval maps, dyad maps, major/minor pentatonics and blues,
+A: chromatic/root maps, major/minor pentatonics and blues,
 major/natural-minor scales, pentatonic boxes that fit inside the range, CAGED
 major grips and scale/arpeggio windows, major/minor/diminished/augmented triads
 and five seventh-chord arpeggio maps.
