@@ -16,6 +16,9 @@ Same day, after a second research pass on electric bass and acoustic guitar/viol
 - The map covers three instruments.
 - A `requires` edge counts per instrument.
 - The reference data is installed in a fixed order on a database recreated from empty.
+
+Later the same day, from the implementation review: the map's "a child is never wider than its
+parent" rule holds for every admin edit, not only for the installed map.
 **Partially supersedes:** ADR-026's model of Skill and Concept as two separate trees with a single
 `name` string, and its rule that no prerequisite relation exists. Everything else in ADR-026 stands:
 content, exercises and diagrams referencing nodes by id; a challenge's subject; the five difficulty
@@ -108,6 +111,11 @@ KnowledgeNode {
     for at least one of the content's instruments.
   - Content for every instrument may use only nodes for every instrument.
   - A node's instruments can't be narrowed while content outside the new scope uses it.
+- **A child is never wider than its parent.** A child of a parent for specific instruments is for
+  some of those instruments, never for every instrument. This holds for every write: creating,
+  moving and re-scoping a node are rejected when the node would end up wider than its parent,
+  and narrowing a node is refused while one of its children is for an instrument outside the new
+  scope.
   - Exercises carry instruments too (stored now, while the schema is being rebuilt). Applying
     this rule to exercises, filtering by instrument, and the editor follow in their own item.
 - **Level is not a node property**, because it varies by instrument: hammer-ons are a

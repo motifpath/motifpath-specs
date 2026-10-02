@@ -121,6 +121,12 @@ Feature: Link knowledge nodes
     Then the request is rejected as invalid
     And the rejection identifies "level" as the source of the error
 
+  Scenario: Listing knowledge edges of an unknown type is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" lists the "prerequisite_of" edges from skill "improvise-over-a-blues"
+    Then the request is rejected as invalid
+    And the rejection identifies "type" as the source of the error
+
   # ── Conflicts ──────────────────────────────────────────────────────────────
 
   Scenario: Creating the same edge twice is refused
