@@ -1,0 +1,412 @@
+# Guitar knowledge map v1 — the reviewed skill/concept graph installed in every
+# environment. Rules, scope and acceptance: guitar-knowledge-map.md.
+#
+# instruments: all = every instrument (empty instrument_ids)
+#              guitars = Guitar + Electric guitar
+#              electric = Electric guitar only
+# level: typical calibration (B beginner, EI early intermediate, I intermediate,
+#        A advanced boundary). Annotation for authors only; not installed.
+
+instruments:
+  guitars: [guitar, electric-guitar]
+  electric: [electric-guitar]
+
+concepts:
+  # C1 The instrument
+  - {key: the-instrument, names: {en: "The instrument", pt_BR: "O instrumento"}, instruments: guitars}
+  - {key: parts-of-the-guitar, parent: the-instrument, names: {en: "Parts of the guitar", pt_BR: "Partes da guitarra"}, instruments: guitars, level: B}
+  - {key: string-names, parent: the-instrument, names: {en: "String names and numbering", pt_BR: "Nomes e numeração das cordas"}, instruments: guitars, level: B}
+  - {key: finger-numbering, parent: the-instrument, names: {en: "Finger numbering", pt_BR: "Numeração dos dedos"}, instruments: guitars, level: B}
+  - {key: standard-tuning, parent: the-instrument, names: {en: "Standard tuning", pt_BR: "Afinação padrão (Mi Lá Ré Sol Si Mi)"}, instruments: guitars, level: B}
+  - {key: alternate-tunings, parent: the-instrument, names: {en: "Alternate tunings (Drop D)", pt_BR: "Afinações alternativas (Drop D)"}, instruments: guitars, level: EI}
+
+  # C2 Notes and the fretboard
+  - {key: notes-fretboard, names: {en: "Notes and the fretboard", pt_BR: "Notas e o braço"}, instruments: all}
+  - {key: note-names, parent: notes-fretboard, names: {en: "Note names", pt_BR: "Nomes das notas (cifras C D E F G A B)"}, instruments: all, level: B}
+  - {key: octaves, parent: notes-fretboard, names: {en: "Octaves", pt_BR: "Oitavas"}, instruments: all, level: B}
+  - {key: sharps-and-flats, parent: notes-fretboard, names: {en: "Sharps and flats", pt_BR: "Acidentes (sustenido e bemol)"}, instruments: all, level: B}
+  - {key: tones-and-semitones, parent: notes-fretboard, names: {en: "Tones and semitones", pt_BR: "Tom e semitom"}, instruments: all, level: B}
+  - {key: chromatic-scale, parent: notes-fretboard, names: {en: "Chromatic scale", pt_BR: "Escala cromática"}, instruments: all, level: B}
+  - {key: fretboard-landmarks, parent: notes-fretboard, names: {en: "Fretboard landmarks", pt_BR: "Referências do braço (marcações, casa 12, desenhos de oitava)"}, instruments: guitars, level: B}
+  - {key: fretboard-systems, parent: notes-fretboard, names: {en: "Fretboard systems", pt_BR: "Sistemas de mapeamento do braço"}, instruments: guitars}
+  - {key: caged-system, parent: fretboard-systems, names: {en: "CAGED system", pt_BR: "Sistema CAGED"}, instruments: guitars, level: I}
+  - {key: three-notes-per-string, parent: fretboard-systems, names: {en: "Three notes per string (3NPS)", pt_BR: "Três notas por corda (3NPS)"}, instruments: guitars, level: I}
+
+  # C3 Intervals
+  - {key: intervals, names: {en: "Intervals", pt_BR: "Intervalos"}, instruments: all}
+  - {key: root-note, parent: intervals, names: {en: "Root", pt_BR: "Tônica (fundamental)"}, instruments: all, level: B}
+  - {key: interval-names, parent: intervals, names: {en: "Interval names", pt_BR: "Nomes dos intervalos"}, instruments: all, level: EI}
+  - {key: interval-quality, parent: intervals, names: {en: "Interval quality (major, minor, perfect)", pt_BR: "Qualidade dos intervalos (maior, menor, justo)"}, instruments: all, level: EI}
+  - {key: interval-shapes, parent: intervals, names: {en: "Interval shapes on the fretboard", pt_BR: "Desenhos de intervalos no braço"}, instruments: guitars, level: EI}
+
+  # C4 Keys and tonality
+  - {key: keys-and-tonality, names: {en: "Keys and tonality", pt_BR: "Tonalidade"}, instruments: all}
+  - {key: key-center, parent: keys-and-tonality, names: {en: "Key", pt_BR: "Tom (centro tonal)"}, instruments: all, level: B}
+  - {key: major-minor-tonality, parent: keys-and-tonality, names: {en: "Major and minor tonality", pt_BR: "Tonalidade maior e menor"}, instruments: all, level: B}
+  - {key: transposition, parent: keys-and-tonality, names: {en: "Transposition", pt_BR: "Transposição"}, instruments: all, level: EI}
+  - {key: relative-keys, parent: keys-and-tonality, names: {en: "Relative major and minor", pt_BR: "Tons relativos (maior e menor)"}, instruments: all, level: EI}
+  - {key: key-signature, parent: keys-and-tonality, names: {en: "Key signature", pt_BR: "Armadura de clave"}, instruments: all, level: I}
+  - {key: circle-of-fifths, parent: keys-and-tonality, names: {en: "Circle of fifths", pt_BR: "Ciclo das quintas"}, instruments: all, level: I}
+
+  # C5 Scales
+  - {key: scales, names: {en: "Scales", pt_BR: "Escalas"}, instruments: all}
+  - {key: major-scale, parent: scales, names: {en: "Major scale", pt_BR: "Escala maior (diatônica maior)"}, instruments: all, level: B}
+  - {key: scale-degrees, parent: scales, names: {en: "Scale degrees", pt_BR: "Graus da escala"}, instruments: all, level: EI}
+  - {key: minor-pentatonic, parent: scales, names: {en: "Minor pentatonic scale", pt_BR: "Escala pentatônica menor"}, instruments: all, level: B}
+  - {key: pentatonic-shapes, parent: minor-pentatonic, names: {en: "Pentatonic shapes (positions 1–5)", pt_BR: "Formatos da pentatônica (1 a 5)"}, instruments: guitars, level: EI}
+  - {key: major-pentatonic, parent: scales, names: {en: "Major pentatonic scale", pt_BR: "Escala pentatônica maior"}, instruments: all, level: EI}
+  - {key: blues-scale, parent: scales, names: {en: "Blues scale", pt_BR: "Escala blues"}, instruments: all, level: EI}
+  - {key: natural-minor, parent: scales, names: {en: "Natural minor scale", pt_BR: "Escala menor natural"}, instruments: all, level: EI}
+  - {key: modes, parent: scales, names: {en: "Modes of the major scale", pt_BR: "Modos gregos"}, instruments: all, level: I}
+  - {key: mixolydian, parent: modes, names: {en: "Mixolydian mode", pt_BR: "Modo mixolídio"}, instruments: all, level: I}
+  - {key: dorian, parent: modes, names: {en: "Dorian mode", pt_BR: "Modo dórico"}, instruments: all, level: I}
+
+  # C6 Chords
+  - {key: chords, names: {en: "Chords", pt_BR: "Acordes"}, instruments: all}
+  - {key: chord-construction, parent: chords, names: {en: "Chord construction (stacked thirds)", pt_BR: "Formação de acordes (empilhamento de terças)"}, instruments: all, level: EI}
+  - {key: major-triads, parent: chords, names: {en: "Major triads", pt_BR: "Tríades maiores"}, instruments: all, level: B}
+  - {key: minor-triads, parent: chords, names: {en: "Minor triads", pt_BR: "Tríades menores"}, instruments: all, level: B}
+  - {key: diminished-augmented-triads, parent: chords, names: {en: "Diminished and augmented triads", pt_BR: "Tríades diminutas e aumentadas"}, instruments: all, level: I}
+  - {key: power-chord, parent: chords, names: {en: "Power chord", pt_BR: "Power chord (acorde de quinta)"}, instruments: all, level: B}
+  - {key: open-chord-shapes, parent: chords, names: {en: "Open chord shapes", pt_BR: "Acordes abertos (formatos)"}, instruments: guitars, level: B}
+  - {key: barre-chord-shapes, parent: chords, names: {en: "Barre chord shapes", pt_BR: "Formatos de pestana"}, instruments: guitars, level: EI}
+  - {key: dominant-seventh, parent: chords, names: {en: "Dominant seventh chord", pt_BR: "Acorde de sétima dominante (7)"}, instruments: all, level: EI}
+  - {key: seventh-chords, parent: chords, names: {en: "Seventh chords", pt_BR: "Tétrades (7M, m7, 7, m7(b5))"}, instruments: all, level: I}
+  - {key: sus-add-chords, parent: chords, names: {en: "Suspended and add chords", pt_BR: "Acordes suspensos e add9"}, instruments: all, level: EI}
+  - {key: inversions, parent: chords, names: {en: "Chord inversions", pt_BR: "Inversões de acordes"}, instruments: all, level: I}
+  - {key: chord-diagrams, parent: chords, names: {en: "Chord diagrams", pt_BR: "Diagrama de acordes"}, instruments: guitars, level: B}
+  - {key: chord-charts, parent: chords, names: {en: "Chord chart notation", pt_BR: "Cifra (notação de acordes)"}, instruments: all, level: B}
+
+  # C7 Rhythm
+  - {key: rhythm, names: {en: "Rhythm", pt_BR: "Ritmo"}, instruments: all}
+  - {key: pulse-and-tempo, parent: rhythm, names: {en: "Pulse, beat and tempo", pt_BR: "Pulsação, tempo e andamento (BPM)"}, instruments: all, level: B}
+  - {key: time-signatures, parent: rhythm, names: {en: "Time signatures", pt_BR: "Fórmula de compasso"}, instruments: all, level: B}
+  - {key: note-values, parent: rhythm, names: {en: "Note values and subdivision", pt_BR: "Figuras rítmicas e subdivisão"}, instruments: all, level: B}
+  - {key: rests-and-ties, parent: rhythm, names: {en: "Rests and ties", pt_BR: "Pausas e ligaduras"}, instruments: all, level: EI}
+  - {key: dotted-notes, parent: rhythm, names: {en: "Dotted notes", pt_BR: "Notas pontuadas"}, instruments: all, level: EI}
+  - {key: triplets, parent: rhythm, names: {en: "Triplets", pt_BR: "Tercinas (quiálteras)"}, instruments: all, level: EI}
+  - {key: swing-feel, parent: rhythm, names: {en: "Swing and shuffle feel", pt_BR: "Swing e shuffle"}, instruments: all, level: EI}
+  - {key: syncopation, parent: rhythm, names: {en: "Syncopation", pt_BR: "Síncope e contratempo"}, instruments: all, level: EI}
+  - {key: strumming-patterns, parent: rhythm, names: {en: "Strumming patterns", pt_BR: "Levadas (padrões de batida)"}, instruments: guitars, level: B}
+  - {key: groove, parent: rhythm, names: {en: "Groove", pt_BR: "Groove (suingue)"}, instruments: all, level: EI}
+
+  # C8 Harmony
+  - {key: harmony, names: {en: "Harmony", pt_BR: "Harmonia"}, instruments: all}
+  - {key: song-form, parent: harmony, names: {en: "Song form", pt_BR: "Forma da música (verso, refrão, ponte)"}, instruments: all, level: B}
+  - {key: blues-form, parent: harmony, names: {en: "Blues form and turnarounds", pt_BR: "Forma do blues e turnarounds"}, instruments: all, level: EI}
+  - {key: common-progressions, parent: harmony, names: {en: "Common progressions", pt_BR: "Progressões comuns (I–IV–V, I–V–vi–IV, ii–V–I)"}, instruments: all, level: EI}
+  - {key: diatonic-chords, parent: harmony, names: {en: "Diatonic chords", pt_BR: "Campo harmônico maior"}, instruments: all, level: EI}
+  - {key: roman-numerals, parent: harmony, names: {en: "Roman numeral chords", pt_BR: "Graus em algarismos romanos"}, instruments: all, level: EI}
+  - {key: chord-tones, parent: harmony, names: {en: "Chord tones and passing tones", pt_BR: "Notas do acorde e notas de passagem"}, instruments: all, level: I}
+  - {key: chord-function, parent: harmony, names: {en: "Chord function", pt_BR: "Função harmônica (tônica, subdominante, dominante)"}, instruments: all, level: I}
+  - {key: cadences, parent: harmony, names: {en: "Cadences", pt_BR: "Cadências"}, instruments: all, level: I}
+  - {key: minor-key-harmony, parent: harmony, names: {en: "Minor-key harmony", pt_BR: "Campo harmônico menor"}, instruments: all, level: I}
+  - {key: modal-interchange, parent: harmony, names: {en: "Modal interchange", pt_BR: "Empréstimo modal"}, instruments: all, level: A}
+
+  # C9 Phrasing
+  - {key: phrasing, names: {en: "Phrasing", pt_BR: "Fraseado"}, instruments: all}
+  - {key: lick, parent: phrasing, names: {en: "Licks", pt_BR: "Licks (frases)"}, instruments: all, level: B}
+  - {key: call-and-response, parent: phrasing, names: {en: "Call and response", pt_BR: "Pergunta e resposta"}, instruments: all, level: B}
+  - {key: motif, parent: phrasing, names: {en: "Motif", pt_BR: "Motivo"}, instruments: all, level: EI}
+  - {key: repetition-variation, parent: phrasing, names: {en: "Repetition and variation", pt_BR: "Repetição e variação"}, instruments: all, level: EI}
+  - {key: space, parent: phrasing, names: {en: "Space in phrasing", pt_BR: "Respiro (pausas no fraseado)"}, instruments: all, level: EI}
+  - {key: articulation, parent: phrasing, names: {en: "Articulation", pt_BR: "Articulação (ligado, staccato, acentos)"}, instruments: all, level: EI}
+  - {key: dynamics, parent: phrasing, names: {en: "Dynamics", pt_BR: "Dinâmica"}, instruments: all, level: EI}
+  - {key: target-notes, parent: phrasing, names: {en: "Target notes", pt_BR: "Notas-alvo"}, instruments: all, level: I}
+  - {key: tension-release, parent: phrasing, names: {en: "Tension and release", pt_BR: "Tensão e resolução"}, instruments: all, level: I}
+
+  # C10 Notation
+  - {key: notation, names: {en: "Notation", pt_BR: "Notação"}, instruments: all}
+  - {key: tablature, parent: notation, names: {en: "Tablature", pt_BR: "Tablatura"}, instruments: guitars, level: B}
+  - {key: tab-symbols, parent: notation, names: {en: "Tab technique symbols", pt_BR: "Símbolos de técnica na tablatura (h, p, b, /, ~, P.M.)"}, instruments: guitars, level: B}
+  - {key: rhythm-notation, parent: notation, names: {en: "Rhythm notation", pt_BR: "Notação rítmica (divisão rítmica)"}, instruments: all, level: EI}
+  - {key: road-map-symbols, parent: notation, names: {en: "Road map symbols", pt_BR: "Sinais de roteiro (ritornelo, casa 1 e 2, D.S., coda)"}, instruments: all, level: EI}
+  - {key: standard-notation, parent: notation, names: {en: "Standard notation", pt_BR: "Partitura (pauta e clave de sol)"}, instruments: all, level: I}
+
+  # C11 Tone and gear
+  - {key: gear-and-signal, names: {en: "Tone and gear", pt_BR: "Timbre e equipamento"}, instruments: electric}
+  - {key: signal-chain, parent: gear-and-signal, names: {en: "Signal chain", pt_BR: "Cadeia de sinal (guitarra → pedais → amplificador)"}, instruments: electric, level: B}
+  - {key: pickups, parent: gear-and-signal, names: {en: "Pickups", pt_BR: "Captadores (single-coil e humbucker, posições)"}, instruments: electric, level: B}
+  - {key: gain-types, parent: gear-and-signal, names: {en: "Gain and distortion types", pt_BR: "Ganho e tipos de saturação (limpo, crunch, overdrive, distorção)"}, instruments: electric, level: B}
+  - {key: eq-basics, parent: gear-and-signal, names: {en: "EQ basics", pt_BR: "Equalização (graves, médios, agudos)"}, instruments: electric, level: EI}
+  - {key: time-modulation-effects, parent: gear-and-signal, names: {en: "Time and modulation effects", pt_BR: "Efeitos de ambiência e modulação (delay, reverb, chorus)"}, instruments: electric, level: EI}
+
+skills:
+  # S1 Instrument basics
+  - {key: instrument-basics, names: {en: "Instrument basics", pt_BR: "Fundamentos do instrumento"}, instruments: guitars}
+  - {key: hold-guitar-and-pick, parent: instrument-basics, names: {en: "Hold the guitar and pick", pt_BR: "Postura e empunhadura da palheta"}, instruments: guitars, level: B, applies: [parts-of-the-guitar, finger-numbering]}
+  - {key: tune-with-tuner, parent: instrument-basics, names: {en: "Tune with a tuner", pt_BR: "Afinar com afinador"}, instruments: guitars, level: B, applies: [standard-tuning, string-names]}
+  - {key: tune-by-ear, parent: instrument-basics, names: {en: "Tune by ear (relative tuning)", pt_BR: "Afinar de ouvido (afinação relativa)"}, instruments: guitars, level: EI, applies: [standard-tuning, octaves, note-names]}
+  - {key: use-capo-and-tunings, parent: instrument-basics, names: {en: "Use a capo and alternate tunings", pt_BR: "Usar capotraste e afinações alternativas"}, instruments: guitars, level: EI, applies: [alternate-tunings, transposition]}
+
+  # S2 Fretboard fluency
+  - {key: fretboard-fluency, names: {en: "Fretboard fluency", pt_BR: "Domínio do braço"}, instruments: guitars}
+  - {key: find-notes, parent: fretboard-fluency, names: {en: "Find notes on the fretboard", pt_BR: "Localizar notas no braço"}, instruments: guitars}
+  - {key: find-notes-root-strings, parent: find-notes, names: {en: "Find notes on strings 6 and 5", pt_BR: "Localizar notas nas cordas 6 e 5"}, instruments: guitars, level: B, applies: [note-names, sharps-and-flats, fretboard-landmarks]}
+  - {key: find-notes-top-strings, parent: find-notes, names: {en: "Find notes on strings 4 to 1", pt_BR: "Localizar notas nas cordas 4 a 1"}, instruments: guitars, level: EI, applies: [note-names, sharps-and-flats, fretboard-landmarks]}
+  - {key: find-octaves, parent: find-notes, names: {en: "Find the octaves of any note", pt_BR: "Achar as oitavas de uma nota"}, instruments: guitars, level: EI, applies: [octaves, fretboard-landmarks]}
+  - {key: play-scale-positions, parent: fretboard-fluency, names: {en: "Play scale positions", pt_BR: "Tocar escalas por região"}, instruments: guitars}
+  - {key: play-major-scale-open, parent: play-scale-positions, names: {en: "Play the major scale in open position", pt_BR: "Escala maior na 1ª região"}, instruments: guitars, level: B, applies: [major-scale, tones-and-semitones]}
+  - {key: play-pentatonic-positions, parent: play-scale-positions, names: {en: "Play pentatonic positions", pt_BR: "Tocar os formatos da pentatônica"}, instruments: guitars}
+  - {key: play-pentatonic-position-1, parent: play-pentatonic-positions, names: {en: "Play minor pentatonic position 1", pt_BR: "Pentatônica menor no formato 1"}, instruments: guitars, level: B, applies: [minor-pentatonic, pentatonic-shapes]}
+  - {key: play-all-pentatonic-positions, parent: play-pentatonic-positions, names: {en: "Play all five pentatonic positions", pt_BR: "Os cinco formatos da pentatônica"}, instruments: guitars, level: EI, applies: [pentatonic-shapes, major-pentatonic]}
+  - {key: connect-pentatonic-positions, parent: play-pentatonic-positions, names: {en: "Connect pentatonic positions across the neck", pt_BR: "Conectar os formatos da pentatônica pelo braço"}, instruments: guitars, level: I, applies: [pentatonic-shapes, fretboard-landmarks]}
+  - {key: play-blues-scale-positions, parent: play-scale-positions, names: {en: "Play blues scale positions", pt_BR: "Escala blues nos formatos"}, instruments: guitars, level: EI, applies: [blues-scale]}
+  - {key: play-natural-minor-positions, parent: play-scale-positions, names: {en: "Play natural minor scale positions", pt_BR: "Escala menor natural por região"}, instruments: guitars, level: EI, applies: [natural-minor, relative-keys]}
+  - {key: play-major-scale-across-neck, parent: play-scale-positions, names: {en: "Play the major scale across the neck", pt_BR: "Escala maior em todas as regiões"}, instruments: guitars, level: I, applies: [major-scale, caged-system, three-notes-per-string]}
+  - {key: play-arpeggios, parent: fretboard-fluency, names: {en: "Play arpeggios", pt_BR: "Tocar arpejos"}, instruments: guitars}
+  - {key: play-triad-arpeggios, parent: play-arpeggios, names: {en: "Play major and minor triad arpeggios", pt_BR: "Arpejos de tríades maiores e menores"}, instruments: guitars, level: EI, applies: [major-triads, minor-triads, interval-shapes]}
+  - {key: play-seventh-arpeggios, parent: play-arpeggios, names: {en: "Play seventh-chord arpeggios", pt_BR: "Arpejos de tétrades"}, instruments: guitars, level: I, applies: [seventh-chords, dominant-seventh]}
+  - {key: map-fretboard-caged, parent: fretboard-fluency, names: {en: "Map chords and scales with CAGED", pt_BR: "Mapear o braço com o Sistema CAGED"}, instruments: guitars, level: I, applies: [caged-system, barre-chord-shapes, major-scale]}
+  - {key: play-shapes-in-any-key, parent: fretboard-fluency, names: {en: "Play shapes in any key", pt_BR: "Tocar os desenhos em qualquer tom"}, instruments: guitars, level: EI, applies: [transposition, key-center, note-names]}
+
+  # S3 Fretting-hand technique
+  - {key: fretting-technique, names: {en: "Fretting-hand technique", pt_BR: "Técnica da mão digitadora"}, instruments: guitars}
+  - {key: fret-cleanly, parent: fretting-technique, names: {en: "Fret notes cleanly", pt_BR: "Pressionar notas com som limpo"}, instruments: guitars, level: B, applies: [finger-numbering]}
+  - {key: finger-independence, parent: fretting-technique, names: {en: "Build finger independence", pt_BR: "Independência dos dedos (exercícios cromáticos)"}, instruments: guitars, level: B, applies: [chromatic-scale, finger-numbering]}
+  - {key: hammer-ons, parent: fretting-technique, names: {en: "Play hammer-ons", pt_BR: "Hammer-on (ligado ascendente)"}, instruments: guitars, level: B, applies: [articulation, tab-symbols]}
+  - {key: pull-offs, parent: fretting-technique, names: {en: "Play pull-offs", pt_BR: "Pull-off (ligado descendente)"}, instruments: guitars, level: B, applies: [articulation, tab-symbols]}
+  - {key: legato-runs, parent: fretting-technique, names: {en: "Play legato runs", pt_BR: "Sequências de ligados"}, instruments: guitars, level: I, applies: [articulation, pentatonic-shapes]}
+  - {key: slides, parent: fretting-technique, names: {en: "Play slides", pt_BR: "Slide"}, instruments: guitars, level: B, applies: [articulation, tab-symbols]}
+  - {key: bends, parent: fretting-technique, names: {en: "Bend strings", pt_BR: "Bends"}, instruments: guitars}
+  - {key: bend-to-pitch, parent: bends, names: {en: "Bend to pitch (half and whole step)", pt_BR: "Bend afinado (meio tom e um tom)"}, instruments: guitars, level: EI, applies: [tones-and-semitones, scale-degrees]}
+  - {key: pre-bend-release, parent: bends, names: {en: "Pre-bend and release", pt_BR: "Pré-bend e release"}, instruments: guitars, level: I, applies: [tones-and-semitones]}
+  - {key: unison-bends, parent: bends, names: {en: "Play unison and double-stop bends", pt_BR: "Bend em uníssono e com nota dupla"}, instruments: guitars, level: I, applies: [interval-names]}
+  - {key: vibrato, parent: fretting-technique, names: {en: "Add vibrato", pt_BR: "Vibrato"}, instruments: guitars, level: EI, applies: [articulation, dynamics]}
+  - {key: position-shifts, parent: fretting-technique, names: {en: "Shift positions", pt_BR: "Mudança de região (shift)"}, instruments: guitars, level: EI, applies: [fretboard-landmarks]}
+  - {key: double-stops, parent: fretting-technique, names: {en: "Play double stops", pt_BR: "Notas duplas (double stops)"}, instruments: guitars, level: EI, applies: [interval-shapes]}
+  - {key: natural-harmonics, parent: fretting-technique, names: {en: "Play natural harmonics", pt_BR: "Harmônicos naturais"}, instruments: guitars, level: EI, applies: [fretboard-landmarks]}
+  - {key: pinch-harmonics, parent: fretting-technique, names: {en: "Play pinch harmonics", pt_BR: "Harmônico artificial (pinch harmonic)"}, instruments: electric, level: I, applies: [gain-types]}
+
+  # S4 Picking technique
+  - {key: picking-technique, names: {en: "Picking technique", pt_BR: "Técnica da mão palhetadora"}, instruments: guitars}
+  - {key: downstrokes, parent: picking-technique, names: {en: "Pick with downstrokes", pt_BR: "Palhetada para baixo"}, instruments: guitars, level: B, applies: [note-values, pulse-and-tempo]}
+  - {key: alternate-picking, parent: picking-technique, names: {en: "Alternate picking", pt_BR: "Palhetada alternada"}, instruments: guitars, level: B, applies: [note-values]}
+  - {key: string-crossing, parent: picking-technique, names: {en: "Cross strings while picking", pt_BR: "Troca de cordas (cross picking)"}, instruments: guitars, level: EI, applies: [string-names]}
+  - {key: hand-sync, parent: picking-technique, names: {en: "Synchronise both hands at speed", pt_BR: "Sincronismo entre as mãos"}, instruments: guitars, level: EI, applies: [pulse-and-tempo, note-values]}
+  - {key: string-skipping, parent: picking-technique, names: {en: "Skip strings", pt_BR: "Salto de cordas"}, instruments: guitars, level: I, applies: [interval-shapes]}
+  - {key: economy-picking, parent: picking-technique, names: {en: "Use economy picking", pt_BR: "Palhetada econômica"}, instruments: guitars, level: I, applies: [note-values]}
+  - {key: hybrid-picking, parent: picking-technique, names: {en: "Use hybrid picking", pt_BR: "Palhetada híbrida"}, instruments: guitars, level: I, applies: [articulation]}
+  - {key: fingerstyle, parent: picking-technique, names: {en: "Play fingerstyle patterns", pt_BR: "Dedilhado"}, instruments: guitars, level: EI, applies: [open-chord-shapes, note-values]}
+  - {key: picking-dynamics, parent: picking-technique, names: {en: "Control picking dynamics and accents", pt_BR: "Dinâmica e acentuação na palhetada"}, instruments: guitars, level: EI, applies: [dynamics, articulation]}
+  - {key: tremolo-picking, parent: picking-technique, names: {en: "Tremolo pick", pt_BR: "Palhetada tremolo"}, instruments: guitars, level: I, applies: [note-values]}
+
+  # S5 Muting and noise control
+  - {key: muting, names: {en: "Muting and noise control", pt_BR: "Abafamento e controle de ruído"}, instruments: guitars}
+  - {key: palm-muting, parent: muting, names: {en: "Palm mute", pt_BR: "Palm mute (abafamento com a palma)"}, instruments: guitars, level: B, applies: [power-chord, tab-symbols]}
+  - {key: fretting-hand-muting, parent: muting, names: {en: "Mute with the fretting hand", pt_BR: "Abafamento com a mão digitadora"}, instruments: guitars, level: EI, applies: [string-names]}
+  - {key: silence-unused-strings, parent: muting, names: {en: "Silence unused strings when soloing", pt_BR: "Silenciar as cordas que não estão sendo tocadas"}, instruments: guitars, level: EI, applies: [gain-types]}
+  - {key: percussive-strums, parent: muting, names: {en: "Play percussive muted strums", pt_BR: "Abafamento percussivo na levada (\"chuck\")"}, instruments: guitars, level: EI, applies: [strumming-patterns, groove]}
+  - {key: staccato-chords, parent: muting, names: {en: "Cut chords short (staccato)", pt_BR: "Acordes em staccato (cortar o som)"}, instruments: guitars, level: EI, applies: [articulation, rests-and-ties]}
+
+  # S6 Chords and rhythm
+  - {key: chords-rhythm, names: {en: "Chords and rhythm", pt_BR: "Acordes e levadas"}, instruments: all}
+  - {key: play-open-chords, parent: chords-rhythm, names: {en: "Play open chords", pt_BR: "Tocar acordes abertos"}, instruments: guitars, level: B, applies: [open-chord-shapes, major-triads, minor-triads, chord-diagrams]}
+  - {key: play-open-seventh-chords, parent: chords-rhythm, names: {en: "Play open seventh chords (E7, A7, B7)", pt_BR: "Acordes com sétima abertos (E7, A7, B7)"}, instruments: guitars, level: EI, applies: [dominant-seventh, open-chord-shapes]}
+  - {key: embellish-open-chords, parent: chords-rhythm, names: {en: "Embellish open chords (sus, add9)", pt_BR: "Enfeitar acordes (sus2, sus4, add9)"}, instruments: guitars, level: EI, applies: [sus-add-chords]}
+  - {key: change-chords, parent: chords-rhythm, names: {en: "Change chords smoothly", pt_BR: "Trocar acordes com fluidez"}, instruments: guitars, level: B, applies: [open-chord-shapes, pulse-and-tempo]}
+  - {key: strum-steady, parent: chords-rhythm, names: {en: "Strum steady rhythms", pt_BR: "Levadas com ritmo constante"}, instruments: guitars, level: B, applies: [strumming-patterns, note-values, pulse-and-tempo]}
+  - {key: read-chord-charts, parent: chords-rhythm, names: {en: "Read chord charts", pt_BR: "Ler cifras"}, instruments: all, level: B, applies: [chord-charts, song-form]}
+  - {key: play-power-chords, parent: chords-rhythm, names: {en: "Play power chords", pt_BR: "Tocar power chords (acordes de quinta)"}, instruments: guitars, level: B, applies: [power-chord, interval-shapes]}
+  - {key: play-riffs, parent: chords-rhythm, names: {en: "Play riffs", pt_BR: "Tocar riffs"}, instruments: guitars, level: B, applies: [power-chord, note-values, tablature]}
+  - {key: play-barre-chords, parent: chords-rhythm, names: {en: "Play barre chords", pt_BR: "Fazer acordes com pestana"}, instruments: guitars}
+  - {key: play-e-shape-barre, parent: play-barre-chords, names: {en: "Play E-shape barre chords (root on string 6)", pt_BR: "Pestana no formato de Mi (tônica na 6ª corda)"}, instruments: guitars, level: EI, applies: [barre-chord-shapes, major-triads, minor-triads]}
+  - {key: play-a-shape-barre, parent: play-barre-chords, names: {en: "Play A-shape barre chords (root on string 5)", pt_BR: "Pestana no formato de Lá (tônica na 5ª corda)"}, instruments: guitars, level: EI, applies: [barre-chord-shapes, major-triads, minor-triads]}
+  - {key: play-blues-shuffle, parent: chords-rhythm, names: {en: "Play a blues shuffle rhythm", pt_BR: "Levada de blues (shuffle)"}, instruments: guitars, level: EI, applies: [blues-form, swing-feel, dominant-seventh]}
+  - {key: play-string-set-triads, parent: chords-rhythm, names: {en: "Play movable triads on string sets", pt_BR: "Tríades em grupos de cordas"}, instruments: guitars, level: I, applies: [major-triads, minor-triads, inversions]}
+  - {key: play-movable-sevenths, parent: chords-rhythm, names: {en: "Play movable seventh chords", pt_BR: "Tétrades pelo braço"}, instruments: guitars, level: I, applies: [seventh-chords]}
+  - {key: play-inversions, parent: chords-rhythm, names: {en: "Play chord inversions", pt_BR: "Inversões de acordes"}, instruments: guitars, level: I, applies: [inversions]}
+  - {key: voice-lead, parent: chords-rhythm, names: {en: "Voice-lead between chords", pt_BR: "Conduzir vozes entre acordes"}, instruments: guitars, level: I, applies: [inversions, chord-tones, common-progressions]}
+  - {key: comp-partial-chords, parent: chords-rhythm, names: {en: "Comp with partial chords", pt_BR: "Acompanhar com acordes parciais (comping)"}, instruments: guitars, level: I, applies: [chord-tones, groove]}
+
+  # S7 Time and groove
+  - {key: time-and-groove, names: {en: "Time and groove", pt_BR: "Tempo e groove"}, instruments: all}
+  - {key: play-with-metronome, parent: time-and-groove, names: {en: "Play with a metronome", pt_BR: "Tocar com metrônomo"}, instruments: all, level: B, applies: [pulse-and-tempo]}
+  - {key: count-beats, parent: time-and-groove, names: {en: "Count beats and subdivisions", pt_BR: "Contar tempos e subdivisões"}, instruments: all, level: B, applies: [note-values, time-signatures]}
+  - {key: play-subdivisions, parent: time-and-groove, names: {en: "Play eighth- and sixteenth-note subdivisions", pt_BR: "Tocar colcheias e semicolcheias"}, instruments: all, level: EI, applies: [note-values, rests-and-ties]}
+  - {key: play-triplets, parent: time-and-groove, names: {en: "Play triplets", pt_BR: "Tocar tercinas"}, instruments: all, level: EI, applies: [triplets]}
+  - {key: swing-straight, parent: time-and-groove, names: {en: "Switch between swing and straight feel", pt_BR: "Alternar entre swing e reto (straight)"}, instruments: all, level: EI, applies: [swing-feel, triplets]}
+  - {key: play-syncopation, parent: time-and-groove, names: {en: "Play syncopated rhythms", pt_BR: "Tocar ritmos sincopados (contratempo)"}, instruments: all, level: EI, applies: [syncopation, rests-and-ties]}
+  - {key: play-in-three-and-six, parent: time-and-groove, names: {en: "Play in 3/4 and 6/8", pt_BR: "Tocar em 3/4 e 6/8"}, instruments: all, level: EI, applies: [time-signatures]}
+  - {key: play-with-backing-track, parent: time-and-groove, names: {en: "Play along with a backing track", pt_BR: "Tocar com playback (base)"}, instruments: all, level: B, applies: [song-form, pulse-and-tempo]}
+  - {key: lock-in-with-band, parent: time-and-groove, names: {en: "Lock in with a band", pt_BR: "Tocar em banda (encaixar com baixo e bateria)"}, instruments: all, level: I, applies: [groove, song-form]}
+
+  # S8 Reading
+  - {key: reading, names: {en: "Reading", pt_BR: "Leitura"}, instruments: all}
+  - {key: read-tab, parent: reading, names: {en: "Read tab", pt_BR: "Ler tablatura"}, instruments: guitars, level: B, applies: [tablature, tab-symbols]}
+  - {key: read-rhythm-notation, parent: reading, names: {en: "Read rhythm notation", pt_BR: "Ler divisão rítmica"}, instruments: all, level: EI, applies: [rhythm-notation, note-values, dotted-notes]}
+  - {key: follow-road-map, parent: reading, names: {en: "Follow a song road map", pt_BR: "Seguir o roteiro da música (ritornelo, casas, coda)"}, instruments: all, level: EI, applies: [road-map-symbols, song-form]}
+  - {key: read-standard-notation, parent: reading, names: {en: "Read standard notation in open position", pt_BR: "Ler partitura na 1ª região"}, instruments: guitars, level: I, applies: [standard-notation, note-names]}
+
+  # S9 Ear
+  - {key: ear, names: {en: "Ear", pt_BR: "Percepção"}, instruments: all}
+  - {key: match-pitch, parent: ear, names: {en: "Match a pitch", pt_BR: "Achar uma nota de ouvido"}, instruments: all, level: B, applies: [note-names, octaves]}
+  - {key: sing-what-you-play, parent: ear, names: {en: "Sing what you play", pt_BR: "Cantar o que toca"}, instruments: all, level: B, applies: [major-scale, minor-pentatonic]}
+  - {key: echo-phrases, parent: ear, names: {en: "Echo short phrases by ear", pt_BR: "Repetir frases curtas de ouvido"}, instruments: all, level: B, applies: [call-and-response, minor-pentatonic]}
+  - {key: hear-intervals, parent: ear, names: {en: "Recognise intervals by ear", pt_BR: "Reconhecer intervalos de ouvido"}, instruments: all, level: EI, applies: [interval-names, interval-quality]}
+  - {key: hear-chord-quality, parent: ear, names: {en: "Recognise chord quality by ear", pt_BR: "Reconhecer acordes maiores, menores e com sétima"}, instruments: all, level: EI, applies: [major-triads, minor-triads, dominant-seventh]}
+  - {key: repeat-rhythms, parent: ear, names: {en: "Repeat rhythms by ear", pt_BR: "Repetir ritmos de ouvido (ditado rítmico)"}, instruments: all, level: EI, applies: [note-values, syncopation]}
+  - {key: hear-licks, parent: ear, names: {en: "Recognise licks by ear", pt_BR: "Reconhecer licks de ouvido"}, instruments: all, level: EI, applies: [lick, minor-pentatonic, scale-degrees]}
+  - {key: find-key-by-ear, parent: ear, names: {en: "Find the key of a song by ear", pt_BR: "Achar o tom de uma música de ouvido"}, instruments: all, level: EI, applies: [key-center, major-minor-tonality]}
+  - {key: hear-progressions, parent: ear, names: {en: "Hear progressions by number", pt_BR: "Reconhecer progressões por graus"}, instruments: all, level: I, applies: [roman-numerals, common-progressions, chord-function]}
+  - {key: transcribe, parent: ear, names: {en: "Transcribe a riff or solo", pt_BR: "Tirar música de ouvido (transcrever)"}, instruments: all, level: I, applies: [tablature, lick, key-center]}
+
+  # S10 Lick vocabulary
+  - {key: lick-vocabulary, names: {en: "Lick vocabulary", pt_BR: "Vocabulário de licks (frases)"}, instruments: all}
+  - {key: learn-lick, parent: lick-vocabulary, names: {en: "Learn a lick", pt_BR: "Aprender um lick"}, instruments: all, level: B, applies: [lick, tablature, pentatonic-shapes]}
+  - {key: play-lick-in-time, parent: lick-vocabulary, names: {en: "Play a lick in time over a backing track", pt_BR: "Encaixar um lick no tempo sobre a base"}, instruments: all, level: EI, applies: [lick, pulse-and-tempo, chord-tones]}
+  - {key: move-lick, parent: lick-vocabulary, names: {en: "Move a lick to other keys and positions", pt_BR: "Transpor um lick para outros tons e regiões"}, instruments: all, level: EI, applies: [transposition, pentatonic-shapes]}
+  - {key: vary-lick, parent: lick-vocabulary, names: {en: "Vary a lick", pt_BR: "Variar um lick (ritmo, notas, final)"}, instruments: all, level: EI, applies: [repetition-variation, motif]}
+  - {key: combine-licks, parent: lick-vocabulary, names: {en: "Combine licks into phrases", pt_BR: "Encadear licks em frases"}, instruments: all, level: I, applies: [call-and-response, tension-release]}
+
+  # S11 Improvisation
+  - {key: improvisation, names: {en: "Improvisation", pt_BR: "Improvisação"}, instruments: all}
+  - {key: improvise-one-chord, parent: improvisation, names: {en: "Improvise over a one-chord groove", pt_BR: "Improvisar sobre um groove de um acorde"}, instruments: all, level: B, applies: [minor-pentatonic, key-center]}
+  - {key: phrase-call-response, parent: improvisation, names: {en: "Phrase with call and response", pt_BR: "Fraseado de pergunta e resposta"}, instruments: all, level: EI, applies: [call-and-response, space]}
+  - {key: use-space-dynamics, parent: improvisation, names: {en: "Use space and dynamics in a solo", pt_BR: "Usar respiro e dinâmica no solo"}, instruments: all, level: EI, applies: [space, dynamics]}
+  - {key: improvise-blues, parent: improvisation, names: {en: "Improvise over a blues", pt_BR: "Improvisar sobre um blues"}, instruments: all, level: EI, applies: [blues-form, blues-scale, minor-pentatonic]}
+  - {key: improvise-rhythm-part, parent: improvisation, names: {en: "Improvise a rhythm part from a chart", pt_BR: "Criar a levada a partir da cifra"}, instruments: guitars, level: EI, applies: [chord-charts, strumming-patterns, groove]}
+  - {key: mix-pentatonics, parent: improvisation, names: {en: "Mix major and minor pentatonic", pt_BR: "Misturar pentatônica maior e menor"}, instruments: all, level: I, applies: [major-pentatonic, minor-pentatonic, chord-tones]}
+  - {key: develop-motif, parent: improvisation, names: {en: "Develop a motif", pt_BR: "Desenvolver um motivo"}, instruments: all, level: I, applies: [motif, repetition-variation]}
+  - {key: target-chord-tones, parent: improvisation, names: {en: "Target chord tones over changes", pt_BR: "Mirar as notas do acorde nas mudanças"}, instruments: all, level: I, applies: [chord-tones, target-notes, diatonic-chords]}
+  - {key: improvise-diatonic, parent: improvisation, names: {en: "Improvise over a diatonic progression", pt_BR: "Improvisar sobre uma progressão diatônica"}, instruments: all, level: I, applies: [diatonic-chords, major-scale, natural-minor]}
+  - {key: use-modal-interchange, parent: improvisation, names: {en: "Use modal interchange", pt_BR: "Usar empréstimo modal"}, instruments: all, level: A, applies: [modal-interchange]}
+
+  # S12 Repertoire
+  - {key: repertoire, names: {en: "Repertoire", pt_BR: "Repertório"}, instruments: all}
+  - {key: learn-song-by-sections, parent: repertoire, names: {en: "Learn a song section by section", pt_BR: "Aprender uma música por partes"}, instruments: all, level: B, applies: [song-form, chord-charts]}
+  - {key: play-along-recording, parent: repertoire, names: {en: "Play a full song along with the recording", pt_BR: "Tocar a música inteira junto com a gravação"}, instruments: all, level: B, applies: [song-form, road-map-symbols]}
+  - {key: memorise-song, parent: repertoire, names: {en: "Memorise a song", pt_BR: "Decorar uma música"}, instruments: all, level: B, applies: [song-form]}
+  - {key: perform-song, parent: repertoire, names: {en: "Perform a song for others", pt_BR: "Apresentar uma música para outras pessoas"}, instruments: all, level: EI, applies: [dynamics, song-form]}
+  - {key: keep-going-after-mistakes, parent: repertoire, names: {en: "Keep going after mistakes", pt_BR: "Seguir tocando depois de errar"}, instruments: all, level: EI, applies: [pulse-and-tempo, song-form]}
+  - {key: arrange-song, parent: repertoire, names: {en: "Arrange a song for one guitar", pt_BR: "Fazer um arranjo de uma música para guitarra"}, instruments: guitars, level: I, applies: [chord-tones, song-form, inversions]}
+
+  # S13 Tone and gear
+  - {key: tone-and-gear, names: {en: "Tone and gear", pt_BR: "Timbre e equipamento"}, instruments: guitars}
+  - {key: set-amp-tone, parent: tone-and-gear, names: {en: "Set up a clean and a driven amp tone", pt_BR: "Regular o amplificador (limpo e com drive)"}, instruments: electric, level: B, applies: [signal-chain, eq-basics, gain-types]}
+  - {key: use-guitar-controls, parent: tone-and-gear, names: {en: "Use the pickup selector, volume and tone controls", pt_BR: "Usar a chave seletora e os potenciômetros de volume e tonalidade"}, instruments: electric, level: B, applies: [pickups]}
+  - {key: match-gain-to-style, parent: tone-and-gear, names: {en: "Match gain to the style", pt_BR: "Ajustar o ganho ao estilo"}, instruments: electric, level: EI, applies: [gain-types]}
+  - {key: use-effects-pedals, parent: tone-and-gear, names: {en: "Use basic effects pedals", pt_BR: "Usar pedais de efeito básicos"}, instruments: electric, level: EI, applies: [time-modulation-effects, signal-chain]}
+  - {key: change-strings, parent: tone-and-gear, names: {en: "Change strings and care for the guitar", pt_BR: "Trocar cordas e cuidar da guitarra"}, instruments: guitars, level: EI, applies: [parts-of-the-guitar, standard-tuning]}
+
+  # S14 Practice craft
+  - {key: practice-craft, names: {en: "Practice craft", pt_BR: "Como estudar"}, instruments: all}
+  - {key: practise-slowly, parent: practice-craft, names: {en: "Practise slowly and build tempo", pt_BR: "Estudar devagar e subir o andamento"}, instruments: all, level: B}
+  - {key: loop-recording, parent: practice-craft, names: {en: "Loop and slow down a recording", pt_BR: "Usar loop e desacelerar a gravação"}, instruments: all, level: EI}
+  - {key: record-and-self-assess, parent: practice-craft, names: {en: "Record yourself and self-assess", pt_BR: "Gravar-se e se autoavaliar"}, instruments: all, level: EI}
+  - {key: plan-practice, parent: practice-craft, names: {en: "Plan a practice routine", pt_BR: "Montar uma rotina de estudo"}, instruments: all, level: EI}
+
+  # S15 Composition
+  - {key: composition, names: {en: "Composition", pt_BR: "Composição"}, instruments: all}
+  - {key: write-riff, parent: composition, names: {en: "Write a riff", pt_BR: "Compor um riff"}, instruments: all, level: EI, applies: [power-chord, minor-pentatonic, motif]}
+  - {key: write-progression, parent: composition, names: {en: "Write a chord progression", pt_BR: "Compor uma progressão de acordes"}, instruments: all, level: EI, applies: [diatonic-chords, common-progressions]}
+  - {key: write-melody, parent: composition, names: {en: "Write a melody over chords", pt_BR: "Compor uma melodia sobre acordes"}, instruments: all, level: I, applies: [chord-tones, motif, target-notes]}
+  - {key: structure-song, parent: composition, names: {en: "Structure a song", pt_BR: "Estruturar uma música (verso, refrão, ponte)"}, instruments: all, level: I, applies: [song-form]}
+  - {key: compose-solo, parent: composition, names: {en: "Compose a solo", pt_BR: "Compor um solo"}, instruments: all, level: I, applies: [motif, tension-release, lick]}
+
+# from requires to at level. basis: S syllabus order, R research, Syn synthesis.
+requires:
+  # skill → skill
+  - {from: change-chords, to: play-open-chords, level: accurate, basis: S}
+  - {from: strum-steady, to: count-beats, level: accurate, basis: S}
+  - {from: strum-steady, to: play-with-metronome, level: accurate, basis: S}
+  - {from: play-power-chords, to: find-notes-root-strings, level: accurate, basis: S}
+  - {from: play-e-shape-barre, to: play-open-chords, level: fluent, basis: S}
+  - {from: play-a-shape-barre, to: play-open-chords, level: fluent, basis: S}
+  - {from: play-e-shape-barre, to: find-notes-root-strings, level: accurate, basis: S}
+  - {from: play-a-shape-barre, to: find-notes-root-strings, level: accurate, basis: S}
+  - {from: play-e-shape-barre, to: fret-cleanly, level: fluent, basis: Syn}
+  - {from: play-a-shape-barre, to: fret-cleanly, level: fluent, basis: Syn}
+  - {from: palm-muting, to: downstrokes, level: accurate, basis: Syn}
+  - {from: play-riffs, to: downstrokes, level: accurate, basis: S}
+  - {from: play-riffs, to: read-tab, level: accurate, basis: S}
+  - {from: play-pentatonic-position-1, to: alternate-picking, level: accurate, basis: S}
+  - {from: play-all-pentatonic-positions, to: play-pentatonic-position-1, level: fluent, basis: S}
+  - {from: connect-pentatonic-positions, to: play-all-pentatonic-positions, level: accurate, basis: Syn}
+  - {from: connect-pentatonic-positions, to: position-shifts, level: accurate, basis: Syn}
+  - {from: bend-to-pitch, to: match-pitch, level: accurate, basis: S}
+  - {from: unison-bends, to: bend-to-pitch, level: fluent, basis: S}
+  - {from: legato-runs, to: hammer-ons, level: fluent, basis: Syn}
+  - {from: legato-runs, to: pull-offs, level: fluent, basis: Syn}
+  - {from: hammer-ons, to: fret-cleanly, level: accurate, basis: Syn}
+  - {from: pull-offs, to: fret-cleanly, level: accurate, basis: Syn}
+  - {from: slides, to: fret-cleanly, level: accurate, basis: Syn}
+  - {from: hybrid-picking, to: alternate-picking, level: fluent, basis: S}
+  - {from: hybrid-picking, to: fingerstyle, level: accurate, basis: S}
+  - {from: economy-picking, to: alternate-picking, level: fluent, basis: Syn}
+  - {from: economy-picking, to: string-crossing, level: fluent, basis: Syn}
+  - {from: silence-unused-strings, to: fretting-hand-muting, level: accurate, basis: Syn}
+  - {from: silence-unused-strings, to: palm-muting, level: accurate, basis: Syn}
+  - {from: swing-straight, to: play-triplets, level: accurate, basis: S}
+  - {from: play-syncopation, to: count-beats, level: fluent, basis: S}
+  - {from: improvise-blues, to: play-blues-shuffle, level: accurate, basis: S}
+  - {from: improvise-blues, to: play-pentatonic-position-1, level: fluent, basis: S}
+  - {from: improvise-blues, to: improvise-one-chord, level: accurate, basis: S}
+  - {from: improvise-one-chord, to: play-with-backing-track, level: accurate, basis: S}
+  - {from: phrase-call-response, to: echo-phrases, level: accurate, basis: R}
+  - {from: hear-licks, to: echo-phrases, level: accurate, basis: R}
+  - {from: transcribe, to: hear-licks, level: accurate, basis: S}
+  - {from: transcribe, to: loop-recording, level: accurate, basis: S}
+  - {from: transcribe, to: find-key-by-ear, level: accurate, basis: S}
+  - {from: hear-intervals, to: match-pitch, level: accurate, basis: R}
+  - {from: hear-progressions, to: hear-chord-quality, level: accurate, basis: S}
+  - {from: tune-by-ear, to: match-pitch, level: accurate, basis: Syn}
+  - {from: read-rhythm-notation, to: count-beats, level: accurate, basis: R}
+  - {from: read-standard-notation, to: read-rhythm-notation, level: accurate, basis: S}
+  - {from: read-standard-notation, to: find-notes-root-strings, level: accurate, basis: S}
+  - {from: read-standard-notation, to: find-notes-top-strings, level: accurate, basis: S}
+  - {from: map-fretboard-caged, to: play-e-shape-barre, level: fluent, basis: S}
+  - {from: map-fretboard-caged, to: play-a-shape-barre, level: fluent, basis: S}
+  - {from: play-string-set-triads, to: find-notes-top-strings, level: accurate, basis: Syn}
+  - {from: play-inversions, to: play-string-set-triads, level: accurate, basis: S}
+  - {from: voice-lead, to: play-inversions, level: accurate, basis: Syn}
+  - {from: play-movable-sevenths, to: play-e-shape-barre, level: accurate, basis: S}
+  - {from: play-movable-sevenths, to: play-a-shape-barre, level: accurate, basis: S}
+  - {from: play-triad-arpeggios, to: play-all-pentatonic-positions, level: accurate, basis: S}
+  - {from: target-chord-tones, to: play-triad-arpeggios, level: fluent, basis: S}
+  - {from: improvise-diatonic, to: improvise-one-chord, level: fluent, basis: S}
+  - {from: improvise-diatonic, to: hear-progressions, level: accurate, basis: S}
+  - {from: mix-pentatonics, to: play-all-pentatonic-positions, level: accurate, basis: Syn}
+  - {from: improvise-rhythm-part, to: read-chord-charts, level: fluent, basis: S}
+  - {from: improvise-rhythm-part, to: strum-steady, level: fluent, basis: S}
+  - {from: play-lick-in-time, to: learn-lick, level: fluent, basis: Syn}
+  - {from: move-lick, to: play-all-pentatonic-positions, level: accurate, basis: Syn}
+  - {from: move-lick, to: play-shapes-in-any-key, level: accurate, basis: Syn}
+  - {from: combine-licks, to: play-lick-in-time, level: fluent, basis: R}
+  - {from: combine-licks, to: vary-lick, level: accurate, basis: R}
+  - {from: perform-song, to: memorise-song, level: retained, basis: Syn}
+  - {from: match-gain-to-style, to: set-amp-tone, level: accurate, basis: Syn}
+  # concept → concept
+  - {from: interval-names, to: note-names, level: accurate, basis: Syn}
+  - {from: interval-names, to: tones-and-semitones, level: accurate, basis: Syn}
+  - {from: major-scale, to: tones-and-semitones, level: accurate, basis: S}
+  - {from: major-triads, to: interval-names, level: accurate, basis: Syn}
+  - {from: power-chord, to: interval-names, level: accurate, basis: Syn}
+  - {from: diatonic-chords, to: major-scale, level: accurate, basis: S}
+  - {from: diatonic-chords, to: major-triads, level: accurate, basis: S}
+  - {from: diatonic-chords, to: minor-triads, level: accurate, basis: S}
+  - {from: roman-numerals, to: scale-degrees, level: accurate, basis: Syn}
+  - {from: chord-function, to: diatonic-chords, level: accurate, basis: S}
+  - {from: relative-keys, to: major-scale, level: accurate, basis: S}
+  - {from: relative-keys, to: natural-minor, level: accurate, basis: S}
+  - {from: blues-scale, to: minor-pentatonic, level: accurate, basis: S}
+  - {from: modes, to: major-scale, level: accurate, basis: S}
+  - {from: modes, to: scale-degrees, level: accurate, basis: S}
+  - {from: modal-interchange, to: diatonic-chords, level: accurate, basis: Syn}
+  - {from: modal-interchange, to: minor-key-harmony, level: accurate, basis: Syn}
+  - {from: swing-feel, to: triplets, level: accurate, basis: Syn}
+  - {from: key-signature, to: sharps-and-flats, level: accurate, basis: Syn}
+  - {from: key-signature, to: major-scale, level: accurate, basis: Syn}
+  - {from: circle-of-fifths, to: key-signature, level: accurate, basis: Syn}
+
+# Nodes created by the basic guitar diagram catalog before this map existed, and
+# the map node that takes over each one's links.
+legacy:
+  skills:
+    Scales: play-scale-positions
+    Chords: chords-rhythm
+    Arpeggios: play-arpeggios
+    Improvisation: improvisation
+    Fretboard navigation: find-notes
+  concepts:
+    Fretboard patterns: notes-fretboard
