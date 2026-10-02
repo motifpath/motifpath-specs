@@ -3,6 +3,9 @@
 **Status:** Proposed
 **Date:** 2026-10-01
 **Deciders:** Gilson (Product Owner)
+**Revised:** 2026-10-01, in review. `prerequisite_of` ("learn this first") is replaced by `requires`
+with a mastery level, between any two nodes, skills and concepts alike. One vertical relation can't
+express that improvising needs fluency in scale positions; a leveled, cross-branch dependency can.
 **Partially supersedes:** ADR-026's model of Skill and Concept as two separate trees with a single
 `name` string, and its rule that no prerequisite relation exists. Everything else in ADR-026 stands:
 content, exercises and diagrams referencing nodes by id; a challenge's subject; the five difficulty
@@ -27,9 +30,13 @@ calls for exposed four problems with that model:
    and the blues form, but nothing records it. Each piece of content tags skills and concepts
    independently, so the platform can't explain why a student is learning a concept, roll concept
    knowledge up from skill practice, or find practice for a concept.
-3. **Nothing records the order of learning.** The practice-session composer needs "the next skills"
-   for students who are caught up (PB-22), and recommendations (PB-8g) need the same backbone.
-   ADR-026 deliberately added no prerequisite relation.
+3. **Nothing records what a skill or concept depends on.** To improvise over a blues, a student
+   needs to be fluent in pentatonic positions, hear licks and phrase. Those live in other branches,
+   and the dependency carries a level ("fluent", not just "seen"). One vertical relation can't hold
+   that, and forcing it into the tree leads to placement questions with no right answer (does
+   "Arpeggios" belong under Fretboard or Improvisation?). The practice-session composer needs
+   these dependencies for "stretch" items (PB-22), and recommendations (PB-8g) need the same
+   backbone. ADR-026 deliberately added no such relation.
 4. **Nodes can't be corrected.** There is no update or delete endpoint, so a misplaced or misnamed
    node is permanent.
 
@@ -57,8 +64,10 @@ Alternatives considered:
 ## Decision
 
 **MotifPath will model skills and concepts as one knowledge graph in Postgres: `KnowledgeNode`
-rows of kind `skill` or `concept`, a strict `part_of` tree within each kind, and typed edges for
-`applies` and `prerequisite_of`. Content keeps its own tables and links to nodes as it does today.**
+rows of kind `skill` or `concept`, a strict `part_of` tree within each kind that says where a node
+lives, and typed edges that say what it uses (`applies`) and what it needs, and how well
+(`requires`, with a mastery level). Content keeps its own tables and links to nodes as it does
+today.**
 
 ### Nodes
 
@@ -93,18 +102,31 @@ KnowledgeNode {
 ### Edges
 
 ```
-KnowledgeEdge { source_id, target_id, type: "applies" | "prerequisite_of" }   // unique per triple
+KnowledgeEdge {
+  from_id, to_id: uuid
+  type: "applies" | "requires"
+  level: "accurate" | "fluent" | "retained" | null   // set for requires, null for applies
+}                                                    // unique per (from_id, to_id, type)
 ```
 
-| Type | Allowed pairs | Meaning |
-|---|---|---|
-| `applies` | skill → concept | The skill uses the concept: "Improvise over a blues" applies "Blues form". |
-| `prerequisite_of` | concept → concept, skill → skill, concept → skill | Learn the source before the target. |
+| Type | Allowed pairs | Level | Meaning |
+|---|---|---|---|
+| `applies` | skill → concept | none | The skill uses the concept: "Improvise over a blues" applies "Blues form". |
+| `requires` | any node → any node: skill → skill, skill → concept, concept → concept, concept → skill | required | `from` needs `to` at that level or above: "Improvise over a blues" requires "Play pentatonic positions" at `fluent`; "Major triads" requires "Interval names" at `accurate`. |
 
-- **`prerequisite_of` may not form a cycle**; a write that would create one is refused.
-- **`prerequisite_of` informs; it never gates.** The practice-session composer uses it for "stretch"
-  items and recommendations use it for ordering. It does not lock content, block practice, or
-  validate learning paths. Path order stays a teacher's explicit choice, as ADR-026 decided.
+- **The tree says where a node lives; `requires` says what it needs.** Anything cross-branch is a
+  `requires` edge, never a second parent.
+- **Levels reuse the practice mastery scale** (`accurate < fluent < retained`). "Learn it first"
+  is `requires … accurate`.
+- **`requires` may not form a cycle**; a write that would create one is refused.
+- **`requires` informs; it never gates.** The practice-session composer uses it for "stretch" items,
+  recommendations use it for ordering, and it yields a **readiness** measure per node (how many of
+  its requirements the student meets at the required level). It doesn't lock content, block
+  practice, or validate learning paths. Path order stays a teacher's explicit choice, as ADR-026
+  decided.
+- **A node has a mastery level of its own, derived from its items.** Checking "requires X at
+  `fluent`" needs one. The rule that rolls item states up into a node level belongs to the PB-22
+  practice ADR. This ADR only requires that one exists and is derived, never stored by hand.
 - **Edges are filled in gradually.** A node with no edges is valid.
 
 ### Content links are unchanged in shape
@@ -133,7 +155,7 @@ graph node, and songs and repertoire stay content.
   and `key` is derived from it.
 - Existing content links keep their ids.
 - `seed-full` is rewritten to the reviewed guitar knowledge map: bilingual names, the trees,
-  `applies` and `prerequisite_of`, with seed content re-linked. The first draft of that map was
+  `applies` and `requires` with their levels, with seed content re-linked. The first draft of that map was
   reviewed with the PO on 2026-10-01.
 - The `TaxonomyNode` and `TaxonomyEdge` schema files are deleted in the spec slice.
 
@@ -147,15 +169,21 @@ graph node, and songs and repertoire stay content.
 - **A strict tree for `part_of`, cross links as edges.** Several parents would make subtree rollups
   count items twice: "Minor pentatonic scale" under both "Scales" and "Blues" would inflate both,
   and the dashboard reports those rollups to students. Real overlap is expressed with `applies`
-  and `prerequisite_of`, which can cross the tree freely. Keeping the tree as a column (`parent_id`)
+  and `requires`, which can cross the tree freely. Keeping the tree as a column (`parent_id`)
   rather than an edge row also makes "one parent" a schema property rather than a validation rule.
 - **Content outside the graph**, unlike the old `TaxonomyNode` design. Lessons, exercises, diagrams
   and drill templates already have tables, lifecycles and authors. Making them nodes too would mean
   keeping two copies in sync forever, for no query the link tables can't answer.
 - **A stable `key` alongside localized names.** Names change with translation and editorial review.
   Code, seed scripts and generated drills need a handle that never changes.
-- **Prerequisites that inform rather than gate.** PB-22 decided that practice is never blocked, by
-  grades or by waiting on a teacher. A gating prerequisite would contradict that, and would turn a
+- **`requires` with a level, rather than an unleveled prerequisite.** "Learn X before Y" can't say
+  how well X is needed, and that is the useful part: improvising needs scale positions at
+  `fluent`, not merely seen. Reusing the practice mastery levels makes the requirement checkable
+  against each student's progress, and yields a readiness measure the dashboard can phrase
+  positively ("3 of 4 steps there"). One edge type for both kinds keeps concepts and skills alike:
+  a concept can need another concept, and a skill can need a concept at a level.
+- **Dependencies that inform rather than gate.** PB-22 decided that practice is never blocked, by
+  grades or by waiting on a teacher. A gating requirement would contradict that, and would turn a
   partly filled graph into hard locks. Informational edges are safe to add gradually.
 - **Admin-only writes at MVP.** With the team as concierge, a curated graph is worth more than an
   open one: duplicate or ad-hoc nodes would fragment rollups and recommendations. Teachers lose the
@@ -169,8 +197,8 @@ graph node, and songs and repertoire stay content.
 - Skill and concept names are translatable, under the same rule as every other catalog row.
 - The platform can explain links ("you're learning this concept because this skill applies it"),
   roll concept knowledge up from skill practice, and find practice for a concept.
-- The practice composer's "stretch" items and recommendations get an order of learning without
-  gating anything.
+- Every node gets a readiness measure from its `requires` edges, which feeds the dashboard, the
+  practice composer's "stretch" items and recommendations, without gating anything.
 - Nodes can be renamed, re-parented and deleted, so the map can be corrected as the curriculum
   matures.
 - A coverage view (lessons and practice items per node) becomes a simple query, which shows
@@ -186,16 +214,17 @@ graph node, and songs and repertoire stay content.
   deliberate, as for instruments, but it slows ad-hoc authoring.
 - **Teachers can no longer create nodes from the tree picker** until a proposal flow exists. A
   teacher who needs a missing node asks the team.
-- **Cycle checks** on re-parenting and on `prerequisite_of` writes add a recursive query to those
+- **Cycle checks** on re-parenting and on `requires` writes add a recursive query to those
   writes. It's cheap at this size, but it is per-write validation logic the old trees didn't have.
-- **The graph is only as good as its curation.** Wrong `applies` or `prerequisite_of` edges mislead
-  rollups and recommendations silently. The coverage and map views exist so people can review it.
+- **The graph is only as good as its curation.** Wrong `applies` or `requires` edges, or levels set
+  too high or too low, mislead rollups, readiness and recommendations silently. The coverage and map views exist so people can review it.
 
 ### Neutral
 
 - The skill/concept naming convention (action vs fact) is documented, not enforced.
 - Difficulty stays on content, not on nodes: a node like "Play open chords" spans several levels of
   content.
+- Readiness depends on node levels, whose rollup rule is decided in the PB-22 practice ADR.
 - More edge types (for example "appears in" for repertoire) can be added later, each with its
   allowed pairs, without changing the node model.
 - The remediation rule from ADR-026 keeps its exact-node match. The tree and edges now make wider
