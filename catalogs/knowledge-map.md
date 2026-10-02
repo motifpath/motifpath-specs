@@ -67,13 +67,12 @@ follows and what an installation must guarantee.
 
 ## Delivery
 
-- **Installed by frozen reference-data migrations**, which run after the schema migrations in
-  this order:
-  1. catalog instruments: Acoustic guitar, Electric guitar, Electric bass;
-  2. this knowledge map;
-  3. the basic guitar diagram catalog, whose diagrams are classified by map key.
-- Node, edge and instrument IDs are deterministic, derived from their keys, so every
-  environment holds the same IDs.
+- **Installed by frozen reference-data migrations** after the schema, following the order and
+  the fixed-ID rule in `reference-data.md`: instruments (keys `guitar`, `electric-guitar`,
+  `electric-bass`) install first, then this map, then the basic guitar diagram catalog, whose
+  diagrams are classified by map key.
+- **IDs are fixed and identical in every environment:** `knowledge-node/<key>` and
+  `knowledge-edge/<type>/<from key>/<to key>` under the catalog namespace.
 - **Seeds run only after every migration** and never create reference rows: no instruments,
   voices, nodes, edges or catalog diagrams. Seed content links to map nodes by key.
 - **Until production exists**, reference-data migrations may be regenerated in place, and

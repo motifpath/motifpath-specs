@@ -8,18 +8,18 @@
 #        authors only; not installed.
 
 instruments:
-  guitars: [acoustic-guitar, electric-guitar]
+  guitars: [guitar, electric-guitar]
   electric: [electric-guitar]
-  acoustic: [acoustic-guitar]
+  acoustic: [guitar]
   bass: [electric-bass]
-  fretted: [acoustic-guitar, electric-guitar, electric-bass]
-  bass-acoustic: [acoustic-guitar, electric-bass]
+  fretted: [guitar, electric-guitar, electric-bass]
+  bass-acoustic: [guitar, electric-bass]
 
 concepts:
 
   # The instrument
   - {key: the-instrument, names: {en: "The instrument", pt_BR: "O instrumento"}, instruments: fretted}
-  - {key: parts-of-the-guitar, parent: the-instrument, names: {en: "Parts of the guitar", pt_BR: "Partes da guitarra"}, instruments: guitars, level: B}
+  - {key: parts-of-the-instrument, parent: the-instrument, names: {en: "Parts of the instrument", pt_BR: "Partes do instrumento"}, instruments: fretted, level: B}
   - {key: string-names, parent: the-instrument, names: {en: "String names and numbering", pt_BR: "Nomes e numeração das cordas"}, instruments: fretted, level: B}
   - {key: finger-numbering, parent: the-instrument, names: {en: "Finger numbering", pt_BR: "Numeração dos dedos"}, instruments: fretted, level: B}
   - {key: standard-tuning, parent: the-instrument, names: {en: "Standard tuning", pt_BR: "Afinação padrão (Mi Lá Ré Sol Si Mi)"}, instruments: guitars, level: B}
@@ -167,14 +167,14 @@ skills:
 
   # Instrument basics
   - {key: instrument-basics, names: {en: "Instrument basics", pt_BR: "Fundamentos do instrumento"}, instruments: fretted}
-  - {key: hold-guitar-and-pick, parent: instrument-basics, names: {en: "Hold the guitar and pick", pt_BR: "Postura e empunhadura da palheta"}, instruments: guitars, level: B, applies: [parts-of-the-guitar, finger-numbering]}
+  - {key: hold-guitar-and-pick, parent: instrument-basics, names: {en: "Hold the guitar and pick", pt_BR: "Postura e empunhadura da palheta"}, instruments: guitars, level: B, applies: [parts-of-the-instrument, finger-numbering]}
   - {key: tune-with-tuner, parent: instrument-basics, names: {en: "Tune with a tuner", pt_BR: "Afinar com afinador"}, instruments: guitars, level: B, applies: [standard-tuning, string-names]}
   - {key: tune-by-ear, parent: instrument-basics, names: {en: "Tune by ear (relative tuning)", pt_BR: "Afinar de ouvido (afinação relativa)"}, instruments: guitars, level: EI, applies: [standard-tuning, octaves, note-names]}
   - {key: use-capo-and-tunings, parent: instrument-basics, names: {en: "Use a capo and alternate tunings", pt_BR: "Usar capotraste e afinações alternativas"}, instruments: guitars, level: EI, applies: [alternate-tunings, transposition]}
-  - {key: hold-bass, parent: instrument-basics, names: {en: "Hold the bass and place the plucking hand", pt_BR: "Segurar o baixo e posicionar a mão direita"}, instruments: bass, level: B, applies: [parts-of-the-guitar]}
+  - {key: hold-bass, parent: instrument-basics, names: {en: "Hold the bass and place the plucking hand", pt_BR: "Segurar o baixo e posicionar a mão direita"}, instruments: bass, level: B, applies: [parts-of-the-instrument]}
   - {key: play-five-string-bass, parent: instrument-basics, names: {en: "Play a 5-string bass", pt_BR: "Tocar baixo de 5 cordas"}, instruments: bass, level: A, applies: [bass-tuning]}
   - {key: play-fretless-bass, parent: instrument-basics, names: {en: "Play fretless bass", pt_BR: "Tocar baixo fretless"}, instruments: bass, level: A, applies: [bass-tuning]}
-  - {key: hold-violao, parent: instrument-basics, names: {en: "Sit and hold the acoustic guitar", pt_BR: "Postura com o violão (clássica e popular)"}, instruments: acoustic, level: B, applies: [parts-of-the-guitar]}
+  - {key: hold-violao, parent: instrument-basics, names: {en: "Sit and hold the acoustic guitar", pt_BR: "Postura com o violão (clássica e popular)"}, instruments: acoustic, level: B, applies: [parts-of-the-instrument]}
   - {key: choose-capo-for-singer, parent: instrument-basics, names: {en: "Choose a capo position for a singer's key", pt_BR: "Escolher a casa do capotraste para o tom do cantor"}, instruments: acoustic, level: EI, applies: [key-center, transposition]}
   - {key: play-open-tunings, parent: instrument-basics, names: {en: "Play in open tunings", pt_BR: "Tocar em afinações abertas"}, instruments: acoustic, level: I, applies: [open-tunings]}
   - {key: play-seven-string-violao, parent: instrument-basics, names: {en: "Play 7-string violão", pt_BR: "Tocar violão de 7 cordas"}, instruments: acoustic, level: A, applies: [alternating-bass]}
@@ -370,7 +370,7 @@ skills:
   - {key: use-guitar-controls, parent: tone-and-gear, names: {en: "Use the pickup selector, volume and tone controls", pt_BR: "Usar a chave seletora e os potenciômetros de volume e tonalidade"}, instruments: electric, level: B, applies: [pickups]}
   - {key: match-gain-to-style, parent: tone-and-gear, names: {en: "Match gain to the style", pt_BR: "Ajustar o ganho ao estilo"}, instruments: electric, level: EI, applies: [gain-types]}
   - {key: use-effects-pedals, parent: tone-and-gear, names: {en: "Use basic effects pedals", pt_BR: "Usar pedais de efeito básicos"}, instruments: electric, level: EI, applies: [time-modulation-effects, signal-chain]}
-  - {key: change-strings, parent: tone-and-gear, names: {en: "Change strings and care for the guitar", pt_BR: "Trocar cordas e cuidar da guitarra"}, instruments: guitars, level: EI, applies: [parts-of-the-guitar, standard-tuning]}
+  - {key: change-strings, parent: tone-and-gear, names: {en: "Change strings and care for the guitar", pt_BR: "Trocar cordas e cuidar da guitarra"}, instruments: guitars, level: EI, applies: [parts-of-the-instrument, standard-tuning]}
   - {key: set-bass-amp-tone, parent: tone-and-gear, names: {en: "Set a bass amp tone", pt_BR: "Regular o timbre no amplificador de baixo"}, instruments: bass, level: B, applies: [eq-basics, signal-chain]}
   - {key: use-compression, parent: tone-and-gear, names: {en: "Use compression", pt_BR: "Usar compressor"}, instruments: bass, level: I, applies: [compression]}
   - {key: choose-strings, parent: tone-and-gear, names: {en: "Choose strings and care for the acoustic guitar", pt_BR: "Escolher cordas (aço ou náilon) e cuidar do violão"}, instruments: acoustic, level: B, applies: [string-types]}

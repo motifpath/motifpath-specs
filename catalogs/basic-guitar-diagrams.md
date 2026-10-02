@@ -1,7 +1,7 @@
 # Basic guitar diagram catalog
 
-All three catalog tiers cover 12 tonic pitch classes on standard six-string Guitar
-and Electric guitar, strings numbered 1 (E4) through 6 (E2), frets 0–12. Each
+All three catalog tiers cover 12 tonic pitch classes on standard six-string Acoustic
+guitar and Electric guitar, strings numbered 1 (E4) through 6 (E2), frets 0–12. Each
 musical diagram is stored once and linked to both instruments. Stored text uses `en` and
 `pt_BR`; Portuguese tonic names use Dó/Ré/Mi/Fá/Sol/Lá/Si, with sustenido/bemol
 where appropriate. Note tokens remain language-independent letter spellings.
@@ -75,6 +75,6 @@ existing position. No removed `sequence_index` field may be emitted.
 - Fresh schema installs with the fixed system catalog profile and no human admin; an incompatible
   pre-existing reserved profile fails atomically.
 - Repeat Atlas apply is a no-op. Colliding IDs fail; existing diagrams are preserved.
-- Local demonstration seeds reuse the installed Guitar and classification nodes without
+- Local demonstration seeds reuse the installed Acoustic guitar and classification nodes without
   duplicating the canonical data; demo-only shapes remain explicit.
 - The generated payload passes the current Go domain constructors before release.
