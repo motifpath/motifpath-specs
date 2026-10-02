@@ -1966,7 +1966,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
         "409":
-          description: The new parent is the node itself or one of its descendants, so the move would create a cycle.
+          description: |
+            The new parent is the node itself or one of its descendants, so
+            the move would create a cycle; or the new instrument_ids would
+            leave out an instrument of content or a diagram classified under
+            this node.
           content:
             application/json:
               schema:
@@ -2573,7 +2577,8 @@ paths:
             backwards or past the instrument's strings, per-language text
             (custom_label, note, region description) not keyed by exactly
             the languages of names, or a skill_ids/concept_ids entry that
-            does not reference an existing node of the matching kind.
+            does not reference an existing node of the matching kind or is
+            not for any of the diagram's instruments.
           content:
             application/json:
               schema:
@@ -5133,6 +5138,11 @@ components:
         skill_ids/concept_ids reference existing KnowledgeNodes of kind
         skill and concept respectively. Only admins create nodes; a teacher
         who needs a missing one asks the team.
+        Every node must suit the content's instruments: it is for every
+        instrument, or for at least one of the content's instrument_ids.
+        Content for every instrument (empty instrument_ids) may use only
+        nodes for every instrument. A violation is rejected with the
+        offending skill_ids or concept_ids identified.
       properties:
         skill_ids:
           type: array
@@ -5973,7 +5983,8 @@ components:
         exact knowledge graph ContentNode and Exercise use (see
         ClassificationInput) — not a separate tagging scheme — but carry no
         difficulty_level; a diagram is a reusable shape, not a leveled
-        piece of content.
+        piece of content. Every node must be for every instrument or for
+        at least one of the diagram's instruments.
       properties:
         skill_ids:
           type: array

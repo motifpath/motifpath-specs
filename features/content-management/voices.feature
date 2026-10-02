@@ -29,6 +29,13 @@ Feature: List voices
     When "alice" lists the voices
     Then every voice has a non-empty attribution
 
+  @wip
+  Scenario: The electric bass voice reaches the bass's lowest string
+    Given "alice" is authenticated as a student
+    When "alice" lists the voices
+    Then the voices include "electric-bass" for fretted instruments
+    And the lowest sample of voice "electric-bass" is at or below "E1"
+
   Scenario: Every voice is named in every language
     Given "alice" is authenticated as a student
     When "alice" lists the voices

@@ -168,6 +168,23 @@ Feature: Manage knowledge nodes
     When "admin" makes skill "read-chord-charts" for every instrument
     Then the knowledge node is for every instrument
 
+  Scenario: An admin cannot narrow a node's instruments while content outside them uses it
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a root skill "hammer-ons" for instruments "guitar" and "bass" exists in the system
+    And a content node "Bass Hammer-ons" for instruments "bass" classified under skill "hammer-ons" exists in the system
+    And "admin" is authenticated as an admin
+    When "admin" makes skill "hammer-ons" for instrument "guitar" only
+    Then the request is refused with a conflict error
+
+  Scenario: An admin narrows a node's instruments when no content outside them uses it
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a root skill "hammer-ons" for instruments "guitar" and "bass" exists in the system
+    And "admin" is authenticated as an admin
+    When "admin" makes skill "hammer-ons" for instrument "guitar" only
+    Then the knowledge node's instruments are "guitar"
+
   Scenario: An admin removes a node's description
     Given a root concept "blues-form" with a description exists in the system
     And "admin" is authenticated as an admin

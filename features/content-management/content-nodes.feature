@@ -369,6 +369,44 @@ Feature: Manage content nodes
     When "bob" creates an article content node titled "Intervals Explained" for every instrument
     Then the content node is for every instrument
 
+  @wip
+  Scenario: A content node for one instrument may use a skill for every instrument
+    Given a fretted instrument "guitar" exists in the system
+    And a root skill "read-chord-charts" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates an article content node titled "Reading Charts" for instruments "guitar" classified under skill "read-chord-charts"
+    Then the content node is created and assigned a stable identifier
+
+  @wip
+  Scenario: A content node cannot use a skill that is for none of its instruments
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a root skill "thumb-slap" for instrument "bass" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates an article content node titled "Slap Basics" for instruments "guitar" classified under skill "thumb-slap"
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
+
+  @wip
+  Scenario: A content node for every instrument cannot use an instrument-specific skill
+    Given a fretted instrument "guitar" exists in the system
+    And a root skill "palm-muting" for instrument "guitar" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates an article content node titled "Palm Muting" for every instrument classified under skill "palm-muting"
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
+
+  @wip
+  Scenario: Changing a content node's instruments so a skill no longer suits them is rejected
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a root skill "palm-muting" for instrument "guitar" exists in the system
+    And a content node "Palm Muting" for instruments "guitar" classified under skill "palm-muting" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" updates content node "Palm Muting" to be for instruments "bass"
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
+
   Scenario: Creating a content node for an instrument that does not exist is rejected
     Given "bob" is authenticated as a teacher
     When "bob" creates an article content node titled "Barre Chords" for instruments "banjo"
