@@ -32,6 +32,7 @@
 | No cross-service Go package imports between `services/core-domain` and `services/event-ingestion`; shared code (if any) lives in root `shared/` and must stay non-domain-specific | `motifpath-core/CLAUDE.md` — Monorepo Boundaries |
 | JWT validation goes through one `clerk.Client` per service via `clerk-sdk-go/v2` — no custom JWKS fetch/cache logic (ADR-009) | `motifpath-core/CLAUDE.md` — Auth |
 | Errors are always handled explicitly — never a blank `_` on an error return; no `interface{}`/`any` | `motifpath-core/CLAUDE.md` — Code Quality |
+| No request-validator middleware runs, and oapi-codegen 2.4 generates no enum checks, so an enum query parameter reaches the handler unchecked. When the spec answers an unknown enum value with 400, does the application layer (or the domain filter) reject it, or does the query just return an empty list? | `cmd/main.go` wires no OpenAPI validator; the generated `BindQueryParameter` only checks the format. Found in core#66 (`?kind=`, `?type=`); `exercise_type` on `/exercises` still had the gap |
 
 ## Boundaries
 
