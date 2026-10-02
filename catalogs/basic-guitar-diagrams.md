@@ -16,8 +16,23 @@ model. No nullable owner, catalog CRUD entity or additional MIDI field is introd
 
 Names, marker notes and region descriptions are localized together. SQL includes
 stable diagram/position UUIDs, canonical spelled notes and intervals, not SVGs.
-Published migration files are append-only. Existing diagrams, copies, exercises and
-position references are never overwritten by a regeneration or a seed run.
+Until production exists, the catalog migration may be regenerated in place and development
+databases are recreated from empty; from the first production install, migration files are
+append-only. Existing diagrams, copies, exercises and position references are never
+overwritten by a seed run.
+
+The catalog installs after the catalog instruments and the knowledge map
+(`knowledge-map.md`), and classifies each diagram by map key, never by creating skills or
+concepts of its own:
+
+| Diagram family | Skill key | Concept key |
+|---|---|---|
+| Scale maps and windows (incl. modes, 3NPS, substitutions) | `play-scale-positions` | `scales` |
+| Pentatonic and blues boxes | `play-pentatonic-positions` | `pentatonic-shapes` |
+| CAGED grips | `map-fretboard-caged` | `caged-system` |
+| Triad and seventh-chord arpeggio maps | `play-arpeggios` | `chords` |
+| Chromatic and root maps | `find-notes` | `notes-fretboard` |
+| Structures for improvisation (quartal, triad pairs, 1-2-3-5 patterns) | `improvisation` | `scales` |
 
 ## Coverage
 
