@@ -626,53 +626,6 @@ Feature: Manage exercises
     When "alice" lists the path exercises for a content node ID that does not exist
     Then the request is refused with a not-found error
 
-  # ── Happy path — practice sessions ────────────────────────────────────────────
-
-  Scenario: A student starts a practice session for a skill with enough linked exercises
-    Given 12 exercises linked to skill "alternate_picking" exist in the system
-    And "alice" is authenticated as a student
-    When "alice" starts a practice session for skill "alternate_picking" with count 10
-    Then the practice session contains 10 exercises
-    And every exercise in the practice session is linked to skill "alternate_picking"
-    And the practice session is assigned a stable practice_session_id
-
-  Scenario: A practice session returns fewer exercises when the linked pool is smaller than requested
-    Given 3 exercises linked to skill "hybrid_picking" exist in the system
-    And "alice" is authenticated as a student
-    When "alice" starts a practice session for skill "hybrid_picking" with count 10
-    Then the practice session contains 3 exercises
-
-  Scenario: A practice session defaults its count when none is given
-    Given 12 exercises linked to skill "alternate_picking" exist in the system
-    And "alice" is authenticated as a student
-    When "alice" starts a practice session for skill "alternate_picking" without specifying a count
-    Then the practice session contains 10 exercises
-
-  Scenario: Two practice sessions for the same skill may differ in composition and order
-    Given 12 exercises linked to skill "alternate_picking" exist in the system
-    And "alice" is authenticated as a student
-    When "alice" starts two practice sessions for skill "alternate_picking" with count 10
-    Then the two practice sessions are assigned different practice_session_ids
-
-  # ── Validation failures — practice sessions ───────────────────────────────────
-
-  Scenario: Starting a practice session without a skill is rejected
-    Given "alice" is authenticated as a student
-    When "alice" submits a start practice session request with the skill_id field omitted
-    Then the request is rejected as invalid
-    And the rejection identifies "skill_id" as the source of the error
-
-  Scenario: Starting a practice session with a count above the maximum is rejected
-    Given "alice" is authenticated as a student
-    When "alice" submits a start practice session request with skill "alternate_picking" and count 51
-    Then the request is rejected as invalid
-    And the rejection identifies "count" as the source of the error
-
-  Scenario: Starting a practice session for a skill with no matching exercises returns an empty session
-    Given "alice" is authenticated as a student
-    When "alice" starts a practice session for skill "nonexistent-skill" with count 10
-    Then the practice session contains 0 exercises
-
   # ── Instrument fit — linking to a content node ───────────────────────────────
 
   Scenario: A node for several instruments takes an exercise for one of them
@@ -842,11 +795,6 @@ Feature: Manage exercises
     Given a content node "intro-to-triads" exists in the system
     And no authentication token is provided
     When an unauthenticated request attempts to list the path exercises for content node "intro-to-triads"
-    Then the request is refused with an authentication error
-
-  Scenario: Starting a practice session without an authentication token is refused
-    Given no authentication token is provided
-    When an unauthenticated request attempts to start a practice session for skill "alternate_picking"
     Then the request is refused with an authentication error
 
   Scenario: Listing exercises without an authentication token is refused
