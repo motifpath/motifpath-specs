@@ -1,7 +1,7 @@
 # Spike Findings: PB-22 — Practice sessions: data model and user experience
 
 **Task:** PB-22 (= PB-8f, Practice & assessment), step 0
-**Date:** 2026-10-01 (Phase 5, knowledge-graph model: 2026-10-02; Phase 6, timed thresholds: 2026-10-03)
+**Date:** 2026-10-01 (Phase 5, knowledge-graph model: 2026-10-02; Phase 6, timed thresholds, and Phase 7, instruments: 2026-10-03)
 **Author:** Gilson + Claude
 **ADR:** input to the PB-22 practice-model ADR (to be written)
 **Spike branch:** `motifpath-web@spike/PB-22/practice-model` (throwaway, not for merge; delete once
@@ -48,7 +48,10 @@ screen. No console errors.
 6. **Phase 6 calibrated timed thresholds** from the team's benchmark, a tap-time baseline and
    students' felt ratings, on simulated populations with a known answer. Felt ratings turned out to
    be essential, not just helpful. See [Phase 6](#phase-6--calibrating-timed-thresholds).
-7. **Still open for the PO** before the ADR: how wide nodes (parents, concepts) show progress
+7. **Phase 7 made instruments first-class in practice.** Items carry instruments (as exercises do
+   since PB-86), node levels and readiness are per instrument, and next steps rank by the graph alone.
+   See [Phase 7](#phase-7--instruments).
+8. **Still open for the PO** before the ADR: how wide nodes (parents, concepts) show progress
    (Finding 17), whether the home reports concepts beside skills (Finding 24), and the caught-up
    time split (Finding 20).
 
@@ -300,6 +303,39 @@ In the walkthrough, a tap check gave 314 ms, a 16-item session ended with "How d
 recalibrating moved *name the note* from 2000 ms to 2442 ms (321 sessions, 41 students; true value
 2500). No console errors.
 
+## Phase 7 — instruments
+
+Added 2026-10-03. Phases 1–6 assumed one guitar per student. The schema has since made instruments
+first-class: exercises carry `instrument_ids` (PB-86, empty means every instrument) with an enforced
+fit rule, nodes are scoped to instruments, `requires` counts per instrument, the map's B/EI/I/A level
+is not installed, and a student's instruments follow from their enrolments. **Decided 2026-10-03:** a
+student's instruments are those of their enrolled paths and courses (one for every instrument adds
+none), plus any they add in their profile.
+
+```text
+PracticeItem      + instrument_ids (empty = every instrument): exercise as authored, fretboard cell =
+                  its instrument, play-along and chord change = their diagrams'
+Student           instruments = enrolments ∪ profile additions
+Session           instrument_in_hand: instrument id | null (in your head)
+Node level        per instrument: only items that suit it, plus items for every instrument
+Next steps        ranked by: builds on something the student has, then requires depth for the
+                  instrument (the longest chain of requirements below the node), then catalog order
+```
+
+**M16 — Does instrument fit keep sessions honest? Yes.** With the guitar in hand there's no bass item.
+In your head, items come from every instrument the student plays. Theory items (every instrument)
+are available everywhere.
+
+**M17 — Are levels kept apart per instrument? Yes.** For the same student, *notes on the E and A
+strings* is Fluent on guitar and 0 of 24 started on bass.
+
+**M18 — Can the graph alone rank next steps? Yes.** Requires depth replaced the uninstalled level, and
+the power-chord riff is still the guitar stretch pick.
+
+**U9 — Still a two-tap start? Yes.** With one instrument, "Guitar in hand?" stays. With several, it
+becomes "Which instrument is in your hands?" (or none), then the minutes. Three problems surfaced
+(Findings 37–39).
+
 ---
 
 ## Findings
@@ -394,6 +430,21 @@ recalibrating moved *name the note* from 2000 ms to 2442 ms (321 sessions, 41 st
     slower than fluent. The spike validates the estimator given that assumption. Only real students
     can confirm how felt effort relates to time.
 
+*Phase 7:*
+
+34. **Instrument fit keeps sessions honest.** No item for another instrument; theory items everywhere.
+35. **Node levels and readiness are per instrument.**
+36. **The graph alone can rank next steps.** Requires depth replaces the map's calibration level, which
+    is not installed.
+37. **Adding an instrument floods practice in your head.** With bass added, a 5-minute session was 24
+    bass "new" items out of 29: the whole bass fretboard is new on her path while her guitar is caught
+    up. **Proposed:** treat the 15% "new" share as a ceiling, and balance across the student's
+    instruments.
+38. **Instrument-independent nodes repeat on every instrument tab.** **Proposed:** an "Any instrument"
+    group on the home.
+39. **Questions must name the instrument when the student has several.** "Where is A on string 4?" is
+    ambiguous for a student who plays both guitar and bass.
+
 ## Decided
 
 - **Practice ≠ assessment.** The existing challenge stays the path gate. Practice is open-ended and
@@ -425,6 +476,8 @@ recalibrating moved *name the note* from 2000 ms to 2442 ms (321 sessions, 41 st
 | Fluent latency | **Phase 6:** versioned per drill template, net of tap time; benchmark then felt-calibrated |
 | Calibration gate, prior weight, step cap (Findings 29, 30) | 20 sessions / 5 students, prior = 10 sessions, no cap |
 | Felt questions per session (Finding 32) | one per timed drill practised |
+| New items when caught up / across instruments (Finding 37) | no ceiling, no balancing |
+| Instrument-independent nodes on the home (Finding 38) | repeated on every instrument tab |
 | Session mix | due 60 / weak 25 / new 15 |
 | Source weights | auto 0.3, self 0.3, teacher 0.6 |
 | Real metronome click in play-along | not built: the drill's own sound only |
