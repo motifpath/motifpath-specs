@@ -438,10 +438,10 @@ becomes "Which instrument is in your hands?" (or none), then the minutes. Three 
     is not installed.
 37. **Adding an instrument floods practice in your head.** With bass added, a 5-minute session was 24
     bass "new" items out of 29: the whole bass fretboard is new on her path while her guitar is caught
-    up. **Proposed:** treat the 15% "new" share as a ceiling, and balance across the student's
-    instruments.
-38. **Instrument-independent nodes repeat on every instrument tab.** **Proposed:** an "Any instrument"
-    group on the home.
+    up. **Decided 2026-10-03:** the 15% "new" share is a ceiling, and sessions balance across the
+    student's instruments.
+38. **Instrument-independent nodes repeat on every instrument tab.** **Decided 2026-10-03:** an "Any
+    instrument" group on the home.
 39. **Questions must name the instrument when the student has several.** "Where is A on string 4?" is
     ambiguous for a student who plays both guitar and bass.
 
@@ -458,6 +458,8 @@ becomes "Which instrument is in your hands?" (or none), then the minutes. Three 
   note, or when the teacher closes it, with a 30-day safety expiry (2026-10-02).
 - **A caught-up student's spare time is split 50/50** between review ahead and stretch (Finding 20,
   2026-10-03).
+- **New items are capped at their 15% share and balanced across instruments**; instrument-independent
+  nodes get an "Any instrument" group on the home (Findings 37–38, 2026-10-03).
 - **Stretch draws from any ready node** for the student's instrument, ranked closest first
   (2026-10-02).
 - **Wide nodes show progress through their relationships**, not as one level of their own: a
@@ -476,8 +478,6 @@ becomes "Which instrument is in your hands?" (or none), then the minutes. Three 
 | Fluent latency | **Phase 6:** versioned per drill template, net of tap time; benchmark then felt-calibrated |
 | Calibration gate, prior weight, step cap (Findings 29, 30) | 20 sessions / 5 students, prior = 10 sessions, no cap |
 | Felt questions per session (Finding 32) | one per timed drill practised |
-| New items when caught up / across instruments (Finding 37) | no ceiling, no balancing |
-| Instrument-independent nodes on the home (Finding 38) | repeated on every instrument tab |
 | Session mix | due 60 / weak 25 / new 15 |
 | Source weights | auto 0.3, self 0.3, teacher 0.6 |
 | Real metronome click in play-along | not built: the drill's own sound only |
