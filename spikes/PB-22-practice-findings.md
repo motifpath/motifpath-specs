@@ -367,10 +367,9 @@ becomes "Which instrument is in your hands?" (or none), then the minutes. Three 
     take ends on its own.
 11. **Verification is manual** (decided 2026-10-01).
 12. **A caught-up student runs dry.** The improving student's 3-minute mind session had 4 items,
-    because everything on the path was fresh. **Open for the PO:**
-    - **"review ahead":** the least secure items that aren't due yet. Stays within the path.
-    - **"stretch":** the next skills on the path.
-    - both.
+    because everything on the path was fresh. **Decided:** both. Review ahead the items coming due
+    soonest, and stretch into any ready node for the student's instrument, with the spare time
+    split 50/50 (Findings 19–20, Phase 5).
 13. **A flagged item must not be the warm-up.** The composer chose the drill the teacher had just
     flagged as the warm-up, because it was the most fluent. Warm-ups now exclude suggested items.
 14. **Short guitar sessions skip the warm-up.** At 3 minutes the warm-up took the whole time.
