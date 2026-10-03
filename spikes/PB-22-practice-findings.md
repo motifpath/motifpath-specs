@@ -1,7 +1,7 @@
 # Spike Findings: PB-22 — Practice sessions: data model and user experience
 
 **Task:** PB-22 (= PB-8f, Practice & assessment), step 0
-**Date:** 2026-10-01
+**Date:** 2026-10-01 (Phase 5, knowledge-graph model: 2026-10-02)
 **Author:** Gilson + Claude
 **ADR:** input to the PB-22 practice-model ADR (to be written)
 **Spike branch:** `motifpath-web@spike/PB-22/practice-model` (throwaway, not for merge; delete once
@@ -40,8 +40,14 @@ screen. No console errors.
    model call.
 4. **Build the instrument slice first.** Play-along reuses diagram playback, and that's where the
    model needed the most correction (tempo ladder, exploration takes, warm-ups).
-5. **Two decisions are still open for the PO** before the ADR: what a caught-up student practises
-   (Finding 12), and how a teacher suggestion ends (Finding 9).
+5. **Phase 5 moved the model onto the knowledge graph** (ADR-043) and checked the 2026-10-01
+   architecture decisions in code: server-side grading through versioned graders, a `practice.*`
+   event family, a single-writer incremental fold proven equal to batch derivation, a node level
+   and readiness, "review ahead, then stretch" for caught-up students, and a skill-centred home.
+   See [Phase 5](#phase-5--the-knowledge-graph-model).
+6. **Still open for the PO** before the ADR: how wide nodes (parents, concepts) show progress
+   (Finding 17), whether the home reports concepts beside skills (Finding 24), and the caught-up
+   time split (Finding 20).
 
 ---
 
@@ -59,10 +65,14 @@ PracticeItem          the smallest thing whose knowledge we track
 
 PlayAlongParams       start_bpm, target_bpm, step_bpm, cleans_to_advance, loops, count_in_beats
 
+PracticeResponse      the raw answer a client sends, never a verdict
+                      name_the_note {chosen_note} · find_the_note {string, fret}
+                      option_choice {option_id} · self_rating {rating, bpm?, changes_per_minute?}
+
 Evidence              one observation about one item — the only stored learning state
   source              auto_graded | self_assessed | teacher_reviewed   (audio_detected reserved)
-  auto_graded         correct, latency_ms
-  self_assessed       rating (struggled | almost | clean), bpm?, changes_per_minute?
+  auto_graded         correct, latency_ms, grader, response
+  self_assessed       rating (struggled | almost | clean), bpm?, changes_per_minute?, grader, response
   teacher_reviewed    rating, bpm?, changes_per_minute?, verified, teacher_note_id
 
 KnowledgeState        derived at read time, never stored
@@ -72,13 +82,23 @@ KnowledgeState        derived at read time, never stored
 
 TeacherNote           a video review or a live-lesson note — one shape
   take_id?, item_key?, rating?, bpm?, verified, rubric (timing, clean_notes, tension, dynamics: 1–5),
-  comments [{at_seconds, text}], summary, needs_work {skill_ids, concept_ids}, suggested_item_keys
+  comments [{at_seconds, text}], summary, needs_work {skill_ids, concept_ids}, suggested_item_keys,
+  target_level, closed_at
 
 RecordedTake          take_id, item_key, recorded_at, bpm, duration, media_url, sent_for_review
 
 Session               composed, not stored: blocks [{kind, entries [{item_key, reason}]}]
   block kinds         warm_up | focus | application | mental
   reasons             teacher_suggested | due | weak | new | warm_up | application
+                      | review_ahead | stretch (with the node it opens)
+
+Practice events       practice.session_started {plan} · practice.item_answered {event_id,
+                      item_key, response} · practice.session_ended {answered_count, ended_early}
+                      (event_id becomes the evidence id; teacher reviews are written with the note)
+
+StudentSummary        derived per student, the home's one read: practice_days_last_7,
+                      progress [{node, from, to}], opportunities (refresh | strengthen | start),
+                      areas [{root, practice nodes with level, met/total, accuracy, fluency}]
 ```
 
 **Mastery rules as they stand after the spike:**
@@ -174,6 +194,52 @@ skills to work on appear on the student's home, and the next session's focus ite
 and latest takes side by side, then send one for review. Whether it motivates is a question for
 real students, outside this spike.
 
+## Phase 5 — the knowledge-graph model
+
+Added 2026-10-02, once the knowledge graph (ADR-043, PB-85) shipped. Items now link real keys of
+the reviewed knowledge map, and a fixture slice of it carries the real `requires`/`applies` edges
+and instruments. The spike's suite grew from 61 to 124 tests. A scripted headless walkthrough ran
+every archetype's home, caught-up sessions, a live graded answer and closing a teacher note, with
+no console errors.
+
+**M7 — One node-level rule for big and small nodes? For leaf skills, yes.** A node is at level L
+when at least 80% of the items in its subtree show L or above (unseen counts as new). A node with
+nothing to practise has no level, rather than `new`. That works for what `requires` points at,
+usually a leaf skill. It misleads for wide nodes: after three weeks the improving student is
+`fluent` on the E/A-string notes, yet the concept *Note names* (72 cells) and the parent *Fretboard
+fluency* read `new` (Finding 17).
+
+**M8 — Is readiness meaningful? Yes, and it exposes content gaps.** Readiness counts the `requires`
+edges whose ends are both for the student's instrument, met when the target's level reaches the
+edge's level. Two real edges point at nodes with no items (`change-chords → play-open-chords`,
+`hear-intervals → match-pitch`), so they can never be met (Finding 18). It informs and never gates,
+so nothing breaks, but authors need to see it.
+
+**M9 — Does "review ahead, then stretch" fill a caught-up session? Yes, sharing the time.** Review
+ahead takes known items soonest due. Stretch takes unseen items of **any ready node for the
+student's instrument** (decided 2026-10-02), ranked: builds on something the student has, then the
+map's calibration level, then catalog order. A strict order starved stretch (Finding 20), so the
+spike splits the leftover time half and half. Every pick is still explainable, and a stretch names
+the node it opens.
+
+**M10 — Can the state be folded incrementally? Yes, identically.** `deriveState` is now a
+time-ordered, clock-free fold step plus a view at "now". A property test checks fold == batch for
+every archetype and item at two moments. A duplicate is dropped by its evidence id, and a late piece
+rebuilds its item from the log. The fold carries more than the knowledge state (Finding 23).
+
+**M11 — One grader interface? Yes.** Clients send raw responses. Three versioned graders
+(`fretboard_cell.v1`, `exercise_option.v1`, `self_rating.v1`) check them against reference data
+(tuning, the exercise's options) and either return the evidence payload or reject the response. 15
+golden cases live in a language-neutral JSON file a Go grader can run. Evidence keeps the response
+and the grader id, so a rule change can regrade.
+
+**U7 — Is the skill-centred home readable? Mostly.** Progress this week comes first, with both values
+("accuracy 93% → 96%, Accurate → Fluent"). Then the opportunities, phrased as next steps (refresh,
+strengthen, ready to start). Then the practice nodes grouped by area, with no level for the area
+itself. There are no streaks or red badges, and the `learning` chip moved off the danger colour. Two
+problems remain: concepts echo skills (Finding 24), and the opportunity list grows too long
+(Finding 25).
+
 ---
 
 ## Findings
@@ -213,24 +279,73 @@ real students, outside this spike.
     flagged as the warm-up, because it was the most fluent. Warm-ups now exclude suggested items.
 14. **Short guitar sessions skip the warm-up.** At 3 minutes the warm-up took the whole time.
 
+*Phase 5:*
+
+15. **The map has no per-string skills.** It tracks notes on the E and A strings and notes on the
+    D string and above. The per-string view belongs to the heatmap, at item level.
+16. **A teacher suggestion can't end on a level the student already had.** A flagged item that is
+    already fluent, or an overconfident self-claim, would end the suggestion the moment it's
+    written. **Rule:** it ends once practised *since the note* at the teacher's target level, or
+    when the teacher closes it, with a 30-day safety expiry.
+17. **The 80% rule dilutes wide nodes.** The concept *Note names* and the parent *Fretboard
+    fluency* read `new` after three weeks of real progress on the E/A strings. **Proposed:** keep
+    the rule for the node level that `requires` checks. Show parents and wide concepts as coverage
+    plus their children, never as a single level. **Open for the PO.**
+18. **Requirements on empty nodes can never be met.** Readiness stays at 0/1 for everyone, forever.
+    The map editor's coverage view should flag "required, nothing to practise".
+19. **A node without `requires` is trivially ready.** Ranking "builds on something you have" first
+    keeps those behind real next steps (the power-chord riff, which requires the root-string notes).
+20. **"Review ahead, then stretch" in strict order starves stretch.** A caught-up 5-minute session
+    holds all 27 review-ahead items. **Spike default:** split the leftover time half and half, each
+    taking over the other's share when it runs out. **Open for the PO.**
+21. **Graders work only from reference data.** The client's verdict is never trusted, and the
+    client shows feedback with the same grader. Enharmonic spellings and the same note an octave up
+    on the asked string count as right.
+22. **Two things are versioned, not one.** Graders map a response to a verdict, and the mastery
+    rules map evidence to a state. Keeping the raw response makes a grader change replayable. A
+    mastery-rule change only needs a fold rebuild.
+23. **The fold needs more than the knowledge state.** It also carries: counted attempts, the
+    clean-tempo edge since the last review, the latest review's vouch, the best clean tempo or count
+    since then, the last ten correct latencies, and the latest timestamp, which detects late
+    evidence. Evidence sharing a timestamp needs a defined tiebreak (arrival sequence) for
+    fold == batch to hold.
+24. **Concepts echo skills on the home.** A concept backed by the same items as a skill repeats its
+    progress line and its opportunities. **Proposed:** progress and opportunities per skill, with
+    concepts in the map and as context. **Open for the PO.**
+25. **The opportunity list needs a cap.** Nine entries for the improving student. **Proposed:** the
+    top three (one refresh, one strengthen, one start) and "see all".
+26. **Practice days need the student's time zone.** The spike counts UTC dates.
+
 ## Decided
 
 - **Practice ≠ assessment.** The existing challenge stays the path gate. Practice is open-ended and
   adaptive, and is never "done".
 - **Verification is a manual teacher call.**
+- **Server grading is authoritative**; the client grades only for instant feedback (2026-10-01).
+- **A `practice.*` event family** carries raw responses (2026-10-01).
+- **Practice is never blocked**, by grades or by waiting on a teacher. Suggestions only reorder
+  (2026-10-01).
+- **A teacher suggestion ends** when the item reaches the target level (default `accurate`) after the
+  note, or when the teacher closes it, with a 30-day safety expiry (2026-10-02).
+- **Stretch draws from any ready node** for the student's instrument, ranked closest first
+  (2026-10-02).
+- **The home is organised by skills and concepts**, never by exercise type. Progress comes before
+  opportunities, and there are no streak resets or red badges (2026-10-01).
 
 ## Open for the ADR
 
 | Question | Spike default |
 |---|---|
-| What does a caught-up student practise? (Finding 12) | nothing more: the session ends early |
-| How does a teacher suggestion end? (Finding 9) | 14 days |
+| How do parents and wide concepts show progress? (Finding 17) | coverage + children, no single level |
+| Does the home report concepts beside skills? (Finding 24) | both (echoes) — proposed: skills only |
+| Caught-up time split, review ahead vs stretch (Finding 20) | half and half |
+| Node-level share | 80% of the subtree's items at the level |
 | Leitner boxes or FSRS for spaced repetition | Leitner, with waits of 1, 2, 4, 8, 16, 32 days |
 | Fluent latency: fixed, or relative to the student's own baseline | fixed 2 s per fretboard cell |
 | Session mix | due 60 / weak 25 / new 15 |
 | Source weights | auto 0.3, self 0.3, teacher 0.6 |
 | Real metronome click in play-along | not built: the drill's own sound only |
-| Practice scope: only skills met on the path, or free drills too | path skills plus teacher suggestions |
+| Practice scope | path skills, teacher suggestions, then review ahead and stretch when caught up |
 | Streak, or practice days per week | practice days in the last 7 days, no streak |
 
 ## Recommended slices after the ADR
@@ -253,6 +368,8 @@ git checkout spike/PB-22/practice-model
 npx vitest run src/spikes          # the model's logic
 npx vite                           # then open /spike-practice.html
 ```
+
+Phase 5 added `#progress` readiness, a skill-centred home and teacher-note closing; the suite is 124 tests.
 
 No backend is needed: the page answers the voice list itself, using the same public guitar samples
 the platform's voices come from. Hash links jump straight in: `#run=mind-5`, `#run=guitar-15`,
