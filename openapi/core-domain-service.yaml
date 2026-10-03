@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.20.0
+  version: 0.21.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -690,9 +690,7 @@ paths:
       summary: List standalone exercises for authoring
       description: |
         Returns exercises from the reusable pool, for browsing and picking one
-        to edit in an authoring tool — not the randomized, skill-targeted
-        selection GET /practice-sessions performs for a student's practice
-        attempt.
+        to edit in an authoring tool.
         Results are paginated (ADR-031): ordered by id and
         returned in a {items, total, limit, offset} envelope. An offset
         past the end returns an empty items array, not an error.
@@ -888,69 +886,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForbiddenError'
-
-  /practice-sessions:
-    get:
-      operationId: startPracticeSession
-      summary: Start a randomized, skill-targeted practice session
-      description: |
-        Selects up to count exercises linked to skill_id from the reusable
-        exercise pool, in random order with each exercise's options also
-        shuffled, and returns them grouped under a new practice_session_id.
-        A practice session is not a stored resource — nothing is persisted by
-        this call, and repeating it returns a different selection and a new
-        practice_session_id. The returned exercises include which option(s)
-        are correct, on the same client-side-scoring basis as challenge
-        exercises.
-
-        This is the entry point for a student's self-directed practice
-        between lessons — for example on a commute or a work break — rather
-        than practice tied to a specific content node. The client threads the
-        returned practice_session_id through the trigger_context of the
-        exercise.* tracking events it emits while attempting the session, so
-        the recommendation engine can evaluate outcomes per skill.
-
-        Any authenticated user may start a practice session.
-      tags:
-        - Content
-      parameters:
-        - name: skill_id
-          in: query
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: The skill-kind KnowledgeNode to select exercises for.
-        - name: count
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 50
-            default: 10
-          description: |
-            The number of exercises requested. The response may contain fewer
-            if the exercise pool linked to skill_id is smaller than count.
-      responses:
-        "200":
-          description: The generated practice session, possibly with fewer exercises than requested.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PracticeSession'
-        "400":
-          description: skill_id was omitted, not a valid uuid, or count was outside 1-50.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        "401":
-          description: Missing or invalid Bearer token.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError'
 
   /challenges/{challenge_id}/exercises:
     get:
@@ -9029,7 +8964,7 @@ components:
             The content nodes this exercise is currently linked to as a path
             exercise. May be empty. Independent of challenge_ids — an exercise
             can be a path exercise on a node, part of a challenge, both, or
-            neither (practice-session-only).
+            neither (practice only).
         estimated_duration_seconds:
           type: integer
           minimum: 1
@@ -9095,38 +9030,6 @@ components:
         - remediation_targets
         - languages
         - created_at
-
-    PracticeSession:
-      type: object
-      description: |
-        A generated, skill-targeted set of exercises for self-directed
-        practice, returned by GET /practice-sessions. Not a stored resource —
-        exists only in the response that generated it.
-      properties:
-        practice_session_id:
-          type: string
-          format: uuid
-          description: |
-            Identifier for this generated session. Carried as
-            practice_session_id in trigger_context on the exercise.* tracking
-            events emitted while attempting it, so outcomes can be grouped
-            back to the session and skill that produced them.
-        skill_id:
-          type: string
-          format: uuid
-          description: The skill-kind KnowledgeNode this session was generated for.
-        exercises:
-          type: array
-          items:
-            $ref: '#/components/schemas/Exercise'
-          description: |
-            The session's exercises, in randomized order, each with its
-            options also randomized. May contain fewer than the requested
-            count if the linked pool is smaller.
-      required:
-        - practice_session_id
-        - skill_id
-        - exercises
 
     Option:
       type: object
