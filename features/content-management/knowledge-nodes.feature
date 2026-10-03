@@ -176,7 +176,6 @@ Feature: Manage knowledge nodes
     When "admin" makes skill "hammer-ons" for instrument "guitar" only
     Then the request is refused with a conflict error
 
-  @wip
   Scenario: An admin cannot narrow a node's instruments while an exercise outside them uses it
     Given a fretted instrument "guitar" exists in the system
     And a fretted instrument "bass" exists in the system
