@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.21.0
+  version: 0.22.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -4780,6 +4780,123 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+  /students/me/practice-sessions:
+    post:
+      operationId: createPracticeSessionPlan
+      summary: Compose a practice session for the authenticated student
+      description: |
+        Composes a practice session from what the student knows: the items to practise,
+        in order, each with the reason it was picked. Nothing is stored by this call. The
+        client starts the session by sending practice.session_started with the returned
+        practice_session_id and items, and sends every answer as practice.item_answered.
+
+        The plan is never empty. When nothing is due, weak or new, the time goes to
+        reviewing known items ahead of their due date and to starting nodes the student is
+        ready for. Practice is never blocked: requirements and teacher suggestions only
+        decide the order.
+
+        With an instrument in hand, only items that suit that instrument (or every
+        instrument) are picked. Without one, items for any of the student's instruments
+        that don't need an instrument in hand are picked. Any instrument may be named, not
+        only the ones the student is enrolled for.
+
+        Any authenticated user may practise.
+      tags:
+        - Practice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePracticeSessionPlanRequest'
+      responses:
+        "200":
+          description: The composed session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeSessionPlan'
+        "400":
+          description: The request body failed schema validation, such as minutes outside 1–60.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No instrument exists with the given instrument_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /students/me/practice-summary:
+    get:
+      operationId: getPracticeSummary
+      summary: Read the authenticated student's practice summary for the home
+      description: |
+        Everything the practice home shows, in one read, for one of the student's
+        instruments: practice days this week, progress this week per skill, the next steps,
+        and every practice node grouped by area, with a separate group for nodes that suit
+        any instrument. Progress is reported per skill; concepts are context, never progress
+        lines. A wide node is shown through its coverage and its children, never as a level
+        of its own.
+
+        Derived from the student's evidence; reading it changes nothing.
+
+        Any authenticated user may read their own summary.
+      tags:
+        - Practice
+      parameters:
+        - name: instrument_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: |
+            The instrument to summarise. Absent means only nodes and items that suit any
+            instrument.
+        - name: time_zone
+          in: query
+          required: false
+          schema:
+            type: string
+            default: UTC
+          description: |
+            The student's IANA time zone, such as America/Sao_Paulo, used to decide which
+            calendar day each practice falls on.
+      responses:
+        "200":
+          description: The student's practice summary.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeSummary'
+        "400":
+          description: instrument_id is not a valid uuid, or time_zone is not a known IANA time zone.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No instrument exists with the given instrument_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /users/me:
     get:
       operationId: getMyProfile
@@ -9264,6 +9381,366 @@ components:
             platform operations.
       required:
         - role
+
+    CreatePracticeSessionPlanRequest:
+      type: object
+      description: What the student chose before practising.
+      properties:
+        instrument_id:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          description: |
+            The instrument in the student's hands. Null (or omitted) for a session
+            practised in the head, without an instrument.
+        minutes:
+          type: integer
+          minimum: 1
+          maximum: 60
+          description: How long the student wants to practise, in minutes.
+      additionalProperties: false
+      required:
+        - minutes
+
+    PracticeSessionPlan:
+      type: object
+      description: |
+        A composed practice session. Not stored: it exists only in this response and in the
+        practice.session_started event the client sends when the student starts it.
+      properties:
+        practice_session_id:
+          type: string
+          format: uuid
+          description: New identifier for this session, carried by every practice.* event it produces.
+        instrument_id:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          description: The instrument in hand, or null for a session in the head.
+        minutes:
+          type: integer
+          minimum: 1
+          maximum: 60
+          description: The time the session was composed for, in minutes.
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PracticeSessionItem'
+          description: The items to practise, in order.
+      required:
+        - practice_session_id
+        - instrument_id
+        - minutes
+        - items
+
+    PracticeSessionItem:
+      type: object
+      description: |
+        One item of a composed session, with what the client needs to present it. Exactly
+        one of fretboard_cell, exercise and play_along is present, matching kind.
+      properties:
+        item_key:
+          $ref: './components/schemas/practice.yaml#/PracticeItemKey'
+        kind:
+          $ref: './components/schemas/practice.yaml#/PracticeItemKind'
+        reason:
+          $ref: './components/schemas/practice.yaml#/PracticePickReason'
+        node_id:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          description: |
+            The knowledge node this pick serves, shown with its reason (for example the
+            node a stretch item starts). Null when the reason needs none.
+        level:
+          $ref: './components/schemas/practice.yaml#/KnowledgeLevel'
+        estimated_seconds:
+          type: integer
+          minimum: 1
+          description: About how long the item takes, used to fit the session to its minutes.
+        fretboard_cell:
+          type: object
+          description: Present when kind is fretboard_cell.
+          properties:
+            layout_instrument_id:
+              type: string
+              format: uuid
+              description: The instrument whose fretboard layout and tuning the cell belongs to.
+            string:
+              type: integer
+              minimum: 1
+              description: The cell's string, 1 being the highest-pitched.
+            fret:
+              type: integer
+              minimum: 0
+              description: The cell's fret; 0 is the open string.
+            drill:
+              $ref: './components/schemas/practice.yaml#/FretboardDrill'
+          additionalProperties: false
+          required:
+            - layout_instrument_id
+            - string
+            - fret
+            - drill
+        exercise:
+          $ref: '#/components/schemas/Exercise'
+        play_along:
+          type: object
+          description: Present when kind is play_along.
+          properties:
+            diagram_id:
+              type: string
+              format: uuid
+              description: The diagram played along with.
+            start_tempo_bpm:
+              type: integer
+              minimum: 20
+              description: |
+                The tempo to play this take at. For a warm-up, about 80% of the student's
+                best clean tempo; otherwise the tempo ladder's current step.
+            target_tempo_bpm:
+              type: integer
+              minimum: 20
+              description: The tempo the item aims for, the diagram's own tempo.
+            best_clean_tempo_bpm:
+              type:
+                - integer
+                - 'null'
+              minimum: 20
+              description: |
+                The student's best clean tempo since their latest teacher review. Null when
+                they have no clean take yet.
+          additionalProperties: false
+          required:
+            - diagram_id
+            - start_tempo_bpm
+            - target_tempo_bpm
+            - best_clean_tempo_bpm
+      required:
+        - item_key
+        - kind
+        - reason
+        - node_id
+        - level
+        - estimated_seconds
+
+    PracticeSummary:
+      type: object
+      description: The practice home for one instrument, derived from the student's evidence.
+      properties:
+        instrument_id:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          description: The instrument summarised, or null for nodes that suit any instrument only.
+        student_instrument_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: |
+            The student's instruments: those of the paths and courses they're enrolled in,
+            plus any they added. The home shows one tab per instrument.
+        practice_days_last_7:
+          type: integer
+          minimum: 0
+          maximum: 7
+          description: |
+            On how many of the last 7 calendar days, in the given time zone, the student
+            practised. Never a streak: a missed day is never a reset.
+        progress_this_week:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkillProgress'
+          description: Skills that improved this week, most improved first. Empty when none did.
+        next_steps:
+          type: array
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/PracticeNextStep'
+          description: The top three next steps, in order.
+        next_steps_total:
+          type: integer
+          minimum: 0
+          description: How many next steps there are in all, for "see all".
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/PracticeNodeGroup'
+          description: |
+            Every practice node, grouped by area, then a group for nodes that suit any
+            instrument.
+      required:
+        - instrument_id
+        - student_instrument_ids
+        - practice_days_last_7
+        - progress_this_week
+        - next_steps
+        - next_steps_total
+        - groups
+
+    SkillProgress:
+      type: object
+      description: |
+        How one skill improved this week, with both values so the student sees where they
+        started (for example accuracy 0.72 → 0.86).
+      properties:
+        node_id:
+          type: string
+          format: uuid
+          description: The skill.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+        measure:
+          type: string
+          enum:
+            - accuracy
+            - fluency
+            - best_clean_tempo_bpm
+          description: |
+            What improved. accuracy and fluency are ratios from 0 to 1 over the skill's
+            practised items; best_clean_tempo_bpm is a tempo.
+        before:
+          type: number
+          minimum: 0
+          description: The value at the start of the week.
+        after:
+          type: number
+          minimum: 0
+          description: The value now.
+      required:
+        - node_id
+        - names
+        - measure
+        - before
+        - after
+
+    PracticeNextStep:
+      type: object
+      description: One suggested next step, framed as an opportunity, never as a failure.
+      properties:
+        kind:
+          type: string
+          enum:
+            - refresh
+            - strengthen
+            - ready_to_start
+          description: |
+            refresh = known items are fading; strengthen = practised but not yet secure;
+            ready_to_start = every requirement is met and nothing is practised yet.
+        node_id:
+          type: string
+          format: uuid
+          description: The skill the step is about.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+        level:
+          $ref: './components/schemas/practice.yaml#/KnowledgeLevel'
+      required:
+        - kind
+        - node_id
+        - names
+
+    PracticeNodeGroup:
+      type: object
+      description: The practice nodes of one area, or the nodes that suit any instrument.
+      properties:
+        area_node_id:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          description: The area (a top-level node) of this group. Null for the "Any instrument" group.
+        any_instrument:
+          type: boolean
+          description: True for the group of nodes that suit any instrument.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PracticeNodeProgress'
+          description: The group's nodes, in catalog order.
+      required:
+        - area_node_id
+        - any_instrument
+        - names
+        - nodes
+
+    PracticeNodeProgress:
+      type: object
+      description: |
+        Where the student stands on one knowledge node for the summarised instrument. A
+        node with items of its own has a level; a wide node (one with child nodes) is shown
+        through its coverage and its children, never a level.
+      properties:
+        node_id:
+          type: string
+          format: uuid
+          description: The knowledge node.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+        level:
+          oneOf:
+            - $ref: './components/schemas/practice.yaml#/KnowledgeLevel'
+            - type: 'null'
+          description: |
+            The highest level at least 80% of the node's items reach. Null for a wide node,
+            or a node with nothing to practise.
+        fading:
+          type: boolean
+          description: True when the node's level rests on items whose review is due.
+        coverage:
+          type: object
+          description: How much of the node's subtree the student has met.
+          properties:
+            met_count:
+              type: integer
+              minimum: 0
+              description: Items in the subtree at accurate or above.
+            item_count:
+              type: integer
+              minimum: 0
+              description: Items in the subtree that suit the instrument.
+          required:
+            - met_count
+            - item_count
+        child_node_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: The node's children, shown with their own levels. Empty for a leaf.
+        readiness:
+          type: object
+          description: |
+            How many of the node's requirements are met for the instrument. Informs, never
+            gates.
+          properties:
+            met_count:
+              type: integer
+              minimum: 0
+              description: Requirements whose target has reached the required level.
+            required_count:
+              type: integer
+              minimum: 0
+              description: Requirements that count for the instrument.
+          required:
+            - met_count
+            - required_count
+      required:
+        - node_id
+        - names
+        - level
+        - fading
+        - coverage
+        - child_node_ids
+        - readiness
 
     LocalizedNames:
       type: object
