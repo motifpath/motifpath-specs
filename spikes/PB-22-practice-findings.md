@@ -290,7 +290,7 @@ problems remain: concepts echo skills (Finding 24), and the opportunity list gro
 17. **The 80% rule dilutes wide nodes.** The concept *Note names* and the parent *Fretboard
     fluency* read `new` after three weeks of real progress on the E/A strings. **Proposed:** keep
     the rule for the node level that `requires` checks. Show parents and wide concepts as coverage
-    plus their children, never as a single level. **Open for the PO.**
+    plus their children, never as a single level. **Decided 2026-10-03:** as proposed.
 18. **Requirements on empty nodes can never be met.** Readiness stays at 0/1 for everyone, forever.
     The map editor's coverage view should flag "required, nothing to practise".
 19. **A node without `requires` is trivially ready.** Ranking "builds on something you have" first
@@ -311,7 +311,7 @@ problems remain: concepts echo skills (Finding 24), and the opportunity list gro
     fold == batch to hold.
 24. **Concepts echo skills on the home.** A concept backed by the same items as a skill repeats its
     progress line and its opportunities. **Proposed:** progress and opportunities per skill, with
-    concepts in the map and as context. **Open for the PO.**
+    concepts in the map and as context. **Decided 2026-10-03:** as proposed.
 25. **The opportunity list needs a cap.** Nine entries for the improving student. **Proposed:** the
     top three (one refresh, one strengthen, one start) and "see all".
 26. **Practice days need the student's time zone.** The spike counts UTC dates.
@@ -329,6 +329,10 @@ problems remain: concepts echo skills (Finding 24), and the opportunity list gro
   note, or when the teacher closes it, with a 30-day safety expiry (2026-10-02).
 - **Stretch draws from any ready node** for the student's instrument, ranked closest first
   (2026-10-02).
+- **Wide nodes show progress through their relationships**, not as one level of their own: a
+  parent or wide concept shows coverage plus its children's levels (Finding 17, 2026-10-03).
+- **The home reports progress and next steps per skill**; concepts appear in the map and as context
+  (Finding 24, 2026-10-03).
 - **The home is organised by skills and concepts**, never by exercise type. Progress comes before
   opportunities, and there are no streak resets or red badges (2026-10-01).
 
@@ -336,8 +340,6 @@ problems remain: concepts echo skills (Finding 24), and the opportunity list gro
 
 | Question | Spike default |
 |---|---|
-| How do parents and wide concepts show progress? (Finding 17) | coverage + children, no single level |
-| Does the home report concepts beside skills? (Finding 24) | both (echoes) — proposed: skills only |
 | Caught-up time split, review ahead vs stretch (Finding 20) | half and half |
 | Node-level share | 80% of the subtree's items at the level |
 | Leitner boxes or FSRS for spaced repetition | Leitner, with waits of 1, 2, 4, 8, 16, 32 days |
