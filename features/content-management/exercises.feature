@@ -206,6 +206,20 @@ Feature: Manage exercises
     And the response does not include "bobs-drill"
     And the response does not include "legacy-drill"
 
+  @wip
+  Scenario: The exercise list's instrument filter keeps exercises for every instrument
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a keyboard instrument "piano" exists in the system
+    And an exercise "palm-mute-drill" for instruments "guitar" exists in the system
+    And an exercise "root-notes" for instruments "bass" exists in the system
+    And an exercise "name-the-interval" exists for every instrument
+    And an exercise "piano-voicings" for instruments "piano" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" lists exercises filtered by instruments "guitar" and "bass"
+    Then the response includes "palm-mute-drill", "root-notes" and "name-the-interval"
+    And the response does not include "piano-voicings"
+
   Scenario: Exercise list filters combine
     Given an exercise "carols-triad" exists titled "Triad shapes", created by "carol"
     And an exercise "carols-picking" exists titled "Picking drill", created by "carol"
@@ -397,6 +411,65 @@ Feature: Manage exercises
     When "bob" creates an exercise titled "Root notes on the E string" for instruments "banjo"
     Then the request is rejected as invalid
     And the rejection identifies "instrument_ids" as the source of the error
+
+  # ── Instrument match — skills and concepts (ADR-043) ─────────────────────────
+
+  @wip
+  Scenario: An exercise for one instrument may use a skill for every instrument
+    Given a fretted instrument "bass" exists in the system
+    And a root skill "read-chord-charts" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates an exercise titled "Chart reading" for instruments "bass" classified under skill "read-chord-charts"
+    Then the exercise is created and assigned a stable identifier
+
+  @wip
+  Scenario: An exercise for several instruments may use a skill for one of them
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a root skill "thumb-slap" for instrument "bass" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates an exercise titled "Slap groove" for instruments "guitar", "bass" classified under skill "thumb-slap"
+    Then the exercise is created and assigned a stable identifier
+
+  @wip
+  Scenario: An exercise cannot use a skill that is for none of its instruments
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a root skill "palm-muting" for instrument "guitar" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates an exercise titled "Muted roots" for instruments "bass" classified under skill "palm-muting"
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
+
+  @wip
+  Scenario: An exercise cannot use a concept that is for none of its instruments
+    Given a fretted instrument "guitar" exists in the system
+    And a keyboard instrument "piano" exists in the system
+    And a root concept "fret-numbers" for instrument "guitar" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates an exercise titled "Find the fret" for instruments "piano" classified under concept "fret-numbers"
+    Then the request is rejected as invalid
+    And the rejection identifies "concept_ids" as the source of the error
+
+  @wip
+  Scenario: An exercise for every instrument cannot use an instrument-specific skill
+    Given a fretted instrument "guitar" exists in the system
+    And a root skill "palm-muting" for instrument "guitar" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" creates an exercise titled "Palm muting basics" for every instrument classified under skill "palm-muting"
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
+
+  @wip
+  Scenario: Changing an exercise's instruments so a skill no longer suits them is rejected
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a root skill "palm-muting" for instrument "guitar" exists in the system
+    And an exercise "Muted chugs" for instruments "guitar" classified under skill "palm-muting" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" updates exercise "Muted chugs" to be for instruments "bass"
+    Then the request is rejected as invalid
+    And the rejection identifies "skill_ids" as the source of the error
 
   Scenario: Creating an exercise with a skill id that does not exist is rejected
     Given "bob" is authenticated as a teacher
@@ -606,6 +679,83 @@ Feature: Manage exercises
     Given "alice" is authenticated as a student
     When "alice" starts a practice session for skill "nonexistent-skill" with count 10
     Then the practice session contains 0 exercises
+
+  # ── Instrument fit — linking to a content node ───────────────────────────────
+
+  @wip
+  Scenario: A node for several instruments takes an exercise for one of them
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a content node "power-chords" exists for instruments "guitar", "bass"
+    And a challenge "power-chord-check" exists for content node "power-chords"
+    And an exercise "guitar-power-chords" for instruments "guitar" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" links exercise "guitar-power-chords" to "power-chord-check"
+    Then the exercise records "power-chord-check" among its linked challenges
+
+  @wip
+  Scenario: Any node takes an exercise for every instrument
+    Given a fretted instrument "bass" exists in the system
+    And a content node "root-notes" exists for instruments "bass"
+    And a challenge "root-notes-check" exists for content node "root-notes"
+    And an exercise "name-the-interval" exists for every instrument
+    And "bob" is authenticated as a teacher
+    When "bob" links exercise "name-the-interval" to "root-notes-check"
+    Then the exercise records "root-notes-check" among its linked challenges
+
+  @wip
+  Scenario: A challenge refuses an exercise for none of its node's instruments
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a content node "root-notes" exists for instruments "bass"
+    And a challenge "root-notes-check" exists for content node "root-notes"
+    And an exercise "palm-mute-drill" for instruments "guitar" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" links exercise "palm-mute-drill" to "root-notes-check"
+    Then the request is refused with a conflict error
+
+  @wip
+  Scenario: A node for every instrument refuses an instrument-specific exercise
+    Given a fretted instrument "guitar" exists in the system
+    And a content node "intervals-explained" exists for every instrument
+    And a challenge "intervals-check" exists for content node "intervals-explained"
+    And an exercise "palm-mute-drill" for instruments "guitar" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" links exercise "palm-mute-drill" to "intervals-check"
+    Then the request is refused with a conflict error
+
+  @wip
+  Scenario: A node refuses a path exercise for none of its instruments
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a content node "root-notes" exists for instruments "bass"
+    And an exercise "palm-mute-drill" for instruments "guitar" exists in the system
+    And "bob" is authenticated as a teacher
+    When "bob" links exercise "palm-mute-drill" to content node "root-notes" as a path exercise
+    Then the request is refused with a conflict error
+
+  @wip
+  Scenario: Changing a linked exercise's instruments so it no longer suits its node is refused
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a content node "root-notes" exists for instruments "bass"
+    And a challenge "root-notes-check" exists for content node "root-notes"
+    And an exercise "bass-roots" for instruments "bass" exists in the system
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "bass-roots" to "root-notes-check"
+    When "bob" updates exercise "bass-roots" to be for instruments "guitar"
+    Then the request is refused with a conflict error
+
+  @wip
+  Scenario: Changing a path exercise's instruments so it no longer suits its node is refused
+    Given a fretted instrument "guitar" exists in the system
+    And a fretted instrument "bass" exists in the system
+    And a content node "root-notes" exists for instruments "bass"
+    And an exercise "bass-roots" for instruments "bass" exists in the system
+    And "bob" is authenticated as a teacher
+    And "bob" has linked exercise "bass-roots" to content node "root-notes" as a path exercise
+    When "bob" updates exercise "bass-roots" to be for instruments "guitar"
+    Then the request is refused with a conflict error
 
   # ── Conflict — linking ───────────────────────────────────────────────────────
 

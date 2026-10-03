@@ -116,8 +116,9 @@ KnowledgeNode {
   moving and re-scoping a node are rejected when the node would end up wider than its parent,
   and narrowing a node is refused while one of its children is for an instrument outside the new
   scope.
-  - Exercises carry instruments too (stored now, while the schema is being rebuilt). Applying
-    this rule to exercises, filtering by instrument, and the editor follow in their own item.
+  - Exercises follow the same rule for their skills and concepts (PB-86). A content node's
+    challenges and path exercises take only exercises that suit it: exercises for every
+    instrument, or, when the node is for specific instruments, exercises for at least one of them.
 - **Level is not a node property**, because it varies by instrument: hammer-ons are a
   beginner technique on guitar and an early-intermediate one on bass.
 
