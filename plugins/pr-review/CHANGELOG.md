@@ -1,5 +1,15 @@
 # PR Review — Changelog
 
+## [1.5.0] — 2026-10-02
+
+### Changed
+- `HEURISTICS.md` item 7 (absence) now asks whether "empty" means "not set yet" or a deliberate
+  value, and whether code that fills in a default tells the two apart. From the motifpath-web#75
+  review: picking a diagram filled in its instruments over an exercise saved for every instrument.
+- `HEURISTICS.md` item 13 (same rule, two sides) now asks whether both sides get the same inputs.
+  From the same review: the challenge picker applied the server's fit rule to the lesson's unsaved
+  instruments, while the server checked the saved lesson.
+
 ## [1.4.1] — 2026-09-30
 
 ### Fixed
