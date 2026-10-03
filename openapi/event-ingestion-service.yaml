@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Event Ingestion Service
-  version: 0.2.0
+  version: 0.3.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -11,8 +11,9 @@ info:
     the TrackingEvent schema, writes them synchronously to the MongoDB events collection,
     and publishes them asynchronously to the motifpath.events Kafka topic.
 
-    This service is the sole Kafka producer in the MotifPath platform. All seven
-    student-facing event types flow through this single entry point.
+    This service is the sole Kafka producer in the MotifPath platform. Every
+    student-facing event type (lesson.*, exercise.* and practice.*) flows through this
+    single entry point.
 
 servers:
   - url: https://events.motifpath.io/v1
@@ -77,6 +78,20 @@ paths:
                   attempt_number: 1
                   answer_payload:
                     selected_option: "C"
+              practice_item_answered:
+                summary: Student names the note of a fretboard cell in a practice session
+                value:
+                  event_id: "a1b2c3d4-0000-0000-0000-000000000003"
+                  event_type: practice.item_answered
+                  student_id: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                  session_id: "550e8400-e29b-41d4-a716-446655440000"
+                  occurred_at: "2026-10-03T19:02:41Z"
+                  practice_session_id: "f1a2b3c4-0000-0000-0000-000000000001"
+                  item_key: "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:3"
+                  response:
+                    response_type: name_the_note
+                    note_name: "C"
+                    latency_ms: 1800
       responses:
         "202":
           description: |
