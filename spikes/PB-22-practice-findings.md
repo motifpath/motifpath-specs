@@ -407,7 +407,7 @@ becomes "Which instrument is in your hands?" (or none), then the minutes. Three 
 24. **Concepts echo skills on the home.** A concept backed by the same items as a skill repeats its
     progress line and its opportunities. **Proposed:** progress and opportunities per skill, with
     concepts in the map and as context. **Decided 2026-10-03:** as proposed.
-25. **The opportunity list needs a cap.** Nine entries for the improving student. **Proposed:** the
+25. **The opportunity list needs a cap.** Nine entries for the improving student. **Decided 2026-10-03:** the
     top three (one refresh, one strengthen, one start) and "see all".
 26. **Practice days need the student's time zone.** The spike counts UTC dates.
 
@@ -417,12 +417,12 @@ becomes "Which instrument is in your hands?" (or none), then the minutes. Three 
 28. **Tap time must come out.** Ingest stamps each answer with the student's tap time, so replays
     stay stable.
 29. **Small samples drift toward the prior.** Just past the gate (24 sessions), a wrong prior still
-    pulls the result 15–32% off. **Proposed:** a higher gate (100 sessions from 20 students), or
+    pulls the result 15–32% off. **Decided 2026-10-03:** a higher gate (100 sessions from 20 students), or
     less weight on the prior once both felt classes are well represented.
-30. **Overconfidence biases toward lax.** **Proposed:** cap a single recalibration step at ±25%, and
+30. **Overconfidence biases toward lax.** **Decided 2026-10-03:** cap a single recalibration step at ±25%, and
     use teacher-reviewed or, later, audio evidence as the check.
 31. **Versioned thresholds never take back a level.**
-32. **Ask fewer felt questions.** **Proposed:** at most one or two per session, for the templates with
+32. **Ask fewer felt questions.** **Decided 2026-10-03:** at most one or two per session, for the templates with
     the least calibration data, with authored exercises grouped by family (per-exercise data will be
     too sparse).
 33. **The core assumption is untested.** The simulator assumes a drill feels hard once the student is
@@ -459,6 +459,9 @@ becomes "Which instrument is in your hands?" (or none), then the minutes. Three 
   2026-10-03).
 - **New items are capped at their 15% share and balanced across instruments**; instrument-independent
   nodes get an "Any instrument" group on the home (Findings 37–38, 2026-10-03).
+- **Calibration** waits for about 100 sessions from 20 students, changes a threshold by at most ±25% per
+  step, and asks at most one or two felt questions per session; the home shows the top three next
+  steps plus "see all" (Findings 25, 29, 30, 32, 2026-10-03).
 - **Stretch draws from any ready node** for the student's instrument, ranked closest first
   (2026-10-02).
 - **Wide nodes show progress through their relationships**, not as one level of their own: a
@@ -475,8 +478,6 @@ becomes "Which instrument is in your hands?" (or none), then the minutes. Three 
 | Node-level share | 80% of the subtree's items at the level |
 | Leitner boxes or FSRS for spaced repetition | Leitner, with waits of 1, 2, 4, 8, 16, 32 days |
 | Fluent latency | **Phase 6:** versioned per drill template, net of tap time; benchmark then felt-calibrated |
-| Calibration gate, prior weight, step cap (Findings 29, 30) | 20 sessions / 5 students, prior = 10 sessions, no cap |
-| Felt questions per session (Finding 32) | one per timed drill practised |
 | Session mix | due 60 / weak 25 / new 15 |
 | Source weights | auto 0.3, self 0.3, teacher 0.6 |
 | Real metronome click in play-along | not built: the drill's own sound only |
