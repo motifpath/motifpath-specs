@@ -1,7 +1,7 @@
 # Spike Findings: PB-22 — Practice sessions: data model and user experience
 
 **Task:** PB-22 (= PB-8f, Practice & assessment), step 0
-**Date:** 2026-10-01 (Phase 5, knowledge-graph model: 2026-10-02)
+**Date:** 2026-10-01 (Phase 5, knowledge-graph model: 2026-10-02; Phase 6, timed thresholds: 2026-10-03)
 **Author:** Gilson + Claude
 **ADR:** input to the PB-22 practice-model ADR (to be written)
 **Spike branch:** `motifpath-web@spike/PB-22/practice-model` (throwaway, not for merge; delete once
@@ -45,7 +45,10 @@ screen. No console errors.
    event family, a single-writer incremental fold proven equal to batch derivation, a node level
    and readiness, "review ahead, then stretch" for caught-up students, and a skill-centred home.
    See [Phase 5](#phase-5--the-knowledge-graph-model).
-6. **Still open for the PO** before the ADR: how wide nodes (parents, concepts) show progress
+6. **Phase 6 calibrated timed thresholds** from the team's benchmark, a tap-time baseline and
+   students' felt ratings, on simulated populations with a known answer. Felt ratings turned out to
+   be essential, not just helpful. See [Phase 6](#phase-6--calibrating-timed-thresholds).
+7. **Still open for the PO** before the ADR: how wide nodes (parents, concepts) show progress
    (Finding 17), whether the home reports concepts beside skills (Finding 24), and the caught-up
    time split (Finding 20).
 
@@ -240,6 +243,63 @@ itself. There are no streaks or red badges, and the `learning` chip moved off th
 problems remain: concepts echo skills (Finding 24), and the opportunity list grows too long
 (Finding 25).
 
+## Phase 6 — calibrating timed thresholds
+
+Added 2026-10-03. Fluency thresholds for timed drills were guesses (2 s per fretboard note). Gilson
+asked whether they can be calculated, and proposed asking students how a timed drill *felt*: not
+precise, but a signal for regulating thresholds. The model:
+
+```text
+Threshold         per drill template (fretboard_cell:name_the_note, …:find_the_note, exercise:<id>):
+                  fluent_ms net of tap time, version, effective_from, source (benchmark |
+                  calibrated), sessions, students — versioned reference data, not code
+Tap baseline      median of a 6-tap "tap the highlighted fret" check (~20 s); ingest stamps it on
+                  every timed answer (tap_ms), so fluency = threshold / (latency − tap_ms)
+FeltRating        easy | about_right | hard, one per drill template per session, carried on
+                  practice.session_ended — calibration data only, never mastery evidence
+Calibration       v1 = 2 × the team's median net time. Later versions: the net time that best
+                  separates sessions felt "hard" from the rest, blended with the prior by sample size
+                  (prior counts as 10 sessions), only once there are ≥ 20 sessions from ≥ 5 students
+```
+
+Each answer is judged by the version in force when it happened. A new version applies forward only,
+needs no fold rebuild, and never takes back a level.
+
+A population simulator (40 students × 8 sessions, each with their own speed, improvement, tap time
+and rating bias) works around a known true fluent time of 2500 ms, starting from a benchmark that is
+deliberately 2× off. Error of the calibrated threshold, over 5 seeds per condition:
+
+| Condition | Calibrated | Time only, no felt | No tap correction |
+|---|---|---|---|
+| 40 students × 8 sessions | −4 … +3% | −35 … −51% | +12 … +21% |
+| 10 students | −17 … +2% | | |
+| 6 students × 4 (just past the gate) | −15 … −32% | | |
+| 30% rating noise | −8 … +6% | | |
+| ⅓ overconfident | −4 … +3% | | |
+| ½ overconfident | −4 … +53% | | |
+| 90% on phones | −4 … +3% | | +21 … +29% |
+
+**M12 — Does calibration converge from a wrong benchmark? Yes, with enough data.** It lands within
+±4% at 320 sessions, from a benchmark 2× too strict or 2× too lax. Small samples stay too close to
+the prior (Finding 29).
+
+**M13 — Does the tap baseline protect slow tappers? Yes.** A phone-heavy population calibrates to
+the same value once tap time is taken out. Without that correction, the threshold comes out 12–29%
+too lax.
+
+**M14 — Do felt ratings help or bias? They are what makes calibration work.** Time alone says how
+fast knowers are, not where a drill gets hard (−35 … −51%). Noise is absorbed. A third of students
+rating everything easier is absorbed; half of them biases the threshold toward lax (Finding 30).
+
+**M15 — Can recalibration avoid taking levels away? Yes**, through versioning by time.
+
+**U8 — Is the felt question quick? One tap per drill, but too many drills.** A 3-minute session asked
+four questions (Finding 32).
+
+In the walkthrough, a tap check gave 314 ms, a 16-item session ended with "How did it feel?", and
+recalibrating moved *name the note* from 2000 ms to 2442 ms (321 sessions, 41 students; true value
+2500). No console errors.
+
 ---
 
 ## Findings
@@ -316,6 +376,24 @@ problems remain: concepts echo skills (Finding 24), and the opportunity list gro
     top three (one refresh, one strengthen, one start) and "see all".
 26. **Practice days need the student's time zone.** The spike counts UTC dates.
 
+*Phase 6:*
+
+27. **Felt ratings are what make calibration work.** Time alone lands 35–51% off.
+28. **Tap time must come out.** Ingest stamps each answer with the student's tap time, so replays
+    stay stable.
+29. **Small samples drift toward the prior.** Just past the gate (24 sessions), a wrong prior still
+    pulls the result 15–32% off. **Proposed:** a higher gate (100 sessions from 20 students), or
+    less weight on the prior once both felt classes are well represented.
+30. **Overconfidence biases toward lax.** **Proposed:** cap a single recalibration step at ±25%, and
+    use teacher-reviewed or, later, audio evidence as the check.
+31. **Versioned thresholds never take back a level.**
+32. **Ask fewer felt questions.** **Proposed:** at most one or two per session, for the templates with
+    the least calibration data, with authored exercises grouped by family (per-exercise data will be
+    too sparse).
+33. **The core assumption is untested.** The simulator assumes a drill feels hard once the student is
+    slower than fluent. The spike validates the estimator given that assumption. Only real students
+    can confirm how felt effort relates to time.
+
 ## Decided
 
 - **Practice ≠ assessment.** The existing challenge stays the path gate. Practice is open-ended and
@@ -343,7 +421,9 @@ problems remain: concepts echo skills (Finding 24), and the opportunity list gro
 | Caught-up time split, review ahead vs stretch (Finding 20) | half and half |
 | Node-level share | 80% of the subtree's items at the level |
 | Leitner boxes or FSRS for spaced repetition | Leitner, with waits of 1, 2, 4, 8, 16, 32 days |
-| Fluent latency: fixed, or relative to the student's own baseline | fixed 2 s per fretboard cell |
+| Fluent latency | **Phase 6:** versioned per drill template, net of tap time; benchmark then felt-calibrated |
+| Calibration gate, prior weight, step cap (Findings 29, 30) | 20 sessions / 5 students, prior = 10 sessions, no cap |
+| Felt questions per session (Finding 32) | one per timed drill practised |
 | Session mix | due 60 / weak 25 / new 15 |
 | Source weights | auto 0.3, self 0.3, teacher 0.6 |
 | Real metronome click in play-along | not built: the drill's own sound only |
@@ -356,7 +436,8 @@ problems remain: concepts echo skills (Finding 24), and the opportunity list gro
    rating, tempo), and the practice endpoints.
 2. **Play-along drill:** tempo ladder, count-in, self-rating, plus the knowledge-state read model.
 3. **Session composer and practice home:** guitar in hand or not, time budget, reasons.
-4. **Mental fretboard drill and heatmap.**
+4. **Mental fretboard drill and heatmap**, with the tap check, felt question and benchmark thresholds;
+   calibration runs once real sessions accumulate.
 5. **Recorded takes, then vs now.**
 6. **Teacher notes:** rubric, comments, skills to work on, suggestions. Validate with a WhatsApp
    Wizard-of-Oz before building the review UI.
