@@ -235,9 +235,10 @@ One piece of evidence per observation, the only stored learning state:
 ### Recorded takes are out of scope
 
 The platform doesn't store student recordings. Videos for review go over WhatsApp, so the platform
-can't show a then-vs-now comparison. Storing takes on the platform (upload, storage, playback, retention,
-privacy) needs its own decision after a cost and infrastructure review, tracked as PB-88. If that decision stores takes, a note gains an optional take reference. Progress over time is
-still shown from evidence (tempo history, speed per string, levels).
+can't show a then-vs-now comparison. Storing takes on the platform (upload, storage, playback,
+retention, privacy) needs its own decision after a cost and infrastructure review, tracked as PB-88.
+If that decision stores takes, a note gains an optional take reference. Progress over time is still
+shown from evidence (tempo history, speed per string, levels).
 
 ## Rationale
 
