@@ -38,8 +38,8 @@ TypeScript types shaped like future schemas, 163 tests of pure logic, simulated 
 populations, a clickable prototype, and scripted walkthroughs. Its findings are the evidence behind the
 rules below. The spike also built private recorded takes with a then-vs-now comparison; this ADR
 leaves them out (see Recorded takes). The alternatives it weighed: a model call composing sessions;
-storing a mutable mastery state; grading in the client; a different evidence shape per kind of practice; time-only threshold
-calibration; the map's calibration level for ranking.
+storing a mutable mastery state; grading in the client; a different evidence shape per kind of
+practice; time-only threshold calibration; the map's calibration level for ranking.
 
 ## Decision
 
