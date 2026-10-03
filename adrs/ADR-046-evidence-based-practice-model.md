@@ -5,6 +5,10 @@
 **Deciders:** Gilson (Product Owner)
 **Input:** spike findings `spikes/PB-22-practice-findings.md` (specs#153), Phases 1–7, 2026-10-01 to
 2026-10-03
+**Revised:** 2026-10-03, in review. Practice item kinds are an open set, with a recipe for adding one;
+the table lists the first kinds. Recorded takes are out of scope: the platform has no storage for
+student videos (teacher reviews arrive over WhatsApp), and storing them needs its own cost and
+infrastructure decision.
 
 ---
 
@@ -32,8 +36,9 @@ Four gaps block it:
 A throwaway spike tested the model and the flows before this decision (not an MVP, no real students):
 TypeScript types shaped like future schemas, 163 tests of pure logic, simulated student histories and
 populations, a clickable prototype, and scripted walkthroughs. Its findings are the evidence behind the
-rules below. The alternatives it weighed: a model call composing sessions; storing a mutable mastery
-state; grading in the client; a different evidence shape per kind of practice; time-only threshold
+rules below. The spike also built private recorded takes with a then-vs-now comparison; this ADR
+leaves them out (see Recorded takes). The alternatives it weighed: a model call composing sessions;
+storing a mutable mastery state; grading in the client; a different evidence shape per kind of practice; time-only threshold
 calibration; the map's calibration level for ranking.
 
 ## Decision
@@ -41,7 +46,7 @@ calibration; the map's calibration level for ranking.
 MotifPath will record practice as **evidence about items**: one observation per answer, rating or
 review, graded on the server from the raw response. A student's knowledge state for each item, the
 level of each knowledge node and the next session are all **derived from that evidence by versioned
-rules**. Nothing about mastery is stored except the evidence itself, teacher notes and recorded takes.
+rules**. Nothing about mastery is stored except the evidence itself and teacher notes.
 
 ### Practice and assessment are different things
 
@@ -55,6 +60,19 @@ rules**. Nothing about mastery is stored except the evidence itself, teacher not
 A practice item is the smallest thing whose knowledge is tracked. Every item has a stable, readable
 `item_key` that evidence and events point at, its knowledge-node links (`skill_ids`, `concept_ids`)
 and `instrument_ids` (empty means every instrument, as for exercises).
+
+**Item kinds are an open set.** The model fixes what every item must provide, not which kinds exist.
+Adding a kind (rhythm tapping from the PB-43 spike, interval or chord recognition by ear, sight
+reading, scale runs) takes:
+
+- an `item_key` scheme, stable and readable, that also works for generated items;
+- the response shape(s) a client sends, and a versioned grader for them (or the self-rating grader);
+- its projection onto a hit, miss or hold, with an accuracy and a fluency goal (a timed threshold, a
+  tempo or a count), so mastery, levels and sessions need no change;
+- whether it needs the instrument in hand, and how long it takes in a session;
+- golden cases for the grader.
+
+No other part of the model changes. The first kinds:
 
 | Kind | `item_key` | Instruments |
 |---|---|---|
@@ -90,7 +108,7 @@ One piece of evidence per observation, the only stored learning state:
 - Auto-graded and self-assessed evidence keeps the **raw response** and the **grader id**, so a grader
   change can regrade it. Timed answers also keep the student's **tap time** (below).
 - The evidence id is the event id that produced it, so a redelivered event can't count twice.
-- Evidence, teacher notes and takes live in MongoDB. An archive to object storage is deferred until a
+- Evidence and teacher notes live in MongoDB. An archive to object storage is deferred until a
   measured trigger (volume or cost) calls for it.
 
 ### Events: the `practice.*` family
@@ -174,10 +192,13 @@ One piece of evidence per observation, the only stored learning state:
 
 ### Teacher notes and suggestions
 
-- One note shape covers a video review and a live-lesson note: an optional take and item, a rating and
+- One note shape covers a review of a video the student sent and a live-lesson note: an optional item, a rating and
   measure, `verified`, a 1–5 rubric (timing, clean notes, tension, dynamics), timestamped comments, a
   summary, skills and concepts that need work, suggested items, and a **target level** (default
   `accurate`). A note that judges an item also writes `teacher_reviewed` evidence.
+- Students send videos for review over WhatsApp, as the concierge does today (PB-78). The teacher, or
+  the team acting as one, watches it there and records the note on the platform. Timestamped comments
+  refer to that video, which the platform doesn't store.
 - **A suggestion ends** when its item or node reaches the target level **after the note was written**,
   or when the teacher closes the note, with a **30-day safety expiry**. A suggestion never ends on a
   level the student already had.
@@ -210,18 +231,28 @@ One piece of evidence per observation, the only stored learning state:
 - The home is organised by skills and concepts, never by exercise type, with progress before next
   steps and no red badges. Practice days are counted in the student's time zone.
 
-### Recorded takes
+### Recorded takes are out of scope
 
-A take recorded during a play-along is private by default. The student can compare their first and
-latest takes and send one to a teacher for review. Media follows ADR-021.
+The platform doesn't store student recordings. Videos for review go over WhatsApp, so the platform
+can't show a then-vs-now comparison. Storing takes on the platform (upload, storage, playback, retention,
+privacy) needs its own decision after a cost and infrastructure review, tracked as a separate backlog
+item. If that decision stores takes, a note gains an optional take reference. Progress over time is
+still shown from evidence (tempo history, speed per string, levels).
 
 ## Rationale
 
+- **Open item kinds behind one contract, over a fixed list.** Practice will grow (rhythm, ear, reading),
+  and each new kind should cost a key scheme, a grader and a projection, not a change to mastery,
+  levels or sessions.
+- **No platform storage for takes yet, over building video upload now.** Student video means storage,
+  delivery and retention costs on the single-VM hosting (ADR-039), plus privacy handling for
+  students' recordings, minors' included. WhatsApp already carries the review loop at no infrastructure cost, so the comparison
+  feature waits for a decision on cost.
 - **Evidence plus derivation, over a stored mastery state.** A mutable state can't be audited, can't be
   recomputed when a rule improves, and drifts when events arrive twice or late. Deriving from immutable
   evidence makes every rule change a rebuild, and the spike's property test showed the incremental fold
   gives exactly the batch result for every simulated student.
-- **One evidence shape, over one per kind of practice.** All four kinds fit one shape with
+- **One evidence shape, over one per kind of practice.** All the first kinds fit one shape with
   source-specific fields. Mastery branches on kind in one projection only, so new kinds of practice
   cost a projection, not a new model.
 - **Server grading, over trusting the client.** The client's verdict could be wrong or manipulated, and
@@ -271,6 +302,8 @@ latest takes and send one to a teacher for review. Media follows ADR-021.
   version 1 (the team's benchmark) is what students are measured against.
 - **Overconfident populations bias calibration toward lax thresholds**; the ±25% step cap limits the
   damage but doesn't remove it. Teacher-reviewed (and later audio) evidence is the check.
+- **No then-vs-now comparison.** The spike's most motivating flow for students without a teacher waits
+  for the take-storage decision, and teacher reviews depend on a manual WhatsApp step.
 - **Requirements on empty nodes stay unmet** until content exists, which the map editor has to surface.
 - **Small-sample instability.** Below the calibration gate, thresholds don't move at all, even when the
   benchmark is visibly off.
@@ -281,6 +314,8 @@ latest takes and send one to a teacher for review. Media follows ADR-021.
 - Evidence stays in MongoDB; the archive question is reopened only by a measured trigger.
 - Tempo targets for play-alongs and chord changes stay authored (they come from the music).
 - Audio detection is reserved as an evidence source and is its own later spike.
+- A future take-storage decision can extend ADR-021 (presigned upload, object storage) to student
+  media, and add an optional take reference to teacher notes.
 
 ## Follow-up slices
 
@@ -290,10 +325,9 @@ latest takes and send one to a teacher for review. Media follows ADR-021.
 3. **Session composer and practice home:** instrument choice, time budget, reasons, summary.
 4. **Mental fretboard drill and heatmap**, with the tap check, felt questions and benchmark thresholds;
    calibration runs once real sessions accumulate.
-5. **Recorded takes**, then vs now.
-6. **Teacher notes**: rubric, comments, needs-work, suggestions. Validate with a WhatsApp Wizard-of-Oz
-   before building the review UI.
-7. **Authored exercises in the scheduler**, the S7 challenge on `practice.item_answered`, and the feed
+5. **Teacher notes** for videos received over WhatsApp: rubric, comments, needs-work, suggestions.
+   Validate with a WhatsApp Wizard-of-Oz before building the review UI.
+6. **Authored exercises in the scheduler**, the S7 challenge on `practice.item_answered`, and the feed
    into recommendations (PB-8g).
 
 ## Related ADRs
@@ -302,7 +336,8 @@ latest takes and send one to a teacher for review. Media follows ADR-021.
   per student.
 - **ADR-011** (Aggregation Worker): gains the evidence processor and the student summary.
 - **ADR-019** (Exercise as a first-class entity): authored exercises become practice items.
-- **ADR-021** (media storage): recorded takes.
+- **ADR-021** (media storage): the starting point if student takes are ever stored.
+- **ADR-039** (single-VM hosting): the cost and capacity context for student media.
 - **ADR-023** (challenge time threshold is informational): timed thresholds here measure fluency, not
   pass/fail.
 - **ADR-026 / ADR-043** (knowledge graph): node levels, readiness and stretch build on `part_of` and
