@@ -1,14 +1,15 @@
 # ADR-046: Practice is evidence-based: graded evidence per item, knowledge state derived per instrument
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-03
 **Deciders:** Gilson (Product Owner)
 **Input:** spike findings `spikes/PB-22-practice-findings.md` (specs#153), Phases 1–7, 2026-10-01 to
 2026-10-03
+**Accepted:** 2026-10-03, by Gilson.
 **Revised:** 2026-10-03, in review. Practice item kinds are an open set, with a recipe for adding one;
 the table lists the first kinds. Recorded takes are out of scope: the platform has no storage for
 student videos (teacher reviews arrive over WhatsApp), and storing them needs its own cost and
-infrastructure decision.
+infrastructure decision (PB-88).
 
 ---
 
@@ -235,8 +236,7 @@ One piece of evidence per observation, the only stored learning state:
 
 The platform doesn't store student recordings. Videos for review go over WhatsApp, so the platform
 can't show a then-vs-now comparison. Storing takes on the platform (upload, storage, playback, retention,
-privacy) needs its own decision after a cost and infrastructure review, tracked as a separate backlog
-item. If that decision stores takes, a note gains an optional take reference. Progress over time is
+privacy) needs its own decision after a cost and infrastructure review, tracked as PB-88. If that decision stores takes, a note gains an optional take reference. Progress over time is
 still shown from evidence (tempo history, speed per string, levels).
 
 ## Rationale
@@ -349,4 +349,4 @@ still shown from evidence (tempo history, speed per string, levels).
 
 ---
 
-*This ADR was proposed on 2026-10-03. To revise, create a new ADR with Status: Supersedes ADR-046.*
+*This ADR was accepted on 2026-10-03. To revise, create a new ADR with Status: Supersedes ADR-046.*
