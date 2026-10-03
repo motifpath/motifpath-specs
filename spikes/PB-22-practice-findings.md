@@ -3,9 +3,9 @@
 **Task:** PB-22 (= PB-8f, Practice & assessment), step 0
 **Date:** 2026-10-01 (Phase 5, knowledge-graph model: 2026-10-02; Phase 6, timed thresholds, and Phase 7, instruments: 2026-10-03)
 **Author:** Gilson + Claude
-**ADR:** input to the PB-22 practice-model ADR (to be written)
-**Spike branch:** `motifpath-web@spike/PB-22/practice-model` (throwaway, not for merge; delete once
-the ADR lands)
+**ADR:** input to [ADR-046](../adrs/ADR-046-evidence-based-practice-model.md) (Accepted 2026-10-03)
+**Spike branch:** `motifpath-web@spike/PB-22/practice-model` (throwaway, not for merge; deleted after
+ADR-046 was accepted, last head `e4cd77a`)
 
 ---
 
@@ -51,9 +51,8 @@ screen. No console errors.
 7. **Phase 7 made instruments first-class in practice.** Items carry instruments (as exercises do
    since PB-86), node levels and readiness are per instrument, and next steps rank by the graph alone.
    See [Phase 7](#phase-7--instruments).
-8. **Still open for the PO** before the ADR: how wide nodes (parents, concepts) show progress
-   (Finding 17), whether the home reports concepts beside skills (Finding 24), and the caught-up
-   time split (Finding 20).
+8. **Every PO question is decided** (findings 17, 20, 24, 25, 29, 30, 32, 37 and 38), and
+   [ADR-046](../adrs/ADR-046-evidence-based-practice-model.md) records the model.
 
 ---
 
@@ -360,8 +359,8 @@ becomes "Which instrument is in your hands?" (or none), then the minutes. Three 
 8. **Rollups need coverage.** "Fretboard knowledge 96%", with only 24 of 72 cells ever practised,
    misleads. **Fix:** show "n/N met" with the mean fluency over the met items.
 9. **Teacher suggestions need a lifetime.** Without one, a note steers every future session. The
-   spike uses 14 days. **Open:** expire after a time, end once the student has practised it, or the
-   teacher closes it.
+   spike used 14 days. **Decided (Phase 5):** a suggestion ends when the item reaches the target
+   level after the note, or when the teacher closes it, with a 30-day safety expiry.
 10. **The count-in belongs in the sequence, not a timer.** iOS only starts audio inside the tap. So
     the count-in is rest steps at the front of the take, and the drill's loops are unrolled, so a
     take ends on its own.
@@ -471,7 +470,10 @@ becomes "Which instrument is in your hands?" (or none), then the minutes. Three 
 - **The home is organised by skills and concepts**, never by exercise type. Progress comes before
   opportunities, and there are no streak resets or red badges (2026-10-01).
 
-## Open for the ADR
+## Settled by ADR-046
+
+ADR-046 adopted the spike's defaults below, except the metronome click, which is left to the
+play-along slice.
 
 | Question | Spike default |
 |---|---|
@@ -492,12 +494,15 @@ becomes "Which instrument is in your hands?" (or none), then the minutes. Three 
 3. **Session composer and practice home:** guitar in hand or not, time budget, reasons.
 4. **Mental fretboard drill and heatmap**, with the tap check, felt question and benchmark thresholds;
    calibration runs once real sessions accumulate.
-5. **Recorded takes, then vs now.**
+5. **Recorded takes, then vs now.** Out of scope in ADR-046 (no platform storage for student
+   video); tracked as PB-88.
 6. **Teacher notes:** rubric, comments, skills to work on, suggestions. Validate with a WhatsApp
    Wizard-of-Oz before building the review UI.
 7. **Authored exercises in the scheduler, and the feed into recommendations.**
 
 ## How to rerun the spike
+
+The spike branch was deleted once ADR-046 was accepted; these steps applied while it existed.
 
 ```bash
 cd motifpath-web
