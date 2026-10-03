@@ -357,7 +357,7 @@ recalibrating moved *name the note* from 2000 ms to 2442 ms (321 sessions, 41 st
     keeps those behind real next steps (the power-chord riff, which requires the root-string notes).
 20. **"Review ahead, then stretch" in strict order starves stretch.** A caught-up 5-minute session
     holds all 27 review-ahead items. **Spike default:** split the leftover time half and half, each
-    taking over the other's share when it runs out. **Open for the PO.**
+    taking over the other's share when it runs out. **Decided 2026-10-03:** keep 50/50.
 21. **Graders work only from reference data.** The client's verdict is never trusted, and the
     client shows feedback with the same grader. Enharmonic spellings and the same note an octave up
     on the asked string count as right.
@@ -405,6 +405,8 @@ recalibrating moved *name the note* from 2000 ms to 2442 ms (321 sessions, 41 st
   (2026-10-01).
 - **A teacher suggestion ends** when the item reaches the target level (default `accurate`) after the
   note, or when the teacher closes it, with a 30-day safety expiry (2026-10-02).
+- **A caught-up student's spare time is split 50/50** between review ahead and stretch (Finding 20,
+  2026-10-03).
 - **Stretch draws from any ready node** for the student's instrument, ranked closest first
   (2026-10-02).
 - **Wide nodes show progress through their relationships**, not as one level of their own: a
@@ -418,7 +420,6 @@ recalibrating moved *name the note* from 2000 ms to 2442 ms (321 sessions, 41 st
 
 | Question | Spike default |
 |---|---|
-| Caught-up time split, review ahead vs stretch (Finding 20) | half and half |
 | Node-level share | 80% of the subtree's items at the level |
 | Leitner boxes or FSRS for spaced repetition | Leitner, with waits of 1, 2, 4, 8, 16, 32 days |
 | Fluent latency | **Phase 6:** versioned per drill template, net of tap time; benchmark then felt-calibrated |
