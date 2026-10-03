@@ -1,0 +1,178 @@
+{
+  "grader": "self_rating.v1",
+  "description": "Takes the student rates themselves: a play-along at a tempo, or chord changes counted over a minute. The grader checks the take fits the item and keeps the rating and its measure as they are.",
+  "reference": {
+    "diagrams": {
+      "00000000-0000-4000-8000-0000000000f1": {
+        "name": "Minor pentatonic run (play-along)"
+      },
+      "00000000-0000-4000-8000-0000000000f2": {
+        "name": "A minor chord"
+      },
+      "00000000-0000-4000-8000-0000000000f3": {
+        "name": "C major chord"
+      }
+    }
+  },
+  "cases": [
+    {
+      "name": "play-along: a clean take with its tempo",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 90
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "clean",
+          "tempo_bpm": 90
+        }
+      }
+    },
+    {
+      "name": "play-along: a take the student struggled with",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "struggled",
+        "tempo_bpm": 60
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "struggled",
+          "tempo_bpm": 60
+        }
+      }
+    },
+    {
+      "name": "chord change: an almost-clean minute with its count",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "almost",
+        "changes_per_minute": 42
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "almost",
+          "changes_per_minute": 42
+        }
+      }
+    },
+    {
+      "name": "chord change: zero changes in a minute is still a rating",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "struggled",
+        "changes_per_minute": 0
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "struggled",
+          "changes_per_minute": 0
+        }
+      }
+    },
+    {
+      "name": "rejected: a play-along rating without its tempo",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "measure_missing"
+      }
+    },
+    {
+      "name": "rejected: a chord-change rating without its count",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "measure_missing"
+      }
+    },
+    {
+      "name": "rejected: a play-along rating with a change count",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 90,
+        "changes_per_minute": 40
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a chord-change rating with a tempo",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 90,
+        "changes_per_minute": 40
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a play-along of a diagram that doesn't exist",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000ff",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 90
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: a chord change to a diagram that doesn't exist",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000ff",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "changes_per_minute": 40
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: naming a note doesn't answer a play-along",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "name_the_note",
+        "note_name": "C",
+        "latency_ms": 1000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    }
+  ]
+}
