@@ -1,4 +1,3 @@
-@wip
 Feature: Compose a practice session
   As a student
   I want a session built for the time I have and the instrument in my hands
@@ -14,15 +13,18 @@ Feature: Compose a practice session
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
+  @wip
   Scenario: Every item in a session carries the reason it was picked
     When "alice" composes a 10-minute session with "guitar" in hand
     Then every item in the session has one of the reasons teacher_suggested, due, weak, new, warm_up, application, review_ahead or stretch
 
+  @wip
   Scenario: Due, weak and new items share the time 60, 25 and 15
     Given "alice" has plenty of due, weak and new items on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then about 12 minutes go to due items, 5 to weak items and 3 to new items
 
+  @wip
   Scenario: A teacher's suggestion comes before everything else
     Given a teacher suggested the play-along "pentatonic-run" to "alice"
     When "alice" composes a 10-minute session with "guitar" in hand
@@ -33,6 +35,7 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the session starts with "c-major-scale" with the reason warm_up at 80 BPM
 
+  @wip
   Scenario: A session of 10 minutes or more ends by applying a skill to music
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the session includes an item with the reason application
@@ -43,11 +46,13 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with "electric-bass" in hand
     Then every item in the session suits "electric-bass" or every instrument
 
+  @wip
   Scenario: A session in the head picks only items that need no instrument in hand
     When "alice" composes a 5-minute session with no instrument in hand
     Then no item in the session is a play-along
     And the session may include fretboard cells of both "guitar" and "electric-bass"
 
+  @wip
   Scenario: New items are balanced across the student's instruments
     Given "alice" has 40 new items on guitar and 40 new items on electric bass
     When "alice" composes a 10-minute session with no instrument in hand
@@ -55,11 +60,13 @@ Feature: Compose a practice session
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
+  @wip
   Scenario: The new share is a ceiling, never filled past it
     Given "alice" has 2 due items and 200 new items on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then no more than 3 minutes go to new items
 
+  @wip
   Scenario: A caught-up student reviews ahead and stretches, half and half
     Given "alice" has nothing due, weak or new on their path for guitar
     And "alice" has known items coming due within the week
@@ -68,12 +75,14 @@ Feature: Compose a practice session
     Then about half the session is items with the reason review_ahead
     And about half the session is items of "notes-on-high-strings" with the reason stretch
 
+  @wip
   Scenario: When nothing is coming due, stretch takes the whole session
     Given "alice" has nothing due, weak, new or coming due on their path for guitar
     And "alice" is ready to start the skill "notes-on-high-strings"
     When "alice" composes a 10-minute session with "guitar" in hand
     Then every item after the warm-up has the reason stretch
 
+  @wip
   Scenario: Stretch starts first with nodes that build on what the student has met
     Given "alice" is ready to start "notes-on-high-strings", which requires a skill they have met
     And "alice" is ready to start "chord-tones", which requires nothing
@@ -96,6 +105,7 @@ Feature: Compose a practice session
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
+  @wip
   Scenario: A session is never empty
     Given "alice" has no practice history and their path has no practice items
     When "alice" composes a 5-minute session with no instrument in hand
