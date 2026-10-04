@@ -15,7 +15,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '26'
           cache: 'npm'
 
       - run: npm ci
@@ -31,7 +31,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '26'
           cache: 'npm'
 
       - run: npm ci
@@ -51,35 +51,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '26'
           cache: 'npm'
 
       - run: npm ci
 
       - name: Validate grader golden cases against their schema and the practice contract
         run: npm run validate:golden
-
-  eval-prompts:
-    name: Evaluate Prompts (on prompt changes)
-    runs-on: ubuntu-latest
-    # Only runs when prompt files change
-    if: |
-      github.event_name == 'pull_request' &&
-      contains(join(github.event.pull_request.changed_files.*.filename, ','), 'prompts/')
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - run: npm ci
-
-      - name: Run PromptFoo evals
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: npx promptfoo eval --ci
 
   all-checks:
     name: All checks passed

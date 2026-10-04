@@ -42,15 +42,15 @@
 - **Tolerated legacy:** none documented yet — ask the user before treating anything as
   grandfathered.
 - **Automatic gates (don't re-flag):** Redocly CLI lint on `openapi/*.yaml` (this also validates
-  `events.yaml` through its `$ref`), Gherkin syntax parse recursively under `features/`, PromptFoo
-  eval on `prompts/` changes — all run in `.github/workflows/ci.yml`. There is no separate
+  `events.yaml` through its `$ref`), Gherkin syntax parse recursively under `features/`, golden-case
+  validation (`npm run validate:golden`) — all run in `.github/workflows/ci.yml`. There is no separate
   standalone-JSON-Schema event validation job; a PR proposing one is reintroducing a job this repo
   deliberately dropped (see `plugins/pr-review/CHANGELOG.md` / the PR that fixed `ci.yml`).
 
 ## Tests
 
-- "Tests" here are the CI validations above, plus PromptFoo golden-set evals in `/evals/` for prompt
-  changes. There's no unit-test layer to check coverage on.
+- "Tests" here are the CI validations above. No prompts exist yet; a PR adding the first one must
+  also add PromptFoo and its `/evals/` golden set (ADR-002). There's no unit-test layer to check coverage on.
 
 ## Delivery
 
