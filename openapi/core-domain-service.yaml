@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.22.0
+  version: 0.23.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -2270,10 +2270,11 @@ paths:
   /instruments/{instrument_id}:
     patch:
       operationId: updateInstrument
-      summary: Replace an instrument's names and default voice
+      summary: Replace an instrument's names, default voice and icon
       description: |
-        Replaces an instrument's names and, optionally, its default voice —
-        the only parts of an instrument that can change after creation.
+        Replaces an instrument's names and, optionally, its default voice and
+        its icon — the only parts of an instrument that can change after
+        creation.
         family and the string/key shape (tuning included) are fixed,
         because every diagram's positions depend on them. Only admins
         may update an instrument, since instruments are shared by every user
@@ -2304,8 +2305,8 @@ paths:
           description: |
             The request body failed validation — including names missing a
             language, carrying "any" or an unknown language code, a name
-            that is empty, or a default_voice_id that is not an existing
-            voice of the instrument's family.
+            that is empty, a default_voice_id that is not an existing voice
+            of the instrument's family, or an icon that is not a key.
           content:
             application/json:
               schema:
@@ -5754,6 +5755,17 @@ components:
       required:
         - level
 
+    InstrumentIcon:
+      type: string
+      pattern: '^[a-z][a-z_]*$'
+      description: |
+        Which picture stands for an instrument, as a key a client draws its
+        own icon for. Known keys: acoustic_guitar, electric_guitar,
+        electric_bass, piano, and the generic fretted and keyboard. The set
+        is open: a client that doesn't know a key draws the generic icon of
+        the instrument's family.
+      example: electric_bass
+
     Instrument:
       type: object
       description: |
@@ -5789,6 +5801,8 @@ components:
             instrument use. fretted diagrams populate
             positions[].string/positions[].fret; keyboard diagrams populate
             positions[].key. A single Diagram cannot mix families.
+        icon:
+          $ref: '#/components/schemas/InstrumentIcon'
         string_count:
           type: integer
           minimum: 1
@@ -5832,13 +5846,14 @@ components:
         - names
         - languages
         - family
+        - icon
         - default_voice_id
 
     CreateInstrumentRequest:
       type: object
       description: |
-        Payload for creating a new instrument. Only its names can change
-        afterwards (see updateInstrument); there is no delete endpoint, and
+        Payload for creating a new instrument. Only its names, default voice
+        and icon can change afterwards (see updateInstrument); there is no delete endpoint, and
         changing family or string/key shape after Diagrams exist against it
         is a deliberately open question.
       properties:
@@ -5854,6 +5869,11 @@ components:
             - fretted
             - keyboard
           description: Which coordinate shape Diagrams against this instrument will use.
+        icon:
+          $ref: '#/components/schemas/InstrumentIcon'
+          description: |
+            The picture that stands for the instrument. Omitted gives the
+            generic icon of its family (fretted or keyboard).
         string_count:
           type: integer
           minimum: 1
@@ -9821,7 +9841,7 @@ components:
       type: object
       description: |
         Payload for replacing an instrument's names and, optionally, its
-        default voice.
+        default voice and icon.
       properties:
         names:
           $ref: '#/components/schemas/LocalizedNames'
@@ -9834,6 +9854,11 @@ components:
             The voice that plays this instrument's diagrams by default,
             replacing the current one. Must be an existing voice of the
             instrument's family. Omitted leaves it unchanged.
+        icon:
+          $ref: '#/components/schemas/InstrumentIcon'
+          description: |
+            The picture that stands for the instrument, replacing the current
+            one. Omitted leaves it unchanged.
       required:
         - names
 
