@@ -156,6 +156,42 @@ Feature: Manage instruments
     When "admin" renames an instrument with an ID that does not exist
     Then the request is refused with a not-found error
 
+  # ── Icon ───────────────────────────────────────────────────────────────────
+
+  @wip
+  Scenario: A teacher creates an instrument with its icon
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a fretted instrument named "4-string bass" in English and "Contrabaixo de 4 cordas" in Portuguese with 4 strings tuned "E1, A1, D2, G2" and icon "electric_bass"
+    Then the instrument is created and assigned a stable identifier
+    And the instrument's icon is "electric_bass"
+
+  @wip
+  Scenario: An instrument created without an icon gets its family's icon
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a fretted instrument named "Guitar" in English and "Violão" in Portuguese with 6 strings tuned "E2, A2, D3, G3, B3, E4"
+    Then the instrument's icon is "fretted"
+
+  @wip
+  Scenario: Creating an instrument with an icon that is not a key is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a fretted instrument named "Guitar" in English and "Violão" in Portuguese with 6 strings tuned "E2, A2, D3, G3, B3, E4" and icon "Electric Bass!"
+    Then the request is rejected as invalid
+    And the rejection identifies "icon" as the source of the error
+
+  @wip
+  Scenario: An admin changes an instrument's icon
+    Given a fretted instrument "guitar" exists in the system
+    And "admin" is authenticated as an admin
+    When "admin" renames instrument "guitar" to "Guitar" in English and "Violão" in Portuguese with icon "acoustic_guitar"
+    Then the instrument's icon is "acoustic_guitar"
+
+  @wip
+  Scenario: Renaming an instrument without an icon leaves its icon unchanged
+    Given a fretted instrument "guitar" with icon "electric_guitar" exists in the system
+    And "admin" is authenticated as an admin
+    When "admin" renames instrument "guitar" to "Guitar" in English and "Violão" in Portuguese
+    Then the instrument's icon is "electric_guitar"
+
   # ── Authorisation failures ─────────────────────────────────────────────────
 
   Scenario: A student cannot create an instrument
