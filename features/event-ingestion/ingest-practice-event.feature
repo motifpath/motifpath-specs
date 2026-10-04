@@ -1,4 +1,3 @@
-@wip
 Feature: Ingest practice events
   As the MotifPath platform
   I want to receive and durably store the practice.* events a practice session produces
