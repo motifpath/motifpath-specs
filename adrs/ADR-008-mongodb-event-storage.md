@@ -62,7 +62,7 @@ receipt. Documents are never updated or deleted; the collection is append-only.
 | Field | Type | Notes |
 |---|---|---|
 | `event_id` | UUID string | Client-supplied. Unique index for idempotency. |
-| `event_type` | string (enum) | One of the seven defined tracking event types. |
+| `event_type` | string (enum) | One of the tracking event types defined in `events.yaml` (the lesson, exercise and practice families). |
 | `student_id` | UUID string | Partition key for all student-scoped queries. |
 | `session_id` | UUID string | Groups events within a single browser session. |
 | `occurred_at` | ISODate | Client-supplied event timestamp. |
@@ -75,6 +75,16 @@ receipt. Documents are never updated or deleted; the collection is append-only.
 | `outcome` | string (optional) | Present on `exercise.ended`. Values: `completed`, `abandoned`. |
 | `final_score` | integer (optional) | Present on `exercise.ended` with outcome `completed`. |
 | `duration_seconds` | integer (optional) | Present on `lesson.completed`. |
+| `elapsed_seconds` | integer (optional) | Present on `exercise.progress`. |
+| `practice_session_id` | UUID string (optional) | Present on `practice.session_started`, `practice.item_answered` and `practice.session_ended`. |
+| `instrument_id` | UUID string (optional) | On `practice.session_started`; absent for a session practised without an instrument. |
+| `minutes` | integer (optional) | Present on `practice.session_started`. |
+| `planned_items` | array (optional) | Present on `practice.session_started`: `{ item_key, reason }` per planned item. |
+| `item_key` | string (optional) | Present on `practice.item_answered`. |
+| `response` | object (optional) | Present on `practice.item_answered`: the raw response, holding only its `response_type`'s properties. |
+| `tap_ms` | integer (optional) | On a timed `practice.item_answered`: the student's latest tap time, set by the Event Ingestion Service; never the client's value. |
+| `answered_count`, `left_early`, `felt_ratings` | integer, boolean, array (optional) | Present on `practice.session_ended`, always all three. |
+| `median_tap_ms`, `tap_count` | integer (optional) | Present on `practice.tap_check_completed`. |
 
 **Indexes:**
 - `{ event_id: 1 }` — unique. Enforces idempotency at the storage layer.
@@ -82,6 +92,12 @@ receipt. Documents are never updated or deleted; the collection is append-only.
   student's event history in reverse chronological order.
 - `{ event_type: 1, occurred_at: -1 }` — compound. Supports analytics and backfill queries
   filtered by event type.
+- `{ student_id: 1, event_type: 1, occurred_at: -1 }` — compound. Finds a student's newest event
+  of one type before a given time: the latest `practice.tap_check_completed` before a timed answer,
+  whose `median_tap_ms` the Event Ingestion Service stamps on it as `tap_ms`.
+
+*Amended 2026-10-04 (PB-22, ADR-046): practice event fields and the tap-lookup index added;
+`elapsed_seconds`, stored since the service shipped, recorded.*
 
 ### `aggregates` collection
 
