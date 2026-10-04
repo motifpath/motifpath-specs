@@ -1,0 +1,9 @@
+# mise — the pinned Node.js version for motifpath-specs' validators.
+#
+#   curl https://mise.run | sh        # install mise (once per machine)
+#   mise trust && mise install        # install the version pinned below
+#
+# Keep in step with the node-version in .github/workflows/ci.yml.
+
+[tools]
+node = "26"

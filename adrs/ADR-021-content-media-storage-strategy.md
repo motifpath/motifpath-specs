@@ -1,8 +1,13 @@
 # ADR-021: Content media storage strategy — dev & production
 
-**Status:** Accepted
+**Status:** Accepted (partially superseded by ADR-048)
 **Date:** 2026-09-13
 **Deciders:** Gilson (Product Owner)
+
+> **2026-10-04:** MinIO as the local-dev S3 stand-in is superseded by
+> [ADR-048](./ADR-048-mise-and-seaweedfs-local-dev.md) — MinIO's public images were withdrawn,
+> and SeaweedFS's S3 gateway fills the same role on the same port, credentials and bucket.
+> Production (S3 + CloudFront) is unchanged.
 
 ---
 

@@ -23,7 +23,9 @@ Run this once when setting up a new machine. It installs the global Claude Code
 context and all team skills — applies to every MotifPath repository.
 
 ```bash
-# 1. Clone all repositories
+# 1. Clone all repositories, side by side in one parent directory — motifpath-core
+#    and motifpath-web read ../motifpath-specs and each other by relative path
+mkdir -p ~/repos/motifpath && cd ~/repos/motifpath
 git clone git@github.com:motifpath/motifpath-specs.git
 git clone git@github.com:motifpath/motifpath-core.git
 git clone git@github.com:motifpath/motifpath-web.git
@@ -58,15 +60,19 @@ each session starts and updates them on disk; run `/reload-plugins` (or start a
 new session) to pick up the update. Without auto-update, run
 `/plugin marketplace update motifpath-skills` manually after a `git pull`.
 
+**Next:** set up the local development stack — follow
+[motifpath-core README → Getting Started](../motifpath-core/README.md#getting-started-first-time-on-this-machine)
+(Docker, mise, Atlas, env files, Clerk keys, seed data), which also walks through
+`motifpath-web`. For this repository, see [Prerequisites](#prerequisites) below.
+
 ## Branching Model
 
 ```
-main  (protected — production releases only)
-dev   (protected — integration branch, target for all feature PRs)
+main  (protected — the only long-lived branch in this repository)
 ```
 
-All feature, fix, chore, and spec work branches from `dev` and targets `dev`.
-`main` only receives PRs from `dev` (releases) or `hotfix/*` branches (critical fixes).
+Unlike `motifpath-core` and `motifpath-web`, this repository has no `dev` branch: all
+feature, fix, ADR, and spec work branches from `main` and targets `main`.
 
 Branch naming — task code is mandatory:
 
@@ -74,11 +80,11 @@ Branch naming — task code is mandatory:
 feat/MTP-001/short-description
 fix/BUG-042/short-description
 spec/MTP-007/short-description
-hotfix/BUG-099/short-description    ← branches from main, not dev
+adr/MTP-008/003-short-decision-title
 ```
 
-After any merge to `main`, the `sync-main-to-dev` reusable workflow opens a PR
-from `main` to `dev` automatically. Review and merge it promptly.
+The `sync-main-to-dev` reusable workflow defined here (see below) is for the repositories
+that do have a `dev` branch.
 
 ## Shared Workflows
 
@@ -93,10 +99,11 @@ This repository defines reusable GitHub Actions workflows consumed by all other 
 
 ## Prerequisites
 
-- Node.js 26+
-- npm
+- [mise](https://mise.jdx.dev), activated in your shell — installs the Node.js version pinned in
+  `mise.toml` (npm comes with it). If you set up `motifpath-core` first, you already have it.
 
 ```bash
+mise trust && mise install   # Node.js, at the version in mise.toml
 npm install
 ```
 

@@ -1,8 +1,14 @@
 # ADR-016: Local Dev Orchestration via process-compose; Release-Image Smoke in CI
 
-**Status:** Accepted — 2026-09-07
+**Status:** Accepted — 2026-09-07 (partially superseded by ADR-048)
 **Date:** 2026-09-07
 **Deciders:** Gilson Yamada (solo engineering at MVP)
+
+> **2026-10-04:** process-compose is no longer bundled through Devbox: per
+> [ADR-048](./ADR-048-mise-and-seaweedfs-local-dev.md) it is installed by mise, and
+> `mise run services` / `mise run full` replace `devbox services up`. The orchestration model
+> (dependency containers in Docker Compose, services as processes) and the release-image smoke
+> are unchanged.
 
 ---
 
