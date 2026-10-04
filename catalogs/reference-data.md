@@ -2,7 +2,8 @@
 
 Rows MotifPath installs in every environment, production included, before any user exists:
 languages, voices, instruments, the system catalog profile, the knowledge map
-(`knowledge-map.md`) and the basic guitar diagram catalog (`basic-guitar-diagrams.md`).
+(`knowledge-map.md`), the basic guitar diagram catalog (`basic-guitar-diagrams.md`) and the
+practice drill catalog (`practice-drills.md`).
 None of them is seed data.
 
 ## Fixed IDs
@@ -21,6 +22,8 @@ scripts can refer to rows by ID instead of looking them up by name.
   | Knowledge node | `knowledge-node/<key>` |
   | Knowledge edge | `knowledge-edge/<type>/<from key>/<to key>` |
   | Basic diagram, position | the diagram catalog's keys, as `basic-guitar-diagrams.md` defines |
+  | Drill template | `drill-template/<key>` |
+  | Drill threshold version | `drill-threshold/<template key>/v<version>` |
 
 - Voices use their slug as ID (`acoustic-guitar`), which is already fixed.
 - Keys never change, so neither do IDs. Renaming a row changes its names, never its ID.
@@ -40,6 +43,8 @@ after every migration and never create any of these rows.
 4. The system catalog profile
 5. The knowledge map
 6. The basic guitar diagram catalog
+7. The practice drill catalog (templates, then threshold versions). Fretboard cells are
+   generated from it, not stored as rows.
 
 Until production exists, these migrations are regenerated in place and development databases
 are recreated from empty. From the first production install, they are append-only.
