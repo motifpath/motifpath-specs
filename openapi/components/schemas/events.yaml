@@ -409,7 +409,8 @@ PracticeItemAnsweredEvent:
         options selected, or a take rated. Carries the raw response only. The server grades
         it and keeps the result as evidence of what the student knows; a response the
         grader rejects is kept as an event but yields no evidence. The event_id identifies
-        the evidence, so a redelivered event counts once.
+        the evidence, so a redelivered event counts once. Never sent for the takes of a
+        warm_up item, which are played below the student's edge and are not evidence.
       properties:
         event_type:
           type: string

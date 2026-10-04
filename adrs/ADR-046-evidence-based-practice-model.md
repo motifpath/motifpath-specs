@@ -191,7 +191,8 @@ One piece of evidence per observation, the only stored learning state:
   is not used.
 - **With the instrument in hand:** a warm-up on something known, never on what the teacher flagged and
   skipped under 5 minutes; a focus block; and, from 10 minutes, applying the skill to music. A warm-up
-  play-along starts at about 80% of the best clean tempo, outside the tempo ladder.
+  play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the
+  evidence: its takes are not sent as answers, and a due item is never the warm-up.
 - **Tempo ladder:** start at the best clean tempo; +5 BPM after two clean takes; −5 after a struggle;
   clamped to the item's start and target. The count-in is part of the step sequence (rest steps), so
   audio starts inside the student's tap on every platform.
