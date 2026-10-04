@@ -70,15 +70,17 @@ tonejs-instruments by Nicholaus Brosowsky, CC BY 3.0".
 
 ## Instruments
 
-| Key | Names (en / pt_BR) | Strings and tuning | Default voice | ID |
-|---|---|---|---|---|
-| `guitar` | Acoustic guitar / Violão | 6: E2 A2 D3 G3 B3 E4 | `acoustic-guitar` | `6ea2d087-ab9c-59dc-9657-8546025414d2` |
-| `electric-guitar` | Electric guitar / Guitarra elétrica | 6: E2 A2 D3 G3 B3 E4 | `acoustic-guitar` | `e6fac4f3-7d52-5f46-8f44-4de1b239ebdd` |
-| `electric-bass` | Electric bass / Contrabaixo elétrico | 4: E1 A1 D2 G2 | `electric-bass` | `14fe11ad-efdb-589a-b713-2e81ec041cbe` |
+| Key | Names (en / pt_BR) | Strings and tuning | Default voice | Icon | ID |
+|---|---|---|---|---|---|
+| `guitar` | Acoustic guitar / Violão | 6: E2 A2 D3 G3 B3 E4 | `acoustic-guitar` | `acoustic_guitar` | `6ea2d087-ab9c-59dc-9657-8546025414d2` |
+| `electric-guitar` | Electric guitar / Guitarra elétrica | 6: E2 A2 D3 G3 B3 E4 | `acoustic-guitar` | `electric_guitar` | `e6fac4f3-7d52-5f46-8f44-4de1b239ebdd` |
+| `electric-bass` | Electric bass / Contrabaixo elétrico | 4: E1 A1 D2 G2 | `electric-bass` | `electric_bass` | `14fe11ad-efdb-589a-b713-2e81ec041cbe` |
 
 - `guitar` keeps its key, and therefore its ID, after its English name changes from "Guitar"
   to "Acoustic guitar".
 - Its pt_BR name stays "Violão". It covers the steel-string acoustic and the nylon-string violão.
+- The icon is the picture a client draws for the instrument, such as in the practice instrument
+  picker. Clients draw an unknown icon key as the generic icon of the instrument's family.
 
 ## System catalog profile
 
