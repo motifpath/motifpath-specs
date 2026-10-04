@@ -1,9 +1,10 @@
 # ADR-047: Core publishes a read-only practice reference snapshot to MongoDB for the graders
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-04
 **Deciders:** Gilson (Product Owner)
 **Input:** PB-22 slice 2 plan, question Q1 (decided 2026-10-04)
+**Accepted:** 2026-10-04, by Gilson.
 
 ---
 
@@ -124,4 +125,4 @@ snapshot.**
 
 ---
 
-*This ADR was proposed on 2026-10-04. To revise, create a new ADR with Status: Supersedes ADR-047.*
+*This ADR was accepted on 2026-10-04. To revise, create a new ADR with Status: Supersedes ADR-047.*
