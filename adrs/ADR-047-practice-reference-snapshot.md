@@ -96,8 +96,8 @@ snapshot.**
 - **Two copies of reference facts.** The snapshot can lag PostgreSQL between a commit and its
   upsert, or until the next start after a failed upsert. An answer graded in that window is rejected
   and needs a regrade.
-- **Core gains MongoDB writes** next to its existing read-only access, and every create and update path for
-  diagrams, exercises and instruments must call the snapshot writer. Missing one is
+- **Core gains MongoDB writes** next to its existing read-only access, and every create and
+  update path for diagrams, exercises and instruments must call the snapshot writer. Missing one is
   a silent bug, so each path needs a test asserting the snapshot changed.
 - **The full sync at start grows with the catalog.** It's cheap at today's size, and it can become
   incremental (by `updated_at`) when it isn't.
