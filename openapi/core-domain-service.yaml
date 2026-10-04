@@ -4788,7 +4788,9 @@ paths:
         Composes a practice session from what the student knows: the items to practise,
         in order, each with the reason it was picked. Nothing is stored by this call. The
         client starts the session by sending practice.session_started with the returned
-        practice_session_id and items, and sends every answer as practice.item_answered.
+        practice_session_id and items, and sends every answer as practice.item_answered,
+        except the takes of a warm_up item: a warm-up is played below the student's edge,
+        so it is not evidence of what they know.
 
         The plan is never empty. When nothing is due, weak or new, the time goes to
         reviewing known items ahead of their due date and to starting nodes the student is
