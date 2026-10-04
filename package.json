@@ -7,7 +7,6 @@
     "validate:openapi": "redocly lint openapi/*.yaml",
     "validate:features": "bash -c 'find features -name \"*.feature\" -print0 | while IFS= read -r -d \"\" f; do echo \"Validating $f...\"; npx @cucumber/gherkin-streams \"$f\" > /dev/null; done'",
     "validate:golden": "node scripts/validate-golden.mjs",
-    "eval:prompts": "promptfoo eval",
     "validate": "npm run validate:openapi && npm run validate:features && npm run validate:golden"
   },
   "devDependencies": {
@@ -15,10 +14,6 @@
     "@redocly/cli": "^1.25.0",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
-    "promptfoo": "^0.100.0",
     "yaml": "^2.9.1"
-  },
-  "overrides": {
-    "better-sqlite3": "^13.0.3"
   }
 }

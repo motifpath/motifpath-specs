@@ -100,7 +100,8 @@ This repository defines reusable GitHub Actions workflows consumed by all other 
 npm install
 ```
 
-This installs: `@redocly/cli`, `@cucumber/gherkin-streams`, `promptfoo`.
+This installs: `@redocly/cli`, `@cucumber/gherkin-streams`, and the golden-case validator's
+`ajv`/`yaml`. PromptFoo is added together with the first prompt in `/prompts` (ADR-002).
 
 ## Commands
 
@@ -112,8 +113,8 @@ npm run validate:openapi
 # Validate all Gherkin feature files (searched recursively under features/)
 npm run validate:features
 
-# Run PromptFoo evals against all prompt files
-npm run eval:prompts
+# Validate grader golden cases against their schema
+npm run validate:golden
 
 # Run all validations at once
 npm run validate

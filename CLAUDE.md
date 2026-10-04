@@ -56,7 +56,8 @@ NEVER add optional fields without a corresponding Gherkin scenario that exercise
 ## Prompt Files (/prompts/)
 ALWAYS bump the version field when modifying a prompt file — treat it like a code change.
 NEVER change prompt content without updating CHANGELOG.md.
-Run `promptfoo eval` after any prompt change — CI enforces this as a required check.
+No prompts exist yet, so PromptFoo is not installed. When the first prompt lands, add
+PromptFoo, its golden set in `/evals/`, and an eval CI job in the same PR (ADR-002).
 Model assignments are fixed — do not change models without an ADR.
 
 ## ADR Format
@@ -72,7 +73,7 @@ NEVER delete an ADR. Superseded decisions get a note: "Superseded by ADR-NNN".
 ## CI Checks (must pass before merge)
 - OpenAPI validation: Redocly CLI (also validates event schemas via `$ref`)
 - Gherkin syntax validation
-- PromptFoo eval (runs on prompt file changes only)
+- Golden-case validation (`npm run validate:golden`)
 
 ## Skills (/plugins/)
 Skills are Claude Code behavioral guides used by the whole team, distributed as the
