@@ -93,7 +93,7 @@ This repository defines reusable GitHub Actions workflows consumed by all other 
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 24+
 - npm
 
 ```bash
