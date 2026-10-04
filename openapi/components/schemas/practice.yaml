@@ -214,3 +214,133 @@ FeltRating:
   required:
     - drill_template_key
     - felt
+
+PracticeItemKind:
+  type: string
+  enum:
+    - fretboard_cell
+    - exercise
+    - play_along
+    - chord_change
+  description: |
+    The kind of a practice item, the prefix of its item key. The set is open: a new kind
+    is added with its key scheme, grader and golden cases.
+
+KnowledgeLevel:
+  type: string
+  enum:
+    - new
+    - learning
+    - accurate
+    - fluent
+    - retained
+  description: |
+    How well a student knows an item, or a knowledge node, derived from the evidence.
+    new = never practised; learning = practised, not yet accurate; accurate = at least 3
+    counted attempts with accuracy of 0.8 or more; fluent = at least 5 counted attempts,
+    accuracy of 0.9 or more and fluency of 0.8 or more; retained = fluent and holding up
+    over long reviews.
+
+EvidenceSource:
+  type: string
+  enum:
+    - auto_graded
+    - self_assessed
+    - teacher_reviewed
+    - audio_detected
+  description: |
+    Where a piece of evidence comes from. auto_graded = an answer the platform checked;
+    self_assessed = the student's own rating of a take; teacher_reviewed = a teacher's
+    judgement; audio_detected is reserved and not produced yet.
+
+PracticeEvidence:
+  type: object
+  description: |
+    One observation of what a student knows about one practice item: the only stored
+    learning state. Everything else (an item's level, a node's level, what is due, the next
+    session) is derived from a student's evidence by versioned rules. Evidence is never
+    modified; a rule change derives again from it.
+  properties:
+    evidence_id:
+      type: string
+      format: uuid
+      description: |
+        The identifier of the event that produced this evidence, so the same event can never
+        count twice.
+    student_id:
+      type: string
+      format: uuid
+      description: The student the evidence is about.
+    item_key:
+      $ref: '#/PracticeItemKey'
+    source:
+      $ref: '#/EvidenceSource'
+    occurred_at:
+      type: string
+      format: date-time
+      description: When the observation happened, as the student's device reported it.
+    practice_session_id:
+      type: string
+      format: uuid
+      description: The practice session the answer was given in. Absent for teacher reviews.
+    grader_id:
+      type: string
+      pattern: '^[a-z][a-z_]*\.v[1-9][0-9]*$'
+      description: |
+        The grader and version that graded the raw response, such as fretboard_cell.v1.
+        Present for auto_graded and self_assessed evidence.
+    response:
+      $ref: '#/PracticeResponse'
+    correct:
+      type: boolean
+      description: Whether the answer was right. Present for auto_graded evidence.
+    latency_ms:
+      type: integer
+      minimum: 0
+      description: Milliseconds the student took to answer. Present for auto_graded evidence.
+    tap_ms:
+      type: integer
+      minimum: 0
+      description: |
+        The student's tap time when the answer was given, from their latest tap check.
+        Present for timed auto_graded evidence once the student has done a tap check.
+    rating:
+      type: string
+      enum:
+        - struggled
+        - almost
+        - clean
+      description: The rating given. Present for self_assessed and teacher_reviewed evidence.
+    tempo_bpm:
+      type: integer
+      minimum: 1
+      description: The tempo of a rated play-along take, in beats per minute.
+    changes_per_minute:
+      type: integer
+      minimum: 0
+      description: The chord changes made in a rated minute.
+    verified:
+      type: boolean
+      description: |
+        Whether the teacher vouches for the item at this measure. Present for
+        teacher_reviewed evidence only; only a teacher's review can verify.
+    teacher_note_id:
+      type: string
+      format: uuid
+      description: The teacher note that wrote this evidence. Present for teacher_reviewed evidence.
+  additionalProperties: false
+  required:
+    - evidence_id
+    - student_id
+    - item_key
+    - source
+    - occurred_at
+
+FretboardDrill:
+  type: string
+  enum:
+    - name_the_note
+    - find_the_note
+  description: |
+    How a fretboard cell is asked. name_the_note = the cell is shown and the student names
+    its note; find_the_note = the note and string are named and the student taps the cell.
