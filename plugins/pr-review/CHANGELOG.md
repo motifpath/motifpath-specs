@@ -1,5 +1,12 @@
 # PR Review — Changelog
 
+## [1.5.1] — 2026-10-04
+
+### Fixed
+- `profiles/motifpath-specs.md`: PromptFoo is no longer listed as an automatic CI gate or a test
+  layer. It was never wired up (no prompts, no config, and its CI trigger read a field GitHub
+  doesn't provide) and was removed from the repo; the golden-case validation job is listed instead.
+
 ## [1.5.0] — 2026-10-02
 
 ### Changed
