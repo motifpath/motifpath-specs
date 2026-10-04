@@ -1,8 +1,13 @@
 # ADR-010: Atlas CLI for ent Schema Migration Workflow
 
-**Status:** Proposed
+**Status:** Proposed (partially superseded by ADR-048)
 **Date:** 2026-06-12
 **Deciders:** Gilson Yamada (product/engineering lead)
+
+> **2026-10-04:** "The Atlas CLI is added to `devbox.json`" is superseded by
+> [ADR-048](./ADR-048-mise-and-seaweedfs-local-dev.md) — Devbox is gone, and the Atlas CLI is
+> installed separately, pinned to the version in `services/core-domain/Dockerfile`. The
+> migration workflow itself is unchanged.
 
 ---
 
