@@ -43,6 +43,22 @@ jobs:
             npx @cucumber/gherkin-streams "$feature" > /dev/null
           done
 
+  validate-golden:
+    name: Validate Golden Cases
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Validate grader golden cases against their schema and the practice contract
+        run: npm run validate:golden
+
   eval-prompts:
     name: Evaluate Prompts (on prompt changes)
     runs-on: ubuntu-latest
@@ -68,6 +84,6 @@ jobs:
   all-checks:
     name: All checks passed
     runs-on: ubuntu-latest
-    needs: [validate-openapi, validate-gherkin]
+    needs: [validate-openapi, validate-gherkin, validate-golden]
     steps:
       - run: echo "All spec validations passed"

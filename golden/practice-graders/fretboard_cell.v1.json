@@ -1,0 +1,263 @@
+{
+  "grader": "fretboard_cell.v1",
+  "description": "Fretboard cells: name the note of a cell shown, or find a note on the string asked. The cell, its string and its fret come from the item key; the pitch comes from the layout instrument's tuning.",
+  "reference": {
+    "instruments": {
+      "6ea2d087-ab9c-59dc-9657-8546025414d2": {
+        "name": "Acoustic guitar (standard tuning)",
+        "tuning": [
+          "E2",
+          "A2",
+          "D3",
+          "G3",
+          "B3",
+          "E4"
+        ]
+      }
+    }
+  },
+  "cases": [
+    {
+      "name": "name the note: right",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:3",
+      "response": {
+        "response_type": "name_the_note",
+        "note_name": "C",
+        "latency_ms": 1800
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 1800
+        }
+      }
+    },
+    {
+      "name": "name the note: wrong",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:3",
+      "response": {
+        "response_type": "name_the_note",
+        "note_name": "D",
+        "latency_ms": 2500
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2500
+        }
+      }
+    },
+    {
+      "name": "name the note: a flat spelling of the same pitch is right",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:2",
+      "response": {
+        "response_type": "name_the_note",
+        "note_name": "Gb",
+        "latency_ms": 2100
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2100
+        }
+      }
+    },
+    {
+      "name": "name the note: E# names F",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:1",
+      "response": {
+        "response_type": "name_the_note",
+        "note_name": "E#",
+        "latency_ms": 2300
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2300
+        }
+      }
+    },
+    {
+      "name": "name the note: Cb names an open B string",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:2:0",
+      "response": {
+        "response_type": "name_the_note",
+        "note_name": "Cb",
+        "latency_ms": 1900
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 1900
+        }
+      }
+    },
+    {
+      "name": "name the note: the open low E string",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:0",
+      "response": {
+        "response_type": "name_the_note",
+        "note_name": "E",
+        "latency_ms": 900
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 900
+        }
+      }
+    },
+    {
+      "name": "find the note: the asked fret is right",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:1",
+      "response": {
+        "response_type": "find_the_note",
+        "string": 6,
+        "fret": 1,
+        "latency_ms": 1500
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 1500
+        }
+      }
+    },
+    {
+      "name": "find the note: the same note an octave up on the asked string is right",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:1",
+      "response": {
+        "response_type": "find_the_note",
+        "string": 6,
+        "fret": 13,
+        "latency_ms": 1600
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 1600
+        }
+      }
+    },
+    {
+      "name": "find the note: the same note on another string is wrong",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:1",
+      "response": {
+        "response_type": "find_the_note",
+        "string": 4,
+        "fret": 3,
+        "latency_ms": 1500
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 1500
+        }
+      }
+    },
+    {
+      "name": "find the note: the next fret is wrong",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:1",
+      "response": {
+        "response_type": "find_the_note",
+        "string": 6,
+        "fret": 2,
+        "latency_ms": 1400
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 1400
+        }
+      }
+    },
+    {
+      "name": "rejected: the item names a string the instrument doesn't have",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:7:3",
+      "response": {
+        "response_type": "name_the_note",
+        "note_name": "C",
+        "latency_ms": 1800
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_cell"
+      }
+    },
+    {
+      "name": "rejected: a tap on a string the instrument doesn't have",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:1",
+      "response": {
+        "response_type": "find_the_note",
+        "string": 7,
+        "fret": 1,
+        "latency_ms": 1500
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_cell"
+      }
+    },
+    {
+      "name": "rejected: an instrument with no known layout",
+      "item_key": "fretboard_cell:00000000-0000-4000-8000-00000000dead:5:3",
+      "response": {
+        "response_type": "name_the_note",
+        "note_name": "C",
+        "latency_ms": 1800
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: an option choice doesn't answer a fretboard cell",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:3",
+      "response": {
+        "response_type": "option_choice",
+        "option_ids": [
+          "00000000-0000-4000-8000-0000000000b2"
+        ],
+        "latency_ms": 900
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a self-rating doesn't answer a fretboard cell",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 90
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    }
+  ]
+}

@@ -22,6 +22,10 @@ TrackingEventBase:
         - exercise.progress
         - exercise.answer_sent
         - exercise.ended
+        - practice.session_started
+        - practice.item_answered
+        - practice.session_ended
+        - practice.tap_check_completed
       description: |
         Discriminator field. Determines which event-specific payload fields are present.
         The set of valid values is closed — adding a new event type requires a spec change
@@ -70,6 +74,10 @@ TrackingEvent:
       exercise.progress: '#/ExerciseProgressEvent'
       exercise.answer_sent: '#/ExerciseAnswerSentEvent'
       exercise.ended: '#/ExerciseEndedEvent'
+      practice.session_started: '#/PracticeSessionStartedEvent'
+      practice.item_answered: '#/PracticeItemAnsweredEvent'
+      practice.session_ended: '#/PracticeSessionEndedEvent'
+      practice.tap_check_completed: '#/PracticeTapCheckCompletedEvent'
   oneOf:
     - $ref: '#/LessonStartedEvent'
     - $ref: '#/LessonResumedEvent'
@@ -78,6 +86,10 @@ TrackingEvent:
     - $ref: '#/ExerciseProgressEvent'
     - $ref: '#/ExerciseAnswerSentEvent'
     - $ref: '#/ExerciseEndedEvent'
+    - $ref: '#/PracticeSessionStartedEvent'
+    - $ref: '#/PracticeItemAnsweredEvent'
+    - $ref: '#/PracticeSessionEndedEvent'
+    - $ref: '#/PracticeTapCheckCompletedEvent'
 
 ContentContext:
   type: object
@@ -344,3 +356,149 @@ ExerciseEndedEvent:
         - exercise_id
         - trigger_context
         - outcome
+
+PracticeSessionStartedEvent:
+  allOf:
+    - $ref: '#/TrackingEventBase'
+    - type: object
+      description: |
+        Emitted when a student starts a composed practice session. Carries the plan as it
+        was offered, with the reason for every item, so the session composer's choices can
+        be compared with what the student went on to answer. The plan is not stored
+        anywhere else.
+      properties:
+        event_type:
+          type: string
+          enum:
+            - practice.session_started
+        practice_session_id:
+          type: string
+          format: uuid
+          description: |
+            Identifier of this practice session, carried by every practice.* event the
+            session produces. Distinct from session_id, which identifies the browser session.
+        instrument_id:
+          type: string
+          format: uuid
+          description: |
+            The instrument in the student's hands for this session. Absent when the session
+            is practised in the head, without an instrument.
+        minutes:
+          type: integer
+          minimum: 1
+          maximum: 60
+          description: The time the student chose for the session, in minutes.
+        planned_items:
+          type: array
+          minItems: 1
+          items:
+            $ref: './practice.yaml#/PlannedPracticeItem'
+          description: The session's items, in the order offered, each with why it was picked.
+      required:
+        - event_type
+        - practice_session_id
+        - minutes
+        - planned_items
+
+PracticeItemAnsweredEvent:
+  allOf:
+    - $ref: '#/TrackingEventBase'
+    - type: object
+      description: |
+        Emitted when a student answers one practice item: a note named or found, exercise
+        options selected, or a take rated. Carries the raw response only. The server grades
+        it and keeps the result as evidence of what the student knows; a response the
+        grader rejects is kept as an event but yields no evidence. The event_id identifies
+        the evidence, so a redelivered event counts once.
+      properties:
+        event_type:
+          type: string
+          enum:
+            - practice.item_answered
+        practice_session_id:
+          type: string
+          format: uuid
+          description: The practice session this answer belongs to.
+        item_key:
+          $ref: './practice.yaml#/PracticeItemKey'
+        response:
+          $ref: './practice.yaml#/PracticeResponse'
+        tap_ms:
+          type: integer
+          minimum: 0
+          readOnly: true
+          description: |
+            The student's tap time, in milliseconds, from their latest tap check before this
+            answer: how long a tap takes them when they already know where to tap. Set by the
+            server on timed answers (those with a latency_ms) when the student has done a tap
+            check; absent otherwise. A value sent by a client is ignored.
+      required:
+        - event_type
+        - practice_session_id
+        - item_key
+        - response
+
+PracticeSessionEndedEvent:
+  allOf:
+    - $ref: '#/TrackingEventBase'
+    - type: object
+      description: |
+        Emitted when a practice session ends, whether the student finished the plan or left
+        early. Carries how the session's timed drills felt, when the student was asked.
+      properties:
+        event_type:
+          type: string
+          enum:
+            - practice.session_ended
+        practice_session_id:
+          type: string
+          format: uuid
+          description: The practice session that ended.
+        answered_count:
+          type: integer
+          minimum: 0
+          description: How many items the student answered in the session.
+        left_early:
+          type: boolean
+          description: True when the student ended the session before its last planned item.
+        felt_ratings:
+          type: array
+          maxItems: 2
+          items:
+            $ref: './practice.yaml#/FeltRating'
+          description: |
+            The student's answers to "How did it feel?" for at most two of the session's
+            timed drills. Empty when the session asked none, or the student skipped them.
+      required:
+        - event_type
+        - practice_session_id
+        - answered_count
+        - left_early
+        - felt_ratings
+
+PracticeTapCheckCompletedEvent:
+  allOf:
+    - $ref: '#/TrackingEventBase'
+    - type: object
+      description: |
+        Emitted when a student completes the tap check: about 20 seconds of tapping a
+        highlighted fret as soon as it lights up. It measures how long a tap takes the
+        student on their device when there is nothing to work out, so timed drills can judge
+        the time spent knowing the answer apart from the time spent tapping it.
+      properties:
+        event_type:
+          type: string
+          enum:
+            - practice.tap_check_completed
+        median_tap_ms:
+          type: integer
+          minimum: 0
+          description: The median time from a fret lighting up to the student's tap, in milliseconds.
+        tap_count:
+          type: integer
+          minimum: 1
+          description: How many taps the median was taken over.
+      required:
+        - event_type
+        - median_tap_ms
+        - tap_count

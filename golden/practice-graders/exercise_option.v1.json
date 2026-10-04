@@ -1,0 +1,197 @@
+{
+  "grader": "exercise_option.v1",
+  "description": "Authored exercises answered by selecting options. Right only when the selected options are exactly the exercise's correct options, in any order.",
+  "reference": {
+    "exercises": {
+      "00000000-0000-4000-8000-0000000000e1": {
+        "name": "From A, which note is the minor third? (one correct option)",
+        "option_ids": [
+          "00000000-0000-4000-8000-0000000000a1",
+          "00000000-0000-4000-8000-0000000000b1",
+          "00000000-0000-4000-8000-0000000000c1",
+          "00000000-0000-4000-8000-0000000000d1"
+        ],
+        "correct_option_ids": [
+          "00000000-0000-4000-8000-0000000000b1"
+        ]
+      },
+      "00000000-0000-4000-8000-0000000000e2": {
+        "name": "Which notes belong to a C major triad? (several correct options)",
+        "option_ids": [
+          "00000000-0000-4000-8000-0000000000a2",
+          "00000000-0000-4000-8000-0000000000b2",
+          "00000000-0000-4000-8000-0000000000c2",
+          "00000000-0000-4000-8000-0000000000d2"
+        ],
+        "correct_option_ids": [
+          "00000000-0000-4000-8000-0000000000b2",
+          "00000000-0000-4000-8000-0000000000c2"
+        ]
+      }
+    }
+  },
+  "cases": [
+    {
+      "name": "one correct option: selected",
+      "item_key": "exercise:00000000-0000-4000-8000-0000000000e1",
+      "response": {
+        "response_type": "option_choice",
+        "option_ids": [
+          "00000000-0000-4000-8000-0000000000b1"
+        ],
+        "latency_ms": 4000
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 4000
+        }
+      }
+    },
+    {
+      "name": "one correct option: a wrong option selected",
+      "item_key": "exercise:00000000-0000-4000-8000-0000000000e1",
+      "response": {
+        "response_type": "option_choice",
+        "option_ids": [
+          "00000000-0000-4000-8000-0000000000a1"
+        ],
+        "latency_ms": 4100
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 4100
+        }
+      }
+    },
+    {
+      "name": "one correct option: the right option plus a wrong one is wrong",
+      "item_key": "exercise:00000000-0000-4000-8000-0000000000e1",
+      "response": {
+        "response_type": "option_choice",
+        "option_ids": [
+          "00000000-0000-4000-8000-0000000000b1",
+          "00000000-0000-4000-8000-0000000000c1"
+        ],
+        "latency_ms": 4200
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 4200
+        }
+      }
+    },
+    {
+      "name": "several correct options: all of them, in another order, is right",
+      "item_key": "exercise:00000000-0000-4000-8000-0000000000e2",
+      "response": {
+        "response_type": "option_choice",
+        "option_ids": [
+          "00000000-0000-4000-8000-0000000000c2",
+          "00000000-0000-4000-8000-0000000000b2"
+        ],
+        "latency_ms": 6000
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 6000
+        }
+      }
+    },
+    {
+      "name": "several correct options: only some of them is wrong",
+      "item_key": "exercise:00000000-0000-4000-8000-0000000000e2",
+      "response": {
+        "response_type": "option_choice",
+        "option_ids": [
+          "00000000-0000-4000-8000-0000000000b2"
+        ],
+        "latency_ms": 5000
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 5000
+        }
+      }
+    },
+    {
+      "name": "several correct options: all of them plus a wrong one is wrong",
+      "item_key": "exercise:00000000-0000-4000-8000-0000000000e2",
+      "response": {
+        "response_type": "option_choice",
+        "option_ids": [
+          "00000000-0000-4000-8000-0000000000b2",
+          "00000000-0000-4000-8000-0000000000c2",
+          "00000000-0000-4000-8000-0000000000d2"
+        ],
+        "latency_ms": 7000
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 7000
+        }
+      }
+    },
+    {
+      "name": "rejected: an option the exercise doesn't have",
+      "item_key": "exercise:00000000-0000-4000-8000-0000000000e1",
+      "response": {
+        "response_type": "option_choice",
+        "option_ids": [
+          "00000000-0000-4000-8000-0000000000b1",
+          "00000000-0000-4000-8000-0000000000b2"
+        ],
+        "latency_ms": 3000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_option"
+      }
+    },
+    {
+      "name": "rejected: an exercise that doesn't exist",
+      "item_key": "exercise:00000000-0000-4000-8000-0000000000ee",
+      "response": {
+        "response_type": "option_choice",
+        "option_ids": [
+          "00000000-0000-4000-8000-0000000000b1"
+        ],
+        "latency_ms": 3000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: naming a note doesn't answer an exercise",
+      "item_key": "exercise:00000000-0000-4000-8000-0000000000e1",
+      "response": {
+        "response_type": "name_the_note",
+        "note_name": "C",
+        "latency_ms": 3000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    }
+  ]
+}

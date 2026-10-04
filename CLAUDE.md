@@ -12,6 +12,8 @@ Changes here propagate to all consuming repositories before any implementation b
 /adrs         → Architecture Decision Records
 /prompts      → Versioned AI task prompts
 /evals        → Golden sets for PromptFoo evaluation
+/golden       → Language-neutral golden cases shared by core and web (e.g. practice graders),
+                validated by `npm run validate:golden`
 /plugins      → Claude Code skills for the whole team (plugin marketplace)
 ```
 
@@ -30,7 +32,9 @@ A feature spec is ready when ALL of the following are true:
 ## Gherkin Standards
 ALWAYS use domain language — never HTTP status codes, SQL, or framework names in scenarios.
 ALWAYS reference domain events by exact names: lesson.started, lesson.resumed, lesson.completed,
-exercise.started, exercise.progress, exercise.answer_sent, exercise.ended.
+exercise.started, exercise.progress, exercise.answer_sent, exercise.ended,
+practice.session_started, practice.item_answered, practice.session_ended,
+practice.tap_check_completed.
 One scenario = one behavior. Never test multiple behaviors in a single scenario.
 Steps must be concrete and specific — avoid vague steps like "the system processes the request".
 

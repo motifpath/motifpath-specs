@@ -10,6 +10,9 @@
 the table lists the first kinds. Recorded takes are out of scope: the platform has no storage for
 student videos (teacher reviews arrive over WhatsApp), and storing them needs its own cost and
 infrastructure decision (PB-88).
+**Clarified:** 2026-10-03, while writing the spec. The tap baseline arrives as its own event,
+`practice.tap_check_completed`; ingestion stamps the latest one on each timed answer. This
+clarifies how the existing decision works and changes nothing in it.
 
 ---
 
@@ -119,6 +122,8 @@ One piece of evidence per observation, the only stored learning state:
 - `practice.item_answered`: `event_id`, `item_key` and the raw response.
 - `practice.session_ended`: the answered count, whether the student left early, and how each timed
   drill felt (below).
+- `practice.tap_check_completed`: the student's median tap time and how many taps it was taken
+  over (see Timed thresholds).
 - `practice.item_reviewed`: written by core when a teacher note judges an item. It uses the teacher
   note's id as its session id.
 - The S7 challenge's answers move onto `practice.item_answered`, so assessment and practice feed one
@@ -211,8 +216,9 @@ One piece of evidence per observation, the only stored learning state:
   *knowing*: latency minus the student's tap time. It has a version, a start date, a source
   (`benchmark` or `calibrated`) and the data behind it. Tempo-measured items keep musical targets.
 - **Version 1** is twice the team's median net time on the drill, measured by the team before launch.
-- **Tap baseline:** a 20-second "tap the highlighted fret" check gives each student's tap time.
-  Ingestion stamps it on every timed answer, so replays stay stable.
+- **Tap baseline:** a 20-second "tap the highlighted fret" check gives each student's tap time,
+  sent as `practice.tap_check_completed`. Ingestion stamps the latest one on every timed answer,
+  so replays stay stable.
 - **Felt ratings:** after a session, at most one or two "How did it feel? Easy / About right / Hard"
   questions, for the drill templates with the least calibration data. Felt ratings calibrate
   thresholds and **never count toward mastery**.

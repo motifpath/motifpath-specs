@@ -1,0 +1,216 @@
+PracticeItemKey:
+  type: string
+  description: |
+    Stable, readable identifier of a practice item: the smallest thing whose knowledge is
+    tracked. Every answer, rating and review points at one. The prefix is the item kind:
+
+    - fretboard_cell:<layout instrument id>:<string>:<fret> — a generated fretboard cell.
+      The instrument is the one whose fretboard layout the cell belongs to, so instruments
+      that share a layout share the cell. Strings are numbered from 1, the highest-pitched;
+      fret 0 is the open string.
+    - exercise:<exercise id> — an authored exercise.
+    - play_along:<diagram id> — playing a diagram along with its playback, at a tempo.
+    - chord_change:<from diagram id>:<to diagram id> — changing between two chord diagrams.
+
+    Item kinds are an open set: a new kind adds its own prefix and key scheme here, a
+    grader, and its golden cases.
+  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$'
+  example: 'fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:3'
+
+PracticeResponse:
+  description: |
+    The student's raw answer to one practice item, exactly as given. It never says whether
+    the answer was right: the server grades it against reference data, and a client grades
+    it only to show instant feedback, with the same rules. Exactly one shape applies,
+    discriminated by response_type.
+  discriminator:
+    propertyName: response_type
+    mapping:
+      name_the_note: '#/NameTheNoteResponse'
+      find_the_note: '#/FindTheNoteResponse'
+      option_choice: '#/OptionChoiceResponse'
+      self_rating: '#/SelfRatingResponse'
+  oneOf:
+    - $ref: '#/NameTheNoteResponse'
+    - $ref: '#/FindTheNoteResponse'
+    - $ref: '#/OptionChoiceResponse'
+    - $ref: '#/SelfRatingResponse'
+
+NameTheNoteResponse:
+  type: object
+  description: |
+    Answer to a fretboard cell shown on the fretboard: the student names its note.
+  properties:
+    response_type:
+      type: string
+      enum:
+        - name_the_note
+      description: Discriminator. The student named the note of the cell shown.
+    note_name:
+      type: string
+      pattern: '^[A-G][#b]?$'
+      description: |
+        The note named, as a letter with an optional sharp (#) or flat (b), without an
+        octave. Any spelling of the right pitch counts as right (F# and Gb alike).
+    latency_ms:
+      type: integer
+      minimum: 0
+      description: Milliseconds from the moment the cell was shown to the answer.
+  additionalProperties: false
+  required:
+    - response_type
+    - note_name
+    - latency_ms
+
+FindTheNoteResponse:
+  type: object
+  description: |
+    Answer to a note asked on a given string: the student taps where it is on the fretboard.
+  properties:
+    response_type:
+      type: string
+      enum:
+        - find_the_note
+      description: Discriminator. The student tapped a cell to find the note asked.
+    string:
+      type: integer
+      minimum: 1
+      description: The string tapped, 1 being the highest-pitched.
+    fret:
+      type: integer
+      minimum: 0
+      description: The fret tapped; 0 is the open string.
+    latency_ms:
+      type: integer
+      minimum: 0
+      description: Milliseconds from the moment the note was asked to the tap.
+  additionalProperties: false
+  required:
+    - response_type
+    - string
+    - fret
+    - latency_ms
+
+OptionChoiceResponse:
+  type: object
+  description: |
+    Answer to an authored exercise: the options the student selected. An exercise with one
+    correct option takes one selection; an exercise with several correct options takes
+    several, and is right only when the selection matches its correct options exactly.
+  properties:
+    response_type:
+      type: string
+      enum:
+        - option_choice
+      description: Discriminator. The student selected options of an authored exercise.
+    option_ids:
+      type: array
+      minItems: 1
+      uniqueItems: true
+      items:
+        type: string
+        format: uuid
+      description: The options selected, in any order.
+    latency_ms:
+      type: integer
+      minimum: 0
+      description: Milliseconds from the moment the exercise was shown to the answer.
+  additionalProperties: false
+  required:
+    - response_type
+    - option_ids
+    - latency_ms
+
+SelfRatingResponse:
+  type: object
+  description: |
+    The student's own rating of a take they played: a play-along at a tempo, or chord
+    changes counted over a minute. A play-along rating carries tempo_bpm and no
+    changes_per_minute; a chord-change rating carries changes_per_minute and no tempo_bpm.
+  properties:
+    response_type:
+      type: string
+      enum:
+        - self_rating
+      description: Discriminator. The student rated a take of their own.
+    rating:
+      type: string
+      enum:
+        - struggled
+        - almost
+        - clean
+      description: |
+        How the take went, in the student's judgement. struggled = fell apart or needed to
+        stop; almost = got through with slips; clean = no slips at this measure.
+    tempo_bpm:
+      type: integer
+      minimum: 1
+      maximum: 400
+      description: The tempo of the take, in beats per minute. Present for a play-along.
+    changes_per_minute:
+      type: integer
+      minimum: 0
+      maximum: 600
+      description: The number of chord changes made in one minute. Present for a chord change.
+  additionalProperties: false
+  required:
+    - response_type
+    - rating
+
+PracticePickReason:
+  type: string
+  enum:
+    - teacher_suggested
+    - due
+    - weak
+    - new
+    - warm_up
+    - application
+    - review_ahead
+    - stretch
+  description: |
+    Why the session composer put an item in a session, shown to the student.
+    teacher_suggested = a teacher asked for it; due = its review is due; weak = it is
+    practised but not yet secure; new = it has not been practised yet; warm_up = something
+    already known, played first with the instrument in hand; application = applying the
+    skill to music; review_ahead = a known item reviewed before it falls due, when nothing
+    else is due; stretch = an unseen item of a node the student is ready to start, when
+    nothing else is due.
+
+PlannedPracticeItem:
+  type: object
+  description: One item of a composed practice session, in the order it was offered.
+  properties:
+    item_key:
+      $ref: '#/PracticeItemKey'
+    reason:
+      $ref: '#/PracticePickReason'
+  additionalProperties: false
+  required:
+    - item_key
+    - reason
+
+FeltRating:
+  type: object
+  description: |
+    How a timed drill felt to the student in a session. Used only to calibrate how fast
+    counts as fluent for that drill; it never counts toward the student's own mastery.
+  properties:
+    drill_template_key:
+      type: string
+      pattern: '^[a-z][a-z_]*:[a-z][a-z_]*$'
+      description: |
+        The timed drill asked about, such as fretboard_cell:name_the_note or
+        fretboard_cell:find_the_note.
+      example: 'fretboard_cell:name_the_note'
+    felt:
+      type: string
+      enum:
+        - easy
+        - about_right
+        - hard
+      description: The student's answer to "How did it feel?".
+  additionalProperties: false
+  required:
+    - drill_template_key
+    - felt
