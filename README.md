@@ -42,7 +42,6 @@ claude plugin install adr-writer@motifpath-skills
 claude plugin install ai-consultant@motifpath-skills
 claude plugin install plan-writer@motifpath-skills
 claude plugin install product-discovery@motifpath-skills
-claude plugin install project-index-maintenance@motifpath-skills
 claude plugin install pr-review@motifpath-skills
 
 # 5. Turn on background auto-update for this marketplace (off by default for
