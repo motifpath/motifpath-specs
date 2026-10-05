@@ -29,6 +29,8 @@ Also decided:
 - instruments come from enrollments only;
 - the home counts practice days (finished sessions) and learning days (completed content nodes),
   never streaks, and keeps the raw activity;
+- the home opens on an overview across instruments: practice days on any instrument, learning
+  days, and a card per instrument. Each instrument tab counts only that instrument;
 - progress this week compares now with 7 days ago, from daily item snapshots.
 
 ---
@@ -226,8 +228,12 @@ One piece of evidence per observation, the only stored learning state:
   is not used.
 - **With the instrument in hand:** a warm-up on something known, never on what the teacher flagged and
   skipped under 5 minutes; a focus block; and, from 10 minutes, applying the skill to music.
-  Authored exercises are focus items. The application ending is a play-along on a skill the focus
-  block practised, at its tempo ladder, and its takes are evidence. A warm-up
+  Authored exercises are focus items. The application ending is one play-along on a skill the
+  focus block practised, at its tempo ladder, and its takes are evidence. With no play-along on a
+  focus skill it applies another skill of the student's paths. With none on the instrument at all,
+  the session has no ending and the time stays with the focus block.
+- **Focus time:** the session minus the warm-up and the application ending (one play-along at its
+  estimated time). The mix shares the focus time. A warm-up
   play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the
   evidence: its takes are not sent as answers, and a due item is never the warm-up.
 - **Tempo ladder:** start at the best clean tempo; +5 BPM after two clean takes; −5 after a struggle;
@@ -275,19 +281,26 @@ One piece of evidence per observation, the only stored learning state:
 
 ### The student summary and home
 
-- One derived summary per student and instrument is the home's single read:
-  - **practice days** in the last 7: days with a practice session finished, meaning ended without
-    leaving early and not abandoned;
-  - **learning days** in the last 7: days with at least one content node completed;
-  - progress this week per skill with both values ("accuracy 72% → 86%");
-  - next steps (refresh, strengthen, ready to start; the top three plus "see all");
-  - practice nodes grouped by area.
+- **The home opens on an overview** across instruments, then one tab per instrument. Amended
+  2026-10-05, by Gilson: each tab counts only what is true for its instrument, and what belongs to
+  no instrument lives on the overview.
+  - **The overview:**
+    - practice days in the last 7 on any instrument;
+    - **learning days** in the last 7 (days with at least one content node completed), shown only
+      here;
+    - one card per instrument with its practice days and its top next step.
+  - **An instrument's summary**, one derived read per student and instrument:
+    - **practice days** in the last 7 with that instrument in hand: days with a practice session
+      finished, meaning ended without leaving early and not abandoned;
+    - progress this week per skill with both values ("accuracy 72% → 86%");
+    - next steps (refresh, strengthen, ready to start; the top three plus "see all");
+    - practice nodes grouped by area. Instrument-independent nodes get an **"Any instrument"**
+      group. Concepts appear in the map and as context, not as separate progress lines.
 - **Counts, never streaks, never a reset.** The worker keeps the raw activity (every session's start,
   answers and end; every content node completed, with its time), so a streak or another measure
   can be evaluated later without new tracking.
 - **Progress this week** compares now with the state 7 days ago. The worker keeps a daily snapshot
-  of each practised item's state for this purpose. Instrument-independent nodes get an **"Any instrument"** group. Concepts appear
-  in the map and as context, not as separate progress lines.
+  of each practised item's state for this purpose.
 - The home is organised by skills and concepts, never by exercise type, with progress before next
   steps and no red badges. Practice days are counted in the student's time zone.
 

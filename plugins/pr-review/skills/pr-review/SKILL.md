@@ -1,6 +1,6 @@
 ---
 name: pr-review
-version: 1.5.2
+version: 1.5.3
 description: >
   Review a proposed pull request against MotifPath conventions and the intent behind the change,
   across any of the four MotifPath repos (motifpath-core, motifpath-web, motifpath-infra,

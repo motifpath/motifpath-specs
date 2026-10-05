@@ -1,5 +1,12 @@
 # PR Review — Changelog
 
+## [1.5.3] — 2026-10-05
+
+### Changed
+- `HEURISTICS.md` item 17 (verify, don't presume) also asks the reviewer to recompute each worked
+  example in a spec or test against the rule it illustrates. From the specs#182 review: an
+  abandoned-session scenario's times contradicted the ADR's planned minutes + 15 rule.
+
 ## [1.5.2] — 2026-10-05
 
 ### Fixed

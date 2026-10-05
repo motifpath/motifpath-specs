@@ -15,7 +15,7 @@ Feature: Show the student's practice summary on the home
     Then the summary shows 4 practice days in the last 7
 
   Scenario: Progress this week shows where a skill started and where it is now
-    Given "alice"'s accuracy on "notes-on-low-strings" was 0.72 at the start of the week and is 0.86 now
+    Given "alice"'s accuracy on "notes-on-low-strings" was 0.72 seven days ago and is 0.86 now
     When "alice" reads their practice summary for "guitar"
     Then the progress this week shows "notes-on-low-strings" accuracy from 0.72 to 0.86
 
@@ -28,12 +28,54 @@ Feature: Show the student's practice summary on the home
     When "alice" reads their practice summary for "guitar"
     Then the summary lists "guitar" and "electric-bass" as their instruments
 
+  Scenario: Fading skills come first in the next steps, as refresh
+    Given "alice"'s skill "notes-on-low-strings" on guitar rests on items whose review is due
+    And "alice" has a skill to strengthen and a skill ready to start on guitar
+    When "alice" reads their practice summary for "guitar"
+    Then the next steps are "notes-on-low-strings" to refresh, then the skill to strengthen, then the skill ready to start
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   Scenario: A missed day never resets anything
     Given "alice" practised on 6 consecutive days and then missed a day
     When "alice" reads their practice summary for "guitar"
     Then the summary shows 6 practice days in the last 7
+
+  Scenario: A session the student left early is not a practice day
+    Given "alice"'s only session yesterday ended early
+    When "alice" reads their practice summary for "guitar"
+    Then the summary shows 0 practice days in the last 7
+
+  Scenario: An abandoned session is not a practice day
+    Given "alice" started a 10-minute session yesterday and sent nothing for it after the first 5 minutes
+    When "alice" reads their practice summary for "guitar"
+    Then the summary shows 0 practice days in the last 7
+
+  Scenario: A session finished on another instrument is not a practice day for this one
+    Given "alice" finished a session with "electric-bass" in hand yesterday
+    When "alice" reads their practice summary for "guitar"
+    Then the summary shows 0 practice days in the last 7
+
+  Scenario: A skill first practised this week starts its progress from 0
+    Given "alice" first practised "notes-on-low-strings" 3 days ago and their accuracy on it is 0.8 now
+    When "alice" reads their practice summary for "guitar"
+    Then the progress this week shows "notes-on-low-strings" accuracy from 0 to 0.8
+
+  Scenario: A tempo improvement needs a clean take 7 days ago
+    Given "alice" had no clean take on "pentatonic-run" seven days ago and their best clean tempo on it is 105 BPM now
+    When "alice" reads their practice summary for "guitar"
+    Then the progress this week has no tempo line for the skill of "pentatonic-run"
+
+  Scenario: A path for every instrument adds no instrument
+    Given "alice" is also enrolled in a music-theory path for every instrument
+    When "alice" reads their practice summary for "guitar"
+    Then the summary lists only "guitar" and "electric-bass" as their instruments
+
+  Scenario: A skill with nothing to practise on the instrument is not a next step
+    Given the skill "slap-technique" has practice items only for "electric-bass"
+    And "alice" is ready to start "slap-technique"
+    When "alice" reads their practice summary for "guitar"
+    Then "slap-technique" is not among the next steps
 
   Scenario: Practice days follow the student's time zone
     Given "alice" practised at 23:30 on Monday in "America/Sao_Paulo", which is Tuesday in UTC
