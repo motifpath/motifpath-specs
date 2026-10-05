@@ -13,6 +13,9 @@ infrastructure decision (PB-88).
 **Clarified:** 2026-10-03, while writing the spec. The tap baseline arrives as its own event,
 `practice.tap_check_completed`; ingestion stamps the latest one on each timed answer. This
 clarifies how the existing decision works and changes nothing in it.
+**Amended:** 2026-10-04, after the play-along smoke. `practice.session_ended` is also sent when the
+page closes, and a session without one counts as abandoned after its planned minutes + 15 with no
+event (see Events). The smoke left 4 of 11 sessions without an end event.
 
 ---
 
@@ -121,7 +124,14 @@ One piece of evidence per observation, the only stored learning state:
   a reason for every item.
 - `practice.item_answered`: `event_id`, `item_key` and the raw response.
 - `practice.session_ended`: the answered count, whether the student left early, and how each timed
-  drill felt (below).
+  drill felt (below). Sent once per session: when the student finishes the plan, leaves the session
+  inside the app, or closes or reloads the page. It's sent on page close as best effort, so it can
+  still be lost, for example when the phone discards a background tab.
+- **An abandoned session has no end event.** A session with no `practice.session_ended` counts as
+  abandoned once no `practice.*` event for it has arrived for its planned minutes + 15. It ended
+  early, at its last event. Readers apply this when they read, like fading: no event is written for
+  it. A student who comes back to a page still open can carry on, and the late event reopens the
+  session.
 - `practice.tap_check_completed`: the student's median tap time and how many taps it was taken
   over (see Timed thresholds).
 - `practice.item_reviewed`: written by core when a teacher note judges an item. It uses the teacher

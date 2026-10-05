@@ -444,8 +444,14 @@ PracticeSessionEndedEvent:
     - $ref: '#/TrackingEventBase'
     - type: object
       description: |
-        Emitted when a practice session ends, whether the student finished the plan or left
-        early. Carries how the session's timed drills felt, when the student was asked.
+        Emitted once when a practice session ends: the student finished the plan, left the
+        session inside the app, or closed or reloaded the page. Carries how the session's
+        timed drills felt, when the student was asked. On a page close it's sent as best
+        effort and can be lost, for example when the phone discards a background tab. A
+        session that never sends it counts as abandoned once no practice event for it has
+        arrived for its planned minutes plus 15. It then ended early, at its last event. A
+        later event for the session means the student came back, so the session is open
+        again.
       properties:
         event_type:
           type: string
@@ -461,7 +467,9 @@ PracticeSessionEndedEvent:
           description: How many items the student answered in the session.
         left_early:
           type: boolean
-          description: True when the student ended the session before its last planned item.
+          description: |
+            True when the session ended before its last planned item: the student left it
+            inside the app, or closed or reloaded the page.
         felt_ratings:
           type: array
           maxItems: 2
