@@ -4844,7 +4844,7 @@ paths:
       summary: Read the authenticated student's practice summary for the home
       description: |
         Everything the practice home shows, in one read, for one of the student's
-        instruments: practice days and learning days in the last 7, progress this week per
+        instruments: practice days on that instrument in the last 7, progress this week per
         skill, the next steps, and every practice node grouped by area, with a separate group for nodes that suit
         any instrument. Progress is reported per skill; concepts are context, never progress
         lines. A wide node is shown through its coverage and its children, never as a level
@@ -4899,6 +4899,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+
+  /students/me/practice-overview:
+    get:
+      operationId: getPracticeOverview
+      summary: Read the authenticated student's practice overview, across instruments
+      description: |
+        The first view of the practice home, before the student picks an instrument: on how
+        many of the last 7 days they practised on any instrument and completed a content
+        node, and one card per instrument with that instrument's practice days and its top
+        next step. Each instrument's full picture is its practice summary.
+
+        Derived from the student's activity; reading it changes nothing.
+
+        Any authenticated user may read their own overview.
+      tags:
+        - Practice
+      parameters:
+        - name: time_zone
+          in: query
+          required: false
+          schema:
+            type: string
+            default: UTC
+          description: |
+            The student's IANA time zone, such as America/Sao_Paulo, used to decide which
+            calendar day each practice and each completion falls on.
+      responses:
+        "200":
+          description: The student's practice overview.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeOverview'
+        "400":
+          description: time_zone is not a known IANA time zone.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
 
   /users/me:
     get:
@@ -9576,16 +9621,9 @@ components:
           description: |
             On how many of the last 7 calendar days, in the given time zone, the student
             finished a practice session: ended without leaving early, and not abandoned (no
-            practice event for the session's planned minutes plus 15). Counted across all
-            instruments. Never a streak: a missed day is never a reset.
-        learning_days_last_7:
-          type: integer
-          minimum: 0
-          maximum: 7
-          description: |
-            On how many of the last 7 calendar days, in the given time zone, the student
-            completed at least one content node. Counted across all instruments. Never a
-            streak: a missed day is never a reset.
+            practice event for the session's planned minutes plus 15) with the summarised
+            instrument in hand. A session on another instrument counts on that instrument's
+            summary, not this one. Never a streak: a missed day is never a reset.
         progress_this_week:
           type: array
           items:
@@ -9612,11 +9650,70 @@ components:
         - instrument_id
         - student_instrument_ids
         - practice_days_last_7
-        - learning_days_last_7
         - progress_this_week
         - next_steps
         - next_steps_total
         - groups
+
+    PracticeOverview:
+      type: object
+      description: The practice home's overview, across all of the student's instruments.
+      properties:
+        practice_days_last_7:
+          type: integer
+          minimum: 0
+          maximum: 7
+          description: |
+            On how many of the last 7 calendar days, in the given time zone, the student
+            finished a practice session on any instrument, or without one: ended without
+            leaving early, and not abandoned (no practice event for the session's planned
+            minutes plus 15). Never a streak: a missed day is never a reset.
+        learning_days_last_7:
+          type: integer
+          minimum: 0
+          maximum: 7
+          description: |
+            On how many of the last 7 calendar days, in the given time zone, the student
+            completed at least one content node. Never a streak: a missed day is never a
+            reset.
+        instruments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PracticeInstrumentCard'
+          description: |
+            One card per instrument of the student, inferred from the paths and courses
+            they're enrolled in, in the order their summaries are tabbed.
+      required:
+        - practice_days_last_7
+        - learning_days_last_7
+        - instruments
+
+    PracticeInstrumentCard:
+      type: object
+      description: One instrument at a glance, linking to its practice summary.
+      properties:
+        instrument_id:
+          type: string
+          format: uuid
+          description: The instrument.
+        practice_days_last_7:
+          type: integer
+          minimum: 0
+          maximum: 7
+          description: |
+            On how many of the last 7 calendar days the student finished a practice session
+            with this instrument in hand; the same count as the instrument's practice summary.
+        top_next_step:
+          oneOf:
+            - $ref: '#/components/schemas/PracticeNextStep'
+            - type: 'null'
+          description: |
+            The instrument's first next step, as its practice summary ranks them. Null when
+            there is none.
+      required:
+        - instrument_id
+        - practice_days_last_7
+        - top_next_step
 
     SkillProgress:
       type: object

@@ -28,11 +28,6 @@ Feature: Show the student's practice summary on the home
     When "alice" reads their practice summary for "guitar"
     Then the summary lists "guitar" and "electric-bass" as their instruments
 
-  Scenario: Learning days count the days a content node was completed
-    Given "alice" completed content nodes on 3 of the last 7 days
-    When "alice" reads their practice summary for "guitar"
-    Then the summary shows 3 learning days in the last 7
-
   Scenario: Fading skills come first in the next steps, as refresh
     Given "alice"'s skill "notes-on-low-strings" on guitar rests on items whose review is due
     And "alice" has a skill to strengthen and a skill ready to start on guitar
@@ -56,10 +51,10 @@ Feature: Show the student's practice summary on the home
     When "alice" reads their practice summary for "guitar"
     Then the summary shows 0 practice days in the last 7
 
-  Scenario: A session finished on another instrument still counts as a practice day
+  Scenario: A session finished on another instrument is not a practice day for this one
     Given "alice" finished a session with "electric-bass" in hand yesterday
     When "alice" reads their practice summary for "guitar"
-    Then the summary shows 1 practice day in the last 7
+    Then the summary shows 0 practice days in the last 7
 
   Scenario: A skill first practised this week starts its progress from 0
     Given "alice" first practised "notes-on-low-strings" 3 days ago and their accuracy on it is 0.8 now
