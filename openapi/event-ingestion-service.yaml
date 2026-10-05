@@ -63,7 +63,7 @@ paths:
                     content_type: video
                     teacher_id: "b8c9d0e1-0000-0000-0000-000000000001"
               practice_item_answered_in_a_challenge:
-                summary: Student answers a challenge exercise (first attempt)
+                summary: Student moves on from a challenge exercise with an option selected
                 value:
                   event_id: "a1b2c3d4-0000-0000-0000-000000000002"
                   event_type: practice.item_answered

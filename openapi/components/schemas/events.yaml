@@ -374,11 +374,13 @@ PracticeItemAnsweredEvent:
 
         An answer belongs to exactly one context: a practice session (practice_session_id)
         or an exercise answered elsewhere on the platform, such as a node's challenge
-        (trigger_context). Answers count the same wherever they are given. In a challenge,
-        only the student's first answer to each exercise is evidence: a retry follows the
-        feedback on the first answer, so it shows what the feedback taught, not what the
-        student knew. The client sends only first answers, and the server keeps only the
-        first answer to an item per challenge within a browser session.
+        (trigger_context). Answers count the same wherever they are given. Outside a
+        practice session, an exercise's answer is the selection the student moves on with
+        (to the next exercise, or to finish), sent once per exercise each time the student
+        works through it. Selecting, deselecting or changing options before moving on is not
+        an answer, and changing a selection after going back is not a new one: a later
+        selection may follow what the student learned since, so it is not evidence of what
+        they knew. latency_ms runs from the moment the exercise was shown to moving on.
       properties:
         event_type:
           type: string

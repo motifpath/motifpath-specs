@@ -82,11 +82,24 @@ Feature: Grade a practice answer into evidence
     Then the evidence for that cell records a tap time of 350 milliseconds
 
   @wip
-  Scenario: Only the first answer to an exercise in a challenge is evidence
+  Scenario: A challenge exercise's answer is the selection the student moves on with
     Given "alice" is taking the challenge "open-chords-assessment" of the content node "open-chords"
-    And "alice" answered the exercise "minor-third-from-a" wrong in the challenge
-    When "alice" retries "minor-third-from-a" in the same challenge and selects its correct option
+    And the exercise "c-major-triad" whose correct options are "C" and "E" out of "C", "D", "E" and "F"
+    When "alice" selects "C", then also "E", and moves on to the next exercise
+    Then "alice" has one piece of evidence for "c-major-triad", and it is correct
+
+  @wip
+  Scenario: Changing a challenge answer after going back is not a new answer
+    Given "alice" is taking the challenge "open-chords-assessment" of the content node "open-chords"
+    And "alice" moved on from the exercise "minor-third-from-a" with a wrong option selected
+    When "alice" goes back to "minor-third-from-a", selects its correct option and moves on again
     Then "alice"'s only evidence for "minor-third-from-a" is the wrong answer
+
+  @wip
+  Scenario: Working through a challenge again gives new answers
+    Given "alice" took the challenge "open-chords-assessment" yesterday and answered "minor-third-from-a" wrong
+    When "alice" takes "open-chords-assessment" again and moves on from "minor-third-from-a" with its correct option selected
+    Then "alice" has two pieces of evidence for "minor-third-from-a", the second one correct
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 

@@ -18,8 +18,8 @@ page closes, and a session without one counts as abandoned after its planned min
 event (see Events). The smoke left 4 of 11 sessions without an end event.
 **Amended:** 2026-10-05, planning slice 3, by Gilson. Every exercise counts toward skill levels, so:
 - authored exercises join sessions now;
-- the S7 challenge moves onto `practice.item_answered`, with first answers only, and
-  `exercise.answer_sent` is retired;
+- the S7 challenge moves onto `practice.item_answered`, one answer per exercise (the selection
+  the student moves on with), and `exercise.answer_sent` is retired;
 - exercise families start from default fluent times, with audio taken off the latency. Fluent times
   are configuration.
 
@@ -154,10 +154,11 @@ One piece of evidence per observation, the only stored learning state:
 - `practice.item_reviewed`: written by core when a teacher note judges an item. It uses the teacher
   note's id as its session id.
 - The S7 challenge's answers move onto `practice.item_answered`, so assessment and practice feed one
-  evidence record, under the same rules and weights. **Only the first answer to each exercise in a
-  challenge is evidence:** a retry follows the feedback, so it shows what the feedback taught. The
-  client sends first answers only, and the worker keeps the first answer to an item per challenge
-  within a browser session. `exercise.answer_sent` is retired.
+  evidence record, under the same rules and weights. **One answer per exercise each time the student
+  works through the challenge:** the selection they move on with, timed to that moment. Taps before
+  moving on aren't answers, and a selection changed after going back isn't a new one, since it may
+  follow what the student learned since. Working through the challenge again later gives new
+  answers. `exercise.answer_sent` is retired.
 
 ### Knowledge state: a fold over evidence
 

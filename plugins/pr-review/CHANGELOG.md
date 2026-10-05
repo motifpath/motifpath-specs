@@ -1,5 +1,12 @@
 # PR Review — Changelog
 
+## [1.5.2] — 2026-10-05
+
+### Fixed
+- `profiles/motifpath-specs.md`: the exact event names no longer include the retired
+  `exercise.answer_sent`, and now list the four `practice.*` events (specs#181).
+- `SKILL.md` version brought in line with `plugin.json`; it had stayed at 1.4.1.
+
 ## [1.5.1] — 2026-10-04
 
 ### Fixed
