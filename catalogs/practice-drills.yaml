@@ -27,7 +27,13 @@ fretboard_cells:
       guitar: {strings: [4, 3, 2, 1], frets: [0, 11]}
       electric-bass: {strings: [2, 1], frets: [0, 11]}
 
-# Versioned fluent times, net of the student's tap time. Version 1 of each timed template is
-# twice the team's median net time, measured before the drill reaches students. Not measured
-# yet: no versions are installed.
-thresholds: []
+# Versioned fluent times, net of the student's tap time (and, for exercises with audio, of the
+# audio heard once). Adjust a fluent time by adding a version with a later effective_from; never
+# edit an installed one. The exercise families start from team-set defaults (source: default).
+# The fretboard templates get theirs with the fretboard drill.
+thresholds:
+  - {template: "exercise:text_response", version: 1, effective_from: "2026-10-01", fluent_net_ms: 6000, source: default, sessions: 0, students: 0, id: a2ccf5a4-31e5-5aac-991d-5b17904b4ea8}
+  - {template: "exercise:audio_recognition", version: 1, effective_from: "2026-10-01", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: e0364add-6753-58c3-a781-a9589288510e}
+  - {template: "exercise:image_recognition", version: 1, effective_from: "2026-10-01", fluent_net_ms: 5000, source: default, sessions: 0, students: 0, id: 1fa82f45-7f4f-51ee-b974-cf0673eda4a7}
+  - {template: "exercise:image_choice", version: 1, effective_from: "2026-10-01", fluent_net_ms: 5000, source: default, sessions: 0, students: 0, id: c8d7f798-4ab0-57cb-bf26-5f477154ae87}
+  - {template: "exercise:audio_selection", version: 1, effective_from: "2026-10-01", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 61b55338-dee3-5391-b556-dc8fe121ea6d}
