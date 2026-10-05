@@ -13,14 +13,15 @@ changes.
 
 ## Monorepo: motifpath-core
 
-Scope = first directory under `services/`. Both services share one profile today (the Go standards
-in `motifpath-core/CLAUDE.md` apply repo-wide) — but Phase 4a item 4 (second-order effect / monorepo
-boundary) always runs when a change touches both.
+Scope = first directory under `services/`. All three services share one profile today (the Go
+standards in `motifpath-core/CLAUDE.md` apply repo-wide) — but Phase 4a item 4 (second-order effect /
+monorepo boundary) always runs when a change touches more than one.
 
 | Repository | Path scope | Profile |
 |---|---|---|
 | `motifpath/motifpath-core` | `services/core-domain/` | `motifpath-core.md` |
 | `motifpath/motifpath-core` | `services/event-ingestion/` | `motifpath-core.md` |
+| `motifpath/motifpath-core` | `services/aggregation-worker/` | `motifpath-core.md` |
 | `motifpath/motifpath-core` | `shared/`, root (Makefile, devbox.json, .golangci.yml) | `motifpath-core.md` |
 
 ## Rules

@@ -2,8 +2,8 @@
 
 ## Identification
 
-- Repository / path scope: `motifpath/motifpath-core` — monorepo, both `services/core-domain/` and
-  `services/event-ingestion/` (see `profiles/ROUTING.md`).
+- Repository / path scope: `motifpath/motifpath-core` — monorepo: `services/core-domain/`,
+  `services/event-ingestion/` and `services/aggregation-worker/` (see `profiles/ROUTING.md`).
 - Local reference repo: `motifpath-core` checkout, root `Makefile` / `devbox.json` / `.golangci.yml`
   for shared tooling.
 - Comment language: English.
@@ -52,6 +52,12 @@
 - Table-driven, `testify`, one test function per feature, one row per scenario.
 - Database tests use `testcontainers` — mocking the repository layer is explicitly disallowed, so a
   test that only manipulates a mocked repo is itself a finding (Axis E, item 18).
+- **Practiced divergence (confirmed 2026-10-05, core#76 review):** `services/aggregation-worker`'s
+  application tests and godog steps drive the services through in-memory fakes that keep each
+  repository's contract (one record per key, duplicates reported, stored order), while every Mongo
+  repository has its own testcontainers integration test and the full Redpanda → Mongo path has a
+  pipeline test. Don't flag the fakes there; do flag a worker repository with no testcontainers
+  test, or a fake that drops a contract its Mongo adapter keeps.
 - Gherkin scenarios from `motifpath-specs/features/` run via `godog`, `make test:bdd`.
 - Naming: describe the behavior under test, never a ticket ID or incident number.
 

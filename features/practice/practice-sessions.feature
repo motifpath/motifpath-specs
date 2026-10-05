@@ -1,4 +1,3 @@
-@wip
 Feature: Keep a record of practice sessions and learning activity
   As the MotifPath platform
   I want every practice session's start, answers and end, and every completed content node, kept with its time
