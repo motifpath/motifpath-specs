@@ -4,6 +4,10 @@
 **Date:** 2026-09-10 (Proposed) · 2026-09-10 (Accepted, after the PB-34 phase-1 spike)
 **Deciders:** Gilson Yamada (solo engineering at MVP)
 
+> **Amended by [ADR-049](./ADR-049-practice-first-experience-language.md)** (Accepted
+> 2026-10-05): semantic token names (decision point 1), a library extracted from real flows with a
+> pattern per component (decision point 3), and Storybook adopted now as the executable catalog.
+
 ---
 
 ## Context
