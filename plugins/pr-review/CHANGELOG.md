@@ -1,5 +1,16 @@
 # PR Review — Changelog
 
+## [1.6.0] — 2026-10-05
+
+### Added
+- `profiles/ROUTING.md`: `services/aggregation-worker/` routes to `motifpath-core.md`; it had no
+  row, so a worker-only change fell outside every scope. `SKILL.md` Phase 0 and the profile's
+  identification now name all three services.
+- `profiles/motifpath-core.md`: the aggregation worker's application tests and godog steps use
+  in-memory fakes that keep each repository's contract, with testcontainers covering every Mongo
+  repository and the full pipeline. Recorded as practiced divergence from the "never mock the
+  repository layer" norm (core#76 review).
+
 ## [1.5.3] — 2026-10-05
 
 ### Changed

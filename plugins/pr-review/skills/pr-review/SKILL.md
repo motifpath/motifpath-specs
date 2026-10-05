@@ -1,6 +1,6 @@
 ---
 name: pr-review
-version: 1.5.3
+version: 1.6.0
 description: >
   Review a proposed pull request against MotifPath conventions and the intent behind the change,
   across any of the four MotifPath repos (motifpath-core, motifpath-web, motifpath-infra,
@@ -38,10 +38,10 @@ Don't ask "which profile" — discover it from the files the PR actually touches
 2. Identify the repo (`motifpath-core`, `motifpath-web`, `motifpath-infra`, or `motifpath-specs`).
 3. Resolve repo → profile via `profiles/ROUTING.md`.
 4. **`motifpath-core` is a monorepo**: sub-scope by first directory under `services/`
-   (`core-domain`, `event-ingestion`) or `shared/`. Both services share one profile today
-   (`motifpath-core.md`) — Go conventions apply repo-wide — but a change that imports across the
-   `services/core-domain` ↔ `services/event-ingestion` boundary is itself a Phase 4a finding (see
-   Axis A, item 4, and the profile's Monorepo Boundaries section).
+   (`core-domain`, `event-ingestion`, `aggregation-worker`) or `shared/`. All three services share
+   one profile today (`motifpath-core.md`) — Go conventions apply repo-wide — but a change that
+   imports across a service boundary (e.g. `services/core-domain` ↔ `services/event-ingestion`) is
+   itself a Phase 4a finding (see Axis A, item 4, and the profile's Monorepo Boundaries section).
 5. Special cases:
    - **No profile resolves** (a brand-new repo, or a path outside all known scopes) → **generic
      mode**: review with `HEURISTICS.md` only, don't assert a project norm you haven't confirmed,
