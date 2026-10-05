@@ -1,7 +1,7 @@
 # ADR-049: Practice-First Experience Language, Mobile-First UI, and a PWA Built for Capacitor
 
-**Status:** Proposed
-**Date:** 2026-10-05
+**Status:** Accepted
+**Date:** 2026-10-05 (Proposed) · 2026-10-05 (Accepted, in review of specs#184)
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
 **Task:** MOT-43
 **Amends:** ADR-018 (decision points 1 and 3, and the deferred documentation site; see Relation to
@@ -288,4 +288,4 @@ ADR-018 stays in force. This ADR amends it in three places:
 
 ---
 
-*This ADR was proposed on 2026-10-05. To revise, create a new ADR with Status: Supersedes ADR-049.*
+*This ADR was proposed and accepted on 2026-10-05. To revise, create a new ADR with Status: Supersedes ADR-049.*
