@@ -23,6 +23,11 @@ Feature: Keep a record of practice sessions and learning activity
     When "alice"'s lesson.completed for the content node "intro-to-chords" arrives, completed at 19:30
     Then "alice"'s learning activity shows "intro-to-chords" completed at 19:30
 
+  Scenario: Completing a content node again is kept as another completion
+    Given "alice" completed "intro-to-chords" yesterday
+    When "alice" completes "intro-to-chords" again today
+    Then "alice"'s learning activity shows "intro-to-chords" completed yesterday and today
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   Scenario: A session the student left early is not finished
@@ -33,13 +38,13 @@ Feature: Keep a record of practice sessions and learning activity
   Scenario: A session silent for its planned minutes plus 15 is abandoned
     Given "alice" started a 10-minute practice session at 18:00
     And "alice"'s last practice.item_answered for it arrived at 18:03
-    When the session is read at 18:19
+    When the session is read at 18:29
     Then the session is abandoned, ended early at 18:03
 
   Scenario: A session still within its planned minutes plus 15 is in progress
     Given "alice" started a 10-minute practice session at 18:00
     And "alice"'s last practice.item_answered for it arrived at 18:03
-    When the session is read at 18:17
+    When the session is read at 18:27
     Then the session is in progress
 
   Scenario: A late event reopens an abandoned session
@@ -55,10 +60,10 @@ Feature: Keep a record of practice sessions and learning activity
 
   Scenario: The same practice.session_ended delivered twice counts once
     Given "alice" started a 10-minute practice session at 18:00
-    When "alice"'s practice.session_ended for it arrives twice
+    When the same practice.session_ended event for it, with one event id, is delivered twice
     Then the session is finished once, with its first delivery's end
 
-  Scenario: The same lesson.completed delivered twice is kept once
-    When "alice"'s lesson.completed for "intro-to-chords" arrives twice
+  Scenario: The same lesson.completed event delivered twice is kept once
+    When the same lesson.completed event for "intro-to-chords", with one event id, is delivered twice
     Then "alice"'s learning activity shows "intro-to-chords" completed once
 

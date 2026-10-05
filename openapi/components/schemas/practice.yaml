@@ -184,8 +184,9 @@ PracticePickReason:
     practised, is not due, and is not yet fluent; new = it has not been practised yet;
     warm_up = something already known, played first with the instrument in hand, below the
     student's edge and outside the evidence: its takes are not sent as practice.item_answered;
-    application = a play-along that applies a skill the session's focus items practised, at
-    the end of a session of 10 minutes or more, and evidence like any other take; review_ahead = a known item reviewed before it falls due, when nothing
+    application = one play-along at the end of a session of 10 minutes or more, applying a
+    skill the session's focus items practised (or, with none, another skill of the student's
+    paths), and evidence like any other take; review_ahead = a known item reviewed before it falls due, when nothing
     else is due; stretch = an unseen item of a node the student is ready to start, when
     nothing else is due.
 

@@ -3,8 +3,9 @@ Feature: Compose a practice session
   I want a session built for the time I have and the instrument in my hands
   So that every minute goes to what helps me most, and I always know why
 
-  # Rules: teacher suggestions first; then due 60%, weak 25%, new 15% of the time, the new
-  # share being a ceiling balanced across the student's instruments. Due and weak take over
+  # Rules: teacher suggestions first; then due 60%, weak 25%, new 15% of the focus time (the
+  # session minus its warm-up and its application ending), the new share being a ceiling
+  # balanced across the student's instruments. Due and weak take over
   # each other's unused time; whatever is still left is split 50/50 between review ahead and
   # stretch, as for a caught-up student. Weak = practised, not due, not yet fluent. Every pick
   # carries a reason.
@@ -24,7 +25,7 @@ Feature: Compose a practice session
   Scenario: Due, weak and new items share the time 60, 25 and 15
     Given "alice" has plenty of due, weak and new items on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
-    Then about 12 minutes go to due items, 5 to weak items and 3 to new items
+    Then about 60% of the focus time goes to due items, 25% to weak items and 15% to new items
 
   @wip
   Scenario: A teacher's suggestion comes before everything else
@@ -43,6 +44,26 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the last item is a play-along with the reason application
     And it applies a skill that the session's focus items practise
+
+  @wip
+  Scenario: The application ending is one play-along, outside the focus time
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then exactly one item has the reason application
+    And the focus time is the 20 minutes less the warm-up and that play-along's estimated time
+
+  @wip
+  Scenario: With no play-along on a focus skill, the ending applies another skill of the path
+    Given no skill of the session's focus items has a play-along on guitar
+    And "alice"'s path skill "chord-tones" has the play-along "chord-tone-riff" on guitar
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the last item is "chord-tone-riff" with the reason application
+
+  @wip
+  Scenario: With no play-along on the instrument at all, the session has no ending and keeps the time for focus
+    Given none of "alice"'s path skills has a play-along on "electric-bass"
+    When "alice" composes a 10-minute session with "electric-bass" in hand
+    Then no item in the session has the reason application
+    And the focus time is the 10 minutes less the warm-up
 
   @wip
   Scenario: Authored exercises on the student's path are focus items
@@ -74,21 +95,21 @@ Feature: Compose a practice session
   Scenario: Due items take over the time weak items don't use
     Given "alice" has plenty of due items, no weak items and plenty of new items on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
-    Then about 17 minutes go to due items and 3 to new items
+    Then about 85% of the focus time goes to due items and 15% to new items
 
   @wip
   Scenario: Weak items take over the time due items don't use
     Given "alice" has no due items, plenty of weak items and plenty of new items on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
-    Then about 17 minutes go to weak items and 3 to new items
+    Then about 85% of the focus time goes to weak items and 15% to new items
 
   @wip
   Scenario: Time left after due, weak and new goes to review ahead and stretch
-    Given "alice" has 4 minutes of due items, nothing weak and 1 minute of new items on guitar
+    Given "alice" has 4 minutes of due items, nothing weak and 1 minute of new items on guitar, well under their shares of the focus time
     And "alice" has known items coming due within the week
     And "alice" is ready to start the skill "notes-on-high-strings"
     When "alice" composes a 20-minute session with "guitar" in hand
-    Then the minutes left after the due and new items are split about evenly between review_ahead and stretch items
+    Then the focus time left after the due and new items is split about evenly between review_ahead and stretch items
 
   # ── Instruments ────────────────────────────────────────────────────────────
 

@@ -66,6 +66,11 @@ Feature: Show the student's practice summary on the home
     When "alice" reads their practice summary for "guitar"
     Then the progress this week shows "notes-on-low-strings" accuracy from 0 to 0.8
 
+  Scenario: A tempo improvement needs a clean take 7 days ago
+    Given "alice" had no clean take on "pentatonic-run" seven days ago and their best clean tempo on it is 105 BPM now
+    When "alice" reads their practice summary for "guitar"
+    Then the progress this week has no tempo line for the skill of "pentatonic-run"
+
   Scenario: A path for every instrument adds no instrument
     Given "alice" is also enrolled in a music-theory path for every instrument
     When "alice" reads their practice summary for "guitar"

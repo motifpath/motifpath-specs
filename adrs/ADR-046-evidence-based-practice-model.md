@@ -226,8 +226,12 @@ One piece of evidence per observation, the only stored learning state:
   is not used.
 - **With the instrument in hand:** a warm-up on something known, never on what the teacher flagged and
   skipped under 5 minutes; a focus block; and, from 10 minutes, applying the skill to music.
-  Authored exercises are focus items. The application ending is a play-along on a skill the focus
-  block practised, at its tempo ladder, and its takes are evidence. A warm-up
+  Authored exercises are focus items. The application ending is one play-along on a skill the
+  focus block practised, at its tempo ladder, and its takes are evidence. With no play-along on a
+  focus skill it applies another skill of the student's paths. With none on the instrument at all,
+  the session has no ending and the time stays with the focus block.
+- **Focus time:** the session minus the warm-up and the application ending (one play-along at its
+  estimated time). The mix shares the focus time. A warm-up
   play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the
   evidence: its takes are not sent as answers, and a due item is never the warm-up.
 - **Tempo ladder:** start at the best clean tempo; +5 BPM after two clean takes; −5 after a struggle;
