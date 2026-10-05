@@ -124,8 +124,11 @@ plus the five always-on items.
 ## Axis E — Reviewer method
 
 17. **Verify, don't presume.** Did you claim "this is sanitized," "this path populates the field,"
-    "the API guarantees order"? Open the code and confirm. — *Smell:* a conclusion about unread
-    code.
+    "the API guarantees order"? Open the code and confirm. Does each worked example in a spec or
+    test (times, amounts, counts) actually satisfy the rule it illustrates? Recompute it. — *Smell:*
+    a conclusion about unread code; an example whose numbers nobody re-derived from the rule. (A
+    scenario called a 10-minute session abandoned 16 minutes after its last answer, while the rule
+    waits for its planned minutes + 15.)
 18. **Test the real path.** When the claim depends on runtime behavior, exercise it through the path
     a real caller/user takes — test shortcuts that inject state internally bypass the actual
     mechanism, and so does firing only part of the real gesture. — *Smell:* a suite that only
