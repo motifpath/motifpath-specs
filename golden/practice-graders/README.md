@@ -39,7 +39,7 @@ Each file holds:
      `response_does_not_fit_item`).
 - **A rejection stores no evidence.**
 - **Auto-graded evidence** is `source`, `correct` and `latency_ms`, with `latency_ms` copied
-  from the response.
+  from the response, plus `audio_ms` copied from it when the response carries one.
 - **Self-assessed evidence** is `source`, `rating` and the one measure its kind takes:
   `tempo_bpm` for a play-along, `changes_per_minute` for a chord change.
 

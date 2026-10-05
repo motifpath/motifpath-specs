@@ -47,13 +47,31 @@ the answer is timed. Thresholds and felt questions are per template, never per i
 
 - **What a threshold is:** the time a fluent student spends *knowing* the answer: latency
   minus the student's tap time. A student who never did a tap check has a tap time of 0.
+  For an exercise with audio, the audio the student has to hear once is also taken off: the
+  exercise's sound, or all its sound options added together. Replays are not taken off.
 - **What a version records:**
   - `template`, `version` and `effective_from`;
   - `fluent_net_ms`;
-  - `source`: `benchmark` or `calibrated`;
+  - `source`: `default`, `benchmark` or `calibrated`;
   - the data behind it: `sessions` and `students` (both 0 for a benchmark).
-- **Version 1** is twice the team's median net time on the drill. The team measures it before
-  the drill reaches students.
+- **Version 1** must be installed before a timed drill reaches students. It is either:
+  - a **default**, a fluent time the team sets per drill template as a starting point. Every
+    exercise family starts from one, so exercises can reach `fluent` before the team has
+    measured them. Defaults (net):
+
+    | Template | Fluent time |
+    |---|---|
+    | `exercise:text_response` | 6 s |
+    | `exercise:image_recognition` | 5 s |
+    | `exercise:image_choice` | 5 s |
+    | `exercise:audio_recognition` | 4 s after the audio |
+    | `exercise:audio_selection` | 4 s after the audio options |
+
+  - or a **benchmark**, twice the team's median net time on the drill.
+- **A benchmark after a default** is added as the next version. It doesn't replace the default.
+- **Fluent times are configuration.** Adjusting one means adding a version with a later
+  `effective_from` to the catalog. It needs no code change, and an installed version is never
+  edited.
 - **Calibration** finds the net time that best separates sessions that felt "hard" from the
   rest, and blends it with the current version by sample size.
   - It runs only once a template has **at least 100 felt-rated sessions from at least 20

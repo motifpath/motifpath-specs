@@ -20,7 +20,6 @@ TrackingEventBase:
         - lesson.completed
         - exercise.started
         - exercise.progress
-        - exercise.answer_sent
         - exercise.ended
         - practice.session_started
         - practice.item_answered
@@ -72,7 +71,6 @@ TrackingEvent:
       lesson.completed: '#/LessonCompletedEvent'
       exercise.started: '#/ExerciseStartedEvent'
       exercise.progress: '#/ExerciseProgressEvent'
-      exercise.answer_sent: '#/ExerciseAnswerSentEvent'
       exercise.ended: '#/ExerciseEndedEvent'
       practice.session_started: '#/PracticeSessionStartedEvent'
       practice.item_answered: '#/PracticeItemAnsweredEvent'
@@ -84,7 +82,6 @@ TrackingEvent:
     - $ref: '#/LessonCompletedEvent'
     - $ref: '#/ExerciseStartedEvent'
     - $ref: '#/ExerciseProgressEvent'
-    - $ref: '#/ExerciseAnswerSentEvent'
     - $ref: '#/ExerciseEndedEvent'
     - $ref: '#/PracticeSessionStartedEvent'
     - $ref: '#/PracticeItemAnsweredEvent'
@@ -125,7 +122,8 @@ TriggerContext:
   type: object
   description: |
     Describes the context in which an exercise was initiated. Required on all exercise
-    events. Enables downstream analytics to distinguish spontaneous practice from
+    events, and on practice.item_answered when the answer is given outside a practice
+    session. Enables downstream analytics to distinguish spontaneous practice from
     assessment-driven and remediation-driven exercises.
   properties:
     source:
@@ -276,44 +274,6 @@ ExerciseProgressEvent:
         - exercise_id
         - trigger_context
 
-ExerciseAnswerSentEvent:
-  allOf:
-    - $ref: '#/TrackingEventBase'
-    - type: object
-      description: |
-        Emitted when a student submits an answer to an exercise. May fire multiple times
-        within a single exercise attempt (retry scenarios). The Aggregation Worker uses
-        this event to compute attempt counts and answer-correctness rates per challenge.
-      properties:
-        event_type:
-          type: string
-          enum:
-            - exercise.answer_sent
-        exercise_id:
-          type: string
-          format: uuid
-          description: ID of the exercise for which the answer was submitted.
-        trigger_context:
-          $ref: '#/TriggerContext'
-        attempt_number:
-          type: integer
-          minimum: 1
-          description: |
-            1-indexed count of answer submissions for this exercise_id within the current
-            exercise attempt. Enables retry-aware scoring in the Aggregation Worker.
-        answer_payload:
-          type: object
-          description: |
-            The student's submitted answer. Structure varies by exercise type and is treated
-            as opaque by the Event Ingestion Service and Aggregation Worker at MVP.
-            Exercise-type-specific payload schemas are a post-MVP concern.
-          additionalProperties: true
-      required:
-        - event_type
-        - exercise_id
-        - trigger_context
-        - attempt_number
-
 ExerciseEndedEvent:
   allOf:
     - $ref: '#/TrackingEventBase'
@@ -411,6 +371,14 @@ PracticeItemAnsweredEvent:
         grader rejects is kept as an event but yields no evidence. The event_id identifies
         the evidence, so a redelivered event counts once. Never sent for the takes of a
         warm_up item, which are played below the student's edge and are not evidence.
+
+        An answer belongs to exactly one context: a practice session (practice_session_id)
+        or an exercise answered elsewhere on the platform, such as a node's challenge
+        (trigger_context). Answers count the same wherever they are given. In a challenge,
+        only the student's first answer to each exercise is evidence: a retry follows the
+        feedback on the first answer, so it shows what the feedback taught, not what the
+        student knew. The client sends only first answers, and the server keeps only the
+        first answer to an item per challenge within a browser session.
       properties:
         event_type:
           type: string
@@ -419,7 +387,11 @@ PracticeItemAnsweredEvent:
         practice_session_id:
           type: string
           format: uuid
-          description: The practice session this answer belongs to.
+          description: |
+            The practice session this answer belongs to. Absent when trigger_context is
+            present.
+        trigger_context:
+          $ref: '#/TriggerContext'
         item_key:
           $ref: './practice.yaml#/PracticeItemKey'
         response:
@@ -435,9 +407,13 @@ PracticeItemAnsweredEvent:
             check; absent otherwise. A value sent by a client is ignored.
       required:
         - event_type
-        - practice_session_id
         - item_key
         - response
+      oneOf:
+        - required:
+            - practice_session_id
+        - required:
+            - trigger_context
 
 PracticeSessionEndedEvent:
   allOf:

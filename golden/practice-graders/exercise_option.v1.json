@@ -150,6 +150,27 @@
       }
     },
     {
+      "name": "an exercise with audio: the audio length is kept with the evidence",
+      "item_key": "exercise:00000000-0000-4000-8000-0000000000e1",
+      "response": {
+        "response_type": "option_choice",
+        "option_ids": [
+          "00000000-0000-4000-8000-0000000000b1"
+        ],
+        "latency_ms": 9500,
+        "audio_ms": 5000
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 9500,
+          "audio_ms": 5000
+        }
+      }
+    },
+    {
       "name": "rejected: an option the exercise doesn't have",
       "item_key": "exercise:00000000-0000-4000-8000-0000000000e1",
       "response": {

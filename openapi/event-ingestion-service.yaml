@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Event Ingestion Service
-  version: 0.3.0
+  version: 0.4.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -62,22 +62,24 @@ paths:
                     content_node_id: "c9d1e2f3-0000-0000-0000-000000000001"
                     content_type: video
                     teacher_id: "b8c9d0e1-0000-0000-0000-000000000001"
-              exercise_answer_sent:
-                summary: Student submits an answer to a challenge exercise
+              practice_item_answered_in_a_challenge:
+                summary: Student answers a challenge exercise (first attempt)
                 value:
                   event_id: "a1b2c3d4-0000-0000-0000-000000000002"
-                  event_type: exercise.answer_sent
+                  event_type: practice.item_answered
                   student_id: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
                   session_id: "550e8400-e29b-41d4-a716-446655440000"
                   occurred_at: "2026-05-27T14:45:10Z"
-                  exercise_id: "d2e3f4a5-0000-0000-0000-000000000001"
                   trigger_context:
                     source: challenge_sequence
                     content_node_id: "c9d1e2f3-0000-0000-0000-000000000001"
                     challenge_id: "e3f4a5b6-0000-0000-0000-000000000001"
-                  attempt_number: 1
-                  answer_payload:
-                    selected_option: "C"
+                  item_key: "exercise:d2e3f4a5-0000-0000-0000-000000000001"
+                  response:
+                    response_type: option_choice
+                    option_ids:
+                      - "f4a5b6c7-0000-0000-0000-000000000001"
+                    latency_ms: 4200
               practice_item_answered:
                 summary: Student names the note of a fretboard cell in a practice session
                 value:

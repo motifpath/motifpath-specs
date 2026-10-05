@@ -40,6 +40,18 @@ Feature: Grade a practice answer into evidence
     And the evidence names the grader "fretboard_cell.v1"
     And the evidence is identified by the identifier of the practice.item_answered event
 
+  @wip
+  Scenario: An answer in a node's challenge is evidence like an answer in a practice session
+    Given "alice" is taking the challenge "open-chords-assessment" of the content node "open-chords"
+    When "alice" answers the exercise "minor-third-from-a" in the challenge by selecting its correct option after 3500 milliseconds
+    Then "alice" has auto-graded evidence for "minor-third-from-a" that is correct with a latency of 3500 milliseconds
+    And the evidence names the challenge "open-chords-assessment" instead of a practice session
+
+  @wip
+  Scenario: An exercise with audio keeps the audio's length with its evidence
+    When "alice" answers a listening exercise whose sound lasts 5000 milliseconds by selecting its correct option after 9500 milliseconds
+    Then "alice" has auto-graded evidence for that exercise with a latency of 9500 milliseconds and 5000 milliseconds of audio
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   @wip
@@ -68,6 +80,13 @@ Feature: Grade a practice answer into evidence
     Given "alice" completed a tap check with a median tap of 350 milliseconds
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "C" after 1800 milliseconds
     Then the evidence for that cell records a tap time of 350 milliseconds
+
+  @wip
+  Scenario: Only the first answer to an exercise in a challenge is evidence
+    Given "alice" is taking the challenge "open-chords-assessment" of the content node "open-chords"
+    And "alice" answered the exercise "minor-third-from-a" wrong in the challenge
+    When "alice" retries "minor-third-from-a" in the same challenge and selects its correct option
+    Then "alice"'s only evidence for "minor-third-from-a" is the wrong answer
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 

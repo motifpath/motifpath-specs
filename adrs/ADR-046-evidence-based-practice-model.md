@@ -16,6 +16,20 @@ clarifies how the existing decision works and changes nothing in it.
 **Amended:** 2026-10-04, after the play-along smoke. `practice.session_ended` is also sent when the
 page closes, and a session without one counts as abandoned after its planned minutes + 15 with no
 event (see Events). The smoke left 4 of 11 sessions without an end event.
+**Amended:** 2026-10-05, planning slice 3, by Gilson. Every exercise counts toward skill levels, so:
+- authored exercises join sessions now;
+- the S7 challenge moves onto `practice.item_answered`, with first answers only, and
+  `exercise.answer_sent` is retired;
+- exercise families start from default fluent times, with audio taken off the latency. Fluent times
+  are configuration.
+
+Also decided:
+- `weak` and how a short share's time passes on;
+- the `application` ending;
+- instruments come from enrollments only;
+- the home counts practice days (finished sessions) and learning days (completed content nodes),
+  never streaks, and keeps the raw activity;
+- progress this week compares now with 7 days ago, from daily item snapshots.
 
 ---
 
@@ -122,7 +136,10 @@ One piece of evidence per observation, the only stored learning state:
 
 - `practice.session_started`: the instrument in hand (or none), the minutes, and the composed plan with
   a reason for every item.
-- `practice.item_answered`: `event_id`, `item_key` and the raw response.
+- `practice.item_answered`: `event_id`, `item_key`, the raw response and exactly one context:
+  - the practice session;
+  - or, for an exercise answered elsewhere on the platform such as a node's challenge, the trigger
+    context.
 - `practice.session_ended`: the answered count, whether the student left early, and how each timed
   drill felt (below). Sent once per session: when the student finishes the plan, leaves the session
   inside the app, or closes or reloads the page. It's sent on page close as best effort, so it can
@@ -137,7 +154,10 @@ One piece of evidence per observation, the only stored learning state:
 - `practice.item_reviewed`: written by core when a teacher note judges an item. It uses the teacher
   note's id as its session id.
 - The S7 challenge's answers move onto `practice.item_answered`, so assessment and practice feed one
-  evidence record. `exercise.answer_sent` is retired once nothing emits it.
+  evidence record, under the same rules and weights. **Only the first answer to each exercise in a
+  challenge is evidence:** a retry follows the feedback, so it shows what the feedback taught. The
+  client sends first answers only, and the worker keeps the first answer to an item per challenge
+  within a browser session. `exercise.answer_sent` is retired.
 
 ### Knowledge state: a fold over evidence
 
@@ -183,7 +203,8 @@ One piece of evidence per observation, the only stored learning state:
 - **Rules, not a model call.** Every pick carries a reason (`teacher_suggested`, `due`, `weak`, `new`,
   `warm_up`, `application`, `review_ahead`, `stretch`) and can be explained to the student.
 - **Instruments:** a student's instruments are those of the paths and courses they're enrolled in (one
-  for every instrument adds none), plus any they add in their profile. A session starts with the
+  for every instrument adds none). They are inferred from enrollments only; a student doesn't add
+  instruments by hand. A session starts with the
   instrument in hand ("Guitar in hand?" with one instrument, "Which instrument is in your hands?" with
   several) or none, then the minutes. An in-hand session takes only items that suit that instrument.
   A session in the head covers all the student's instruments, and items for every instrument suit
@@ -193,6 +214,9 @@ One piece of evidence per observation, the only stored learning state:
 - **Mix:** teacher suggestions first; then due 60%, weak 25%, new 15%. The new share is a **ceiling**,
   and new items are **balanced across the student's instruments**, so adding an instrument doesn't
   flood every session with it.
+- **Weak:** an item practised at least once, not due, whose shown level is below `fluent`.
+- **A short share passes on:** due and weak take over each other's unused time, and new never passes
+  its ceiling. Whatever is still left goes to review ahead and stretch, as for a caught-up student.
 - **Caught up:** the remaining time is split **50/50** between **review ahead** (known items coming due
   soonest) and **stretch** (unseen items of any node whose readiness is complete, for the instrument),
   each taking over the other's share when it runs out. Stretch ranks nodes that build on something
@@ -200,7 +224,9 @@ One piece of evidence per observation, the only stored learning state:
   requirements below the node), then catalog order. The map's calibration level is not installed and
   is not used.
 - **With the instrument in hand:** a warm-up on something known, never on what the teacher flagged and
-  skipped under 5 minutes; a focus block; and, from 10 minutes, applying the skill to music. A warm-up
+  skipped under 5 minutes; a focus block; and, from 10 minutes, applying the skill to music.
+  Authored exercises are focus items. The application ending is a play-along on a skill the focus
+  block practised, at its tempo ladder, and its takes are evidence. A warm-up
   play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the
   evidence: its takes are not sent as answers, and a due item is never the warm-up.
 - **Tempo ladder:** start at the best clean tempo; +5 BPM after two clean takes; −5 after a struggle;
@@ -225,8 +251,15 @@ One piece of evidence per observation, the only stored learning state:
 - A threshold is defined per **drill template** (`fretboard_cell:name_the_note`,
   `fretboard_cell:find_the_note`, authored exercises grouped by family) as the fluent time spent
   *knowing*: latency minus the student's tap time. It has a version, a start date, a source
-  (`benchmark` or `calibrated`) and the data behind it. Tempo-measured items keep musical targets.
-- **Version 1** is twice the team's median net time on the drill, measured by the team before launch.
+  (`default`, `benchmark` or `calibrated`) and the data behind it. Tempo-measured items keep musical targets.
+- **Version 1** is either a **default** the team sets per drill template, or a **benchmark** (twice
+  the team's median net time on the drill). Exercise families start from defaults, so exercises
+  can reach `fluent` before the team measures them. A later benchmark is the next version.
+- **Fluent times are configuration:** versioned reference data in the drill catalog. Adjusting one
+  adds a version with a later start date, with no code change.
+- **Audio is not knowing time:** for an exercise with audio, the client reports the length of the
+  audio the student must hear once (the sound, or all sound options together). It's taken off the
+  latency with the tap time. Replays are not taken off.
 - **Tap baseline:** a 20-second "tap the highlighted fret" check gives each student's tap time,
   sent as `practice.tap_check_completed`. Ingestion stamps the latest one on every timed answer,
   so replays stay stable.
@@ -241,10 +274,18 @@ One piece of evidence per observation, the only stored learning state:
 
 ### The student summary and home
 
-- One derived summary per student and instrument is the home's single read: practice days in the last
-  7 (never a streak, never a reset), progress this week per skill with both values ("accuracy 72% →
-  86%"), next steps (refresh, strengthen, ready to start; the top three plus "see all"), and practice
-  nodes grouped by area. Instrument-independent nodes get an **"Any instrument"** group. Concepts appear
+- One derived summary per student and instrument is the home's single read:
+  - **practice days** in the last 7: days with a practice session finished, meaning ended without
+    leaving early and not abandoned;
+  - **learning days** in the last 7: days with at least one content node completed;
+  - progress this week per skill with both values ("accuracy 72% → 86%");
+  - next steps (refresh, strengthen, ready to start; the top three plus "see all");
+  - practice nodes grouped by area.
+- **Counts, never streaks, never a reset.** The worker keeps the raw activity (every session's start,
+  answers and end; every content node completed, with its time), so a streak or another measure
+  can be evaluated later without new tracking.
+- **Progress this week** compares now with the state 7 days ago. The worker keeps a daily snapshot
+  of each practised item's state for this purpose. Instrument-independent nodes get an **"Any instrument"** group. Concepts appear
   in the map and as context, not as separate progress lines.
 - The home is organised by skills and concepts, never by exercise type, with progress before next
   steps and no red badges. Practice days are counted in the student's time zone.
@@ -328,7 +369,7 @@ shown from evidence (tempo history, speed per string, levels).
 
 ### Neutral
 
-- `exercise.answer_sent` is retired once the challenge emits `practice.item_answered`.
+- `exercise.answer_sent` is retired: the challenge emits `practice.item_answered` (amended 2026-10-05).
 - Evidence stays in MongoDB; the archive question is reopened only by a measured trigger.
 - Tempo targets for play-alongs and chord changes stay authored (they come from the music).
 - Audio detection is reserved as an evidence source and is its own later spike.
@@ -340,13 +381,14 @@ shown from evidence (tempo history, speed per string, levels).
 1. **Spec:** item and evidence schemas, the `practice.*` events, the grader golden cases, threshold
    reference data, and the practice endpoints (session plan, answer, summary).
 2. **Play-along drill:** tempo ladder, count-in, self-rating, and the knowledge-state read model.
-3. **Session composer and practice home:** instrument choice, time budget, reasons, summary.
-4. **Mental fretboard drill and heatmap**, with the tap check, felt questions and benchmark thresholds;
-   calibration runs once real sessions accumulate.
+3. **Session composer and practice home:** instrument choice, time budget, reasons, summary. Amended
+   2026-10-05: also authored exercises in sessions, `exercise_option.v1` with default fluent times,
+   the application ending, and the S7 challenge on `practice.item_answered`.
+4. **Mental fretboard drill and heatmap**, with sessions in the head, the tap check, felt questions and
+   benchmark thresholds; calibration runs once real sessions accumulate.
 5. **Teacher notes** for videos received over WhatsApp: rubric, comments, needs-work, suggestions.
    Validate with a WhatsApp Wizard-of-Oz before building the review UI.
-6. **Authored exercises in the scheduler**, the S7 challenge on `practice.item_answered`, and the feed
-   into recommendations (PB-8g).
+6. **The feed into recommendations** (PB-8g). Authored exercises and the S7 challenge moved to slice 3.
 
 ## Related ADRs
 
