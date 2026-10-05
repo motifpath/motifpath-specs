@@ -20,13 +20,6 @@ Feature: Ingest student tracking events
     Then the event is accepted and stored in the event log
     And the server returns the submitted event identifier and a receipt timestamp
 
-  Scenario: Student submits an exercise.answer_sent event from a challenge sequence
-    Given student "alice" is authenticated with a valid session
-    And "alice" has an active exercise attempt for exercise "chord-recognition-01" triggered by challenge "open-chords-assessment"
-    When "alice" submits an answer to the exercise as attempt number 1
-    Then the event is accepted and stored in the event log
-    And the server returns the submitted event identifier and a receipt timestamp
-
   Scenario: Student submits an exercise.ended event with a passing score
     Given student "alice" is authenticated with a valid session
     And "alice" has an active exercise attempt for exercise "chord-recognition-01"
@@ -108,14 +101,16 @@ Feature: Ingest student tracking events
     Then the submission is rejected as invalid
     And the rejection identifies "content_context" as the source of the error
 
-  Scenario: exercise.answer_sent event submitted with attempt number zero is rejected
+  @wip
+  Scenario: exercise.started event submitted without a trigger context is rejected
     Given student "alice" is authenticated with a valid session
-    When "alice" submits an exercise.answer_sent event with attempt number 0
-    Then the submission is rejected as invalid
-    And the rejection identifies "attempt_number" as the source of the error
-
-  Scenario: exercise.answer_sent event submitted without a trigger context is rejected
-    Given student "alice" is authenticated with a valid session
-    When "alice" submits an exercise.answer_sent event with the trigger context field omitted
+    When "alice" submits an exercise.started event with the trigger context field omitted
     Then the submission is rejected as invalid
     And the rejection identifies "trigger_context" as the source of the error
+
+  @wip
+  Scenario: A retired exercise.answer_sent event is rejected
+    Given student "alice" is authenticated with a valid session
+    When "alice" submits an event with event type "exercise.answer_sent"
+    Then the submission is rejected as invalid
+    And the rejection identifies "event_type" as the source of the error

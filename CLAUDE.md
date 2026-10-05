@@ -32,7 +32,7 @@ A feature spec is ready when ALL of the following are true:
 ## Gherkin Standards
 ALWAYS use domain language — never HTTP status codes, SQL, or framework names in scenarios.
 ALWAYS reference domain events by exact names: lesson.started, lesson.resumed, lesson.completed,
-exercise.started, exercise.progress, exercise.answer_sent, exercise.ended,
+exercise.started, exercise.progress, exercise.ended,
 practice.session_started, practice.item_answered, practice.session_ended,
 practice.tap_check_completed.
 One scenario = one behavior. Never test multiple behaviors in a single scenario.

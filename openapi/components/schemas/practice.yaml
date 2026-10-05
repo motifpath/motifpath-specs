@@ -115,6 +115,16 @@ OptionChoiceResponse:
       type: integer
       minimum: 0
       description: Milliseconds from the moment the exercise was shown to the answer.
+    audio_ms:
+      type: integer
+      minimum: 0
+      description: |
+        Milliseconds of audio the exercise asks the student to hear once before answering:
+        the length of the exercise's sound for a listening exercise, or the lengths of all
+        its sound options added together when the options are sounds. Hearing it is not
+        part of the time spent knowing the answer, so it is taken off the latency before
+        the answer is judged against the drill's fluent time. Replays are not taken off.
+        Absent for exercises without audio.
   additionalProperties: false
   required:
     - response_type
@@ -283,7 +293,11 @@ PracticeEvidence:
     practice_session_id:
       type: string
       format: uuid
-      description: The practice session the answer was given in. Absent for teacher reviews.
+      description: |
+        The practice session the answer was given in. Absent for teacher reviews and for
+        answers given outside a practice session.
+    trigger_context:
+      $ref: './events.yaml#/TriggerContext'
     grader_id:
       type: string
       pattern: '^[a-z][a-z_]*\.v[1-9][0-9]*$'
@@ -299,6 +313,13 @@ PracticeEvidence:
       type: integer
       minimum: 0
       description: Milliseconds the student took to answer. Present for auto_graded evidence.
+    audio_ms:
+      type: integer
+      minimum: 0
+      description: |
+        Milliseconds of audio the student had to hear once before answering, taken off the
+        latency before the answer is judged against the fluent time. Present for auto_graded
+        evidence of exercises with audio.
     tap_ms:
       type: integer
       minimum: 0

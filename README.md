@@ -147,12 +147,13 @@ A feature is ready for development when ALL of the following are true:
 
 ## Domain Events
 
-Seven events form the core behavioral contract of MotifPath:
+These events form the core behavioral contract of MotifPath:
 
 ```
-lesson.started        lesson.resumed         lesson.completed
-exercise.started      exercise.answer_sent   exercise.ended
-node.unlocked
+lesson.started              lesson.resumed            lesson.completed
+exercise.started            exercise.progress         exercise.ended
+practice.session_started    practice.item_answered    practice.session_ended
+practice.tap_check_completed
 ```
 
 Event schemas live in `openapi/components/schemas/events.yaml`, referenced via

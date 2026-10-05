@@ -40,6 +40,18 @@ Feature: Grade a practice answer into evidence
     And the evidence names the grader "fretboard_cell.v1"
     And the evidence is identified by the identifier of the practice.item_answered event
 
+  @wip
+  Scenario: An answer in a node's challenge is evidence like an answer in a practice session
+    Given "alice" is taking the challenge "open-chords-assessment" of the content node "open-chords"
+    When "alice" answers the exercise "minor-third-from-a" in the challenge by selecting its correct option after 3500 milliseconds
+    Then "alice" has auto-graded evidence for "minor-third-from-a" that is correct with a latency of 3500 milliseconds
+    And the evidence names the challenge "open-chords-assessment" instead of a practice session
+
+  @wip
+  Scenario: An exercise with audio keeps the audio's length with its evidence
+    When "alice" answers a listening exercise whose sound lasts 5000 milliseconds by selecting its correct option after 9500 milliseconds
+    Then "alice" has auto-graded evidence for that exercise with a latency of 9500 milliseconds and 5000 milliseconds of audio
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   @wip
@@ -68,6 +80,26 @@ Feature: Grade a practice answer into evidence
     Given "alice" completed a tap check with a median tap of 350 milliseconds
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "C" after 1800 milliseconds
     Then the evidence for that cell records a tap time of 350 milliseconds
+
+  @wip
+  Scenario: A challenge exercise's answer is the selection the student moves on with
+    Given "alice" is taking the challenge "open-chords-assessment" of the content node "open-chords"
+    And the exercise "c-major-triad" whose correct options are "C" and "E" out of "C", "D", "E" and "F"
+    When "alice" selects "C", then also "E", and moves on to the next exercise
+    Then "alice" has one piece of evidence for "c-major-triad", and it is correct
+
+  @wip
+  Scenario: Changing a challenge answer after going back is not a new answer
+    Given "alice" is taking the challenge "open-chords-assessment" of the content node "open-chords"
+    And "alice" moved on from the exercise "minor-third-from-a" with a wrong option selected
+    When "alice" goes back to "minor-third-from-a", selects its correct option and moves on again
+    Then "alice"'s only evidence for "minor-third-from-a" is the wrong answer
+
+  @wip
+  Scenario: Working through a challenge again gives new answers
+    Given "alice" took the challenge "open-chords-assessment" yesterday and answered "minor-third-from-a" wrong
+    When "alice" takes "open-chords-assessment" again and moves on from "minor-third-from-a" with its correct option selected
+    Then "alice" has two pieces of evidence for "minor-third-from-a", the second one correct
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 

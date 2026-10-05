@@ -54,6 +54,30 @@ Feature: Judge timed drills against versioned fluent times
     When "alice" answers two different listening exercises correctly
     Then both answers are judged against the fluent time of "exercise:audio_recognition"
 
+  Scenario: Every exercise family starts from a default fluent time
+    Given the drill template "exercise:text_response" has version 1 from source "default" with a fluent time of 6000 milliseconds
+    When "alice" answers a text exercise correctly in 5500 milliseconds
+    Then the answer took 5200 milliseconds net of tap time
+    And it counts as within the fluent time
+
+  Scenario: A listening exercise is judged on the time after its audio
+    Given the drill template "exercise:audio_recognition" has version 1 from source "default" with a fluent time of 4000 milliseconds
+    When "alice" answers a listening exercise whose sound lasts 5000 milliseconds correctly in 9000 milliseconds
+    Then the answer took 3700 milliseconds net of tap time and audio
+    And it counts as within the fluent time
+
+  Scenario: A sound-choice exercise is judged on the time after all its sound options
+    Given the drill template "exercise:audio_selection" has version 1 from source "default" with a fluent time of 4000 milliseconds
+    When "alice" answers a sound-choice exercise with 3 sound options of 2000 milliseconds each correctly in 11000 milliseconds
+    Then the answer took 4700 milliseconds net of tap time and audio
+    And it counts as slower than fluent
+
+  Scenario: A benchmark added after a default applies from its start date on
+    Given the drill template "exercise:image_choice" has version 1 from source "default" with a fluent time of 5000 milliseconds
+    And version 2 from source "benchmark" with a fluent time of 4000 milliseconds from 2026-11-01
+    When "alice" answers an image-choice exercise correctly on 2026-11-02 in 4800 milliseconds
+    Then the answer is judged against 4000 milliseconds and counts as slower than fluent
+
   Scenario: The felt questions go to the session's least-calibrated timed drills, two at most
     Given "alice"'s session practised "fretboard_cell:name_the_note", "fretboard_cell:find_the_note" and "exercise:text_response"
     And "fretboard_cell:find_the_note" and "exercise:text_response" have the fewest felt-rated sessions
