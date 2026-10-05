@@ -22,7 +22,6 @@ Feature: Grade a practice answer into evidence
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "D" after 2500 milliseconds
     Then "alice" has auto-graded evidence for that cell that is wrong with a latency of 2500 milliseconds
 
-  @wip
   Scenario: Selecting exactly the correct options of an exercise is a correct answer
     Given the exercise "c-major-triad" whose correct options are "C" and "E" out of "C", "D", "E" and "F"
     When "alice" answers exercise "c-major-triad" by selecting "E" and "C"
@@ -40,14 +39,12 @@ Feature: Grade a practice answer into evidence
     And the evidence names the grader "fretboard_cell.v1"
     And the evidence is identified by the identifier of the practice.item_answered event
 
-  @wip
   Scenario: An answer in a node's challenge is evidence like an answer in a practice session
     Given "alice" is taking the challenge "open-chords-assessment" of the content node "open-chords"
     When "alice" answers the exercise "minor-third-from-a" in the challenge by selecting its correct option after 3500 milliseconds
     Then "alice" has auto-graded evidence for "minor-third-from-a" that is correct with a latency of 3500 milliseconds
     And the evidence names the challenge "open-chords-assessment" instead of a practice session
 
-  @wip
   Scenario: An exercise with audio keeps the audio's length with its evidence
     When "alice" answers a listening exercise whose sound lasts 5000 milliseconds by selecting its correct option after 9500 milliseconds
     Then "alice" has auto-graded evidence for that exercise with a latency of 9500 milliseconds and 5000 milliseconds of audio
@@ -69,7 +66,6 @@ Feature: Grade a practice answer into evidence
     When "alice" is asked for the guitar cell on string 6 at fret 1 and taps string 4 at fret 3
     Then "alice" has auto-graded evidence for that cell that is wrong
 
-  @wip
   Scenario: Selecting only some of an exercise's correct options is a wrong answer
     Given the exercise "c-major-triad" whose correct options are "C" and "E" out of "C", "D", "E" and "F"
     When "alice" answers exercise "c-major-triad" by selecting "C"
@@ -110,7 +106,6 @@ Feature: Grade a practice answer into evidence
     Then the answer is rejected because the response does not fit the item
     And "alice" has no evidence for that cell
 
-  @wip
   Scenario: Selecting an option the exercise doesn't have yields no evidence
     Given the exercise "c-major-triad" whose correct options are "C" and "E" out of "C", "D", "E" and "F"
     When "alice" answers exercise "c-major-triad" by selecting an option of another exercise
