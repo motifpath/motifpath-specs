@@ -101,14 +101,12 @@ Feature: Ingest student tracking events
     Then the submission is rejected as invalid
     And the rejection identifies "content_context" as the source of the error
 
-  @wip
   Scenario: exercise.started event submitted without a trigger context is rejected
     Given student "alice" is authenticated with a valid session
     When "alice" submits an exercise.started event with the trigger context field omitted
     Then the submission is rejected as invalid
     And the rejection identifies "trigger_context" as the source of the error
 
-  @wip
   Scenario: A retired exercise.answer_sent event is rejected
     Given student "alice" is authenticated with a valid session
     When "alice" submits an event with event type "exercise.answer_sent"

@@ -19,7 +19,6 @@ Feature: Ingest practice events
     Then the event is accepted and stored in the event log
     And the server returns the submitted event identifier and a receipt timestamp
 
-  @wip
   Scenario: A practice.item_answered event from a challenge exercise is accepted
     When "alice" submits a practice.item_answered event selecting options of exercise "chord-recognition-01" in challenge "open-chords-assessment"
     Then the event is accepted and stored in the event log
@@ -91,13 +90,11 @@ Feature: Ingest practice events
     Then the submission is rejected as invalid
     And the rejection identifies "felt_ratings" as the source of the error
 
-  @wip
   Scenario: A practice.item_answered event with both a practice session and a trigger context is rejected
     When "alice" submits a practice.item_answered event carrying both a practice session and a challenge trigger context
     Then the submission is rejected as invalid
     And the rejection identifies "trigger_context" as the source of the error
 
-  @wip
   Scenario: A practice.item_answered event with neither a practice session nor a trigger context is rejected
     When "alice" submits a practice.item_answered event with neither a practice session nor a trigger context
     Then the submission is rejected as invalid

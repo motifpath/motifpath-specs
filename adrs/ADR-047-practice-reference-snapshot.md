@@ -5,6 +5,9 @@
 **Deciders:** Gilson (Product Owner)
 **Input:** PB-22 slice 2 plan, question Q1 (decided 2026-10-04)
 **Accepted:** 2026-10-04, by Gilson.
+**Amended:** 2026-10-05, PB-22 slice 3. The snapshot also holds every fluent time version, as
+`drill_threshold` documents, and the sync on start writes them first and runs each part regardless
+of the others.
 
 ---
 
@@ -45,7 +48,10 @@ snapshot.**
 - **One document per reference row a grader can need,** keyed by `{kind, id}`:
   - `instrument`: tuning, string count, and the layout instrument whose cells it shares;
   - `diagram`: linked instrument ids and playback `tempo_bpm` (null when it has no sequence);
-  - `exercise`: exercise type, option ids, correct option ids and instrument ids.
+  - `exercise`: exercise type, option ids, correct option ids and instrument ids;
+  - `drill_threshold`: one version of a drill template's fluent time: the template key, version,
+    `effective_from` and `fluent_net_ms`. Timed answers are judged by the version in force when they
+    were given.
 
   Each document carries `updated_at` and a `snapshot_version` for its shape. Documents are never
   removed. Diagrams and exercises can't be deleted today. If retiring them is ever added, their
@@ -54,7 +60,9 @@ snapshot.**
   updated the row commits.
 - **On start:** core runs a full sync that upserts every row's document. It repairs any write lost
   between a commit and a crash, and covers rows installed by migrations (ADR-005, reference data).
-  The same sync runs from a maintenance command.
+  The same sync runs from a maintenance command. Fluent times go first, and every part runs even
+  when another fails: an answer folded while its fluent time is missing would earn no fluency, then
+  gain it when its item is rebuilt.
 - **A grader that finds no document rejects with `unknown_reference`.** The raw event stays in the
   event log, and a later regrade (ADR-046) picks it up once the snapshot has the row.
 - The snapshot holds what grading needs and nothing more: no names, prompts or media. Anything shown
