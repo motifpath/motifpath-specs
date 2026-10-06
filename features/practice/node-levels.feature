@@ -58,9 +58,10 @@ Feature: Roll item knowledge up into knowledge-node levels and readiness
   @wip
   Scenario: A wide node shows coverage and its children, not a level of its own
     Given the skill "fretboard-knowledge" has the children "notes-on-low-strings" and "notes-on-high-strings"
-    And "alice" is accurate on 26 of the 72 cells under "fretboard-knowledge"
-    Then "fretboard-knowledge" shows 26 of 72 items met and the levels of its 2 children
-    And "fretboard-knowledge" shows no level of its own
+    And the skill "notes-on-high-strings" whose items are the 26 guitar fretboard cells on strings 2 and 1, frets 0 to 12
+    And "alice" is accurate on all 26 cells of "notes-on-low-strings"
+    Then "alice"'s "fretboard-knowledge" on guitar shows 26 of 52 items met and the levels of its 2 children
+    And "alice"'s "fretboard-knowledge" on guitar shows no level of its own
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 

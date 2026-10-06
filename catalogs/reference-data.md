@@ -24,6 +24,7 @@ scripts can refer to rows by ID instead of looking them up by name.
   | Basic diagram, position | the diagram catalog's keys, as `basic-guitar-diagrams.md` defines |
   | Drill template | `drill-template/<key>` |
   | Drill threshold version | `drill-threshold/<template key>/v<version>` |
+  | Fretboard cell range (a skill's strings and frets on a layout) | `fretboard-cells/<skill key>/<layout instrument key>` |
 
 - Voices use their slug as ID (`acoustic-guitar`), which is already fixed.
 - Keys never change, so neither do IDs. Renaming a row changes its names, never its ID.
