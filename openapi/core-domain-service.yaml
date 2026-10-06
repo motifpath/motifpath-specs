@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.24.2
+  version: 0.25.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -2336,7 +2336,7 @@ paths:
       summary: List the voices diagrams can be played with
       description: |
         Returns every voice the platform provides — the sampled sounds a
-        diagram's sequence can be played with. Any authenticated user may
+        diagram's playbacks can be played with. Any authenticated user may
         list voices, since students need them to play diagrams.
       tags:
         - Content
@@ -2538,17 +2538,21 @@ paths:
                       fret: 8
                   root_note: "A"
                   mode: "minor"
-                  tempo_bpm: 90
-                  time_signature:
-                    beats: 4
-                    beat_value: 4
-                  sequence:
-                    - position_ids: ["5c1a2b3c-0000-0000-0000-000000000101"]
-                      value: { num: 1, den: 8 }
-                    - position_ids: ["5c1a2b3c-0000-0000-0000-000000000102"]
-                      value: { num: 1, den: 8 }
-                    - position_ids: []
-                      value: { num: 1, den: 4 }
+                  playbacks:
+                    - playback_id: "5c1a2b3c-0000-0000-0000-000000000201"
+                      names: { en: "Ascending" }
+                      tempo_bpm: 90
+                      time_signature:
+                        beats: 4
+                        beat_value: 4
+                      steps:
+                        - position_ids: ["5c1a2b3c-0000-0000-0000-000000000101"]
+                          value: { num: 1, den: 8 }
+                        - position_ids: ["5c1a2b3c-0000-0000-0000-000000000102"]
+                          value: { num: 1, den: 8 }
+                        - position_ids: []
+                          value: { num: 1, den: 4 }
+                  default_playback_id: "5c1a2b3c-0000-0000-0000-000000000201"
                   classification:
                     skill_ids: ["3f4b6f2a-8c3e-4b1a-9d2e-7a1c5f0e9b21"]
                     concept_ids: ["7a2d9e10-4f3b-4c5a-8e6d-1b2c3d4e5f60"]
@@ -6302,26 +6306,22 @@ components:
             or a lone chord shape). Never null unless root_note is also
             recorded. A key signature is derived from root_note and mode;
             it is never stored.
-        tempo_bpm:
-          type: [integer, "null"]
-          minimum: 20
-          maximum: 300
-          description: |
-            The default tempo the sequence plays at, in beats per minute,
-            where one beat is the time signature's pulse. Null exactly when
-            sequence is empty.
-        time_signature:
-          $ref: '#/components/schemas/TimeSignature'
-        sequence:
+        playbacks:
           type: array
-          maxItems: 1024
+          maxItems: 16
           items:
-            $ref: '#/components/schemas/SequenceStep'
+            $ref: '#/components/schemas/DiagramPlayback'
           description: |
-            The diagram's playback, as an ordered list of steps: which
-            positions sound, together or in turn, and for how long. A
-            position may sound in any number of steps. Empty means the
-            diagram has no playback.
+            The ways this diagram can sound, in the order its author gave
+            them — e.g. a strum, an arpeggio and a fingerstyle pattern of the
+            same chord shape. Every playback sounds only this diagram's
+            positions. Empty means the diagram has no playback.
+        default_playback_id:
+          type: [string, "null"]
+          format: uuid
+          description: |
+            The playback a usage plays when it doesn't choose one. Always
+            one of playbacks; null exactly when playbacks is empty.
         positions:
           type: array
           minItems: 1
@@ -6354,9 +6354,8 @@ components:
         - created_by
         - root_note
         - mode
-        - tempo_bpm
-        - time_signature
-        - sequence
+        - playbacks
+        - default_playback_id
         - label_display
         - color
         - positions
@@ -6370,10 +6369,10 @@ components:
         Payload for creating a new diagram. Every position's string/fret vs.
         key, and every region's coordinates, must match the referenced
         instrument's family — the API rejects a request that mixes shapes or
-        supplies the wrong shape for the instrument. Every sequence step may
+        supplies the wrong shape for the instrument. Every playback step may
         only name positions of this request. Every per-language text
-        (positions' custom_label and note, regions' description) must be
-        keyed by exactly the languages of names.
+        (positions' custom_label and note, regions' description, playbacks'
+        names) must be keyed by exactly the languages of names.
       properties:
         instrument_ids:
           type: array
@@ -6431,26 +6430,24 @@ components:
           description: |
             The mode of the diagram's key. Requires root_note. Null (or
             omitted) records no key.
-        tempo_bpm:
-          type: [integer, "null"]
-          minimum: 20
-          maximum: 300
-          description: |
-            The sequence's default tempo in beats per minute. Required when
-            sequence is non-empty; must be null or omitted when it is empty.
-        time_signature:
-          $ref: '#/components/schemas/TimeSignature'
-          description: Omitted defaults to 4/4.
-        sequence:
+        playbacks:
           type: array
-          maxItems: 1024
+          maxItems: 16
           items:
-            $ref: '#/components/schemas/SequenceStep'
+            $ref: '#/components/schemas/DiagramPlaybackInput'
           description: |
-            The diagram's playback steps, in order. Every position_id a step
+            The diagram's playbacks, in order. Every position_id a step
             names must be the position_id of one of this request's
             positions, so a position that plays must be given its
             position_id by the client. Omitted means no playback.
+        default_playback_id:
+          type: [string, "null"]
+          format: uuid
+          description: |
+            Which of playbacks is the default; it must be the playback_id
+            of one of them, so the client supplies that playback's id.
+            Omitted or null makes the first playback the default. Must be
+            omitted or null when there are no playbacks.
         positions:
           type: array
           minItems: 1
@@ -6481,13 +6478,14 @@ components:
       description: |
         Payload for replacing an existing diagram's names, positions,
         regions, classification, root_note, mode, label_display, color,
-        tempo_bpm, time_signature, or sequence. The rules of a diagram are
-        checked on the result of the update: every sequence step must still
+        playbacks, or default_playback_id. The rules of a diagram are
+        checked on the result of the update: every playback step must still
         name only positions of the diagram (a position that plays can't be
-        removed without also resending the sequence), a mode needs a root
-        note, and tempo_bpm is set exactly when the sequence is non-empty. Every
-        per-language text on the diagram — names, positions' custom_label
-        and note, regions' description — must cover exactly the same
+        removed without also resending the playbacks), a mode needs a root
+        note, and default_playback_id names one of the playbacks exactly
+        when there are any. Every per-language text on the diagram — names,
+        positions' custom_label and note, regions' description, playbacks'
+        names — must cover exactly the same
         languages once the update is applied. instrument_ids may replace the
         compatible instruments only with records that match the diagram's
         immutable layout geometry. Nor are kind and
@@ -6542,26 +6540,25 @@ components:
           description: |
             The mode of the diagram's key, replacing the current value. Null
             clears it. Omitted leaves it unchanged.
-        tempo_bpm:
-          type: [integer, "null"]
-          minimum: 20
-          maximum: 300
-          description: |
-            The sequence's default tempo, replacing the current value. Null
-            clears it, which is only valid when the resulting sequence is
-            empty. Omitted leaves it unchanged.
-        time_signature:
-          $ref: '#/components/schemas/TimeSignature'
-          description: The time signature, replacing the current one. Omitted leaves it unchanged.
-        sequence:
+        playbacks:
           type: array
-          maxItems: 1024
+          maxItems: 16
           items:
-            $ref: '#/components/schemas/SequenceStep'
+            $ref: '#/components/schemas/DiagramPlaybackInput'
           description: |
-            The diagram's full list of playback steps, replacing the current
-            one; an empty list removes the playback. Omitted leaves the
-            sequence unchanged.
+            The diagram's full list of playbacks, replacing the current one;
+            an empty list removes every playback. A playback sent with the
+            playback_id of an existing one keeps that id, so usages that
+            chose it still find it. Omitted leaves the playbacks unchanged.
+        default_playback_id:
+          type: [string, "null"]
+          format: uuid
+          description: |
+            Which playback is the default, replacing the current choice; it
+            must name one of the resulting playbacks. Omitted keeps the
+            current default if it is still one of the playbacks, and
+            otherwise makes the first playback the default. Null is only
+            valid when the resulting playbacks are empty.
         positions:
           type: array
           minItems: 1
@@ -6649,10 +6646,93 @@ components:
         - beats
         - beat_value
 
+    DiagramPlayback:
+      type: object
+      description: |
+        One named way a diagram sounds: an ordered list of steps over the
+        diagram's own positions, with its tempo and time signature. A
+        diagram can have several, e.g. a strum and an arpeggio of the same
+        chord shape.
+      properties:
+        playback_id:
+          type: string
+          format: uuid
+          description: Stable identifier of this playback within its diagram.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: |
+            The playback's name in each of the diagram's languages (e.g.
+            {"en": "Arpeggio", "pt_BR": "Arpejo"}). No two playbacks of one
+            diagram share a name in the same language.
+        tempo_bpm:
+          type: integer
+          minimum: 20
+          maximum: 300
+          description: |
+            The tempo this playback plays at by default, in beats per
+            minute, where one beat is the time signature's pulse.
+        time_signature:
+          $ref: '#/components/schemas/TimeSignature'
+        steps:
+          type: array
+          minItems: 1
+          maxItems: 1024
+          items:
+            $ref: '#/components/schemas/SequenceStep'
+          description: |
+            Which positions sound, together or in turn, and for how long,
+            in order. A position may sound in any number of steps.
+      required:
+        - playback_id
+        - names
+        - tempo_bpm
+        - time_signature
+        - steps
+
+    DiagramPlaybackInput:
+      type: object
+      description: |
+        A playback as sent when creating or updating a diagram.
+        playback_id may be supplied by the client (and must be, for the one
+        default_playback_id names) or left for the server to assign.
+      properties:
+        playback_id:
+          type: string
+          format: uuid
+          description: |
+            The playback's identifier. Omitted means the server assigns a
+            new one. No two playbacks of one request may share an id.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: |
+            The playback's name in each of the diagram's languages. No two
+            playbacks of one diagram share a name in the same language.
+        tempo_bpm:
+          type: integer
+          minimum: 20
+          maximum: 300
+          description: The playback's default tempo in beats per minute.
+        time_signature:
+          $ref: '#/components/schemas/TimeSignature'
+          description: Omitted defaults to 4/4.
+        steps:
+          type: array
+          minItems: 1
+          maxItems: 1024
+          items:
+            $ref: '#/components/schemas/SequenceStep'
+          description: |
+            The playback's steps, in order. Every position_id a step names
+            must be a position of the diagram.
+      required:
+        - names
+        - tempo_bpm
+        - steps
+
     SequenceStep:
       type: object
       description: |
-        One step of a diagram's playback. Its positions start together (or
+        One step of a diagram playback. Its positions start together (or
         strummed), sound for the step's value, and the next step starts
         when this one ends. A step with no positions is a rest.
       properties:
@@ -6828,19 +6908,28 @@ components:
         playback:
           type: [object, "null"]
           description: |
-            How this usage plays the diagram's sequence. Null means this
-            usage offers no Play control. A diagram with an empty sequence
-            never plays, whatever this says. Positions this usage hides
-            still sound when played, but are never drawn. Ignored for an
-            entry of a DiagramStackRef — a stack doesn't play.
+            How this usage plays the diagram. Null means this usage offers
+            no Play control. A diagram with no playbacks never plays,
+            whatever this says. Positions this usage hides still sound when
+            played, but are never drawn. Ignored for an entry of a
+            DiagramStackRef — a stack doesn't play.
           properties:
+            playback_id:
+              type: [string, "null"]
+              format: uuid
+              description: |
+                Which of the diagram's playbacks this usage plays. Null (or
+                omitted) plays the diagram's default playback. When saved, it
+                must be one of the diagram's playbacks. If that playback is
+                later removed from the diagram, the usage plays the default
+                playback instead.
             tempo_bpm:
               type: [integer, "null"]
               minimum: 20
               maximum: 300
               description: |
-                Overrides the diagram's tempo for this usage. Null (or
-                omitted) uses the diagram's own tempo. A student can still
+                Overrides the chosen playback's tempo for this usage. Null
+                (or omitted) uses that playback's own tempo. A student can still
                 change the tempo while playing; that choice is never saved.
             voice_id:
               type: [string, "null"]
@@ -9574,7 +9663,7 @@ components:
             target_tempo_bpm:
               type: integer
               minimum: 20
-              description: The tempo the item aims for, the diagram's own tempo.
+              description: The tempo the item aims for, the tempo of the diagram's default playback.
             best_clean_tempo_bpm:
               type:
                 - integer

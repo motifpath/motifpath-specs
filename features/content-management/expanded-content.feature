@@ -104,23 +104,42 @@ Feature: Manage expanded content
 
   # ── Diagram content — playback ────────────────────────────────────────────────
 
+  @wip
   Scenario: A teacher adds a diagram that plays with its own voice, tempo and looping
-    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with a 3-step sequence at 90 BPM
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with one 3-step playback at 90 BPM
     And "bob" is authenticated as a teacher
     And a video content node "intro-to-triads" exists in the system
     When "bob" adds diagram "minor-pentatonic-guitar" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165, playing reversed and looping at 60 BPM with voice "acoustic-guitar"
     Then the expanded content item is created and assigned a stable identifier
     And the item's diagram plays reversed and looping at 60 BPM with voice "acoustic-guitar"
 
-  Scenario: A diagram's playback defaults to the authored order, the diagram's tempo and the instrument's voice
-    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with a 3-step sequence at 90 BPM
+  @wip
+  Scenario: A diagram's playback defaults to the default playback, as authored, with the instrument's voice
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with one 3-step playback at 90 BPM
     And "bob" is authenticated as a teacher
     And a video content node "intro-to-triads" exists in the system
     When "bob" adds diagram "minor-pentatonic-guitar" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165, playing with no overrides
-    Then the item's diagram plays as authored, not looping, with no tempo or voice of its own
+    Then the item's diagram plays its default playback as authored, not looping, with no tempo or voice of its own
 
+  @wip
+  Scenario: A teacher chooses which of a diagram's playbacks a usage plays
+    Given a diagram "a5-chord" exists on instrument "guitar" with playbacks "Strum, Arpeggio"
+    And "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" adds diagram "a5-chord" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165, playing playback "Arpeggio"
+    Then the expanded content item is created and assigned a stable identifier
+    And the item's diagram plays playback "Arpeggio"
+
+  @wip
+  Scenario: Removing a playback from a diagram leaves the usages that chose it unchanged
+    Given a diagram "a5-chord" exists on instrument "guitar" with playbacks "Strum, Arpeggio"
+    And a video content node "intro-to-triads" has diagram "a5-chord" as expanded content, playing playback "Arpeggio"
+    When the playback "Arpeggio" is removed from diagram "a5-chord"
+    Then the item's diagram still names playback "Arpeggio"
+
+  @wip
   Scenario Outline: An invalid diagram playback is rejected
-    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with a 3-step sequence at 90 BPM
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with one 3-step playback at 90 BPM
     And "bob" is authenticated as a teacher
     And a video content node "intro-to-triads" exists in the system
     When "bob" adds diagram "minor-pentatonic-guitar" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165, playing <playback>
@@ -134,6 +153,7 @@ Feature: Manage expanded content
       | at 19 BPM                 |
       | at 301 BPM                |
       | in direction "shuffled"   |
+      | playback "Not On It"      |
 
   # ── Diagram content — validation failures ─────────────────────────────────────
 
