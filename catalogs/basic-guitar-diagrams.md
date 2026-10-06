@@ -11,7 +11,7 @@ through a separate Atlas data-migration directory after schema migrations. The
 catalog migration creates a fixed `system:catalog` system profile, which owns every
 basic row and cannot authenticate through Clerk. Ambiguous standard-guitar layouts
 or missing offered-language translations abort installation; never invent a production
-user or silently skip content. The catalog uses the accepted octave tuning, voice, mode and sequence
+user or silently skip content. The catalog uses the accepted octave tuning, voice, mode and playback
 model. No nullable owner, catalog CRUD entity or additional MIDI field is introduced.
 
 Names, marker notes and region descriptions are localized together. SQL includes
@@ -60,9 +60,18 @@ Scale windows are explicitly named windows, not claimed to be ergonomic fingerin
 Chord shapes are limited to CAGED grips and full-range arpeggio maps; there are no
 three-string triad/tetrad, shell or drop-voicing templates.
 
-Maps are silent. Playable shapes use the diagram step list and a tempo, with
-quarter-note ascending runs or simultaneous chord steps. Every step refers to an
-existing position. No removed `sequence_index` field may be emitted.
+Maps are silent: they have no playbacks. Playable shapes have named playbacks at
+60 BPM in 4/4, with names in `en` and `pt_BR`:
+
+| Shape | Playbacks, default first |
+|---|---|
+| Chord shapes (CAGED grips) | "Strum down" / "Batida para baixo": one whole-note step of every position, strummed down. "Arpeggio" / "Arpejo": quarter notes from the lowest pitch to the highest. |
+| Scale and arpeggio windows | "Ascending" / "Ascendente": quarter notes from the lowest pitch to the highest. |
+
+A chord shape's default playback is always the down-strum. Playback IDs derive from
+the diagram key and the playback's role (`strum-down`, `arpeggio`, `ascending`), not
+array order. Every step refers to an existing position. No removed `sequence_index`
+or single `sequence` field may be emitted.
 
 ## Acceptance
 
