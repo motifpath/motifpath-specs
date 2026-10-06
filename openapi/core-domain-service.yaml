@@ -9528,7 +9528,9 @@ components:
         estimated_seconds:
           type: integer
           minimum: 1
-          description: About how long the item takes, used to fit the session to its minutes.
+          description: |
+            About how long the item takes, used to fit the session to its minutes. An exercise
+            takes its estimated_duration_seconds, or 30 seconds without one.
         fretboard_cell:
           type: object
           description: Present when kind is fretboard_cell.
