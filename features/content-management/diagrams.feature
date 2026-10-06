@@ -358,7 +358,6 @@ Feature: Manage prebuilt diagrams
 
   # ── Playbacks ────────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A diagram created without playbacks has no playback and no default
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "No Playback" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
@@ -368,7 +367,6 @@ Feature: Manage prebuilt diagrams
     And the diagram has no playbacks
     And the diagram has no default playback
 
-  @wip
   Scenario: A teacher gives a diagram a playback of single notes
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "A5 Arpeggio" on instrument "guitar" with fretted positions:
@@ -390,7 +388,6 @@ Feature: Manage prebuilt diagrams
       | 2         | 1/8   | none  |
       | 3         | 1/4   | none  |
 
-  @wip
   Scenario: A playback's time signature defaults to 4/4
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "A5 Arpeggio" on instrument "guitar" with fretted positions:
@@ -403,7 +400,6 @@ Feature: Manage prebuilt diagrams
       | 2         | 1/4   |
     Then playback "Arpeggio" is at 90 BPM in "4/4"
 
-  @wip
   Scenario: A diagram can sound its one shape in several playbacks
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "A5 Chord" on instrument "guitar" with fretted positions:
@@ -424,19 +420,16 @@ Feature: Manage prebuilt diagrams
     And playback "Strum" is at 90 BPM in "4/4"
     And playback "Arpeggio" is at 70 BPM in "6/8"
 
-  @wip
   Scenario: The first playback is the default when none is chosen
     Given "bob" is authenticated as a teacher
     When "bob" creates diagram "A5 Chord" with playbacks "Strum, Arpeggio" and no default playback
     Then the diagram's default playback is "Strum"
 
-  @wip
   Scenario: A teacher chooses which playback is the default
     Given "bob" is authenticated as a teacher
     When "bob" creates diagram "A5 Chord" with playbacks "Strum, Arpeggio" and default playback "Arpeggio"
     Then the diagram's default playback is "Arpeggio"
 
-  @wip
   Scenario: A step with several positions sounds them together as a chord, optionally strummed
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "A5 Chord" on instrument "guitar" with fretted positions:
@@ -455,7 +448,6 @@ Feature: Manage prebuilt diagrams
       | 1, 2, 3   | 1/4   | up    |
       | 1, 2, 3   | 1/2   | none  |
 
-  @wip
   Scenario: A position can sound in more than one step
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Strum Then Arpeggiate" on instrument "guitar" with fretted positions:
@@ -471,7 +463,6 @@ Feature: Manage prebuilt diagrams
       | 3         | 1/4   |       |
     Then in playback "Strum Then Arpeggiate", position 1 sounds in steps 1 and 2
 
-  @wip
   Scenario: A step with no positions is a rest
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "With a Rest" on instrument "guitar" with fretted positions:
@@ -485,7 +476,6 @@ Feature: Manage prebuilt diagrams
       | 2         | 1/2   |
     Then step 2 of playback "With a Rest" is a rest of 1/4
 
-  @wip
   Scenario: Tuplets are kept as the fractions the author gave
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "Triplet Run" on instrument "guitar" with fretted positions:
@@ -503,13 +493,11 @@ Feature: Manage prebuilt diagrams
       | 3         | 1/24  |
     Then the step values of playback "Triplet Run" are "1/12, 1/12, 1/12, 1/24, 1/24, 1/24"
 
-  @wip
   Scenario: Playback names are given in every language of the diagram
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "A5 Chord" in "en" and "Acorde A5" in "pt_BR" with a playback named "Strum" in "en" and "Batida" in "pt_BR"
     Then the diagram's playback is named "Strum" in "en" and "Batida" in "pt_BR"
 
-  @wip
   Scenario Outline: An invalid playback is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create diagram request on instrument "guitar" with <problem>
@@ -537,7 +525,6 @@ Feature: Manage prebuilt diagrams
       | a default playback id that is none of its playbacks                  | default_playback_id |
       | a default playback id and no playbacks                               | default_playback_id |
 
-  @wip
   Scenario: A teacher replaces the playbacks of their own diagram
     Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
     And "bob" is authenticated as a teacher
@@ -548,7 +535,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram has 1 playback
     And the diagram's default playback is "Fingerstyle"
 
-  @wip
   Scenario: A playback resent with its id keeps that id
     Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
     And "bob" is authenticated as a teacher
@@ -556,14 +542,12 @@ Feature: Manage prebuilt diagrams
     Then playback "Arpeggio" keeps its id
     And playback "Arpeggio" is at 60 BPM in "4/4"
 
-  @wip
   Scenario: Updating the playbacks keeps the default when it is still one of them
     Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio" and default playback "Arpeggio"
     And "bob" is authenticated as a teacher
     When "bob" updates diagram "a5-chord" adding a playback "Fingerstyle" first and resending "Strum, Arpeggio" with their ids
     Then the diagram's default playback is "Arpeggio"
 
-  @wip
   Scenario: A teacher changes the default playback of their own diagram
     Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
     And "bob" is authenticated as a teacher
@@ -571,7 +555,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram's default playback is "Arpeggio"
     And the diagram has 2 playbacks, in the order "Strum, Arpeggio"
 
-  @wip
   Scenario: Updating a diagram without playbacks keeps its playbacks
     Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
     And "bob" is authenticated as a teacher
@@ -579,7 +562,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram has 2 playbacks, in the order "Strum, Arpeggio"
     And the diagram's default playback is "Strum"
 
-  @wip
   Scenario: A teacher removes every playback of their own diagram
     Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
     And "bob" is authenticated as a teacher
@@ -587,7 +569,6 @@ Feature: Manage prebuilt diagrams
     Then the diagram has no playbacks
     And the diagram has no default playback
 
-  @wip
   Scenario: Removing a position that plays, without resending the playbacks, is rejected
     Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
     And "bob" is authenticated as a teacher
@@ -596,7 +577,6 @@ Feature: Manage prebuilt diagrams
     And the rejection identifies "playbacks" as the source of the error
     And diagram "a5-chord" is unchanged
 
-  @wip
   Scenario: A student retrieves a diagram with its playbacks
     Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
     And "alice" is authenticated as a student
