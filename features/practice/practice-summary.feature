@@ -96,6 +96,13 @@ Feature: Show the student's practice summary on the home
     When "alice" reads their practice summary for "guitar"
     Then "intervals" is in the "Any instrument" group, not in a guitar area
 
+  Scenario: A summary without an instrument covers only what suits any instrument
+    Given the concept "intervals" has exercises for every instrument
+    And the skill "slap-technique" has practice items only for "electric-bass"
+    When "alice" reads their practice summary without an instrument
+    Then "intervals" is in the "Any instrument" group, not in a guitar area
+    And "slap-technique" is in no group
+
   Scenario: Concepts are not progress lines
     Given "alice"'s accuracy on the concept "intervals" improved this week
     When "alice" reads their practice summary for "guitar"
