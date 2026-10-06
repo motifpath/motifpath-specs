@@ -49,17 +49,6 @@ Feature: Derive a student's knowledge of an item from evidence
     When "alice" answers the cell wrongly
     Then the cell moves to box 1 and is next due in 1 day
 
-  @wip
-  Scenario: An item whose review is due is fading
-    Given "alice" is accurate on the cell and the cell's review was due yesterday
-    Then the cell is fading
-    And "alice"'s shown level for the cell is still "accurate"
-
-  @wip
-  Scenario: An item overdue by more than its wait shows one level lower
-    Given "alice" is fluent on the cell, in box 3, and the review is 5 days overdue
-    Then "alice"'s shown level for the cell is "accurate"
-
   # ── Self-rated and teacher-reviewed takes ──────────────────────────────────
 
   Scenario: A self-rating of almost changes nothing

@@ -85,20 +85,6 @@ Feature: Judge timed drills against versioned fluent times
     When "alice" answers an image-choice exercise correctly on 2026-11-02 in 4800 milliseconds
     Then the answer is judged against 4000 milliseconds and counts as slower than fluent
 
-  @wip
-  Scenario: The plan's felt questions go to its least-calibrated timed drills, two at most
-    Given "alice"'s next session will practise "fretboard_cell:name_the_note", "fretboard_cell:find_the_note" and "exercise:text_response"
-    And "fretboard_cell:find_the_note" and "exercise:text_response" have the fewest felt-rated sessions
-    When "alice" composes the session
-    Then the plan asks how "fretboard_cell:find_the_note" and "exercise:text_response" felt
-    And the plan doesn't ask about "fretboard_cell:name_the_note"
-
-  @wip
-  Scenario: Play-alongs are never asked how they felt
-    Given "alice"'s next session will practise only play-alongs
-    When "alice" composes the session
-    Then the plan asks no felt questions
-
   @web
   Scenario: Only drills the student practised are asked about at the end
     Given "alice"'s plan asks how "fretboard_cell:find_the_note" and "exercise:text_response" felt
