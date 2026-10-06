@@ -8,7 +8,7 @@
 #   - authored positions, labels, shapes, colors, notes and regions:
 #       features/content-management/diagrams.feature (ADR-028, ADR-034)
 #   - per-use labels, hidden positions and answer cells: ADR-040
-#   - sequences, voices, tempo precedence and playback eligibility:
+#   - playbacks, voices, tempo precedence and playback eligibility:
 #       features/content-management/diagrams.feature, voices.feature (ADR-041)
 #
 # Sizes are CSS pixels. "Narrow screen" means a 360 px wide viewport.
@@ -198,7 +198,7 @@ Feature: Fretboard presentation
       Then that position is drawn in "#22C55E" with the label "T"
 
     Scenario: Selected, focused and sounding markers remain distinguishable
-      Given an exercise diagram with a selectable position that is also in the playback sequence
+      Given an exercise diagram with a selectable position that is also in the chosen playback
       When that position is selected, keyboard-focused and sounding at the same time
       Then each of the three states is visible without hiding the others
       And the marker keeps its authored shape, color and label
@@ -330,7 +330,7 @@ Feature: Fretboard presentation
   Rule: Playback controls belong to the diagram's control rail
 
     Scenario: A playable diagram shows compact Play and tempo controls in its rail
-      Given a diagram used with playback enabled and a sequence that sounds at least one position
+      Given a diagram used with playback enabled whose chosen playback sounds at least one position
       When the student views the diagram
       Then a Play control and a tempo control showing the effective BPM appear in the diagram's control rail
       And they sit beside the region information controls without overlapping them
@@ -338,14 +338,14 @@ Feature: Fretboard presentation
       And no separate playback footer is shown
 
     Scenario: A diagram without sounding steps offers no player
-      Given a diagram whose sequence contains only rests
+      Given a diagram whose chosen playback contains only rests
       When the student views the diagram
       Then no Play or tempo control is shown
 
-    Scenario: Pressing Play plays the sequence and highlights sounding positions
+    Scenario: Pressing Play plays the chosen playback and highlights sounding positions
       Given a playable diagram
       When the student presses Play
-      Then the diagram's sequence plays with its configured voice
+      Then the playback this use chose plays with its configured voice
       And each visible position is highlighted while it sounds
       And the Play control becomes a Stop control
 
@@ -356,7 +356,7 @@ Feature: Fretboard presentation
       And no position is highlighted as sounding
 
     Scenario: A hidden position may sound but is never revealed
-      Given a playable diagram whose sequence includes a position this use hides
+      Given a playable diagram whose chosen playback includes a position this use hides
       When that position sounds
       Then no marker, label, highlight or note is drawn for it
       And the board does not scroll toward it
@@ -378,7 +378,28 @@ Feature: Fretboard presentation
       Given a playable diagram showing the Retry action
       And its samples can now be loaded
       When the student presses Retry
-      Then the sequence plays
+      Then the chosen playback plays
+
+  Rule: A use plays the playback it chose, else the diagram's default
+
+    Scenario: A use that chose no playback plays the diagram's default playback
+      Given a diagram with playbacks "Strum" and "Arpeggio", "Strum" being the default
+      And a use of it that chose no playback
+      When the student presses Play
+      Then "Strum" plays at its own tempo
+
+    Scenario: A use plays the playback it chose
+      Given a diagram with playbacks "Strum" and "Arpeggio", "Strum" being the default
+      And a use of it that chose "Arpeggio"
+      When the student presses Play
+      Then "Arpeggio" plays at its own tempo
+
+    Scenario: A use whose chosen playback is no longer on the diagram plays the default
+      Given a diagram with playbacks "Strum" and "Arpeggio", "Strum" being the default
+      And a use of it that chose a playback the diagram no longer has
+      When the student presses Play
+      Then "Strum" plays
+      And no error is shown
 
   Rule: Tempo is adjusted in a panel opened on demand
 
@@ -480,8 +501,18 @@ Feature: Fretboard presentation
       And opening the control shows "Box 1" next to it
       And tapping inside the region still places a position rather than opening its description
 
-    Scenario: Sequence recording keeps its step highlights on the new board
-      Given the teacher is recording a sequence in the diagram editor
+    Scenario: Playback recording keeps its step highlights on the new board
+      Given the teacher is recording a playback in the diagram editor
       When the teacher selects a recorded step
       Then the positions of that step are highlighted on the board
-      And tapping a position still records it into the sequence
+      And tapping a position still records it into that playback
+
+    Scenario: The editor lists the diagram's playbacks and marks the default
+      Given the teacher is editing a diagram with playbacks "Strum" and "Arpeggio", "Strum" being the default
+      Then both playbacks are listed by name, in order, with "Strum" marked as the default
+      And the teacher can add, rename, reorder and remove playbacks, and choose another default
+
+    Scenario: Recording into one playback leaves the others unchanged
+      Given the teacher is editing a diagram with playbacks "Strum" and "Arpeggio"
+      When the teacher records new steps into "Arpeggio"
+      Then the steps of "Strum" are unchanged

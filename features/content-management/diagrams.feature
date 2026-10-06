@@ -356,94 +356,144 @@ Feature: Manage prebuilt diagrams
     Then the diagram has no mode
     And the diagram's root note is "A"
 
-  # ── Playback sequence ───────────────────────────────────────────────────────
+  # ── Playbacks ────────────────────────────────────────────────────────────────
 
-  Scenario: A diagram created without a sequence has no playback and a 4/4 time signature
+  @wip
+  Scenario: A diagram created without playbacks has no playback and no default
     Given "bob" is authenticated as a teacher
     When "bob" creates a diagram named "No Playback" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
       | interval | note_name | string | fret |
       | R        | A         | 6      | 5    |
     Then the diagram is created and assigned a stable identifier
-    And the diagram has an empty sequence
-    And the diagram has no tempo
-    And the diagram's time signature is "4/4"
+    And the diagram has no playbacks
+    And the diagram has no default playback
 
-  Scenario: A teacher gives a diagram a sequence of single notes
+  @wip
+  Scenario: A teacher gives a diagram a playback of single notes
     Given "bob" is authenticated as a teacher
-    When "bob" creates a diagram named "A5 Arpeggio" on instrument "guitar" at 90 BPM in "4/4" with fretted positions:
+    When "bob" creates a diagram named "A5 Arpeggio" on instrument "guitar" with fretted positions:
       | interval | note_name | string | fret |
       | R        | A         | 5      | 0    |
       | 5        | E         | 4      | 2    |
       | R        | A         | 3      | 2    |
-    And the sequence:
+    And a playback "Arpeggio" at 90 BPM in "4/4":
       | positions | value |
       | 1         | 1/8   |
       | 2         | 1/8   |
       | 3         | 1/4   |
     Then the diagram is created and assigned a stable identifier
-    And the diagram's tempo is 90 BPM
-    And the diagram's time signature is "4/4"
-    And the diagram's sequence is:
+    And the diagram has 1 playback
+    And playback "Arpeggio" is at 90 BPM in "4/4"
+    And playback "Arpeggio" has the steps:
       | positions | value | strum |
       | 1         | 1/8   | none  |
       | 2         | 1/8   | none  |
       | 3         | 1/4   | none  |
 
-  Scenario: A step with several positions sounds them together as a chord, optionally strummed
+  @wip
+  Scenario: A playback's time signature defaults to 4/4
     Given "bob" is authenticated as a teacher
-    When "bob" creates a diagram named "A5 Chord" on instrument "guitar" at 90 BPM in "4/4" with fretted positions:
+    When "bob" creates a diagram named "A5 Arpeggio" on instrument "guitar" with fretted positions:
+      | interval | note_name | string | fret |
+      | R        | A         | 5      | 0    |
+      | 5        | E         | 4      | 2    |
+    And a playback "Arpeggio" at 90 BPM:
+      | positions | value |
+      | 1         | 1/4   |
+      | 2         | 1/4   |
+    Then playback "Arpeggio" is at 90 BPM in "4/4"
+
+  @wip
+  Scenario: A diagram can sound its one shape in several playbacks
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a diagram named "A5 Chord" on instrument "guitar" with fretted positions:
       | interval | note_name | string | fret |
       | R        | A         | 5      | 0    |
       | 5        | E         | 4      | 2    |
       | R        | A         | 3      | 2    |
-    And the sequence:
+    And a playback "Strum" at 90 BPM in "4/4":
+      | positions | value | strum |
+      | 1, 2, 3   | 1/2   | down  |
+      | 1, 2, 3   | 1/2   | up    |
+    And a playback "Arpeggio" at 70 BPM in "6/8":
+      | positions | value |
+      | 1         | 1/8   |
+      | 2         | 1/8   |
+      | 3         | 1/8   |
+    Then the diagram has 2 playbacks, in the order "Strum, Arpeggio"
+    And playback "Strum" is at 90 BPM in "4/4"
+    And playback "Arpeggio" is at 70 BPM in "6/8"
+
+  @wip
+  Scenario: The first playback is the default when none is chosen
+    Given "bob" is authenticated as a teacher
+    When "bob" creates diagram "A5 Chord" with playbacks "Strum, Arpeggio" and no default playback
+    Then the diagram's default playback is "Strum"
+
+  @wip
+  Scenario: A teacher chooses which playback is the default
+    Given "bob" is authenticated as a teacher
+    When "bob" creates diagram "A5 Chord" with playbacks "Strum, Arpeggio" and default playback "Arpeggio"
+    Then the diagram's default playback is "Arpeggio"
+
+  @wip
+  Scenario: A step with several positions sounds them together as a chord, optionally strummed
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a diagram named "A5 Chord" on instrument "guitar" with fretted positions:
+      | interval | note_name | string | fret |
+      | R        | A         | 5      | 0    |
+      | 5        | E         | 4      | 2    |
+      | R        | A         | 3      | 2    |
+    And a playback "Strum" at 90 BPM in "4/4":
       | positions | value | strum |
       | 1, 2, 3   | 1/4   | down  |
       | 1, 2, 3   | 1/4   | up    |
       | 1, 2, 3   | 1/2   |       |
-    Then the diagram's sequence is:
+    Then playback "Strum" has the steps:
       | positions | value | strum |
       | 1, 2, 3   | 1/4   | down  |
       | 1, 2, 3   | 1/4   | up    |
       | 1, 2, 3   | 1/2   | none  |
 
+  @wip
   Scenario: A position can sound in more than one step
     Given "bob" is authenticated as a teacher
-    When "bob" creates a diagram named "Strum Then Arpeggiate" on instrument "guitar" at 90 BPM in "4/4" with fretted positions:
+    When "bob" creates a diagram named "Strum Then Arpeggiate" on instrument "guitar" with fretted positions:
       | interval | note_name | string | fret |
       | R        | A         | 5      | 0    |
       | 5        | E         | 4      | 2    |
       | R        | A         | 3      | 2    |
-    And the sequence:
+    And a playback "Strum Then Arpeggiate" at 90 BPM in "4/4":
       | positions | value | strum |
       | 1, 2, 3   | 1/2   | down  |
       | 1         | 1/8   |       |
       | 2         | 1/8   |       |
       | 3         | 1/4   |       |
-    Then position 1 sounds in steps 1 and 2
+    Then in playback "Strum Then Arpeggiate", position 1 sounds in steps 1 and 2
 
+  @wip
   Scenario: A step with no positions is a rest
     Given "bob" is authenticated as a teacher
-    When "bob" creates a diagram named "With a Rest" on instrument "guitar" at 90 BPM in "4/4" with fretted positions:
+    When "bob" creates a diagram named "With a Rest" on instrument "guitar" with fretted positions:
       | interval | note_name | string | fret |
       | R        | A         | 5      | 0    |
       | 5        | E         | 4      | 2    |
-      | R        | A         | 3      | 2    |
-    And the sequence:
+    And a playback "With a Rest" at 90 BPM in "4/4":
       | positions | value |
       | 1         | 1/4   |
       |           | 1/4   |
       | 2         | 1/2   |
-    Then step 2 of the diagram's sequence is a rest of 1/4
+    Then step 2 of playback "With a Rest" is a rest of 1/4
 
+  @wip
   Scenario: Tuplets are kept as the fractions the author gave
     Given "bob" is authenticated as a teacher
-    When "bob" creates a diagram named "Triplet Run" on instrument "guitar" at 90 BPM in "4/4" with fretted positions:
+    When "bob" creates a diagram named "Triplet Run" on instrument "guitar" with fretted positions:
       | interval | note_name | string | fret |
       | R        | A         | 5      | 0    |
       | 5        | E         | 4      | 2    |
       | R        | A         | 3      | 2    |
-    And the sequence:
+    And a playback "Triplet Run" at 90 BPM in "4/4":
       | positions | value |
       | 1         | 1/12  |
       | 2         | 1/12  |
@@ -451,85 +501,108 @@ Feature: Manage prebuilt diagrams
       | 1         | 1/24  |
       | 2         | 1/24  |
       | 3         | 1/24  |
-      | 1         | 1/24  |
-      | 2         | 1/24  |
-      | 3         | 1/24  |
-    Then the diagram's step values are "1/12, 1/12, 1/12, 1/24, 1/24, 1/24, 1/24, 1/24, 1/24"
+    Then the step values of playback "Triplet Run" are "1/12, 1/12, 1/12, 1/24, 1/24, 1/24"
 
-  Scenario: A teacher records a compound time signature
+  @wip
+  Scenario: Playback names are given in every language of the diagram
     Given "bob" is authenticated as a teacher
-    When "bob" creates a diagram named "Jig" on instrument "guitar" at 60 BPM in "6/8" with fretted positions:
-      | interval | note_name | string | fret |
-      | R        | A         | 5      | 0    |
-      | 5        | E         | 4      | 2    |
-      | R        | A         | 3      | 2    |
-    And the sequence:
-      | positions | value |
-      | 1         | 1/8   |
-      | 2         | 1/8   |
-      | 3         | 1/8   |
-    Then the diagram's time signature is "6/8"
-    And the diagram's tempo is 60 BPM
+    When "bob" creates a diagram named "A5 Chord" in "en" and "Acorde A5" in "pt_BR" with a playback named "Strum" in "en" and "Batida" in "pt_BR"
+    Then the diagram's playback is named "Strum" in "en" and "Batida" in "pt_BR"
 
-  Scenario Outline: An invalid sequence is rejected
+  @wip
+  Scenario Outline: An invalid playback is rejected
     Given "bob" is authenticated as a teacher
     When "bob" submits a create diagram request on instrument "guitar" with <problem>
     Then the request is rejected as invalid
     And the rejection identifies "<field>" as the source of the error
 
     Examples:
-      | problem                                                   | field          |
-      | a sequence step naming a position not in the diagram      | sequence       |
-      | a sequence step naming the same position twice            | sequence       |
-      | a sequence step with a note value of 0/4                  | sequence       |
-      | a sequence step with a note value of 1/0                  | sequence       |
-      | a sequence step with an unrecognised strum "sideways"     | sequence       |
-      | a sequence and no tempo                                   | tempo_bpm      |
-      | a tempo and an empty sequence                             | tempo_bpm      |
-      | a sequence at 19 BPM                                      | tempo_bpm      |
-      | a sequence at 301 BPM                                     | tempo_bpm      |
-      | a time signature of "4/3"                                 | time_signature |
-      | a time signature of "17/4"                                | time_signature |
-      | a time signature of "0/4"                                 | time_signature |
+      | problem                                                              | field               |
+      | a playback step naming a position not in the diagram                 | playbacks           |
+      | a playback step naming the same position twice                       | playbacks           |
+      | a playback step with a note value of 0/4                             | playbacks           |
+      | a playback step with a note value of 1/0                             | playbacks           |
+      | a playback step with an unrecognised strum "sideways"                | playbacks           |
+      | a playback with no steps                                             | playbacks           |
+      | a playback with no tempo                                             | playbacks           |
+      | a playback at 19 BPM                                                 | playbacks           |
+      | a playback at 301 BPM                                                | playbacks           |
+      | a playback with a time signature of "4/3"                            | playbacks           |
+      | a playback with a time signature of "17/4"                           | playbacks           |
+      | a playback with a time signature of "0/4"                            | playbacks           |
+      | two playbacks with the same id                                       | playbacks           |
+      | two playbacks both named "Strum" in "en"                             | playbacks           |
+      | a playback named only in "en" on a diagram named in "en" and "pt_BR" | playbacks           |
+      | 17 playbacks                                                         | playbacks           |
+      | a default playback id that is none of its playbacks                  | default_playback_id |
+      | a default playback id and no playbacks                               | default_playback_id |
 
-  Scenario: A teacher replaces the sequence of their own diagram
-    Given a custom diagram "a5-arpeggio" exists on instrument "guitar", created by "bob", with a 3-step sequence at 90 BPM
+  @wip
+  Scenario: A teacher replaces the playbacks of their own diagram
+    Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
     And "bob" is authenticated as a teacher
-    When "bob" updates diagram "a5-arpeggio" with the sequence:
-      | positions | value | strum |
-      | 1, 2, 3   | 1/1   | down  |
-    Then the diagram's sequence is:
-      | positions | value | strum |
-      | 1, 2, 3   | 1/1   | down  |
-    And the diagram's tempo is 90 BPM
+    When "bob" updates diagram "a5-chord" with only the playback "Fingerstyle" at 80 BPM in "4/4":
+      | positions | value |
+      | 1         | 1/8   |
+      | 3         | 1/8   |
+    Then the diagram has 1 playback
+    And the diagram's default playback is "Fingerstyle"
 
-  Scenario: Updating a diagram without a sequence keeps its sequence
-    Given a custom diagram "a5-arpeggio" exists on instrument "guitar", created by "bob", with a 3-step sequence at 90 BPM
+  @wip
+  Scenario: A playback resent with its id keeps that id
+    Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
     And "bob" is authenticated as a teacher
-    When "bob" updates diagram "a5-arpeggio" setting root note "A" and label display "note"
-    Then the diagram's sequence has 3 steps
+    When "bob" updates diagram "a5-chord" resending playback "Arpeggio" with its id at 60 BPM, without "Strum"
+    Then playback "Arpeggio" keeps its id
+    And playback "Arpeggio" is at 60 BPM in "4/4"
 
-  Scenario: A teacher removes the playback of their own diagram
-    Given a custom diagram "a5-arpeggio" exists on instrument "guitar", created by "bob", with a 3-step sequence at 90 BPM
+  @wip
+  Scenario: Updating the playbacks keeps the default when it is still one of them
+    Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio" and default playback "Arpeggio"
     And "bob" is authenticated as a teacher
-    When "bob" updates diagram "a5-arpeggio" with an empty sequence and no tempo
-    Then the diagram has an empty sequence
-    And the diagram has no tempo
+    When "bob" updates diagram "a5-chord" adding a playback "Fingerstyle" first and resending "Strum, Arpeggio" with their ids
+    Then the diagram's default playback is "Arpeggio"
 
-  Scenario: Removing a position that plays, without resending the sequence, is rejected
-    Given a custom diagram "a5-arpeggio" exists on instrument "guitar", created by "bob", with a 3-step sequence at 90 BPM
+  @wip
+  Scenario: A teacher changes the default playback of their own diagram
+    Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
     And "bob" is authenticated as a teacher
-    When "bob" updates diagram "a5-arpeggio" replacing its positions with only positions 1 and 2
+    When "bob" updates diagram "a5-chord" setting the default playback to "Arpeggio"
+    Then the diagram's default playback is "Arpeggio"
+    And the diagram has 2 playbacks, in the order "Strum, Arpeggio"
+
+  @wip
+  Scenario: Updating a diagram without playbacks keeps its playbacks
+    Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
+    And "bob" is authenticated as a teacher
+    When "bob" updates diagram "a5-chord" setting root note "A" and label display "note"
+    Then the diagram has 2 playbacks, in the order "Strum, Arpeggio"
+    And the diagram's default playback is "Strum"
+
+  @wip
+  Scenario: A teacher removes every playback of their own diagram
+    Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
+    And "bob" is authenticated as a teacher
+    When "bob" updates diagram "a5-chord" with no playbacks
+    Then the diagram has no playbacks
+    And the diagram has no default playback
+
+  @wip
+  Scenario: Removing a position that plays, without resending the playbacks, is rejected
+    Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
+    And "bob" is authenticated as a teacher
+    When "bob" updates diagram "a5-chord" replacing its positions with only positions 1 and 2
     Then the request is rejected as invalid
-    And the rejection identifies "sequence" as the source of the error
-    And diagram "a5-arpeggio" is unchanged
+    And the rejection identifies "playbacks" as the source of the error
+    And diagram "a5-chord" is unchanged
 
-  Scenario: A student retrieves a diagram with its sequence
-    Given a custom diagram "a5-arpeggio" exists on instrument "guitar", created by "bob", with a 3-step sequence at 90 BPM
+  @wip
+  Scenario: A student retrieves a diagram with its playbacks
+    Given a custom diagram "a5-chord" exists on instrument "guitar", created by "bob", with playbacks "Strum, Arpeggio"
     And "alice" is authenticated as a student
-    When "alice" retrieves diagram "a5-arpeggio"
-    Then the diagram's sequence has 3 steps
-    And the diagram's tempo is 90 BPM
+    When "alice" retrieves diagram "a5-chord"
+    Then the diagram has 2 playbacks, in the order "Strum, Arpeggio"
+    And the diagram's default playback is "Strum"
 
   # ── Happy path — updating ────────────────────────────────────────────────────
 
