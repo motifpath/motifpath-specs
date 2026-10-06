@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.25.0
+  version: 0.25.1
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -4804,7 +4804,7 @@ paths:
         practised (for example, they are enrolled in nothing), there is no plan.
 
         With an instrument in hand, only items that suit that instrument (or every
-        instrument) are picked. Without one (a session in the head), only items that need no
+        instrument) are picked, fretboard cells of its layout included. Without one (a session in the head), only items that need no
         instrument in hand are picked: fretboard cells of every fretboard layout among the
         student's instruments, and exercises; never a play-along, so such a session has no
         application ending. Any instrument may be named, not only the ones the student is
