@@ -106,6 +106,12 @@ Feature: Compose a practice session
     Then every item in the session suits "electric-bass" or every instrument
 
   @wip
+  Scenario: With an instrument in hand, fretboard cells of its layout can be picked
+    Given "alice" has nothing due or weak on guitar and new fretboard cells on the E and A strings
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the session includes fretboard cells of the "guitar" layout
+
+  @wip
   Scenario: A session in the head picks only items that need no instrument in hand
     When "alice" composes a 5-minute session with no instrument in hand
     Then no item in the session is a play-along

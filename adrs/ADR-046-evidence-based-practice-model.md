@@ -64,6 +64,8 @@ in the navigation opens the session setup directly, with no practice home in bet
   instrument;
 - a plan always has an item, or there is no plan: a student with nothing connected to what they
   are learning gets none, instead of an unconnected stretch;
+- sessions with the instrument in hand may pick fretboard cells too, since a cell suits every
+  instrument of its layout;
 - the **fretboard heatmap** is on each instrument's tab of the home, one cell per string and fret
   generated for the instrument's layout, coloured by level.
 
@@ -274,6 +276,9 @@ One piece of evidence per observation, the only stored learning state:
   the session has no ending and the time stays with the focus block. Like the warm-up, a due
   play-along is never the ending (its review belongs in the focus block), and an ending longer than
   a quarter of the session is skipped.
+- **Fretboard cells with the instrument in hand too** (amended 2026-10-06, by Gilson): a cell suits
+  every instrument of its layout, so an in-hand session may pick it like any focus item. Every
+  next step the home offers for an instrument is then reachable from that instrument's Start.
 - **In the head** (amended 2026-10-06): fretboard cells of every layout among the student's
   instruments, and exercises; no warm-up and no application ending, since both are play-alongs.
   Each cell pick is asked the way (drill) with the fewer right answers on that cell, name the
