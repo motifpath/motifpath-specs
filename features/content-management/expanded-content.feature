@@ -138,6 +138,16 @@ Feature: Manage expanded content
     Then the item's diagram still names playback "Arpeggio"
 
   @wip
+  Scenario: A usage whose playback was removed can still be edited
+    Given a diagram "a5-chord" exists on instrument "guitar" with playbacks "Strum, Arpeggio"
+    And a video content node "intro-to-triads" has diagram "a5-chord" as expanded content, playing playback "Arpeggio"
+    And the playback "Arpeggio" is removed from diagram "a5-chord"
+    And "bob" is authenticated as a teacher
+    When "bob" updates the item's caption to "Updated caption", resending its diagram unchanged
+    Then the item's caption is "Updated caption"
+    And the item's diagram still names playback "Arpeggio"
+
+  @wip
   Scenario Outline: An invalid diagram playback is rejected
     Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar" with one 3-step playback at 90 BPM
     And "bob" is authenticated as a teacher
