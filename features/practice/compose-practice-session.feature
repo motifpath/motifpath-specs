@@ -7,8 +7,9 @@ Feature: Compose a practice session
   # session minus its warm-up and its application ending), the new share being a ceiling
   # balanced across the student's instruments. Due and weak take over
   # each other's unused time; whatever is still left is split 50/50 between review ahead and
-  # stretch, as for a caught-up student. Weak = practised, not due, not yet fluent. Every pick
-  # carries a reason.
+  # stretch, as for a caught-up student. Weak = practised, not due, not yet fluent. Stretch reaches
+  # only nodes connected to what the student is learning: path skills, their applies and part_of
+  # neighbours, and nodes that build on something the student has met. Every pick carries a reason.
 
   Background:
     Given student "alice" plays "guitar" and "electric-bass"
@@ -123,25 +124,43 @@ Feature: Compose a practice session
     When "alice" composes a 20-minute session with "guitar" in hand
     Then no more than 3 minutes go to new items
 
+  @wip
   Scenario: A caught-up student reviews ahead and stretches, half and half
     Given "alice" has nothing due, weak or new on their path for guitar
     And "alice" has known items coming due within the week
-    And "alice" is ready to start the skill "notes-on-high-strings"
+    And "alice" is ready to start the skill "notes-on-high-strings", which builds on a skill they have met
     When "alice" composes a 10-minute session with "guitar" in hand
     Then about half the session is items with the reason review_ahead
     And about half the session is items of "notes-on-high-strings" with the reason stretch
 
+  @wip
   Scenario: When nothing is coming due, stretch takes the whole session
     Given "alice" has nothing due, weak, new or coming due on their path for guitar
-    And "alice" is ready to start the skill "notes-on-high-strings"
+    And "alice" is ready to start the skill "notes-on-high-strings", which builds on a skill they have met
     When "alice" composes a 10-minute session with "guitar" in hand
     Then every item after the warm-up has the reason stretch
 
+  @wip
   Scenario: Stretch starts first with nodes that build on what the student has met
     Given "alice" is ready to start "notes-on-high-strings", which requires a skill they have met
-    And "alice" is ready to start "chord-tones", which requires nothing
+    And "alice" is ready to start the concept "chord-tones", which requires nothing and a skill on their path applies
     When "alice" composes a caught-up 10-minute session with "guitar" in hand
     Then the stretch items are of "notes-on-high-strings" before "chord-tones"
+
+  @wip
+  Scenario: Stretch reaches a node that a path skill is part of
+    Given "alice" has nothing due, weak, new or coming due on their path for guitar
+    And "alice" is ready to start the skill "lead-guitar", which requires nothing and a skill on their path is part of
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the session has items of "lead-guitar" with the reason stretch
+
+  @wip
+  Scenario: Stretch never reaches a node unconnected to what the student is learning
+    Given "alice" has nothing due, weak, new or coming due on their path for guitar
+    And "alice" is ready to start the skill "notes-on-high-strings", which builds on a skill they have met
+    And "alice" is ready to start the skill "slide-technique", which requires nothing and has no link to their path
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then no item in the session is of "slide-technique"
 
   Scenario: A short session skips the warm-up
     When "alice" composes a 3-minute session with "guitar" in hand

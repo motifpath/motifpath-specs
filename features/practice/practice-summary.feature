@@ -71,6 +71,16 @@ Feature: Show the student's practice summary on the home
     When "alice" reads their practice summary for "guitar"
     Then the summary lists only "guitar" and "electric-bass" as their instruments
 
+  Scenario: A skill unconnected to what the student is learning is not a next step
+    Given "alice" is ready to start the skill "slide-technique", which requires nothing and has no link to their path
+    When "alice" reads their practice summary for "guitar"
+    Then "slide-technique" is not among the next steps
+
+  Scenario: A skill that builds on what the student has met is ready to start
+    Given "alice" is ready to start the skill "notes-on-high-strings", which builds on a skill they have met
+    When "alice" reads their practice summary for "guitar"
+    Then the next steps include "notes-on-high-strings" as ready to start
+
   Scenario: A skill with nothing to practise on the instrument is not a next step
     Given the skill "slap-technique" has practice items only for "electric-bass"
     And "alice" is ready to start "slap-technique"

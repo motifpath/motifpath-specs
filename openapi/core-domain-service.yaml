@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.24.0
+  version: 0.24.1
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -9768,7 +9768,9 @@ components:
             - ready_to_start
           description: |
             refresh = known items are fading; strengthen = practised but not yet secure;
-            ready_to_start = every requirement is met and nothing is practised yet.
+            ready_to_start = every requirement is met, nothing is practised yet, and the node
+            connects to what the student is learning: one of their path skills, linked to one
+            by applies or part_of, or building on something they have met.
         node_id:
           type: string
           format: uuid
