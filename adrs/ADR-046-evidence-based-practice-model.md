@@ -46,6 +46,10 @@ what the student is learning: stretch and "ready to start" next steps reach only
 `applies` and `part_of` neighbours, and nodes that build on something the student has met. Practice
 the student chooses for themselves, beyond these, is a later feature.
 
+**Amended:** 2026-10-06, planning slice 4, by Gilson. The overview and the instrument tabs are the
+app's **general home**, the first screen every signed-in user sees, whatever their role. **Practice**
+in the navigation opens the session setup directly, with no practice home in between.
+
 ---
 
 ## Context
@@ -304,6 +308,10 @@ One piece of evidence per observation, the only stored learning state:
 
 ### The student summary and home
 
+- **The home is the app's general home** (amended 2026-10-06, by Gilson): the first screen every
+  signed-in user sees, whatever their role, since every role can learn. **Practice** in the
+  navigation opens the session setup directly; an instrument tab's start opens it with that
+  instrument chosen.
 - **The home opens on an overview** across instruments, then one tab per instrument. Amended
   2026-10-05, by Gilson: each tab counts only what is true for its instrument, and what belongs to
   no instrument lives on the overview.

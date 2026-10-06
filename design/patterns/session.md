@@ -30,7 +30,8 @@ like the same product.
 
 - **Phases:** setup (what the student holds and how long they have) → run → summary. All three sit in
   the shell. Setup asks one question per step, with today's choice preselected, so a returning
-  student starts in two taps from the practice home.
+  student starts in two taps: **Practice** in the navigation opens the setup, then Start. From an
+  instrument tab on the home, Start opens the setup with that instrument chosen.
 - **Exit (×):**
   - in setup, × goes back to where the student came from;
   - during a run, × ends the session as left early;

@@ -3,7 +3,7 @@ Feature: Show the student's practice overview across instruments
   I want to see at a glance that I've been practising and learning, whatever I played
   So that every session counts toward my sense of progress, before I pick an instrument
 
-  # The overview is the practice home's first view. Practice days here count finished sessions
+  # The overview is the first view of the app's home, for every signed-in user. Practice days here count finished sessions
   # on any instrument; each instrument's card and summary count only that instrument. Learning
   # days count completed content nodes and appear only here.
 
@@ -57,6 +57,24 @@ Feature: Show the student's practice overview across instruments
     Given "alice" completed a content node at 23:30 on Monday in "America/Sao_Paulo", which is Tuesday in UTC
     When "alice" reads their practice overview in time zone "America/Sao_Paulo"
     Then that completion counts on Monday
+
+  # ── Where it shows ─────────────────────────────────────────────────────────
+
+  @web
+  Scenario: Signing in opens the home on the practice overview
+    When "alice" signs in
+    Then "alice" sees their practice overview first
+
+  @web
+  Scenario: Practice in the navigation opens the session setup
+    When "alice" chooses Practice in the navigation
+    Then the practice session setup opens, without a page in between
+
+  @web
+  Scenario: Starting from an instrument's tab chooses that instrument
+    Given "alice" is on the "electric-bass" tab of the home
+    When "alice" starts a practice session from it
+    Then the session setup opens with "electric-bass" in hand chosen
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
