@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.24.1
+  version: 0.24.2
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -4843,7 +4843,7 @@ paths:
       operationId: getPracticeSummary
       summary: Read the authenticated student's practice summary for the home
       description: |
-        Everything the practice home shows, in one read, for one of the student's
+        Everything the home shows for an instrument, in one read, for one of the student's
         instruments: practice days on that instrument in the last 7, progress this week per
         skill, the next steps, and every practice node grouped by area, with a separate group for nodes that suit
         any instrument. Progress is reported per skill; concepts are context, never progress
@@ -4905,7 +4905,7 @@ paths:
       operationId: getPracticeOverview
       summary: Read the authenticated student's practice overview, across instruments
       description: |
-        The first view of the practice home, before the student picks an instrument: on how
+        The first view of the home, before the student picks an instrument: on how
         many of the last 7 days they practised on any instrument and completed a content
         node, and one card per instrument with that instrument's practice days and its top
         next step. Each instrument's full picture is its practice summary.
@@ -9599,7 +9599,7 @@ components:
 
     PracticeSummary:
       type: object
-      description: The practice home for one instrument, derived from the student's evidence.
+      description: The home for one instrument, derived from the student's evidence.
       properties:
         instrument_id:
           type:
@@ -9659,7 +9659,7 @@ components:
 
     PracticeOverview:
       type: object
-      description: The practice home's overview, across all of the student's instruments.
+      description: The home's overview, across all of the student's instruments.
       properties:
         practice_days_last_7:
           type: integer
