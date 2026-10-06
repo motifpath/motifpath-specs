@@ -66,6 +66,11 @@ the answer is timed. Thresholds and felt questions are per template, never per i
     | `exercise:image_choice` | 5 s |
     | `exercise:audio_recognition` | 4 s after the audio |
     | `exercise:audio_selection` | 4 s after the audio options |
+    | `fretboard_cell:name_the_note` | 3 s |
+    | `fretboard_cell:find_the_note` | 4 s |
+
+    The fretboard defaults stand in until the team benchmarks the drill, which needs the drill
+    built first; the benchmark is their version 2.
 
   - or a **benchmark**, twice the team's median net time on the drill.
 - **A benchmark after a default** is added as the next version. It doesn't replace the default.
