@@ -50,6 +50,11 @@ the student chooses for themselves, beyond these, is a later feature.
 app's **general home**, the first screen every signed-in user sees, whatever their role. **Practice**
 in the navigation opens the session setup directly, with no practice home in between.
 
+**Amended:** 2026-10-06, after the slice 4 smoke, by Gilson. A tempo the student chooses is theirs:
+the tempo ladder never lowers it, struggles included, and only the student changes it. A best clean
+tempo above the target is kept: a play-along starts at it, and a warm-up at about 80% of it, even
+past the target.
+
 **Amended:** 2026-10-06, planning slice 4 (the mental fretboard), by Gilson:
 - the fretboard drills start from team-set **default** fluent times (name the note 3 s, find the
   note 4 s, net), like the exercise families; the team benchmark becomes their version 2, since
@@ -297,7 +302,10 @@ One piece of evidence per observation, the only stored learning state:
   play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the
   evidence: its takes are not sent as answers, and a due item is never the warm-up.
 - **Tempo ladder:** start at the best clean tempo; +5 BPM after two clean takes; −5 after a struggle;
-  clamped to the item's start and target. The count-in is part of the step sequence (rest steps), so
+  never above the target by itself, and never below 60% of it. The student may choose another tempo
+  for the next take, past the target too, and the ladder never goes below a tempo the student chose
+  for the item (amended 2026-10-06). A start or warm-up tempo is capped at the target only when the
+  best clean tempo is below it: a best clean tempo past the target is kept. The count-in is part of the step sequence (rest steps), so
   audio starts inside the student's tap on every platform.
 
 ### Teacher notes and suggestions
