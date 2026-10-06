@@ -45,11 +45,11 @@ Feature: Grade a practice answer into evidence
     Then the evidence's answer key is string 5, fret 3, note "C"
 
   @wip
-  Scenario: Evidence keeps an exercise's correct options as they were when it was graded
+  Scenario: Evidence keeps an exercise's options as the student saw them
     Given the exercise "c-major-triad" whose correct options are "C" and "E" out of "C", "D", "E" and "F"
     When "alice" answers exercise "c-major-triad" by selecting "D"
-    And the exercise's correct options later change to "C", "E" and "G"
-    Then the evidence's answer key is the options "C" and "E"
+    And the exercise's options are later edited to "C", "E", "G" and "B", with "G" correct as well
+    Then the evidence's answer key shows the options "C", "D", "E" and "F", with "C" and "E" correct
 
   Scenario: An answer in a node's challenge is evidence like an answer in a practice session
     Given "alice" is taking the challenge "open-chords-assessment" of the content node "open-chords"

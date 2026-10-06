@@ -44,7 +44,10 @@ Each file holds:
   so a disputed answer can be checked from the evidence alone. For a fretboard cell, the asked
   `string` and `fret` and the cell's `note_name`, spelled with sharps (any spelling of that
   pitch is right, and for find the note any octave on that string). For an exercise, its
-  correct `option_ids`. The server stores it; a client's instant feedback may ignore it.
+  `options` in the exercise's order, each with `option_id` and `is_correct`; the server also
+  copies each option's content (label, image, audio, region, diagram), which these cases
+  don't pin since their reference has none. The server stores it; a client's instant
+  feedback may ignore it.
   Adding it to `exercise_option.v1`'s cases changes no grading rule.
 - **Self-assessed evidence** is `source`, `rating` and the one measure its kind takes:
   `tempo_bpm` for a play-along, `changes_per_minute` for a chord change.

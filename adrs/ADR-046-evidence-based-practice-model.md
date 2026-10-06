@@ -165,7 +165,8 @@ One piece of evidence per observation, the only stored learning state:
 - Auto-graded and self-assessed evidence keeps the **raw response** and the **grader id**, so a grader
   change can regrade it. Timed answers also keep the student's **tap time** (below).
 - Auto-graded evidence also keeps its **answer key** (amended 2026-10-06, by Gilson): what a right
-  answer was when it was graded (the asked cell and its note, or the exercise's correct options),
+  answer was when it was graded (the asked cell and its note, or every option of the exercise as
+  the student saw it, each marked right or wrong),
   so a student's complaint about one answer can be checked from the evidence alone, even after
   the exercise changed.
 - The evidence id is the event id that produced it, so a redelivered event can't count twice.

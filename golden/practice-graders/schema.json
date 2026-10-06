@@ -96,7 +96,7 @@
                           "latency_ms": { "type": "integer", "minimum": 0 },
                           "audio_ms": { "type": "integer", "minimum": 0 },
                           "answer_key": {
-                            "description": "What a right answer was, kept so a disputed answer can be checked without the reference data of the day: the asked cell and its note (spelled with sharps), or the exercise's correct options.",
+                            "description": "What a right answer was, kept so a disputed answer can be checked without the reference data of the day: the asked cell and its note (spelled with sharps), or every option of the exercise as shown, each with whether it was correct.",
                             "oneOf": [
                               {
                                 "type": "object",
@@ -111,9 +111,21 @@
                               {
                                 "type": "object",
                                 "additionalProperties": false,
-                                "required": ["option_ids"],
+                                "required": ["options"],
                                 "properties": {
-                                  "option_ids": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+                                  "options": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "items": {
+                                      "type": "object",
+                                      "additionalProperties": false,
+                                      "required": ["option_id", "is_correct"],
+                                      "properties": {
+                                        "option_id": { "type": "string" },
+                                        "is_correct": { "type": "boolean" }
+                                      }
+                                    }
+                                  }
                                 }
                               }
                             ]
