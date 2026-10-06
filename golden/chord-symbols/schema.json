@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motifpath.io/specs/golden/chord-symbols/schema.json",
+  "title": "Chord symbol parser golden cases",
+  "description": "One file per parser version: chord symbols as authors write them -> how the parser reads them. Each parsed result must also be valid against ParsedChordSymbol in openapi/core-domain-service.yaml.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["parser", "description", "cases"],
+  "properties": {
+    "parser": {
+      "type": "string",
+      "pattern": "^[a-z][a-z_]*\\.v[1-9][0-9]*$",
+      "description": "The parser id these cases pin, as <name>.v<version>. Matches the file name."
+    },
+    "description": { "type": "string", "minLength": 1 },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "input", "expected"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "input": { "type": "string", "description": "The symbol exactly as written." },
+          "expected": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["status", "parsed"],
+                "properties": {
+                  "status": { "const": "parsed" },
+                  "parsed": { "type": "object", "description": "A ParsedChordSymbol." }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["status", "warning"],
+                "properties": {
+                  "status": { "const": "unparsed" },
+                  "warning": { "enum": ["unparsed_symbol", "unsupported_quality"] }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["status"],
+                "properties": { "status": { "const": "no_chord" } }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
