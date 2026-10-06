@@ -9,7 +9,6 @@ Feature: Judge timed drills against versioned fluent times
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: An answer's time is judged net of the student's tap time
     When "alice" names the note of a cell correctly in 2200 milliseconds
     Then the answer took 1900 milliseconds net of tap time
@@ -22,7 +21,6 @@ Feature: Judge timed drills against versioned fluent times
     Then version 2 is added with source "calibrated", 120 sessions and 25 students
     And version 1 stays as it was
 
-  @wip
   Scenario: A new version applies from its start date on
     Given version 2 of "fretboard_cell:name_the_note" has a fluent time of 1700 milliseconds from 2026-11-01
     When "alice" names the note of a cell correctly on 2026-11-02 in 2100 milliseconds
@@ -30,13 +28,11 @@ Feature: Judge timed drills against versioned fluent times
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A new version never takes back a level
     Given "alice" became fluent on a cell with answers judged against version 1
     When version 2 lowers the fluent time to 1700 milliseconds
     Then "alice" is still fluent on that cell
 
-  @wip
   Scenario: A student who never did a tap check is judged on the whole latency
     Given student "bruno" has never done a tap check
     When "bruno" names the note of a cell correctly in 2200 milliseconds
@@ -66,7 +62,6 @@ Feature: Judge timed drills against versioned fluent times
     Then the answer took 5200 milliseconds net of tap time
     And it counts as within the fluent time
 
-  @wip
   Scenario: The fretboard drills start from default fluent times
     Given the practice drill catalog is installed
     Then "fretboard_cell:name_the_note" has version 1 from source "default" with a fluent time of 3000 milliseconds
@@ -114,7 +109,6 @@ Feature: Judge timed drills against versioned fluent times
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
-  @wip
   Scenario: An answer given before a template has any version counts for accuracy only
     Given the drill template "fretboard_cell:find_the_note" has no version yet
     When "alice" finds a note correctly in 900 milliseconds
