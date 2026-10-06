@@ -115,7 +115,6 @@ Feature: Judge timed drills against versioned fluent times
     Then the answer counts toward "alice"'s accuracy
     And it never counts toward fluency, even after version 1 is installed
 
-  @wip
   Scenario: A felt rating for a drill the session didn't practise is ignored
     Given "alice"'s session practised only "fretboard_cell:name_the_note"
     When the session ends with "exercise:image_choice" rated "hard"
