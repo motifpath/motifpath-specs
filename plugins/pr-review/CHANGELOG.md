@@ -1,5 +1,17 @@
 # PR Review — Changelog
 
+## [1.7.0] — 2026-10-06
+
+### Changed
+- `HEURISTICS.md` item 7 (absence and transitional state) also asks whether a test reads a
+  source that moves on its own schedule, such as another repo's main branch, a shared catalog
+  or an external API, and pins its exact contents. Such a test fails every unrelated change once
+  the source grows; it should check what must hold of the source instead. From the core#82
+  review: tests of the live drill catalog, newly run in CI against specs main, asserted its
+  exact template count.
+- `HEURISTICS.md` activation: a change that adds a test or CI step reading another repo or
+  shared data activates item 7.
+
 ## [1.6.0] — 2026-10-05
 
 ### Added
