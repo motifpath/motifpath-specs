@@ -53,7 +53,7 @@ Feature: Know what a practice session holds while practising it
   Scenario: A play-along hands over to the next item
     Given "alice" played "A Major pentatonic — Box 4" up to 300 BPM
     When "alice" rates its last take
-    Then "alice" sees that she played "A Major pentatonic — Box 4" up to 300 BPM
+    Then "alice" sees that they played "A Major pentatonic — Box 4" up to 300 BPM
     And next up is "Ab Major pentatonic — Box 1", with why it was picked
     And the next item starts only when "alice" chooses Continue
 
