@@ -23,6 +23,7 @@ plus the five always-on items.
 | adds validation or a constraint | 11, 12, 13 |
 | carries external content into render/query/exec | 15, 16, 2 |
 | touches configuration, migration, or rollout | 7, 14, 2 |
+| adds a test or CI step that reads another repo or shared data | 7 |
 | is user-facing (motifpath-web) | 12, 18, 14, 23 |
 | runs on a tick (animation frame, timer, poller, scheduled job) | 24, 7 |
 | **always** | **17, 19, 20, 21, 22** |
@@ -65,9 +66,13 @@ plus the five always-on items.
 7. **Absence and transitional state.** What if the input is empty/null/duplicated? Does "empty"
    mean "not set yet" or a deliberate value ("every instrument", "no limit"), and does code that
    fills in a default tell the two apart? And **during** rollout (field not yet migrated, event not
-   yet reprocessed, an old client version still in flight)? — *Smell:* only the happy path
-   covered; no "doesn't exist yet" case; a default applied to any empty value, including one a
-   user saved on purpose.
+   yet reprocessed, an old client version still in flight)? And does a test read a source that
+   moves on its own schedule (another repo's main branch, a shared catalog, an external API)? If
+   it pins that source's exact contents, the source's next addition fails every unrelated change;
+   check what must hold of it instead. — *Smell:* only the happy path covered; no "doesn't exist
+   yet" case; a default applied to any empty value, including one a user saved on purpose; an
+   exact count or full list asserted on data another team or repo keeps growing. (A test of the
+   live drill catalog asserted exactly 7 templates, read from specs main by CI.)
 8. **Normalization destroys uniqueness and information.** Shortened/normalized/hashed an
    identifier: what guaranteed uniqueness before, and what guarantees it now? Does the destination
    accept a duplicate **silently**? What does whoever operates it lose for debugging? — *Smell:*
