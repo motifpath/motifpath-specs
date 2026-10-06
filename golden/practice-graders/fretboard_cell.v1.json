@@ -30,7 +30,12 @@
         "evidence": {
           "source": "auto_graded",
           "correct": true,
-          "latency_ms": 1800
+          "latency_ms": 1800,
+          "answer_key": {
+            "string": 5,
+            "fret": 3,
+            "note_name": "C"
+          }
         }
       }
     },
@@ -47,7 +52,12 @@
         "evidence": {
           "source": "auto_graded",
           "correct": false,
-          "latency_ms": 2500
+          "latency_ms": 2500,
+          "answer_key": {
+            "string": 5,
+            "fret": 3,
+            "note_name": "C"
+          }
         }
       }
     },
@@ -64,7 +74,12 @@
         "evidence": {
           "source": "auto_graded",
           "correct": true,
-          "latency_ms": 2100
+          "latency_ms": 2100,
+          "answer_key": {
+            "string": 6,
+            "fret": 2,
+            "note_name": "F#"
+          }
         }
       }
     },
@@ -81,7 +96,12 @@
         "evidence": {
           "source": "auto_graded",
           "correct": true,
-          "latency_ms": 2300
+          "latency_ms": 2300,
+          "answer_key": {
+            "string": 6,
+            "fret": 1,
+            "note_name": "F"
+          }
         }
       }
     },
@@ -98,7 +118,12 @@
         "evidence": {
           "source": "auto_graded",
           "correct": true,
-          "latency_ms": 1900
+          "latency_ms": 1900,
+          "answer_key": {
+            "string": 2,
+            "fret": 0,
+            "note_name": "B"
+          }
         }
       }
     },
@@ -115,7 +140,12 @@
         "evidence": {
           "source": "auto_graded",
           "correct": true,
-          "latency_ms": 900
+          "latency_ms": 900,
+          "answer_key": {
+            "string": 6,
+            "fret": 0,
+            "note_name": "E"
+          }
         }
       }
     },
@@ -133,7 +163,12 @@
         "evidence": {
           "source": "auto_graded",
           "correct": true,
-          "latency_ms": 1500
+          "latency_ms": 1500,
+          "answer_key": {
+            "string": 6,
+            "fret": 1,
+            "note_name": "F"
+          }
         }
       }
     },
@@ -151,7 +186,12 @@
         "evidence": {
           "source": "auto_graded",
           "correct": true,
-          "latency_ms": 1600
+          "latency_ms": 1600,
+          "answer_key": {
+            "string": 6,
+            "fret": 1,
+            "note_name": "F"
+          }
         }
       }
     },
@@ -169,7 +209,12 @@
         "evidence": {
           "source": "auto_graded",
           "correct": false,
-          "latency_ms": 1500
+          "latency_ms": 1500,
+          "answer_key": {
+            "string": 6,
+            "fret": 1,
+            "note_name": "F"
+          }
         }
       }
     },
@@ -187,7 +232,12 @@
         "evidence": {
           "source": "auto_graded",
           "correct": false,
-          "latency_ms": 1400
+          "latency_ms": 1400,
+          "answer_key": {
+            "string": 6,
+            "fret": 1,
+            "note_name": "F"
+          }
         }
       }
     },

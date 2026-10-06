@@ -39,6 +39,18 @@ Feature: Grade a practice answer into evidence
     And the evidence names the grader "fretboard_cell.v1"
     And the evidence is identified by the identifier of the practice.item_answered event
 
+  @wip
+  Scenario: Evidence keeps what a right answer was for a fretboard cell
+    When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "D" after 2500 milliseconds
+    Then the evidence's answer key is string 5, fret 3, note "C"
+
+  @wip
+  Scenario: Evidence keeps an exercise's correct options as they were when it was graded
+    Given the exercise "c-major-triad" whose correct options are "C" and "E" out of "C", "D", "E" and "F"
+    When "alice" answers exercise "c-major-triad" by selecting "D"
+    And the exercise's correct options later change to "C", "E" and "G"
+    Then the evidence's answer key is the options "C" and "E"
+
   Scenario: An answer in a node's challenge is evidence like an answer in a practice session
     Given "alice" is taking the challenge "open-chords-assessment" of the content node "open-chords"
     When "alice" answers the exercise "minor-third-from-a" in the challenge by selecting its correct option after 3500 milliseconds

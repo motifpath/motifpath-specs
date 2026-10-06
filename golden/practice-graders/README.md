@@ -40,6 +40,12 @@ Each file holds:
 - **A rejection stores no evidence.**
 - **Auto-graded evidence** is `source`, `correct` and `latency_ms`, with `latency_ms` copied
   from the response, plus `audio_ms` copied from it when the response carries one.
+- **Auto-graded evidence keeps its `answer_key`:** what a right answer was when it was graded,
+  so a disputed answer can be checked from the evidence alone. For a fretboard cell, the asked
+  `string` and `fret` and the cell's `note_name`, spelled with sharps (any spelling of that
+  pitch is right, and for find the note any octave on that string). For an exercise, its
+  correct `option_ids`. The server stores it; a client's instant feedback may ignore it.
+  Adding it to `exercise_option.v1`'s cases changes no grading rule.
 - **Self-assessed evidence** is `source`, `rating` and the one measure its kind takes:
   `tempo_bpm` for a play-along, `changes_per_minute` for a chord change.
 
