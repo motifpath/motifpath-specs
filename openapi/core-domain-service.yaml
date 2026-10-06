@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.25.2
+  version: 0.26.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -2390,6 +2390,10 @@ paths:
         alphabetically first language it has — then by id; an offset past
         the end returns an empty items array. Every filter below is
         optional and they combine with AND.
+
+        Chord voicings from the chord catalog are left out unless purpose
+        asks for them, so they don't crowd the diagrams authors browse;
+        total counts only the diagrams that match.
       tags:
         - Content
       parameters:
@@ -2468,6 +2472,20 @@ paths:
             type: string
             format: uuid
           description: When given, only diagrams with this exact concept id among their linked concepts are returned.
+        - name: purpose
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - general
+              - chord_voicing
+              - any
+            default: general
+          description: |
+            Restricts the results to diagrams of this purpose (see
+            Diagram.purpose). Omitted, it is general, so chord voicings are
+            listed only when asked for; any lists both.
       responses:
         "200":
           description: One page of the diagrams visible to the caller, possibly empty.
@@ -2476,7 +2494,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedDiagrams'
         "400":
-          description: limit, offset, kind, language, name or root_note is out of range.
+          description: limit, offset, kind, language, name, root_note or purpose is out of range.
           content:
             application/json:
               schema:
@@ -2599,7 +2617,8 @@ paths:
       summary: List the creators of the diagrams the caller can see
       description: |
         Returns every distinct user who created at least one diagram the
-        caller can see in GET /diagrams, so a picker can offer a complete
+        caller can see in GET /diagrams with its default purpose (general),
+        so a picker can offer a complete
         creator filter (its created_by parameter) without paging. A teacher
         gets the creators of basic diagrams, plus themselves once they have
         a custom diagram of their own — never another teacher who has only
@@ -2697,7 +2716,11 @@ paths:
       description: |
         Only an admin may update a basic diagram. A custom diagram may be
         updated only by its creator or by an admin. An update never changes
-        a diagram's kind or created_by. Updating a diagram
+        a diagram's kind, purpose or created_by. A chord_voicing diagram
+        can't be updated here by anyone: its fingering changes only through
+        the chord catalog, where it is checked against its chord. Saving a
+        copy of it (createDiagram) gives an ordinary general diagram that
+        can be edited. Updating a diagram
         that is already referenced by one or more diagram_refs changes what
         every one of them renders — there is no versioning or copy-on-write.
       tags:
@@ -2752,6 +2775,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: |
+            The diagram is a chord_voicing diagram, which only the chord
+            catalog can change.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
 
   /learning-paths:
     get:
@@ -6318,6 +6349,23 @@ components:
             diagrams belong to their creator: only the creator and admins can
             find them in the diagram list, and only the creator or an admin
             may update one. Fixed at creation.
+        purpose:
+          type: string
+          enum:
+            - general
+            - chord_voicing
+          description: |
+            What the diagram is for. chord_voicing marks a diagram that is
+            the fingering of a voicing in the chord catalog: it is listed
+            only when GET /diagrams asks for it, found through the chord
+            catalog instead, and its positions and playbacks can't be
+            changed through updateDiagram, so a fingering can't drift from
+            the chord it is validated against. Every other diagram is
+            general. Set by the server, never by a request: a diagram is
+            chord_voicing exactly when the chord catalog installed it as a
+            voicing, and a diagram created through createDiagram, including
+            a copy saved from a chord_voicing diagram, is general. A
+            diagram's purpose doesn't change how it renders or plays.
         created_by:
           $ref: '#/components/schemas/UserRef'
         root_note:
@@ -6409,6 +6457,7 @@ components:
         - names
         - languages
         - kind
+        - purpose
         - created_by
         - root_note
         - mode
