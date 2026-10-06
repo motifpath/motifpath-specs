@@ -144,6 +144,24 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with no instrument in hand
     Then the new items in the session are split evenly between guitar and electric bass
 
+  # ── Felt questions ─────────────────────────────────────────────────────────
+  # How a drill felt calibrates its fluent time, so the plan asks about the timed drills with the
+  # fewest felt-rated sessions so far, across all students, two at most, fewest first.
+
+  @wip
+  Scenario: The plan's felt questions go to its least-calibrated timed drills, two at most
+    Given "alice"'s next session will practise "fretboard_cell:name_the_note", "fretboard_cell:find_the_note" and "exercise:text_response"
+    And "fretboard_cell:find_the_note" and "exercise:text_response" have the fewest felt-rated sessions
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the plan asks how "fretboard_cell:find_the_note" and "exercise:text_response" felt
+    And the plan doesn't ask about "fretboard_cell:name_the_note"
+
+  @wip
+  Scenario: Play-alongs are never asked how they felt
+    Given "alice"'s next session will practise only play-alongs
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the plan asks no felt questions
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   Scenario: The new share is a ceiling, never filled past it
