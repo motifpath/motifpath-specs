@@ -1,7 +1,7 @@
 # ADR-050: Chord library and song charts — chord identity, voicings, chart documents and a rights gate
 
-**Status:** Proposed
-**Date:** 2026-10-06
+**Status:** Accepted
+**Date:** 2026-10-06 (Proposed) · 2026-10-06 (Accepted, in review of specs#195)
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
 **Task:** MOT-44 (follows the MOT-40 / PB-87 spike)
 **Amends:** ADR-041 (a diagram has a list of named playbacks instead of one `sequence`; see §1a);
@@ -407,4 +407,4 @@ every chart that uses it.
 
 ---
 
-*This ADR was proposed on 2026-10-06. To revise, create a new ADR with Status: Supersedes ADR-050.*
+*This ADR was proposed and accepted on 2026-10-06. To revise, create a new ADR with Status: Supersedes ADR-050.*
