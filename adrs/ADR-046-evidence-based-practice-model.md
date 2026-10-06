@@ -435,7 +435,9 @@ shown from evidence (tempo history, speed per string, levels).
 2. **Play-along drill:** tempo ladder, count-in, self-rating, and the knowledge-state read model.
 3. **Session composer and practice home:** instrument choice, time budget, reasons, summary. Amended
    2026-10-05: also authored exercises in sessions, `exercise_option.v1` with default fluent times,
-   the application ending, and the S7 challenge on `practice.item_answered`.
+   the application ending, and the S7 challenge on `practice.item_answered`. Amended 2026-10-06: the
+   practice home and the session screen are built as ADR-049's pilot, in the Practice Shell, and a
+   wrong session answer reveals the right option(s).
 4. **Mental fretboard drill and heatmap**, with sessions in the head, the tap check, felt questions and
    benchmark thresholds; calibration runs once real sessions accumulate.
 5. **Teacher notes** for videos received over WhatsApp: rubric, comments, needs-work, suggestions.

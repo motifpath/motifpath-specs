@@ -37,6 +37,11 @@ practice.session_started, practice.item_answered, practice.session_ended,
 practice.tap_check_completed.
 One scenario = one behavior. Never test multiple behaviors in a single scenario.
 Steps must be concrete and specific — avoid vague steps like "the system processes the request".
+Two tags keep motifpath-core's strict godog runs honest; both are skipped there:
+- `@wip`: the behaviour is specified but not yet implemented in core. Remove the tag in the PR that
+  follows the core implementation's merge.
+- `@web`: the behaviour is the client's (what the app sends, and when), so a service could only test
+  it vacuously. motifpath-web's own tests pin it.
 
 ## OpenAPI Standards
 - operationId: camelCase verb + noun (e.g. submitExerciseAnswer, getStudentPath)
