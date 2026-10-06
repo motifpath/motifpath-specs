@@ -7,6 +7,7 @@ Feature: Climb the tempo ladder of a play-along
   # −5 after a struggle, holding otherwise. By itself it never climbs past the target, nor drops
   # below 60% of it. The student may choose the next take's tempo, past the target too, and the
   # ladder never goes below a tempo the student chose for the item: only the student lowers it.
+  # The student chooses a tempo with a slider, in one gesture, or 5 BPM slower or faster.
 
   Background:
     Given student "alice" plays "guitar"
@@ -28,6 +29,12 @@ Feature: Climb the tempo ladder of a play-along
   Scenario: A tempo the student chooses is the next take's, past the target too
     When "alice" chooses 180 BPM for the next take of "pentatonic-run"
     Then the next take of "pentatonic-run" is at 180 BPM
+
+  @web
+  Scenario: Any tempo can be chosen in one gesture
+    When "alice" slides the tempo of "pentatonic-run" to 180 BPM
+    Then the next take of "pentatonic-run" is at 180 BPM
+    And the tempos offered run in 5 BPM steps from 70 BPM, the ladder's slowest, to 300 BPM
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
