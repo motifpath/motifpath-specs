@@ -41,6 +41,11 @@ Also decided:
 - the application ending is never a due item and takes at most a quarter of the session;
 - an exercise with no authored estimate counts as 30 seconds.
 
+**Amended:** 2026-10-05, after the composer review, by Gilson. What the system suggests connects to
+what the student is learning: stretch and "ready to start" next steps reach only path skills, their
+`applies` and `part_of` neighbours, and nodes that build on something the student has met. Practice
+the student chooses for themselves, beyond these, is a later feature.
+
 ---
 
 ## Context
@@ -229,8 +234,12 @@ One piece of evidence per observation, the only stored learning state:
 - **A short share passes on:** due and weak take over each other's unused time, and new never passes
   its ceiling. Whatever is still left goes to review ahead and stretch, as for a caught-up student.
 - **Caught up:** the remaining time is split **50/50** between **review ahead** (known items coming due
-  within the next week, soonest first) and **stretch** (unseen items of any node whose readiness is
-  complete, for the instrument), each taking over the other's share when it runs out. Stretch ranks
+  within the next week, soonest first) and **stretch** (unseen items of a node whose readiness is
+  complete, for the instrument, and that is **connected to what the student is learning**), each
+  taking over the other's share when it runs out. A node is connected (amended 2026-10-05) when it
+  is one of the student's path skills, is linked to one by `applies` (either way) or `part_of` (its
+  parent or a child), or builds on something the student has met (it has a `requires` edge for the
+  instrument, all of them met). Stretch ranks
   the student's **path skills first** (amended 2026-10-05), then nodes that build on something the
   student meets, then the shallowest **requires depth** for the instrument (the longest chain of
   requirements below the node), then catalog order. So past the new share, a ready path skill's
@@ -307,7 +316,9 @@ One piece of evidence per observation, the only stored learning state:
     - **practice days** in the last 7 with that instrument in hand: days with a practice session
       finished, meaning ended without leaving early and not abandoned;
     - progress this week per skill with both values ("accuracy 72% → 86%");
-    - next steps (refresh, strengthen, ready to start; the top three plus "see all");
+    - next steps (refresh, strengthen, ready to start; the top three plus "see all"). "Ready to
+      start" takes the nodes stretch could reach, in stretch's order: connected to what the
+      student is learning, never any ready node in the catalog;
     - practice nodes grouped by area. Instrument-independent nodes get an **"Any instrument"**
       group. Concepts appear in the map and as context, not as separate progress lines.
 - **Counts, never streaks, never a reset.** The worker keeps the raw activity (every session's start,
@@ -358,6 +369,13 @@ shown from evidence (tempo history, speed per string, levels).
   the rest to unrelated nodes or an empty session. Ranking path skills as any other node may still
   send it elsewhere. Ranking them first keeps a beginner on their path and keeps the ceiling
   meaningful for review ahead (decided 2026-10-05).
+- **Suggestions connected to learning, over any ready node.** Ready nodes span the whole catalog,
+  and the last ranking tiers (requires depth, then catalog order) could suggest a node with no link
+  to anything the student does: an area they never chose, labelled with its name. A suggestion the
+  student can't place reads as noise and erodes trust in the rest. Path skills, their `applies` and
+  `part_of` neighbours, and nodes built on what the student has met keep every suggestion
+  explainable ("because you're learning …"). A student who wants to go further will choose for
+  themselves, which is a later feature (practice on demand) (decided 2026-10-05).
 - **Requires depth, over the map's calibration level, for ranking.** The calibration level varies by
   instrument and is deliberately not installed; the graph already carries the order of learning.
 - **Felt-calibrated thresholds, over fixed guesses or time alone.** In simulated populations with a
