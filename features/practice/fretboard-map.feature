@@ -37,7 +37,6 @@ Feature: Show how well the student knows each fretboard cell
     When "alice" reads their fretboard map for "guitar"
     Then the cell on string 6, fret 5 is fluent and fading
 
-  @wip
   Scenario: A cell overdue by more than its wait shows one level lower
     # Box 3 waits 4 days, so a review 5 days overdue lowers the level shown, not the one earned.
     Given "alice"'s "guitar" cell on string 6, fret 5 is fluent, in box 3, and its review is 5 days overdue
