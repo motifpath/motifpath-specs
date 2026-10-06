@@ -73,7 +73,6 @@ Feature: Roll item knowledge up into knowledge-node levels and readiness
     And the skill "music-reading" has no practice items
     Then "alice"'s readiness for "sight-reading" on guitar is 0 of 1 requirements met
 
-  @wip
   Scenario: An unmet requirement never keeps a skill on the student's path out of practice
     Given the skill "notes-on-all-strings" requires "notes-on-low-strings" at level "accurate"
     And "notes-on-all-strings" is a skill on "alice"'s path

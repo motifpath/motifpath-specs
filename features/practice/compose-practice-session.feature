@@ -16,12 +16,10 @@ Feature: Compose a practice session
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: Every item in a session carries the reason it was picked
     When "alice" composes a 10-minute session with "guitar" in hand
     Then every item in the session has one of the reasons teacher_suggested, due, weak, new, warm_up, application, review_ahead or stretch
 
-  @wip
   Scenario: Due, weak and new items share the time 60, 25 and 15
     Given "alice" has plenty of due, weak and new items on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
@@ -38,72 +36,61 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the session starts with "c-major-scale" with the reason warm_up at 80 BPM
 
-  @wip
   Scenario: A session of 10 minutes or more ends by applying a skill to music
     Given "alice"'s path skill "chord-tones" has exercises and the play-along "chord-tone-riff" on guitar
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the last item is a play-along with the reason application
     And it applies a skill that the session's focus items practise
 
-  @wip
   Scenario: The application ending is one play-along, outside the focus time
     When "alice" composes a 20-minute session with "guitar" in hand
     Then exactly one item has the reason application
     And the focus time is the 20 minutes less the warm-up and that play-along's estimated time
 
-  @wip
   Scenario: With no play-along on a focus skill, the ending applies another skill of the path
     Given no skill of the session's focus items has a play-along on guitar
     And "alice"'s path skill "chord-tones" has the play-along "chord-tone-riff" on guitar
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the last item is "chord-tone-riff" with the reason application
 
-  @wip
   Scenario: With no play-along on the instrument at all, the session has no ending and keeps the time for focus
     Given none of "alice"'s path skills has a play-along on "electric-bass"
     When "alice" composes a 10-minute session with "electric-bass" in hand
     Then no item in the session has the reason application
     And the focus time is the 10 minutes less the warm-up
 
-  @wip
   Scenario: Authored exercises on the student's path are focus items
     Given "alice"'s path skill "chord-tones" has the exercise "name-the-third" for every instrument
     And "alice" has never answered "name-the-third"
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the session includes "name-the-third" with the reason new
 
-  @wip
   Scenario: A session under 10 minutes has no application ending
     When "alice" composes a 9-minute session with "guitar" in hand
     Then no item in the session has the reason application
 
   # ── Weak items and leftover time ───────────────────────────────────────────
 
-  @wip
   Scenario: An item practised, not due and not yet fluent is weak
     Given "alice" is accurate but not fluent on "pentatonic-run", and its review isn't due
     When "alice" composes a 20-minute session with "guitar" in hand
     Then the session includes "pentatonic-run" with the reason weak
 
-  @wip
   Scenario: A fluent item that isn't due is never weak
     Given "alice" is fluent on "c-major-scale", and its review isn't due
     When "alice" composes a 20-minute session with "guitar" in hand
     Then "c-major-scale" is not in the session with the reason weak
 
-  @wip
   Scenario: Due items take over the time weak items don't use
     Given "alice" has plenty of due items, no weak items and plenty of new items on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then about 85% of the focus time goes to due items and 15% to new items
 
-  @wip
   Scenario: Weak items take over the time due items don't use
     Given "alice" has no due items, plenty of weak items and plenty of new items on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then about 85% of the focus time goes to weak items and 15% to new items
 
-  @wip
   Scenario: Time left after due, weak and new goes to review ahead and stretch
     Given "alice" has 4 minutes of due items, nothing weak and 1 minute of new items on guitar, well under their shares of the focus time
     And "alice" has known items coming due within the week
@@ -131,13 +118,11 @@ Feature: Compose a practice session
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: The new share is a ceiling, never filled past it
     Given "alice" has 2 due items and 200 new items on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then no more than 3 minutes go to new items
 
-  @wip
   Scenario: A caught-up student reviews ahead and stretches, half and half
     Given "alice" has nothing due, weak or new on their path for guitar
     And "alice" has known items coming due within the week
@@ -146,14 +131,12 @@ Feature: Compose a practice session
     Then about half the session is items with the reason review_ahead
     And about half the session is items of "notes-on-high-strings" with the reason stretch
 
-  @wip
   Scenario: When nothing is coming due, stretch takes the whole session
     Given "alice" has nothing due, weak, new or coming due on their path for guitar
     And "alice" is ready to start the skill "notes-on-high-strings"
     When "alice" composes a 10-minute session with "guitar" in hand
     Then every item after the warm-up has the reason stretch
 
-  @wip
   Scenario: Stretch starts first with nodes that build on what the student has met
     Given "alice" is ready to start "notes-on-high-strings", which requires a skill they have met
     And "alice" is ready to start "chord-tones", which requires nothing
