@@ -77,21 +77,20 @@ Feature: Grade a practice answer into evidence
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "C" after 1800 milliseconds
     Then the evidence for that cell records a tap time of 350 milliseconds
 
-  @wip
+  @web
   Scenario: A challenge exercise's answer is the selection the student moves on with
     Given "alice" is taking the challenge "open-chords-assessment" of the content node "open-chords"
     And the exercise "c-major-triad" whose correct options are "C" and "E" out of "C", "D", "E" and "F"
     When "alice" selects "C", then also "E", and moves on to the next exercise
     Then "alice" has one piece of evidence for "c-major-triad", and it is correct
 
-  @wip
+  @web
   Scenario: Changing a challenge answer after going back is not a new answer
     Given "alice" is taking the challenge "open-chords-assessment" of the content node "open-chords"
     And "alice" moved on from the exercise "minor-third-from-a" with a wrong option selected
     When "alice" goes back to "minor-third-from-a", selects its correct option and moves on again
     Then "alice"'s only evidence for "minor-third-from-a" is the wrong answer
 
-  @wip
   Scenario: Working through a challenge again gives new answers
     Given "alice" took the challenge "open-chords-assessment" yesterday and answered "minor-third-from-a" wrong
     When "alice" takes "open-chords-assessment" again and moves on from "minor-third-from-a" with its correct option selected
