@@ -1,4 +1,3 @@
-@wip
 Feature: Show how well the student knows each fretboard cell
   As a student
   I want to see my fretboard coloured by how well I know each note
