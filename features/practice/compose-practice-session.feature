@@ -105,36 +105,30 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with "electric-bass" in hand
     Then every item in the session suits "electric-bass" or every instrument
 
-  @wip
   Scenario: With an instrument in hand, fretboard cells of its layout can be picked
     Given "alice" has nothing due or weak on guitar and new fretboard cells on the E and A strings
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the session includes fretboard cells of the "guitar" layout
 
-  @wip
   Scenario: A session in the head picks only items that need no instrument in hand
     When "alice" composes a 5-minute session with no instrument in hand
     Then no item in the session is a play-along
     And the session may include fretboard cells of both "guitar" and "electric-bass"
 
-  @wip
   Scenario: A session in the head has no warm-up and no application ending
     When "alice" composes a 15-minute session with no instrument in hand
     Then no item in the session has the reason warm_up or application
 
-  @wip
   Scenario: A fretboard cell is asked the way it has fewer right answers
     Given "alice" has named the note of the "guitar" cell on string 6, fret 3 correctly 4 times and found it correctly once
     When the cell is picked for "alice"'s session in the head
     Then it is asked as find_the_note
 
-  @wip
   Scenario: A fretboard cell never answered right is asked to name its note
     Given "alice" has never answered the "guitar" cell on string 5, fret 7 correctly
     When the cell is picked for "alice"'s session in the head
     Then it is asked as name_the_note
 
-  @wip
   Scenario: A fretboard cell takes about 8 seconds of the session
     When "alice" composes a 5-minute session with no instrument in hand
     Then every fretboard cell in the session is estimated at 8 seconds
@@ -145,7 +139,6 @@ Feature: Compose a practice session
     When a fretboard cell is shown
     Then the question names the instrument whose fretboard the cell is on
 
-  @wip
   Scenario: New items are balanced across the student's instruments
     Given "alice" has 40 new items on guitar and 40 new items on electric bass
     When "alice" composes a 10-minute session with no instrument in hand
@@ -209,13 +202,11 @@ Feature: Compose a practice session
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A session in the head always has an item for a student learning the fretboard
     Given "alice" has no practice history and their path has the skill "find-notes-root-strings"
     When "alice" composes a 5-minute session with no instrument in hand
     Then the session has at least one fretboard cell with the reason new
 
-  @wip
   Scenario: A student with nothing connected to what they're learning gets no session
     Given student "bob" is enrolled in nothing and has no practice history
     When "bob" composes a 5-minute session with no instrument in hand
