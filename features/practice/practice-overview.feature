@@ -1,4 +1,3 @@
-@wip
 Feature: Show the student's practice overview across instruments
   As a student
   I want to see at a glance that I've been practising and learning, whatever I played

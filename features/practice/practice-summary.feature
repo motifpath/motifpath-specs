@@ -1,4 +1,3 @@
-@wip
 Feature: Show the student's practice summary on the home
   As a student
   I want to see that I'm practising, what improved, and what to do next
@@ -96,6 +95,13 @@ Feature: Show the student's practice summary on the home
     Given the concept "intervals" has exercises for every instrument
     When "alice" reads their practice summary for "guitar"
     Then "intervals" is in the "Any instrument" group, not in a guitar area
+
+  Scenario: A summary without an instrument covers only what suits any instrument
+    Given the concept "intervals" has exercises for every instrument
+    And the skill "slap-technique" has practice items only for "electric-bass"
+    When "alice" reads their practice summary without an instrument
+    Then "intervals" is in the "Any instrument" group, not in a guitar area
+    And "slap-technique" is in no group
 
   Scenario: Concepts are not progress lines
     Given "alice"'s accuracy on the concept "intervals" improved this week
