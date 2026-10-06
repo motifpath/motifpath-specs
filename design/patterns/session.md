@@ -19,7 +19,7 @@ like the same product.
 ┌────────────────────────────┐
 │ ×          4 / 10          │  exit · position · (options, once one exists)
 │ ██████████░░░░░░░░         │  progress, one segment per item
-│                            │
+│ ITEM TITLE · why picked    │  what this item is, and why it's in the session
 │          STIMULUS          │  what is played or shown
 │         INTERACTION        │  what the student does
 │                            │
@@ -28,10 +28,23 @@ like the same product.
 └────────────────────────────┘
 ```
 
-- **Phases:** setup (what the student holds and how long they have) → run → summary. All three sit in
-  the shell. Setup asks one question per step, with today's choice preselected, so a returning
-  student starts in two taps: **Practice** in the navigation opens the setup, then Start. From an
-  instrument tab on the home, Start opens the setup with that instrument chosen.
+- **Phases:** setup (what the student holds and how long they have) → today's plan → run → summary.
+  All of them sit in the shell. Setup asks one question per step, with today's choice preselected:
+  **Practice** in the navigation opens the setup, Start composes the session, and **Let's go** on
+  today's plan starts it. From an instrument tab on the home, Start opens the setup with that
+  instrument chosen.
+- **Today's plan:** before the first item, the session lists what it holds, in order: each
+  play-along and exercise by its name, with why it was picked, and the fretboard cells grouped by
+  drill with how many there are ("Name the note · 8 notes"). Its primary action is **Let's go**; ×
+  leaves without starting the session, so nothing is recorded.
+- **Item title:** every item names what it is above its stimulus: a play-along by its diagram's
+  name, an exercise by its title. A fretboard cell's prompt is its title. The reason it was picked
+  stays next to it.
+- **Next up:** when a play-along's last take is rated, the run stays on a card in place before the
+  next item: what was just played and the fastest tempo it was played at, then **Next:** the next
+  item's name and why it was picked. **Continue** starts it. After the session's last item the
+  summary follows instead, with no card. Exercises and fretboard cells move on as before: they are
+  short, and their title names the change.
 - **Exit (×):**
   - in setup, × goes back to where the student came from;
   - during a run, × ends the session as left early;

@@ -35,3 +35,8 @@ the screens as built, with the defaults a returning student sees: the first fret
   app's general home, and Practice opens the setup directly. Opening the app → first item is back to
   **3 / 2** (menu → Practice → Start on Compact, Practice → Start wider), or **2** from the home the app
   opens on (an instrument tab's Start → Start). One screen comes before the first item: the setup.
+- **2026-10-06, today's plan** (after the slice 4 smoke, ADR-049 amended): a student must know what a
+  session holds, so **Let's go** on today's plan comes before the first item. Opening the app → first
+  item is **4 / 3** (menu → Practice → Start → Let's go on Compact), or **3** from the home. Two
+  screens come before the first item: the setup and today's plan. A play-along item takes one more tap
+  when another item follows it: Continue on its Next up card (9 for 4 takes).

@@ -6,6 +6,10 @@
 **Task:** MOT-43
 **Amended:** 2026-10-06, by Gilson (PB-22 slice 4): the pilot's practice home became the app's
 general home, and Practice opens the session setup directly (see §10 and ADR-046).
+**Amended:** 2026-10-06, by Gilson, after the slice 4 smoke: a student must always know what they
+are practising. A session shows **today's plan** before its first item, every item is **named**,
+and a play-along hands over to the next item with a **Next up** card (§2, and the session pattern).
+The plan costs one tap at the start, accepted for knowing what the session holds.
 **Amends:** ADR-018 (decision points 1 and 3, and the deferred documentation site; see Relation to
 ADR-018)
 
@@ -90,7 +94,7 @@ Every way of practising is composed from shared primitives instead of its own sc
 
 | Group | Primitives |
 |---|---|
-| Session | Setup (instrument in hand, minutes), Progress, Timer, Exit, Options, Summary |
+| Session | Setup (instrument in hand, minutes), Today's plan, Item title, Progress, Timer, Exit, Options, Next up, Summary |
 | Stimulus | Text, Image, Audio, Diagram with playback, Notation, Count-in |
 | Interaction | Choice, MultipleChoice, Region, Sequence, SelfRating, TempoLadder |
 | Feedback | Correct, Incorrect, Explanation |
