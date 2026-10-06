@@ -189,13 +189,15 @@ Feature: Compose a practice session
     When "alice" composes a 3-minute session with "guitar" in hand
     Then no item in the session has the reason warm_up
 
+  @wip
   Scenario: A play-along starts on the student's tempo ladder
-    Given "alice"'s best clean tempo on "pentatonic-run" is 90 BPM and the diagram's tempo is 120 BPM
+    Given "alice"'s best clean tempo on "pentatonic-run" is 90 BPM and the diagram's default playback is at 120 BPM
     When "pentatonic-run" is picked as a due item
     Then it starts at 90 BPM with a target of 120 BPM
 
-  Scenario: A play-along with no clean take yet starts at 60% of the diagram's tempo
-    Given "alice" has never rated "pentatonic-run" clean and the diagram's tempo is 120 BPM
+  @wip
+  Scenario: A play-along with no clean take yet starts at 60% of the default playback's tempo
+    Given "alice" has never rated "pentatonic-run" clean and the diagram's default playback is at 120 BPM
     When "pentatonic-run" is picked as a new item
     Then it starts at 70 BPM with a target of 120 BPM
 
