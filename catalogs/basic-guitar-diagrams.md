@@ -60,13 +60,16 @@ Scale windows are explicitly named windows, not claimed to be ergonomic fingerin
 Chord shapes are limited to CAGED grips and full-range arpeggio maps; there are no
 three-string triad/tetrad, shell or drop-voicing templates.
 
-Maps are silent: they have no playbacks. Playable shapes have named playbacks at
-60 BPM in 4/4, with names in `en` and `pt_BR`:
+Maps are silent: they have no playbacks. That is every full-range map (chromatic, root,
+scale and arpeggio maps on frets 0–12, interval structures, substitutions, triad pairs
+and digital patterns). Every positional shape plays: CAGED grips, and the scale and
+arpeggio windows, which are CAGED windows, pentatonic boxes and 3NPS patterns. Each has
+named playbacks at 60 BPM in 4/4, with names in `en` and `pt_BR`:
 
 | Shape | Playbacks, default first |
 |---|---|
 | Chord shapes (CAGED grips) | "Strum down" / "Batida para baixo": one whole-note step of every position, strummed down. "Arpeggio" / "Arpejo": quarter notes from the lowest pitch to the highest. |
-| Scale and arpeggio windows | "Ascending" / "Ascendente": quarter notes from the lowest pitch to the highest. |
+| Scale and arpeggio windows (CAGED windows, pentatonic boxes, 3NPS patterns) | "Ascending" / "Ascendente": quarter notes from the lowest pitch to the highest. |
 
 A chord shape's default playback is always the down-strum. Playback IDs derive from
 the diagram key and the playback's role (`strum-down`, `arpeggio`, `ascending`), not
