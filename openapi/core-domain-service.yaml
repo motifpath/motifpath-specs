@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.24.2
+  version: 0.25.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -4793,15 +4793,18 @@ paths:
         except the takes of a warm_up item: a warm-up is played below the student's edge,
         so it is not evidence of what they know.
 
-        The plan is never empty. When nothing is due, weak or new, the time goes to
-        reviewing known items ahead of their due date and to starting nodes the student is
-        ready for. Practice is never blocked: requirements and teacher suggestions only
-        decide the order.
+        When nothing is due, weak or new, the time goes to reviewing known items ahead of
+        their due date and to starting nodes the student is ready for. Practice is never
+        blocked: requirements and teacher suggestions only decide the order. A plan always
+        has at least one item; when nothing connected to what the student is learning can be
+        practised (for example, they are enrolled in nothing), there is no plan.
 
         With an instrument in hand, only items that suit that instrument (or every
-        instrument) are picked. Without one, items for any of the student's instruments
-        that don't need an instrument in hand are picked. Any instrument may be named, not
-        only the ones the student is enrolled for.
+        instrument) are picked. Without one (a session in the head), only items that need no
+        instrument in hand are picked: fretboard cells of every fretboard layout among the
+        student's instruments, and exercises; never a play-along, so such a session has no
+        application ending. Any instrument may be named, not only the ones the student is
+        enrolled for.
 
         Any authenticated user may practise.
       tags:
@@ -4832,7 +4835,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "404":
-          description: No instrument exists with the given instrument_id.
+          description: |
+            No instrument exists with the given instrument_id, or nothing connected to what
+            the student is learning can be practised with the instrument chosen.
           content:
             application/json:
               schema:
@@ -4883,6 +4888,59 @@ paths:
                 $ref: '#/components/schemas/PracticeSummary'
         "400":
           description: instrument_id is not a valid uuid, or time_zone is not a known IANA time zone.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No instrument exists with the given instrument_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /students/me/fretboard-map:
+    get:
+      operationId: getFretboardMap
+      summary: Read how well the authenticated student knows each fretboard cell
+      description: |
+        The fretboard of one of the student's instruments as a heatmap: every cell the
+        practice catalog generates for that instrument's fretboard layout, with the
+        student's level on it and whether it is fading. Instruments that share a layout
+        share its cells, so an electric guitar shows the cells practised on an acoustic one.
+        A cell never practised is new. Both ways of asking about a cell (name the note,
+        find the note) build one level for it.
+
+        Derived from the student's evidence; reading it changes nothing.
+
+        Any authenticated user may read their own map.
+      tags:
+        - Practice
+      parameters:
+        - name: instrument_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The instrument whose fretboard to show.
+      responses:
+        "200":
+          description: |
+            The student's fretboard map. Its cells are empty for an instrument whose layout
+            has no generated cells, such as one without a fretboard.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FretboardMap'
+        "400":
+          description: instrument_id is missing or not a valid uuid.
           content:
             application/json:
               schema:
@@ -9497,11 +9555,32 @@ components:
           items:
             $ref: '#/components/schemas/PracticeSessionItem'
           description: The items to practise, in order.
+        felt_questions:
+          type: array
+          maxItems: 2
+          items:
+            type: string
+            pattern: '^[a-z][a-z_]*:[a-z][a-z_]*$'
+          description: |
+            The timed drill templates, at most two, to ask "How did it feel?" about when the
+            session ends: those in this plan with the fewest felt-rated sessions so far, fewest
+            first. The client asks only about the ones the student actually practised in the
+            session. Empty when the plan has no timed drill, as with play-alongs only.
+          example: ['fretboard_cell:find_the_note', 'exercise:text_response']
+        tap_check_due:
+          type: boolean
+          description: |
+            True when the plan has a fretboard cell and the student has done no tap check in
+            the last 30 days, or never. The client then offers the tap check before the first
+            item; the student may skip it, and their answers are then judged on the whole
+            latency.
       required:
         - practice_session_id
         - instrument_id
         - minutes
         - items
+        - felt_questions
+        - tap_check_due
 
     PracticeSessionItem:
       type: object
@@ -9533,7 +9612,6 @@ components:
             takes its estimated_duration_seconds, or 30 seconds without one.
         fretboard_cell:
           type: object
-          description: Present when kind is fretboard_cell.
           properties:
             layout_instrument_id:
               type: string
@@ -9550,6 +9628,9 @@ components:
             drill:
               $ref: './components/schemas/practice.yaml#/FretboardDrill'
           additionalProperties: false
+          description: |
+            Present when kind is fretboard_cell. The drill is the way of asking the cell has
+            the fewer right answers so far, name_the_note on a tie.
           required:
             - layout_instrument_id
             - string
@@ -9656,6 +9737,62 @@ components:
         - next_steps
         - next_steps_total
         - groups
+
+    FretboardMap:
+      type: object
+      description: How well the student knows each cell of an instrument's fretboard.
+      properties:
+        instrument_id:
+          type: string
+          format: uuid
+          description: The instrument asked for.
+        layout_instrument_id:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          description: |
+            The instrument whose fretboard layout and tuning the cells belong to, shared by
+            every instrument of the same geometry. Null for an instrument without one.
+        cells:
+          type: array
+          items:
+            $ref: '#/components/schemas/FretboardMapCell'
+          description: Every generated cell of the layout, by string then fret.
+      additionalProperties: false
+      required:
+        - instrument_id
+        - layout_instrument_id
+        - cells
+
+    FretboardMapCell:
+      type: object
+      description: One fretboard cell and the student's level on it.
+      properties:
+        item_key:
+          $ref: './components/schemas/practice.yaml#/PracticeItemKey'
+        string:
+          type: integer
+          minimum: 1
+          description: The cell's string, 1 being the highest-pitched.
+        fret:
+          type: integer
+          minimum: 0
+          description: The cell's fret; 0 is the open string.
+        level:
+          $ref: './components/schemas/practice.yaml#/KnowledgeLevel'
+        fading:
+          type: boolean
+          description: |
+            True when the cell's review is due, so the level shown is slipping; an item
+            overdue by more than its wait already shows one level lower.
+      additionalProperties: false
+      required:
+        - item_key
+        - string
+        - fret
+        - level
+        - fading
 
     PracticeOverview:
       type: object

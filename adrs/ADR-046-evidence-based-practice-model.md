@@ -50,6 +50,23 @@ the student chooses for themselves, beyond these, is a later feature.
 app's **general home**, the first screen every signed-in user sees, whatever their role. **Practice**
 in the navigation opens the session setup directly, with no practice home in between.
 
+**Amended:** 2026-10-06, planning slice 4 (the mental fretboard), by Gilson:
+- the fretboard drills start from team-set **default** fluent times (name the note 3 s, find the
+  note 4 s, net), like the exercise families; the team benchmark becomes their version 2, since
+  benchmarking needs the drill built;
+- a session's plan says when a **tap check** is due: it has a fretboard cell and the student has
+  done none in the last 30 days, or never. The client offers it before the first item, and the
+  student may skip it;
+- core picks the **felt questions** and returns them with the plan;
+- a session in the head has **no application ending**; each fretboard cell pick is asked the way
+  (drill) with the fewer right answers on that cell, name the note on a tie, and takes about
+  8 seconds; one session may mix the cells of several layouts, and each question names its
+  instrument;
+- a plan always has an item, or there is no plan: a student with nothing connected to what they
+  are learning gets none, instead of an unconnected stretch;
+- the **fretboard heatmap** is on each instrument's tab of the home, one cell per string and fret
+  generated for the instrument's layout, coloured by level.
+
 ---
 
 ## Context
@@ -257,8 +274,14 @@ One piece of evidence per observation, the only stored learning state:
   the session has no ending and the time stays with the focus block. Like the warm-up, a due
   play-along is never the ending (its review belongs in the focus block), and an ending longer than
   a quarter of the session is skipped.
+- **In the head** (amended 2026-10-06): fretboard cells of every layout among the student's
+  instruments, and exercises; no warm-up and no application ending, since both are play-alongs.
+  Each cell pick is asked the way (drill) with the fewer right answers on that cell, name the
+  note on a tie. A session may mix layouts; each question then names its instrument.
+- **Never empty, or no plan** (amended 2026-10-06): a plan has at least one item. A student with
+  nothing connected to what they are learning gets no plan, never an unconnected stretch.
 - **Item time:** a play-along is sized by its takes at its start tempo; an exercise by its authored
-  `estimated_duration_seconds`, or 30 seconds without one.
+  `estimated_duration_seconds`, or 30 seconds without one; a fretboard cell by 8 seconds.
 - **Focus time:** the session minus the warm-up and the application ending (one play-along at its
   estimated time). The mix shares the focus time. A warm-up
   play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the
@@ -296,9 +319,12 @@ One piece of evidence per observation, the only stored learning state:
   latency with the tap time. Replays are not taken off.
 - **Tap baseline:** a 20-second "tap the highlighted fret" check gives each student's tap time,
   sent as `practice.tap_check_completed`. Ingestion stamps the latest one on every timed answer,
-  so replays stay stable.
+  so replays stay stable. Amended 2026-10-06: a plan with a fretboard cell asks for one when the
+  student has done none in the last 30 days, or never; the student may skip it.
 - **Felt ratings:** after a session, at most one or two "How did it feel? Easy / About right / Hard"
-  questions, for the drill templates with the least calibration data. Felt ratings calibrate
+  questions, for the drill templates with the least calibration data. Core picks them from the
+  plan's timed templates (fewest felt-rated sessions first) and returns them with the plan; the
+  client asks only about the ones practised. Felt ratings calibrate
   thresholds and **never count toward mastery**.
 - **Calibration:** the net time that best separates sessions felt "hard" from the rest, blended with the
   current version by sample size. It runs only from about **100 sessions by 20 students**, and one step
@@ -327,6 +353,8 @@ One piece of evidence per observation, the only stored learning state:
     - next steps (refresh, strengthen, ready to start; the top three plus "see all"). "Ready to
       start" takes the nodes stretch could reach, in stretch's order: connected to what the
       student is learning, never any ready node in the catalog;
+    - the **fretboard heatmap** (amended 2026-10-06), for an instrument with a fretboard: every
+      generated cell of its layout, coloured by level, fading ones marked;
     - practice nodes grouped by area. Instrument-independent nodes get an **"Any instrument"**
       group. Concepts appear in the map and as context, not as separate progress lines.
 - **Counts, never streaks, never a reset.** The worker keeps the raw activity (every session's start,
@@ -447,7 +475,9 @@ shown from evidence (tempo history, speed per string, levels).
    practice home and the session screen are built as ADR-049's pilot, in the Practice Shell, and a
    wrong session answer reveals the right option(s).
 4. **Mental fretboard drill and heatmap**, with sessions in the head, the tap check, felt questions and
-   benchmark thresholds; calibration runs once real sessions accumulate.
+   benchmark thresholds; calibration runs once real sessions accumulate. Amended 2026-10-06: the
+   drill ships on default thresholds and the benchmark follows as version 2; the slice starts by
+   moving the home's dashboard to the app's general home.
 5. **Teacher notes** for videos received over WhatsApp: rubric, comments, needs-work, suggestions.
    Validate with a WhatsApp Wizard-of-Oz before building the review UI.
 6. **The feed into recommendations** (PB-8g). Authored exercises and the S7 challenge moved to slice 3.

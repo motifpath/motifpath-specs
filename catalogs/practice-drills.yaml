@@ -29,11 +29,13 @@ fretboard_cells:
 
 # Versioned fluent times, net of the student's tap time (and, for exercises with audio, of the
 # audio heard once). Adjust a fluent time by adding a version with a later effective_from; never
-# edit an installed one. The exercise families start from team-set defaults (source: default).
-# The fretboard templates get theirs with the fretboard drill.
+# edit an installed one. Every template starts from a team-set default (source: default); the
+# team benchmark on the fretboard drills is their version 2.
 thresholds:
   - {template: "exercise:text_response", version: 1, effective_from: "2026-10-01", fluent_net_ms: 6000, source: default, sessions: 0, students: 0, id: a2ccf5a4-31e5-5aac-991d-5b17904b4ea8}
   - {template: "exercise:audio_recognition", version: 1, effective_from: "2026-10-01", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: e0364add-6753-58c3-a781-a9589288510e}
   - {template: "exercise:image_recognition", version: 1, effective_from: "2026-10-01", fluent_net_ms: 5000, source: default, sessions: 0, students: 0, id: 1fa82f45-7f4f-51ee-b974-cf0673eda4a7}
   - {template: "exercise:image_choice", version: 1, effective_from: "2026-10-01", fluent_net_ms: 5000, source: default, sessions: 0, students: 0, id: c8d7f798-4ab0-57cb-bf26-5f477154ae87}
   - {template: "exercise:audio_selection", version: 1, effective_from: "2026-10-01", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 61b55338-dee3-5391-b556-dc8fe121ea6d}
+  - {template: "fretboard_cell:name_the_note", version: 1, effective_from: "2026-10-01", fluent_net_ms: 3000, source: default, sessions: 0, students: 0, id: bf63ad0e-f1c7-52ba-a303-230472134f6c}
+  - {template: "fretboard_cell:find_the_note", version: 1, effective_from: "2026-10-01", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: b4038212-bd6e-5749-8b39-cc8862e1974e}

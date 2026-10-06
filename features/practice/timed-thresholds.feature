@@ -66,6 +66,12 @@ Feature: Judge timed drills against versioned fluent times
     Then the answer took 5200 milliseconds net of tap time
     And it counts as within the fluent time
 
+  @wip
+  Scenario: The fretboard drills start from default fluent times
+    Given the practice drill catalog is installed
+    Then "fretboard_cell:name_the_note" has version 1 from source "default" with a fluent time of 3000 milliseconds
+    And "fretboard_cell:find_the_note" has version 1 from source "default" with a fluent time of 4000 milliseconds
+
   Scenario: A listening exercise is judged on the time after its audio
     Given the drill template "exercise:audio_recognition" has version 1 from source "default" with a fluent time of 4000 milliseconds
     When "alice" answers a listening exercise whose sound lasts 5000 milliseconds correctly in 9000 milliseconds
@@ -85,18 +91,26 @@ Feature: Judge timed drills against versioned fluent times
     Then the answer is judged against 4000 milliseconds and counts as slower than fluent
 
   @wip
-  Scenario: The felt questions go to the session's least-calibrated timed drills, two at most
-    Given "alice"'s session practised "fretboard_cell:name_the_note", "fretboard_cell:find_the_note" and "exercise:text_response"
+  Scenario: The plan's felt questions go to its least-calibrated timed drills, two at most
+    Given "alice"'s next session will practise "fretboard_cell:name_the_note", "fretboard_cell:find_the_note" and "exercise:text_response"
     And "fretboard_cell:find_the_note" and "exercise:text_response" have the fewest felt-rated sessions
-    When the session ends
-    Then "alice" is asked how "fretboard_cell:find_the_note" and "exercise:text_response" felt
-    And "alice" is not asked about "fretboard_cell:name_the_note"
+    When "alice" composes the session
+    Then the plan asks how "fretboard_cell:find_the_note" and "exercise:text_response" felt
+    And the plan doesn't ask about "fretboard_cell:name_the_note"
 
   @wip
   Scenario: Play-alongs are never asked how they felt
-    Given "alice"'s session practised only play-alongs
+    Given "alice"'s next session will practise only play-alongs
+    When "alice" composes the session
+    Then the plan asks no felt questions
+
+  @web
+  Scenario: Only drills the student practised are asked about at the end
+    Given "alice"'s plan asks how "fretboard_cell:find_the_note" and "exercise:text_response" felt
+    And "alice" left the session after answering only text exercises
     When the session ends
-    Then "alice" is asked no felt questions
+    Then "alice" is asked how "exercise:text_response" felt
+    And "alice" is not asked about "fretboard_cell:find_the_note"
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
