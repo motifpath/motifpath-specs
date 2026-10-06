@@ -33,6 +33,14 @@ Also decided:
   days, and a card per instrument. Each instrument tab counts only that instrument;
 - progress this week compares now with 7 days ago, from daily item snapshots.
 
+**Amended:** 2026-10-05, building the composer (slice 3), by Gilson:
+- stretch takes the student's path skills first. Past the new share, a ready path skill's unseen
+  items come back as stretch.
+- review ahead looks one week ahead;
+- stretch ranks the shallowest requires depth first;
+- the application ending is never a due item and takes at most a quarter of the session;
+- an exercise with no authored estimate counts as 30 seconds.
+
 ---
 
 ## Context
@@ -221,17 +229,23 @@ One piece of evidence per observation, the only stored learning state:
 - **A short share passes on:** due and weak take over each other's unused time, and new never passes
   its ceiling. Whatever is still left goes to review ahead and stretch, as for a caught-up student.
 - **Caught up:** the remaining time is split **50/50** between **review ahead** (known items coming due
-  soonest) and **stretch** (unseen items of any node whose readiness is complete, for the instrument),
-  each taking over the other's share when it runs out. Stretch ranks nodes that build on something
-  the student meets first, then by **requires depth** for the instrument (the longest chain of
-  requirements below the node), then catalog order. The map's calibration level is not installed and
+  within the next week, soonest first) and **stretch** (unseen items of any node whose readiness is
+  complete, for the instrument), each taking over the other's share when it runs out. Stretch ranks
+  the student's **path skills first** (amended 2026-10-05), then nodes that build on something the
+  student meets, then the shallowest **requires depth** for the instrument (the longest chain of
+  requirements below the node), then catalog order. So past the new share, a ready path skill's
+  unseen items come back as stretch. A path skill whose requirements aren't met stays `new` only. The map's calibration level is not installed and
   is not used.
 - **With the instrument in hand:** a warm-up on something known, never on what the teacher flagged and
   skipped under 5 minutes; a focus block; and, from 10 minutes, applying the skill to music.
   Authored exercises are focus items. The application ending is one play-along on a skill the
   focus block practised, at its tempo ladder, and its takes are evidence. With no play-along on a
   focus skill it applies another skill of the student's paths. With none on the instrument at all,
-  the session has no ending and the time stays with the focus block.
+  the session has no ending and the time stays with the focus block. Like the warm-up, a due
+  play-along is never the ending (its review belongs in the focus block), and an ending longer than
+  a quarter of the session is skipped.
+- **Item time:** a play-along is sized by its takes at its start tempo; an exercise by its authored
+  `estimated_duration_seconds`, or 30 seconds without one.
 - **Focus time:** the session minus the warm-up and the application ending (one play-along at its
   estimated time). The mix shares the focus time. A warm-up
   play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the
@@ -338,6 +352,12 @@ shown from evidence (tempo history, speed per string, levels).
 - **An 80% share for node levels, over the weakest item or the mean.** The weakest item would keep a
   72-cell node at `new` forever; the mean hides gaps. The share is honest for the leaf skills that
   `requires` points at, and wide nodes are shown through their children instead.
+- **Stretch takes path skills first, over the ADR ranking alone or "beyond the path".** With the new
+  share a ceiling, a student whose path holds only new items would get 15% of a session on it: under
+  one play-along in a 5-minute session. Stretching only beyond the path (the slice 2 meaning) leaves
+  the rest to unrelated nodes or an empty session. Ranking path skills as any other node may still
+  send it elsewhere. Ranking them first keeps a beginner on their path and keeps the ceiling
+  meaningful for review ahead (decided 2026-10-05).
 - **Requires depth, over the map's calibration level, for ranking.** The calibration level varies by
   instrument and is deliberately not installed; the graph already carries the order of learning.
 - **Felt-calibrated thresholds, over fixed guesses or time alone.** In simulated populations with a
