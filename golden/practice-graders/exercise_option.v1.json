@@ -46,7 +46,27 @@
         "evidence": {
           "source": "auto_graded",
           "correct": true,
-          "latency_ms": 4000
+          "latency_ms": 4000,
+          "answer_key": {
+            "options": [
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000a1",
+                "is_correct": false
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000b1",
+                "is_correct": true
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000c1",
+                "is_correct": false
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000d1",
+                "is_correct": false
+              }
+            ]
+          }
         }
       }
     },
@@ -65,7 +85,27 @@
         "evidence": {
           "source": "auto_graded",
           "correct": false,
-          "latency_ms": 4100
+          "latency_ms": 4100,
+          "answer_key": {
+            "options": [
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000a1",
+                "is_correct": false
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000b1",
+                "is_correct": true
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000c1",
+                "is_correct": false
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000d1",
+                "is_correct": false
+              }
+            ]
+          }
         }
       }
     },
@@ -85,7 +125,27 @@
         "evidence": {
           "source": "auto_graded",
           "correct": false,
-          "latency_ms": 4200
+          "latency_ms": 4200,
+          "answer_key": {
+            "options": [
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000a1",
+                "is_correct": false
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000b1",
+                "is_correct": true
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000c1",
+                "is_correct": false
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000d1",
+                "is_correct": false
+              }
+            ]
+          }
         }
       }
     },
@@ -105,7 +165,27 @@
         "evidence": {
           "source": "auto_graded",
           "correct": true,
-          "latency_ms": 6000
+          "latency_ms": 6000,
+          "answer_key": {
+            "options": [
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000a2",
+                "is_correct": false
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000b2",
+                "is_correct": true
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000c2",
+                "is_correct": true
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000d2",
+                "is_correct": false
+              }
+            ]
+          }
         }
       }
     },
@@ -124,7 +204,27 @@
         "evidence": {
           "source": "auto_graded",
           "correct": false,
-          "latency_ms": 5000
+          "latency_ms": 5000,
+          "answer_key": {
+            "options": [
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000a2",
+                "is_correct": false
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000b2",
+                "is_correct": true
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000c2",
+                "is_correct": true
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000d2",
+                "is_correct": false
+              }
+            ]
+          }
         }
       }
     },
@@ -145,7 +245,27 @@
         "evidence": {
           "source": "auto_graded",
           "correct": false,
-          "latency_ms": 7000
+          "latency_ms": 7000,
+          "answer_key": {
+            "options": [
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000a2",
+                "is_correct": false
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000b2",
+                "is_correct": true
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000c2",
+                "is_correct": true
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000d2",
+                "is_correct": false
+              }
+            ]
+          }
         }
       }
     },
@@ -166,7 +286,27 @@
           "source": "auto_graded",
           "correct": true,
           "latency_ms": 9500,
-          "audio_ms": 5000
+          "audio_ms": 5000,
+          "answer_key": {
+            "options": [
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000a1",
+                "is_correct": false
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000b1",
+                "is_correct": true
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000c1",
+                "is_correct": false
+              },
+              {
+                "option_id": "00000000-0000-4000-8000-0000000000d1",
+                "is_correct": false
+              }
+            ]
+          }
         }
       }
     },

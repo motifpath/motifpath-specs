@@ -89,12 +89,47 @@
                       {
                         "type": "object",
                         "additionalProperties": false,
-                        "required": ["source", "correct", "latency_ms"],
+                        "required": ["source", "correct", "latency_ms", "answer_key"],
                         "properties": {
                           "source": { "const": "auto_graded" },
                           "correct": { "type": "boolean" },
                           "latency_ms": { "type": "integer", "minimum": 0 },
-                          "audio_ms": { "type": "integer", "minimum": 0 }
+                          "audio_ms": { "type": "integer", "minimum": 0 },
+                          "answer_key": {
+                            "description": "What a right answer was, kept so a disputed answer can be checked without the reference data of the day: the asked cell and its note (spelled with sharps), or every option of the exercise as shown, each with whether it was correct.",
+                            "oneOf": [
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": ["string", "fret", "note_name"],
+                                "properties": {
+                                  "string": { "type": "integer", "minimum": 1 },
+                                  "fret": { "type": "integer", "minimum": 0 },
+                                  "note_name": { "enum": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] }
+                                }
+                              },
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": ["options"],
+                                "properties": {
+                                  "options": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "items": {
+                                      "type": "object",
+                                      "additionalProperties": false,
+                                      "required": ["option_id", "is_correct"],
+                                      "properties": {
+                                        "option_id": { "type": "string" },
+                                        "is_correct": { "type": "boolean" }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
                         }
                       },
                       {

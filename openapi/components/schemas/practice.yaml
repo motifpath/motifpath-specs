@@ -312,6 +312,8 @@ PracticeEvidence:
     correct:
       type: boolean
       description: Whether the answer was right. Present for auto_graded evidence.
+    answer_key:
+      $ref: '#/AnswerKey'
     latency_ms:
       type: integer
       minimum: 0
@@ -360,6 +362,38 @@ PracticeEvidence:
     - item_key
     - source
     - occurred_at
+
+AnswerKey:
+  type: object
+  description: |
+    What a right answer was when the evidence was graded, kept with auto_graded evidence so a
+    disputed answer can be checked from the evidence alone, even after the exercise was edited
+    or its options deleted. For a fretboard cell: the asked string and fret and the cell's note,
+    spelled with sharps (any spelling of that pitch is right, and when finding the note, any
+    octave on that string). For an exercise: every option as the student was shown it, each
+    with whether it was correct, so both their pick and the right answer can be read.
+  properties:
+    string:
+      type: integer
+      minimum: 1
+      description: The asked cell's string, 1 being the highest-pitched. Fretboard cells only.
+    fret:
+      type: integer
+      minimum: 0
+      description: The asked cell's fret. Fretboard cells only.
+    note_name:
+      type: string
+      enum: [C, C#, D, D#, E, F, F#, G, G#, A, A#, B]
+      description: The asked cell's note, spelled with sharps. Fretboard cells only.
+    options:
+      type: array
+      minItems: 1
+      items:
+        $ref: '../../core-domain-service.yaml#/components/schemas/Option'
+      description: |
+        Every option of the exercise as it was when the answer was graded, in the exercise's
+        order, with its content and whether it was correct. Exercises only.
+  additionalProperties: false
 
 FretboardDrill:
   type: string
