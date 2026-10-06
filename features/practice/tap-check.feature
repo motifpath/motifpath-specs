@@ -13,7 +13,6 @@ Feature: Ask for a tap check before fretboard drills
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A first session with fretboard cells asks for a tap check
     Given "alice" has never done a tap check
     When "alice" composes a 5-minute session with no instrument in hand
@@ -27,13 +26,11 @@ Feature: Ask for a tap check before fretboard drills
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A tap check within the last 30 days isn't asked for again
     Given "alice" did a tap check 12 days ago
     When "alice" composes a 5-minute session with no instrument in hand
     Then the plan doesn't ask for a tap check
 
-  @wip
   Scenario: A tap check older than 30 days is asked for again
     Given "alice" did a tap check 31 days ago
     When "alice" composes a 5-minute session with no instrument in hand
@@ -48,7 +45,6 @@ Feature: Ask for a tap check before fretboard drills
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A session without fretboard cells never asks for a tap check
     Given "alice" has never done a tap check
     And "alice"'s next session will practise only play-alongs and exercises
