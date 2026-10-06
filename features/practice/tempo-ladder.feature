@@ -36,6 +36,27 @@ Feature: Climb the tempo ladder of a play-along
     Then the next take of "pentatonic-run" is at 180 BPM
     And the tempos offered run in 5 BPM steps from 70 BPM, the ladder's slowest, to 300 BPM
 
+  @web
+  Scenario: The tempo control says what it sets and how far it goes
+    When "alice" is about to play a take of "pentatonic-run" at 90 BPM
+    Then the tempo control is headed "Tempo" and shows 90 BPM
+    And its slider is marked from 70 BPM to 300 BPM
+
+  @web
+  Scenario: A take started at the wrong tempo is restarted without rating it
+    Given "alice" started a take of "pentatonic-run" at 180 BPM
+    When "alice" restarts it
+    Then no rating of the take is sent
+    And the take doesn't count among the item's takes
+    And "alice" can choose another tempo before playing it again
+
+  @web
+  Scenario: A take stopped early can still be restarted instead of rated
+    Given "alice" stopped a take of "pentatonic-run" early
+    When "alice" restarts it
+    Then no rating of the take is sent
+    And "alice" can choose another tempo before playing it again
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   @web
