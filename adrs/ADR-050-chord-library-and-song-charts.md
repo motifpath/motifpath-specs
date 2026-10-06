@@ -6,6 +6,10 @@
 **Task:** MOT-44 (follows the MOT-40 / PB-87 spike)
 **Amends:** ADR-041 (a diagram has a list of named playbacks instead of one `sequence`; see §1a);
 ADR-005 (a one-time squash of the migration history before the first production deploy; see §7)
+**Amended:** 2026-10-06, by Gilson (MOT-45): Phase 0, the concierge test, is dropped. The spike
+showed the authoring interaction works, and the Product Owner accepts the hypothesis without a
+separate learner test, so Phases 1–3 proceed directly. Learner value is read from the shipped
+reader's usage instead (see Follow-up work).
 
 ---
 
@@ -335,16 +339,15 @@ every chart that uses it.
 - One corrected voicing improves every chart and lesson that uses it. Chord identity, voicing
   and chart text evolve independently.
 - A wrong chord label is caught when the catalog is built, before any learner sees it.
-- Learners get a song-first surface without leaving MotifPath, which is the behaviour the concierge
-  test measures.
+- Learners get a song-first surface without leaving MotifPath.
 - Charts are portable through ChordPro, and published revisions keep an audit trail for rights
   questions.
 
 ### Negative / Trade-offs
 
 - **Licensing is a real cost and a legal dependency.** Licensed songs need negotiation, records and
-  renewal tracking. Until a license is signed, the concierge test can use only public-domain and
-  original songs.
+  renewal tracking. Until a license is signed, only public-domain and original songs can be
+  published.
 - **A broad catalog is a larger curation and review load.** Shape templates, the transposition
   build and the musical validator have to be built and tested before the catalog exists, and every
   template needs a second admin's review. Phase 1 is bigger than the spike's 30–50-voicing
@@ -375,8 +378,9 @@ every chart that uses it.
 
 ## Follow-up work
 
-1. Phase 0 — concierge test with 5–8 students on 3–5 rights-cleared charts (public domain or
-   original until a license is signed).
+1. ~~Phase 0 — concierge test with 5–8 students on 3–5 rights-cleared charts.~~ Dropped
+   (2026-10-06, MOT-45). The learner reader emits tracking events for chart opens, chord views
+   and sections played (Phase 2), so the song-first hypothesis is checked against real use.
 2. Phase 1a — Gherkin and OpenAPI for plural playbacks (`Diagram.playbacks`,
    `default_playback_id`, `DiagramRef.playback.playback_id`) and the diagram editor's playback
    list; in motifpath-core, the one-time migration squash (§7) with `playbacks` in the baseline.
