@@ -129,7 +129,7 @@ UUID v5 under the catalog namespace (`reference-data.md`):
 | Chord voicing (open) | `chord-voicing/<open voicing key>` |
 | Voicing diagram | `chord-diagram/<voicing name hashed above>` |
 | Voicing position | `chord-diagram/<voicing name hashed above>/string-<n>` |
-| Voicing playback | `chord-diagram/<voicing name hashed above>/<strum-down \| arpeggio>` |
+| Voicing playback | `chord-diagram/<voicing name hashed above>/playback/<strum-down \| arpeggio>`, as for CAGED grips |
 
 ## Changing the catalog
 
