@@ -14,17 +14,14 @@ Feature: Roll item knowledge up into knowledge-node levels and readiness
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A node is at the level that 80% of its items reach
     Given "alice" is fluent on 21 of the 26 cells and accurate on the other 5
     Then "alice"'s level for "notes-on-low-strings" on guitar is "fluent"
 
-  @wip
   Scenario: A node falls to the next level when fewer than 80% reach the higher one
     Given "alice" is fluent on 20 of the 26 cells and accurate on the other 6
     Then "alice"'s level for "notes-on-low-strings" on guitar is "accurate"
 
-  @wip
   Scenario: A requirement is met once its target reaches the required level
     Given the skill "notes-on-all-strings" requires "notes-on-low-strings" at level "accurate"
     And "alice" is accurate on all 26 cells
@@ -32,17 +29,14 @@ Feature: Roll item knowledge up into knowledge-node levels and readiness
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: Unseen items count as new
     Given "alice" is fluent on 10 of the 26 cells and has never practised the rest
     Then "alice"'s level for "notes-on-low-strings" on guitar is "new"
 
-  @wip
   Scenario: Instruments that share a fretboard layout share their cells
     Given "alice" is accurate on all 26 cells, practised on "guitar"
     Then "alice"'s level for "notes-on-low-strings" on "electric-guitar" is "accurate"
 
-  @wip
   Scenario: Levels are kept apart for instruments with different layouts
     Given the skill "notes-on-low-strings" also has bass fretboard cells on strings 4 and 3
     And "alice" is fluent on every guitar cell and has never practised a bass cell
@@ -55,7 +49,6 @@ Feature: Roll item knowledge up into knowledge-node levels and readiness
     Then "alice"'s level for "intervals" on guitar is "accurate"
     And "alice"'s level for "intervals" on "electric-bass" is "accurate"
 
-  @wip
   Scenario: A wide node shows coverage and its children, not a level of its own
     Given the skill "fretboard-knowledge" has the children "notes-on-low-strings" and "notes-on-high-strings"
     And the skill "notes-on-high-strings" whose items are the 26 guitar fretboard cells on strings 2 and 1, frets 0 to 12

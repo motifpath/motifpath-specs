@@ -1,4 +1,3 @@
-@wip
 Feature: Generate fretboard cells as practice items
   As a student
   I want every note on the strings a skill covers to be something I can practise
