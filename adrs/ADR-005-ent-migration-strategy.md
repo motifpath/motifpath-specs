@@ -4,6 +4,10 @@
 
 Accepted — 2026-05-17
 
+Amended by ADR-050 (2026-10-06): the migration history is squashed once into a schema baseline and a
+reference-data baseline before the first production deploy. After that, this ADR applies unchanged
+and the history stays append-only.
+
 ## Context
 
 The Core Domain Service uses `ent` as its ORM against Postgres on RDS. `ent` defines the schema as Go code; at runtime, it expects the database schema to match. The question is how schema changes are authored, versioned, validated, applied, and recovered from.

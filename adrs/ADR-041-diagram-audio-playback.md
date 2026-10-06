@@ -5,6 +5,8 @@
 **Deciders:** Gilson (Product Owner)
 **Amended:** 2026-09-29 — existing `sequence_index` values are dropped, not migrated into steps
 (see the `sequence_index` bullet under Decision).
+**Amended by:** ADR-050 (2026-10-06) — a diagram has a list of named playbacks instead of one
+`sequence`; `tempo_bpm` and `time_signature` move onto each playback, and a `DiagramRef` chooses one.
 **Partially supersedes:** ADR-028's `DiagramPosition.sequence_index` and `diagram_ref.playback`
 (`direction`, `step_ms`), and the ADR-027/ADR-028 note that sends audio-synced highlighting to
 Canvas. Everything else in ADR-028 stands.
