@@ -4,6 +4,8 @@
 **Date:** 2026-10-05 (Proposed) · 2026-10-05 (Accepted, in review of specs#184)
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
 **Task:** MOT-43
+**Amended:** 2026-10-06, by Gilson (PB-22 slice 4): the pilot's practice home became the app's
+general home, and Practice opens the session setup directly (see §10 and ADR-046).
 **Amends:** ADR-018 (decision points 1 and 3, and the deferred documentation site; see Relation to
 ADR-018)
 
@@ -201,6 +203,9 @@ The app ships first as an installable **PWA**. Everything is built so that wrapp
   (practice home) waits for this ADR and is built as the pilot. The pilot's representative session
   mixes an `audio_recognition` exercise with diagram playback, an image or region exercise, and the
   application play-along.
+  Amended 2026-10-06: after the pilot, its practice home moved to the app's general home, and
+  **Practice** opens the setup directly. This takes back the tap the home had added before the first
+  item.
 - **Baseline before, compare after:** taps per item, time from opening the app to the first item, and
   the share of sessions left early or abandoned (already in ADR-046's events).
 - Then the App Shell and navigation, then the remaining screens as they are next touched. No big-bang

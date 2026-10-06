@@ -31,3 +31,7 @@ the screens as built, with the defaults a returning student sees: the first fret
 - After (web#84–#86): the exercise taps fall by two thirds, while the home adds one tap before the
   first item. A pilot finding to weigh: a one-tap start from an open instrument tab (default minutes)
   would bring the start back to today's count.
+- **2026-10-06, the home moved** (PB-22 slice 4 Phase 0b): the overview and instrument tabs became the
+  app's general home, and Practice opens the setup directly. Opening the app → first item is back to
+  **3 / 2** (menu → Practice → Start on Compact, Practice → Start wider), or **2** from the home the app
+  opens on (an instrument tab's Start → Start). One screen comes before the first item: the setup.
