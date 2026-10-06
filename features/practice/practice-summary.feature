@@ -1,4 +1,3 @@
-@wip
 Feature: Show the student's practice summary on the home
   As a student
   I want to see that I'm practising, what improved, and what to do next
