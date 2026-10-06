@@ -809,6 +809,80 @@ Feature: Manage prebuilt diagrams
     When "alice" retrieves diagram "bobs-pentatonic"
     Then the response is diagram "bobs-pentatonic"
 
+  # ── Purpose — chord voicings ─────────────────────────────────────────────────
+  #
+  # The chord catalog installs each voicing's fingering as a basic diagram owned by the catalog
+  # profile, with purpose "chord_voicing". Every other diagram is "general". Purpose only affects
+  # finding and editing a diagram, never how it renders or plays.
+
+  @wip
+  Scenario: A diagram a teacher creates is a general diagram
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a diagram named "Minor Pentatonic — Position 1" on instrument "guitar" classified under skills "minor-pentatonic-scale", concepts "scale-construction" with fretted positions:
+      | interval | note_name | string | fret |
+      | R        | A         | 6      | 5    |
+    Then the diagram's purpose is "general"
+
+  @wip
+  Scenario: The diagram list leaves chord voicings out by default
+    Given a basic diagram "major-scale-guitar" exists on instrument "guitar"
+    And the chord catalog has a voicing "a-minor-open" on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    When "bob" lists all diagrams
+    Then the response includes "major-scale-guitar"
+    And the response does not include the diagram of voicing "a-minor-open"
+    And the response reports a total of 1
+
+  @wip
+  Scenario: A teacher lists only the chord voicing diagrams
+    Given a basic diagram "major-scale-guitar" exists on instrument "guitar"
+    And the chord catalog has a voicing "a-minor-open" on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    When "bob" lists diagrams of purpose "chord_voicing"
+    Then the response includes the diagram of voicing "a-minor-open"
+    And the response does not include "major-scale-guitar"
+    And the diagram of voicing "a-minor-open" has purpose "chord_voicing"
+
+  @wip
+  Scenario: A teacher lists diagrams of any purpose
+    Given a basic diagram "major-scale-guitar" exists on instrument "guitar"
+    And the chord catalog has a voicing "a-minor-open" on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    When "bob" lists diagrams of purpose "any"
+    Then the response includes "major-scale-guitar" and the diagram of voicing "a-minor-open"
+    And the response reports a total of 2
+
+  @wip
+  Scenario: Listing diagrams of an unrecognised purpose is rejected
+    Given "bob" is authenticated as a teacher
+    When "bob" lists diagrams of purpose "scale"
+    Then the request is refused with a validation error
+
+  @wip
+  Scenario: An admin cannot update a chord voicing diagram
+    Given the chord catalog has a voicing "a-minor-open" on instrument "guitar"
+    And "admin" is authenticated as an admin
+    When "admin" updates the diagram of voicing "a-minor-open" setting root note "G" and label display "note"
+    Then the request is refused because only the chord catalog can change that diagram
+    And the diagram of voicing "a-minor-open" is unchanged
+
+  @wip
+  Scenario: A copy of a chord voicing diagram is an ordinary diagram its creator can edit
+    Given the chord catalog has a voicing "a-minor-open" on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    When "bob" saves a copy of the diagram of voicing "a-minor-open" named "My A minor"
+    Then a new diagram is created with the same positions as the diagram of voicing "a-minor-open"
+    And the new diagram's kind is "custom"
+    And the new diagram's purpose is "general"
+    And "bob" can update the new diagram
+
+  @wip
+  Scenario: A student retrieves a chord voicing diagram by its id
+    Given the chord catalog has a voicing "a-minor-open" on instrument "guitar"
+    And "alice" is authenticated as a student
+    When "alice" retrieves the diagram of voicing "a-minor-open"
+    Then the response is the diagram of voicing "a-minor-open", with its positions and playbacks
+
   # ── Validation failures ────────────────────────────────────────────────────
 
   Scenario: Creating a diagram with an unrecognised label display is rejected
