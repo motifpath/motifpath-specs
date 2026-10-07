@@ -1,0 +1,178 @@
+# MotifPath chord catalog v1 — chord formulas, movable shape templates and hand-authored open
+# voicings for standard-tuning six-string guitar. Rules: chord-voicings.md.
+#
+# Strings count from 1, the highest-pitched (E4), to 6 (E2). A string a voicing doesn't list is
+# muted. Each listed string is [fret, finger] or [fret] for an open string. Template frets are
+# offsets from the root fret on the template's root string. Fingers: "1" index to "4" little, or
+# "thumb".
+#
+# IDs are UUID v5 under the catalog namespace, from "chord-definition/<canonical symbol>",
+# "chord-template/<key>" and "chord-voicing/<template key>/<root>" or "chord-voicing/<open key>"
+# (reference-data.md). The generator writes them; they are not listed here.
+
+tuning: [E2, A2, D3, G3, B3, E4]
+
+# The 12 roots every quality is defined on, spelled as the catalog spells them.
+roots: [C, Db, D, Eb, E, F, F#, G, Ab, A, Bb, B]
+
+# Every chord quality: its tones above the root, and which of them a voicing may leave out.
+formulas:
+  major:              {intervals: [R, "3", "5"], omittable: []}
+  minor:              {intervals: [R, b3, "5"], omittable: []}
+  power:              {intervals: [R, "5"], omittable: []}
+  diminished:         {intervals: [R, b3, b5], omittable: []}
+  augmented:          {intervals: [R, "3", "#5"], omittable: []}
+  sus2:               {intervals: [R, "2", "5"], omittable: []}
+  sus4:               {intervals: [R, "4", "5"], omittable: []}
+  major_6:            {intervals: [R, "3", "5", "6"], omittable: ["5"]}
+  minor_6:            {intervals: [R, b3, "5", "6"], omittable: ["5"]}
+  dominant_7:         {intervals: [R, "3", "5", b7], omittable: ["5"]}
+  major_7:            {intervals: [R, "3", "5", "7"], omittable: ["5"]}
+  minor_7:            {intervals: [R, b3, "5", b7], omittable: ["5"]}
+  minor_major_7:      {intervals: [R, b3, "5", "7"], omittable: ["5"]}
+  half_diminished_7:  {intervals: [R, b3, b5, b7], omittable: []}
+  diminished_7:       {intervals: [R, b3, b5, bb7], omittable: []}
+  dominant_7_sus4:    {intervals: [R, "4", "5", b7], omittable: ["5"]}
+  add_9:              {intervals: [R, "3", "5", "9"], omittable: []}
+  minor_add_9:        {intervals: [R, b3, "5", "9"], omittable: []}
+  dominant_9:         {intervals: [R, "3", "5", b7, "9"], omittable: ["5"]}
+  major_9:            {intervals: [R, "3", "5", "7", "9"], omittable: ["5"]}
+  minor_9:            {intervals: [R, b3, "5", b7, "9"], omittable: ["5"]}
+  dominant_11:        {intervals: [R, "3", "5", b7, "9", "11"], omittable: ["3", "5", "9"]}
+  minor_11:           {intervals: [R, b3, "5", b7, "9", "11"], omittable: ["5", "9"]}
+  dominant_13:        {intervals: [R, "3", "5", b7, "9", "13"], omittable: ["5", "9"]}
+  dominant_7_flat_5:  {intervals: [R, "3", b5, b7], omittable: []}
+  dominant_7_sharp_5: {intervals: [R, "3", "#5", b7], omittable: []}
+  dominant_7_flat_9:  {intervals: [R, "3", "5", b7, b9], omittable: ["5"]}
+  dominant_7_sharp_9: {intervals: [R, "3", "5", b7, "#9"], omittable: ["5"]}
+
+# Movable shapes. Each is materialized once per root (chord-voicings.md, Templates).
+templates:
+  # ── Root on string 6 ──
+  - {key: major-e-shape, quality: major, shape_family: e_shape, root_string: 6, difficulty: intermediate, technique_tags: [barre],
+     strings: {6: [0, "1"], 5: [2, "3"], 4: [2, "4"], 3: [1, "2"], 2: [0, "1"], 1: [0, "1"]}}
+  - {key: minor-e-shape, quality: minor, shape_family: e_shape, root_string: 6, difficulty: intermediate, technique_tags: [barre],
+     strings: {6: [0, "1"], 5: [2, "3"], 4: [2, "4"], 3: [0, "1"], 2: [0, "1"], 1: [0, "1"]}}
+  - {key: power-e-shape, quality: power, shape_family: e_shape, root_string: 6, difficulty: beginner, technique_tags: [],
+     strings: {6: [0, "1"], 5: [2, "3"], 4: [2, "4"]}}
+  - {key: sus4-e-shape, quality: sus4, shape_family: e_shape, root_string: 6, difficulty: intermediate, technique_tags: [barre],
+     strings: {6: [0, "1"], 5: [2, "2"], 4: [2, "3"], 3: [2, "4"], 2: [0, "1"], 1: [0, "1"]}}
+  - {key: dominant-7-e-shape, quality: dominant_7, shape_family: e_shape, root_string: 6, difficulty: intermediate, technique_tags: [barre],
+     strings: {6: [0, "1"], 5: [2, "3"], 4: [0, "1"], 3: [1, "2"], 2: [0, "1"], 1: [0, "1"]}}
+  - {key: major-7-e-shape, quality: major_7, shape_family: e_shape, root_string: 6, difficulty: intermediate, technique_tags: [],
+     strings: {6: [0, "1"], 4: [1, "3"], 3: [1, "4"], 2: [0, "2"]}}
+  - {key: minor-7-e-shape, quality: minor_7, shape_family: e_shape, root_string: 6, difficulty: intermediate, technique_tags: [barre],
+     strings: {6: [0, "1"], 5: [2, "3"], 4: [0, "1"], 3: [0, "1"], 2: [0, "1"], 1: [0, "1"]}}
+  - {key: minor-6-e-shape, quality: minor_6, shape_family: e_shape, root_string: 6, difficulty: advanced, technique_tags: [],
+     strings: {6: [0, "2"], 4: [-1, "1"], 3: [0, "3"], 2: [0, "4"]}}
+  - {key: dominant-7-sus4-e-shape, quality: dominant_7_sus4, shape_family: e_shape, root_string: 6, difficulty: intermediate, technique_tags: [barre],
+     strings: {6: [0, "1"], 5: [2, "3"], 4: [0, "1"], 3: [2, "4"], 2: [0, "1"], 1: [0, "1"]}}
+  - {key: minor-11-e-shape, quality: minor_11, shape_family: e_shape, root_string: 6, difficulty: advanced, technique_tags: [partial_barre],
+     strings: {6: [0, "3"], 4: [0, "3"], 3: [0, "4"], 2: [-2, "1"], 1: [-2, "1"]}}
+  - {key: dominant-13-e-shape, quality: dominant_13, shape_family: e_shape, root_string: 6, difficulty: advanced, technique_tags: [],
+     strings: {6: [0, "1"], 4: [0, "2"], 3: [1, "3"], 2: [2, "4"]}}
+  # ── Root on string 4 ──
+  - {key: major-d-shape, quality: major, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [],
+     strings: {4: [0, "1"], 3: [2, "2"], 2: [3, "4"], 1: [2, "3"]}}
+  - {key: minor-d-shape, quality: minor, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [],
+     strings: {4: [0, "1"], 3: [2, "3"], 2: [3, "4"], 1: [1, "2"]}}
+  - {key: dominant-7-d-shape, quality: dominant_7, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [],
+     strings: {4: [0, "1"], 3: [2, "3"], 2: [1, "2"], 1: [2, "4"]}}
+  - {key: major-7-d-shape, quality: major_7, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [partial_barre],
+     strings: {4: [0, "1"], 3: [2, "3"], 2: [2, "3"], 1: [2, "3"]}}
+  - {key: minor-7-d-shape, quality: minor_7, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [partial_barre],
+     strings: {4: [0, "1"], 3: [2, "3"], 2: [1, "2"], 1: [1, "2"]}}
+  - {key: sus2-d-shape, quality: sus2, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [partial_barre],
+     strings: {4: [0, "1"], 3: [2, "3"], 2: [3, "4"], 1: [0, "1"]}}
+  - {key: sus4-d-shape, quality: sus4, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [],
+     strings: {4: [0, "1"], 3: [2, "2"], 2: [3, "3"], 1: [3, "4"]}}
+  # ── Root on string 5 ──
+  - {key: major-a-shape, quality: major, shape_family: a_shape, root_string: 5, difficulty: intermediate, technique_tags: [barre],
+     strings: {5: [0, "1"], 4: [2, "3"], 3: [2, "3"], 2: [2, "3"], 1: [0, "1"]}}
+  - {key: minor-a-shape, quality: minor, shape_family: a_shape, root_string: 5, difficulty: intermediate, technique_tags: [barre],
+     strings: {5: [0, "1"], 4: [2, "3"], 3: [2, "4"], 2: [1, "2"], 1: [0, "1"]}}
+  - {key: power-a-shape, quality: power, shape_family: a_shape, root_string: 5, difficulty: beginner, technique_tags: [],
+     strings: {5: [0, "1"], 4: [2, "3"], 3: [2, "4"]}}
+  - {key: sus2-a-shape, quality: sus2, shape_family: a_shape, root_string: 5, difficulty: intermediate, technique_tags: [barre],
+     strings: {5: [0, "1"], 4: [2, "3"], 3: [2, "4"], 2: [0, "1"], 1: [0, "1"]}}
+  - {key: sus4-a-shape, quality: sus4, shape_family: a_shape, root_string: 5, difficulty: intermediate, technique_tags: [barre],
+     strings: {5: [0, "1"], 4: [2, "2"], 3: [2, "3"], 2: [3, "4"], 1: [0, "1"]}}
+  - {key: dominant-7-a-shape, quality: dominant_7, shape_family: a_shape, root_string: 5, difficulty: intermediate, technique_tags: [barre],
+     strings: {5: [0, "1"], 4: [2, "3"], 3: [0, "1"], 2: [2, "4"], 1: [0, "1"]}}
+  - {key: major-7-a-shape, quality: major_7, shape_family: a_shape, root_string: 5, difficulty: intermediate, technique_tags: [barre],
+     strings: {5: [0, "1"], 4: [2, "3"], 3: [1, "2"], 2: [2, "4"], 1: [0, "1"]}}
+  - {key: minor-7-a-shape, quality: minor_7, shape_family: a_shape, root_string: 5, difficulty: intermediate, technique_tags: [barre],
+     strings: {5: [0, "1"], 4: [2, "3"], 3: [0, "1"], 2: [1, "2"], 1: [0, "1"]}}
+  - {key: major-6-a-shape, quality: major_6, shape_family: a_shape, root_string: 5, difficulty: intermediate, technique_tags: [partial_barre],
+     strings: {5: [0, "1"], 4: [2, "3"], 3: [2, "3"], 2: [2, "3"], 1: [2, "3"]}}
+  - {key: augmented-a-shape, quality: augmented, shape_family: a_shape, root_string: 5, difficulty: advanced, technique_tags: [],
+     strings: {5: [0, "4"], 4: [-1, "3"], 3: [-2, "1"], 2: [-2, "2"]}}
+  - {key: diminished-5th-string, quality: diminished, shape_family: null, root_string: 5, difficulty: advanced, technique_tags: [],
+     strings: {5: [0, "1"], 4: [1, "2"], 3: [2, "4"], 2: [1, "3"]}}
+  - {key: diminished-7-5th-string, quality: diminished_7, shape_family: null, root_string: 5, difficulty: advanced, technique_tags: [],
+     strings: {5: [0, "2"], 4: [1, "3"], 3: [-1, "1"], 2: [1, "4"]}}
+  - {key: half-diminished-7-5th-string, quality: half_diminished_7, shape_family: null, root_string: 5, difficulty: advanced, technique_tags: [],
+     strings: {5: [0, "1"], 4: [1, "3"], 3: [0, "2"], 2: [1, "4"]}}
+  - {key: minor-major-7-5th-string, quality: minor_major_7, shape_family: null, root_string: 5, difficulty: advanced, technique_tags: [],
+     strings: {5: [0, "1"], 4: [2, "4"], 3: [1, "2"], 2: [1, "3"]}}
+  - {key: add-9-5th-string, quality: add_9, shape_family: null, root_string: 5, difficulty: advanced, technique_tags: [stretch],
+     strings: {5: [0, "1"], 4: [2, "2"], 3: [4, "4"], 2: [2, "3"]}}
+  - {key: minor-add-9-5th-string, quality: minor_add_9, shape_family: null, root_string: 5, difficulty: advanced, technique_tags: [stretch],
+     strings: {5: [0, "1"], 4: [2, "3"], 3: [4, "4"], 2: [1, "2"]}}
+  - {key: dominant-9-5th-string, quality: dominant_9, shape_family: null, root_string: 5, difficulty: intermediate, technique_tags: [partial_barre],
+     strings: {5: [0, "2"], 4: [-1, "1"], 3: [0, "3"], 2: [0, "3"], 1: [0, "3"]}}
+  - {key: major-9-5th-string, quality: major_9, shape_family: null, root_string: 5, difficulty: advanced, technique_tags: [],
+     strings: {5: [0, "2"], 4: [-1, "1"], 3: [1, "4"], 2: [0, "3"]}}
+  - {key: minor-9-5th-string, quality: minor_9, shape_family: null, root_string: 5, difficulty: intermediate, technique_tags: [partial_barre],
+     strings: {5: [0, "2"], 4: [-2, "1"], 3: [0, "3"], 2: [0, "3"], 1: [0, "3"]}}
+  - {key: dominant-11-5th-string, quality: dominant_11, shape_family: null, root_string: 5, difficulty: intermediate, technique_tags: [partial_barre],
+     strings: {5: [0, "1"], 4: [0, "1"], 3: [0, "1"], 2: [0, "1"]}}
+  - {key: dominant-7-flat-5-5th-string, quality: dominant_7_flat_5, shape_family: null, root_string: 5, difficulty: advanced, technique_tags: [],
+     strings: {5: [0, "1"], 4: [1, "3"], 3: [0, "2"], 2: [2, "4"]}}
+  - {key: dominant-7-sharp-5-5th-string, quality: dominant_7_sharp_5, shape_family: null, root_string: 5, difficulty: advanced, technique_tags: [],
+     strings: {5: [0, "1"], 3: [0, "2"], 2: [2, "4"], 1: [1, "3"]}}
+  - {key: dominant-7-flat-9-5th-string, quality: dominant_7_flat_9, shape_family: null, root_string: 5, difficulty: advanced, technique_tags: [],
+     strings: {5: [0, "3"], 4: [-1, "2"], 3: [0, "4"], 2: [-1, "1"]}}
+  - {key: dominant-7-sharp-9-5th-string, quality: dominant_7_sharp_9, shape_family: null, root_string: 5, difficulty: advanced, technique_tags: [],
+     strings: {5: [0, "2"], 4: [-1, "1"], 3: [0, "3"], 2: [1, "4"]}}
+
+# Open-position voicings, written one by one. chord is a canonical symbol; omits lists the
+# formula tones the voicing leaves out on purpose.
+open_voicings:
+  - {key: c-open, chord: C, difficulty: beginner, strings: {5: [3, "3"], 4: [2, "2"], 3: [0], 2: [1, "1"], 1: [0]}}
+  - {key: a-open, chord: A, difficulty: beginner, strings: {5: [0], 4: [2, "1"], 3: [2, "2"], 2: [2, "3"], 1: [0]}}
+  - {key: g-open, chord: G, difficulty: beginner, strings: {6: [3, "2"], 5: [2, "1"], 4: [0], 3: [0], 2: [0], 1: [3, "3"]}}
+  - {key: e-open, chord: E, difficulty: beginner, strings: {6: [0], 5: [2, "2"], 4: [2, "3"], 3: [1, "1"], 2: [0], 1: [0]}}
+  - {key: d-open, chord: D, difficulty: beginner, strings: {4: [0], 3: [2, "1"], 2: [3, "3"], 1: [2, "2"]}}
+  - {key: a-minor-open, chord: Am, difficulty: beginner, strings: {5: [0], 4: [2, "2"], 3: [2, "3"], 2: [1, "1"], 1: [0]}}
+  - {key: e-minor-open, chord: Em, difficulty: beginner, strings: {6: [0], 5: [2, "2"], 4: [2, "3"], 3: [0], 2: [0], 1: [0]}}
+  - {key: d-minor-open, chord: Dm, difficulty: beginner, strings: {4: [0], 3: [2, "2"], 2: [3, "3"], 1: [1, "1"]}}
+  - {key: e-power-open, chord: E5, difficulty: beginner, strings: {6: [0], 5: [2, "1"], 4: [2, "2"]}}
+  - {key: a-power-open, chord: A5, difficulty: beginner, strings: {5: [0], 4: [2, "1"], 3: [2, "2"]}}
+  - {key: a-sus2-open, chord: Asus2, difficulty: beginner, strings: {5: [0], 4: [2, "1"], 3: [2, "2"], 2: [0], 1: [0]}}
+  - {key: a-sus4-open, chord: Asus4, difficulty: beginner, strings: {5: [0], 4: [2, "1"], 3: [2, "2"], 2: [3, "3"], 1: [0]}}
+  - {key: d-sus2-open, chord: Dsus2, difficulty: beginner, strings: {4: [0], 3: [2, "1"], 2: [3, "3"], 1: [0]}}
+  - {key: d-sus4-open, chord: Dsus4, difficulty: beginner, strings: {4: [0], 3: [2, "1"], 2: [3, "3"], 1: [3, "4"]}}
+  - {key: e-sus4-open, chord: Esus4, difficulty: beginner, strings: {6: [0], 5: [2, "2"], 4: [2, "3"], 3: [2, "4"], 2: [0], 1: [0]}}
+  - {key: a-7-open, chord: A7, difficulty: beginner, strings: {5: [0], 4: [2, "2"], 3: [0], 2: [2, "3"], 1: [0]}}
+  - {key: b-7-open, chord: B7, difficulty: beginner, strings: {5: [2, "2"], 4: [1, "1"], 3: [2, "3"], 2: [0], 1: [2, "4"]}}
+  - {key: c-7-open, chord: C7, difficulty: beginner, omits: ["5"], strings: {5: [3, "3"], 4: [2, "2"], 3: [3, "4"], 2: [1, "1"], 1: [0]}}
+  - {key: d-7-open, chord: D7, difficulty: beginner, strings: {4: [0], 3: [2, "2"], 2: [1, "1"], 1: [2, "3"]}}
+  - {key: e-7-open, chord: E7, difficulty: beginner, strings: {6: [0], 5: [2, "2"], 4: [0], 3: [1, "1"], 2: [0], 1: [0]}}
+  - {key: g-7-open, chord: G7, difficulty: beginner, strings: {6: [3, "3"], 5: [2, "2"], 4: [0], 3: [0], 2: [0], 1: [1, "1"]}}
+  - {key: a-major-7-open, chord: Amaj7, difficulty: beginner, strings: {5: [0], 4: [2, "2"], 3: [1, "1"], 2: [2, "3"], 1: [0]}}
+  - {key: c-major-7-open, chord: Cmaj7, difficulty: beginner, strings: {5: [3, "3"], 4: [2, "2"], 3: [0], 2: [0], 1: [0]}}
+  - {key: d-major-7-open, chord: Dmaj7, difficulty: beginner, strings: {4: [0], 3: [2, "1"], 2: [2, "2"], 1: [2, "3"]}}
+  - {key: f-major-7-open, chord: Fmaj7, difficulty: beginner, strings: {4: [3, "3"], 3: [2, "2"], 2: [1, "1"], 1: [0]}}
+  - {key: a-minor-7-open, chord: Am7, difficulty: beginner, strings: {5: [0], 4: [2, "2"], 3: [0], 2: [1, "1"], 1: [0]}}
+  - {key: d-minor-7-open, chord: Dm7, difficulty: beginner, strings: {4: [0], 3: [2, "2"], 2: [1, "1"], 1: [1, "1"]}}
+  - {key: e-minor-7-open, chord: Em7, difficulty: beginner, strings: {6: [0], 5: [2, "2"], 4: [0], 3: [0], 2: [0], 1: [0]}}
+  - {key: c-add-9-open, chord: Cadd9, difficulty: beginner, strings: {5: [3, "2"], 4: [2, "1"], 3: [0], 2: [3, "3"], 1: [0]}}
+  - {key: a-add-9-open, chord: Aadd9, difficulty: intermediate, technique_tags: [stretch], strings: {5: [0], 4: [2, "1"], 3: [4, "3"], 2: [2, "2"], 1: [0]}}
+  - {key: a-minor-add-9-open, chord: Amadd9, difficulty: intermediate, technique_tags: [stretch], strings: {5: [0], 4: [2, "2"], 3: [4, "4"], 2: [1, "1"], 1: [0]}}
+  # Slash chords: the lowest sounded string is the bass.
+  - {key: d-over-f-sharp-open, chord: D/F#, difficulty: intermediate, technique_tags: [thumb], strings: {6: [2, "thumb"], 4: [0], 3: [2, "1"], 2: [3, "3"], 1: [2, "2"]}}
+  - {key: c-over-g-open, chord: C/G, difficulty: beginner, strings: {6: [3, "4"], 5: [3, "3"], 4: [2, "2"], 3: [0], 2: [1, "1"], 1: [0]}}
+  - {key: g-over-b-open, chord: G/B, difficulty: beginner, strings: {5: [2, "1"], 4: [0], 3: [0], 2: [0], 1: [3, "3"]}}
+  - {key: a-minor-over-g-open, chord: Am/G, difficulty: beginner, strings: {6: [3, "4"], 4: [2, "2"], 3: [2, "3"], 2: [1, "1"], 1: [0]}}
+  - {key: c-over-e-open, chord: C/E, difficulty: beginner, strings: {6: [0], 5: [3, "3"], 4: [2, "2"], 3: [0], 2: [1, "1"], 1: [0]}}

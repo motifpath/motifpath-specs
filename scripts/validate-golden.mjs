@@ -55,6 +55,43 @@ for (const file of files) {
 }
 
 if (files.length === 0) fail(`no golden-case files in ${dir}`)
+
+// Chord symbol parser cases in golden/chord-symbols/: each file against its schema.json, its
+// file name against its parser id, and every parsed result against ParsedChordSymbol in the
+// Core Domain Service schemas, so the cases can't drift from what searchChords returns.
+const chordDir = 'golden/chord-symbols'
+const validateChordFile = ajv.compile(JSON.parse(readFileSync(join(chordDir, 'schema.json'), 'utf8')))
+const coreSchemas = parse(readFileSync('openapi/core-domain-service.yaml', 'utf8')).components.schemas
+const rewriteCoreRefs = (node) => {
+  if (Array.isArray(node)) return node.forEach(rewriteCoreRefs)
+  if (node && typeof node === 'object') {
+    if (typeof node.$ref === 'string') node.$ref = node.$ref.replace(/^#\/components\/schemas\//, 'core.yaml#/$defs/')
+    delete node.discriminator
+    delete node.example
+    Object.values(node).forEach(rewriteCoreRefs)
+  }
+}
+rewriteCoreRefs(coreSchemas)
+ajv.addSchema({ $id: 'core.yaml', $defs: coreSchemas })
+const validateParsed = ajv.compile({ $ref: 'core.yaml#/$defs/ParsedChordSymbol' })
+
+const chordFiles = readdirSync(chordDir).filter((f) => f.endsWith('.json') && f !== 'schema.json')
+for (const file of chordFiles) {
+  const golden = JSON.parse(readFileSync(join(chordDir, file), 'utf8'))
+  if (!validateChordFile(golden)) {
+    fail(`${file}: not a valid chord-symbol golden-case file`, validateChordFile.errors)
+    continue
+  }
+  if (`${golden.parser}.json` !== file) fail(`${file}: parser "${golden.parser}" doesn't match the file name`)
+  for (const c of golden.cases) {
+    if (c.expected.status === 'parsed' && !validateParsed(c.expected.parsed)) {
+      fail(`${file} / ${c.name}: parsed`, validateParsed.errors)
+    }
+  }
+  console.log(`${file}: ${golden.cases.length} cases`)
+}
+if (chordFiles.length === 0) fail(`no golden-case files in ${chordDir}`)
+
 if (failures > 0) {
   console.error(`${failures} problem(s)`)
   process.exit(1)

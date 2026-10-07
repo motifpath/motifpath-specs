@@ -2390,6 +2390,10 @@ paths:
         alphabetically first language it has — then by id; an offset past
         the end returns an empty items array. Every filter below is
         optional and they combine with AND.
+
+        Chord voicings from the chord catalog are left out unless purpose
+        asks for them, so they don't crowd the diagrams authors browse;
+        total counts only the diagrams that match.
       tags:
         - Content
       parameters:
@@ -2468,6 +2472,20 @@ paths:
             type: string
             format: uuid
           description: When given, only diagrams with this exact concept id among their linked concepts are returned.
+        - name: purpose
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - general
+              - chord_voicing
+              - any
+            default: general
+          description: |
+            Restricts the results to diagrams of this purpose (see
+            Diagram.purpose). Omitted, it is general, so chord voicings are
+            listed only when asked for; any lists both.
       responses:
         "200":
           description: One page of the diagrams visible to the caller, possibly empty.
@@ -2476,7 +2494,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedDiagrams'
         "400":
-          description: limit, offset, kind, language, name or root_note is out of range.
+          description: limit, offset, kind, language, name, root_note or purpose is out of range.
           content:
             application/json:
               schema:
@@ -2599,7 +2617,8 @@ paths:
       summary: List the creators of the diagrams the caller can see
       description: |
         Returns every distinct user who created at least one diagram the
-        caller can see in GET /diagrams, so a picker can offer a complete
+        caller can see in GET /diagrams with its default purpose (general),
+        so a picker can offer a complete
         creator filter (its created_by parameter) without paging. A teacher
         gets the creators of basic diagrams, plus themselves once they have
         a custom diagram of their own — never another teacher who has only
@@ -2697,7 +2716,11 @@ paths:
       description: |
         Only an admin may update a basic diagram. A custom diagram may be
         updated only by its creator or by an admin. An update never changes
-        a diagram's kind or created_by. Updating a diagram
+        a diagram's kind, purpose or created_by. A chord_voicing diagram
+        can't be updated here by anyone: its fingering changes only through
+        the chord catalog, where it is checked against its chord. Saving a
+        copy of it (createDiagram) gives an ordinary general diagram that
+        can be edited. Updating a diagram
         that is already referenced by one or more diagram_refs changes what
         every one of them renders — there is no versioning or copy-on-write.
       tags:
@@ -2748,6 +2771,119 @@ paths:
                 $ref: '#/components/schemas/ForbiddenError'
         "404":
           description: No diagram exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: |
+            The diagram is a chord_voicing diagram, which only the chord
+            catalog can change.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+
+  /chords:
+    get:
+      operationId: searchChords
+      summary: Find a chord in the chord catalog by its symbol
+      description: |
+        Parses a chord symbol as an author writes it and returns the chord
+        catalog's chord for it, with that chord's voicings, so an author
+        can pick a fingering for a chord they typed. Parsing is
+        deterministic: every supported spelling of a chord ("Bbmaj7",
+        "B♭M7", "BbΔ7") finds the same chord, and a symbol that can't be
+        parsed is reported as unparsed, never reinterpreted as something
+        close to it. "N.C." and "NC" are read as no chord.
+
+        A parsed symbol finds its chord by root and bass pitch class, not
+        spelling: "A#m" finds the catalog's "Bbm", and the response keeps
+        the symbol as written. Only teachers and admins search the
+        catalog; students see chord voicings only where content embeds
+        them.
+      tags:
+        - Chords
+      parameters:
+        - name: symbol
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 32
+          description: The chord symbol as written, e.g. "Bbmaj7", "F#m7♭5", "D/F#".
+      responses:
+        "200":
+          description: |
+            The symbol was read. Whether it parsed, and whether the catalog
+            has its chord, is in the result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChordSearchResult'
+        "400":
+          description: symbol is missing, empty or longer than 32 characters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is a student.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /chords/{chord_definition_id}:
+    get:
+      operationId: getChord
+      summary: Get a chord from the chord catalog with its voicings
+      description: |
+        Returns one chord of the chord catalog and its active voicings,
+        best first. Only teachers and admins may read the catalog.
+      tags:
+        - Chords
+      parameters:
+        - name: chord_definition_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: The chord and its active voicings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChordDefinition'
+        "400":
+          description: chord_definition_id is not a UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is a student.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No chord exists with the given ID.
           content:
             application/json:
               schema:
@@ -6318,6 +6454,23 @@ components:
             diagrams belong to their creator: only the creator and admins can
             find them in the diagram list, and only the creator or an admin
             may update one. Fixed at creation.
+        purpose:
+          type: string
+          enum:
+            - general
+            - chord_voicing
+          description: |
+            What the diagram is for. chord_voicing marks a diagram that is
+            the fingering of a voicing in the chord catalog: it is listed
+            only when GET /diagrams asks for it, found through the chord
+            catalog instead, and its positions and playbacks can't be
+            changed through updateDiagram, so a fingering can't drift from
+            the chord it is validated against. Every other diagram is
+            general. Set by the server, never by a request: a diagram is
+            chord_voicing exactly when the chord catalog installed it as a
+            voicing, and a diagram created through createDiagram, including
+            a copy saved from a chord_voicing diagram, is general. A
+            diagram's purpose doesn't change how it renders or plays.
         created_by:
           $ref: '#/components/schemas/UserRef'
         root_note:
@@ -6409,6 +6562,7 @@ components:
         - names
         - languages
         - kind
+        - purpose
         - created_by
         - root_note
         - mode
@@ -6886,6 +7040,404 @@ components:
       required:
         - pitch
         - url
+
+    ChordQuality:
+      type: string
+      enum:
+        - major
+        - minor
+        - power
+        - diminished
+        - augmented
+        - sus2
+        - sus4
+        - major_6
+        - minor_6
+        - dominant_7
+        - major_7
+        - minor_7
+        - minor_major_7
+        - half_diminished_7
+        - diminished_7
+        - dominant_7_sus4
+        - add_9
+        - minor_add_9
+        - dominant_9
+        - major_9
+        - minor_9
+        - dominant_11
+        - minor_11
+        - dominant_13
+        - dominant_7_flat_5
+        - dominant_7_sharp_5
+        - dominant_7_flat_9
+        - dominant_7_sharp_9
+      description: |
+        The kind of chord, independent of its root. Each quality has one
+        formula (see ChordDefinition.formula) and one canonical suffix in
+        a chord symbol: major "", minor "m", power "5", diminished "dim",
+        augmented "aug", sus2 "sus2", sus4 "sus4", major_6 "6", minor_6
+        "m6", dominant_7 "7", major_7 "maj7", minor_7 "m7", minor_major_7
+        "mMaj7", half_diminished_7 "m7b5", diminished_7 "dim7",
+        dominant_7_sus4 "7sus4", add_9 "add9", minor_add_9 "madd9",
+        dominant_9 "9", major_9 "maj9", minor_9 "m9", dominant_11 "11",
+        minor_11 "m11", dominant_13 "13", dominant_7_flat_5 "7b5",
+        dominant_7_sharp_5 "7#5", dominant_7_flat_9 "7b9",
+        dominant_7_sharp_9 "7#9".
+
+    ChordInterval:
+      type: string
+      enum:
+        - R
+        - '2'
+        - b3
+        - '3'
+        - '4'
+        - b5
+        - '5'
+        - '#5'
+        - '6'
+        - bb7
+        - b7
+        - '7'
+        - b9
+        - '9'
+        - '#9'
+        - '11'
+        - '13'
+      description: |
+        An interval of a chord formula, as the same canonical code a
+        diagram position uses (R is the root).
+
+    ParsedChordSymbol:
+      type: object
+      description: What a chord symbol means, once parsed.
+      properties:
+        root:
+          type: string
+          pattern: '^[A-G](b|#)?$'
+          description: The root as written, with ♭ and ♯ read as b and # (e.g. "A#" for "A♯m").
+        root_pitch_class:
+          type: integer
+          minimum: 0
+          maximum: 11
+          description: The root's pitch class, C = 0 through B = 11.
+        quality:
+          $ref: '#/components/schemas/ChordQuality'
+        bass:
+          type: [string, "null"]
+          pattern: '^[A-G](b|#)?$'
+          description: |
+            The slash bass as written (e.g. "F#" in "D/F#"); null when the
+            symbol has no slash, or when its bass is the root itself.
+        bass_pitch_class:
+          type: [integer, "null"]
+          minimum: 0
+          maximum: 11
+          description: The bass's pitch class; null exactly when bass is null.
+        canonical_symbol:
+          type: string
+          description: |
+            The symbol in the catalog's own spelling: the root and bass as
+            written, then the quality's canonical suffix (e.g. "Bbmaj7" for
+            "B♭Δ7", "F#m7b5" for "F♯ø").
+      required:
+        - root
+        - root_pitch_class
+        - quality
+        - bass
+        - bass_pitch_class
+        - canonical_symbol
+
+    ChordSearchResult:
+      type: object
+      description: |
+        The result of reading one chord symbol: whether it parsed, what it
+        means, and the catalog's chord for it.
+      properties:
+        written_symbol:
+          type: string
+          description: The symbol exactly as it was sent.
+        status:
+          type: string
+          enum:
+            - parsed
+            - unparsed
+            - no_chord
+          description: |
+            parsed: the symbol names a chord (see parsed). unparsed: it
+            doesn't, in any spelling the parser supports, and it stays
+            text. no_chord: it is a no-chord marking ("N.C.", "NC").
+        parsed:
+          oneOf:
+            - $ref: '#/components/schemas/ParsedChordSymbol'
+            - type: "null"
+          description: The parsed meaning; null unless status is parsed.
+        warning:
+          type: [string, "null"]
+          enum:
+            - unparsed_symbol
+            - unsupported_quality
+            - null
+          description: |
+            Why a symbol didn't parse; null unless status is unparsed.
+            unsupported_quality: the root reads as a note but the rest
+            isn't one of the supported qualities (e.g. "C7#11").
+            unparsed_symbol: anything else (e.g. "H7", "cm", "C/").
+        chord:
+          oneOf:
+            - $ref: '#/components/schemas/ChordDefinition'
+            - type: "null"
+          description: |
+            The catalog's chord with the same root, quality and bass
+            pitch classes, with its active voicings; null when the symbol
+            didn't parse or the catalog has no such chord.
+        chord_without_bass:
+          oneOf:
+            - $ref: '#/components/schemas/ChordDefinition'
+            - type: "null"
+          description: |
+            For a slash chord the catalog doesn't have (chord is null),
+            the catalog's chord with the same root and quality and no
+            bass, so the chord can still be played without its bass note.
+            Null otherwise.
+      required:
+        - written_symbol
+        - status
+        - parsed
+        - warning
+        - chord
+        - chord_without_bass
+
+    ChordDefinition:
+      type: object
+      description: |
+        A chord of the chord catalog: what it is musically, independent of
+        any fingering. A chord has many voicings, each one fingering of it.
+      properties:
+        chord_definition_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this chord, the same in every environment.
+        canonical_symbol:
+          type: string
+          description: The chord's symbol in the catalog's spelling (e.g. "Bbmaj7", "D/F#").
+        root:
+          type: string
+          pattern: '^[A-G](b|#)?$'
+          description: The root as the catalog spells it.
+        root_pitch_class:
+          type: integer
+          minimum: 0
+          maximum: 11
+          description: The root's pitch class, C = 0 through B = 11.
+        quality:
+          $ref: '#/components/schemas/ChordQuality'
+        formula:
+          type: array
+          minItems: 2
+          items:
+            $ref: '#/components/schemas/ChordInterval'
+          description: |
+            The chord's tones as intervals above the root, starting with R
+            (e.g. ["R", "3", "5", "7"] for maj7). Every voicing sounds
+            exactly these pitch classes, less the ones it declares omitted.
+        bass:
+          type: [string, "null"]
+          pattern: '^[A-G](b|#)?$'
+          description: The slash bass as the catalog spells it; null for a chord with no slash bass.
+        aliases:
+          type: array
+          items:
+            type: string
+          description: |
+            Other spellings of this chord that the parser accepts, for
+            display in a picker (e.g. ["BbM7", "BbΔ7", "B♭maj7"]). Not
+            exhaustive: searchChords accepts every supported spelling.
+        voicings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChordVoicing'
+          description: |
+            The chord's active voicings, best first (by recommended_rank,
+            then id). May be empty.
+      required:
+        - chord_definition_id
+        - canonical_symbol
+        - root
+        - root_pitch_class
+        - quality
+        - formula
+        - bass
+        - aliases
+        - voicings
+
+    ChordVoicing:
+      type: object
+      description: |
+        One playable fingering of a chord. Its positions, playbacks and
+        sound are those of its diagram, which it references and never
+        copies; the diagram's purpose is chord_voicing. Every voicing was
+        checked before it entered the catalog: its diagram sounds exactly
+        the chord's pitch classes, less the declared omissions, its lowest
+        sounded string is the bass of a slash chord, and its tuning is its
+        instrument's.
+      properties:
+        chord_voicing_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this voicing, the same in every environment.
+        chord_definition_id:
+          type: string
+          format: uuid
+          description: The chord this voicing plays.
+        diagram_id:
+          type: string
+          format: uuid
+          description: The diagram that holds this voicing's positions and playbacks.
+        instrument_id:
+          type: string
+          format: uuid
+          description: The layout instrument of the voicing's diagram.
+        tuning_fingerprint:
+          type: string
+          description: |
+            The open-string pitches the voicing was checked against, lowest
+            string first, joined by "-" (e.g. "E2-A2-D3-G3-B3-E4").
+        fret_window:
+          type: object
+          description: The frets the voicing's fretted notes span; open strings don't count.
+          properties:
+            lowest_fret:
+              type: integer
+              minimum: 0
+              description: The lowest fretted fret, or 0 when every sounded string is open.
+            highest_fret:
+              type: integer
+              minimum: 0
+              description: The highest fretted fret, or 0 when every sounded string is open.
+          required:
+            - lowest_fret
+            - highest_fret
+        fingering:
+          type: array
+          items:
+            type: object
+            properties:
+              position_id:
+                type: string
+                description: A fretted position of the voicing's diagram.
+              finger:
+                type: string
+                enum:
+                  - '1'
+                  - '2'
+                  - '3'
+                  - '4'
+                  - thumb
+                description: The fretting-hand finger, 1 (index) to 4 (little), or the thumb.
+            required:
+              - position_id
+              - finger
+          description: |
+            Which finger frets each fretted position. Open strings have no
+            entry. A barre is the same finger on several positions.
+        muted_strings:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          description: Strings that must not sound, numbered from 1, the highest-pitched; empty when none.
+        omitted_intervals:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChordInterval'
+          description: |
+            Tones of the chord's formula this voicing leaves out on
+            purpose (e.g. ["5"] in a shell voicing); empty when none.
+        difficulty:
+          type: string
+          enum:
+            - beginner
+            - intermediate
+            - advanced
+          description: How hard the voicing is to fret cleanly.
+        technique_tags:
+          type: array
+          items:
+            type: string
+            enum:
+              - open
+              - barre
+              - partial_barre
+              - stretch
+              - thumb
+          description: What the voicing asks of the fretting hand; empty when nothing in particular.
+        shape_family:
+          type: [string, "null"]
+          enum:
+            - open
+            - e_shape
+            - a_shape
+            - d_shape
+            - shell
+            - drop_2
+            - drop_3
+            - null
+          description: The shape the voicing belongs to; null when it fits none.
+        is_movable:
+          type: boolean
+          description: |
+            Whether the shape keeps its fingering when moved along the neck
+            (no open strings among its sounded notes).
+        recommended_rank:
+          type: integer
+          minimum: 1
+          description: |
+            1 is the voicing offered first for its chord. Ranks are unique
+            within a chord.
+        catalog_status:
+          type: string
+          enum:
+            - active
+            - withdrawn
+          description: |
+            withdrawn voicings stay for the content that embeds their
+            diagram but are no longer offered. Only active voicings are
+            listed in a ChordDefinition.
+        provenance:
+          type: object
+          description: Where the voicing came from.
+          properties:
+            source:
+              type: string
+              enum:
+                - hand_authored
+                - template
+              description: hand_authored voicings are written one by one; template voicings are generated from a movable shape.
+            template_key:
+              type: [string, "null"]
+              description: The shape template that generated the voicing; null for a hand-authored one.
+          required:
+            - source
+            - template_key
+      required:
+        - chord_voicing_id
+        - chord_definition_id
+        - diagram_id
+        - instrument_id
+        - tuning_fingerprint
+        - fret_window
+        - fingering
+        - muted_strings
+        - omitted_intervals
+        - difficulty
+        - technique_tags
+        - shape_family
+        - is_movable
+        - recommended_rank
+        - catalog_status
+        - provenance
 
     DiagramRef:
       type: object

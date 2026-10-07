@@ -1,0 +1,1604 @@
+{
+  "parser": "chord_symbol.v1",
+  "description": "How a chord symbol, as an author writes it, is read: its root, quality and slash bass, or why it isn't a chord. Rules: README.md.",
+  "cases": [
+    {
+      "name": "C major, canonical suffix",
+      "input": "C",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C"
+        }
+      }
+    },
+    {
+      "name": "C minor, canonical suffix",
+      "input": "Cm",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm"
+        }
+      }
+    },
+    {
+      "name": "C power, canonical suffix",
+      "input": "C5",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "power",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C5"
+        }
+      }
+    },
+    {
+      "name": "C diminished, canonical suffix",
+      "input": "Cdim",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "diminished",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cdim"
+        }
+      }
+    },
+    {
+      "name": "C augmented, canonical suffix",
+      "input": "Caug",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "augmented",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Caug"
+        }
+      }
+    },
+    {
+      "name": "C sus2, canonical suffix",
+      "input": "Csus2",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "sus2",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Csus2"
+        }
+      }
+    },
+    {
+      "name": "C sus4, canonical suffix",
+      "input": "Csus4",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "sus4",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Csus4"
+        }
+      }
+    },
+    {
+      "name": "C major_6, canonical suffix",
+      "input": "C6",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major_6",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C6"
+        }
+      }
+    },
+    {
+      "name": "C minor_6, canonical suffix",
+      "input": "Cm6",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_6",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm6"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7, canonical suffix",
+      "input": "C7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7"
+        }
+      }
+    },
+    {
+      "name": "C major_7, canonical suffix",
+      "input": "Cmaj7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cmaj7"
+        }
+      }
+    },
+    {
+      "name": "C minor_7, canonical suffix",
+      "input": "Cm7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm7"
+        }
+      }
+    },
+    {
+      "name": "C minor_major_7, canonical suffix",
+      "input": "CmMaj7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "CmMaj7"
+        }
+      }
+    },
+    {
+      "name": "C half_diminished_7, canonical suffix",
+      "input": "Cm7b5",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "half_diminished_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm7b5"
+        }
+      }
+    },
+    {
+      "name": "C diminished_7, canonical suffix",
+      "input": "Cdim7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "diminished_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cdim7"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_sus4, canonical suffix",
+      "input": "C7sus4",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_sus4",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7sus4"
+        }
+      }
+    },
+    {
+      "name": "C add_9, canonical suffix",
+      "input": "Cadd9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "add_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cadd9"
+        }
+      }
+    },
+    {
+      "name": "C minor_add_9, canonical suffix",
+      "input": "Cmadd9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_add_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cmadd9"
+        }
+      }
+    },
+    {
+      "name": "C dominant_9, canonical suffix",
+      "input": "C9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C9"
+        }
+      }
+    },
+    {
+      "name": "C major_9, canonical suffix",
+      "input": "Cmaj9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cmaj9"
+        }
+      }
+    },
+    {
+      "name": "C minor_9, canonical suffix",
+      "input": "Cm9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm9"
+        }
+      }
+    },
+    {
+      "name": "C dominant_11, canonical suffix",
+      "input": "C11",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_11",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C11"
+        }
+      }
+    },
+    {
+      "name": "C minor_11, canonical suffix",
+      "input": "Cm11",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_11",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm11"
+        }
+      }
+    },
+    {
+      "name": "C dominant_13, canonical suffix",
+      "input": "C13",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_13",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C13"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_flat_5, canonical suffix",
+      "input": "C7b5",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_flat_5",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7b5"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_sharp_5, canonical suffix",
+      "input": "C7#5",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_sharp_5",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7#5"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_flat_9, canonical suffix",
+      "input": "C7b9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_flat_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7b9"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_sharp_9, canonical suffix",
+      "input": "C7#9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_sharp_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7#9"
+        }
+      }
+    },
+    {
+      "name": "C major, alias 'M'",
+      "input": "CM",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C"
+        }
+      }
+    },
+    {
+      "name": "C major, alias 'maj'",
+      "input": "Cmaj",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C"
+        }
+      }
+    },
+    {
+      "name": "C minor, alias 'min'",
+      "input": "Cmin",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm"
+        }
+      }
+    },
+    {
+      "name": "C minor, alias '-'",
+      "input": "C-",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm"
+        }
+      }
+    },
+    {
+      "name": "C diminished, alias '°'",
+      "input": "C°",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "diminished",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cdim"
+        }
+      }
+    },
+    {
+      "name": "C augmented, alias '+'",
+      "input": "C+",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "augmented",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Caug"
+        }
+      }
+    },
+    {
+      "name": "C sus4, alias 'sus'",
+      "input": "Csus",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "sus4",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Csus4"
+        }
+      }
+    },
+    {
+      "name": "C major_6, alias 'M6'",
+      "input": "CM6",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major_6",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C6"
+        }
+      }
+    },
+    {
+      "name": "C major_6, alias 'maj6'",
+      "input": "Cmaj6",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major_6",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C6"
+        }
+      }
+    },
+    {
+      "name": "C minor_6, alias 'min6'",
+      "input": "Cmin6",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_6",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm6"
+        }
+      }
+    },
+    {
+      "name": "C minor_6, alias '-6'",
+      "input": "C-6",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_6",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm6"
+        }
+      }
+    },
+    {
+      "name": "C major_7, alias 'M7'",
+      "input": "CM7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cmaj7"
+        }
+      }
+    },
+    {
+      "name": "C major_7, alias 'Δ7'",
+      "input": "CΔ7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cmaj7"
+        }
+      }
+    },
+    {
+      "name": "C major_7, alias 'Δ'",
+      "input": "CΔ",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cmaj7"
+        }
+      }
+    },
+    {
+      "name": "C major_7, alias 'ma7'",
+      "input": "Cma7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cmaj7"
+        }
+      }
+    },
+    {
+      "name": "C minor_7, alias 'min7'",
+      "input": "Cmin7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm7"
+        }
+      }
+    },
+    {
+      "name": "C minor_7, alias '-7'",
+      "input": "C-7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm7"
+        }
+      }
+    },
+    {
+      "name": "C minor_major_7, alias 'mM7'",
+      "input": "CmM7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "CmMaj7"
+        }
+      }
+    },
+    {
+      "name": "C minor_major_7, alias 'm(maj7)'",
+      "input": "Cm(maj7)",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "CmMaj7"
+        }
+      }
+    },
+    {
+      "name": "C minor_major_7, alias 'minMaj7'",
+      "input": "CminMaj7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "CmMaj7"
+        }
+      }
+    },
+    {
+      "name": "C minor_major_7, alias 'mΔ7'",
+      "input": "CmΔ7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "CmMaj7"
+        }
+      }
+    },
+    {
+      "name": "C minor_major_7, alias '-Δ7'",
+      "input": "C-Δ7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "CmMaj7"
+        }
+      }
+    },
+    {
+      "name": "C half_diminished_7, alias 'm7(b5)'",
+      "input": "Cm7(b5)",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "half_diminished_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm7b5"
+        }
+      }
+    },
+    {
+      "name": "C half_diminished_7, alias '-7b5'",
+      "input": "C-7b5",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "half_diminished_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm7b5"
+        }
+      }
+    },
+    {
+      "name": "C half_diminished_7, alias 'ø'",
+      "input": "Cø",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "half_diminished_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm7b5"
+        }
+      }
+    },
+    {
+      "name": "C half_diminished_7, alias 'ø7'",
+      "input": "Cø7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "half_diminished_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm7b5"
+        }
+      }
+    },
+    {
+      "name": "C diminished_7, alias '°7'",
+      "input": "C°7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "diminished_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cdim7"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_sus4, alias '7sus'",
+      "input": "C7sus",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_sus4",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7sus4"
+        }
+      }
+    },
+    {
+      "name": "C add_9, alias '(add9)'",
+      "input": "C(add9)",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "add_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cadd9"
+        }
+      }
+    },
+    {
+      "name": "C minor_add_9, alias 'm(add9)'",
+      "input": "Cm(add9)",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_add_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cmadd9"
+        }
+      }
+    },
+    {
+      "name": "C major_9, alias 'M9'",
+      "input": "CM9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cmaj9"
+        }
+      }
+    },
+    {
+      "name": "C major_9, alias 'Δ9'",
+      "input": "CΔ9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cmaj9"
+        }
+      }
+    },
+    {
+      "name": "C minor_9, alias 'min9'",
+      "input": "Cmin9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm9"
+        }
+      }
+    },
+    {
+      "name": "C minor_9, alias '-9'",
+      "input": "C-9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm9"
+        }
+      }
+    },
+    {
+      "name": "C minor_11, alias 'min11'",
+      "input": "Cmin11",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_11",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm11"
+        }
+      }
+    },
+    {
+      "name": "C minor_11, alias '-11'",
+      "input": "C-11",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "minor_11",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cm11"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_flat_5, alias '7(b5)'",
+      "input": "C7(b5)",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_flat_5",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7b5"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_sharp_5, alias '7(#5)'",
+      "input": "C7(#5)",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_sharp_5",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7#5"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_sharp_5, alias '7+5'",
+      "input": "C7+5",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_sharp_5",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7#5"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_sharp_5, alias '+7'",
+      "input": "C+7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_sharp_5",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7#5"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_sharp_5, alias 'aug7'",
+      "input": "Caug7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_sharp_5",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7#5"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_flat_9, alias '7(b9)'",
+      "input": "C7(b9)",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_flat_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7b9"
+        }
+      }
+    },
+    {
+      "name": "C dominant_7_sharp_9, alias '7(#9)'",
+      "input": "C7(#9)",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "dominant_7_sharp_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C7#9"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: Bbmaj7",
+      "input": "Bbmaj7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "Bb",
+          "root_pitch_class": 10,
+          "quality": "major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Bbmaj7"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: B♭M7",
+      "input": "B♭M7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "Bb",
+          "root_pitch_class": 10,
+          "quality": "major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Bbmaj7"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: BbΔ7",
+      "input": "BbΔ7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "Bb",
+          "root_pitch_class": 10,
+          "quality": "major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Bbmaj7"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: F#m7b5",
+      "input": "F#m7b5",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "F#",
+          "root_pitch_class": 6,
+          "quality": "half_diminished_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "F#m7b5"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: F♯ø",
+      "input": "F♯ø",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "F#",
+          "root_pitch_class": 6,
+          "quality": "half_diminished_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "F#m7b5"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: A#m",
+      "input": "A#m",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "A#",
+          "root_pitch_class": 10,
+          "quality": "minor",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "A#m"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: Ebm",
+      "input": "Ebm",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "Eb",
+          "root_pitch_class": 3,
+          "quality": "minor",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Ebm"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: Gb7",
+      "input": "Gb7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "Gb",
+          "root_pitch_class": 6,
+          "quality": "dominant_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Gb7"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: Cb",
+      "input": "Cb",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "Cb",
+          "root_pitch_class": 11,
+          "quality": "major",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cb"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: E#",
+      "input": "E#",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "E#",
+          "root_pitch_class": 5,
+          "quality": "major",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "E#"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: Cb5",
+      "input": "Cb5",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "Cb",
+          "root_pitch_class": 11,
+          "quality": "power",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Cb5"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: Abmaj7",
+      "input": "Abmaj7",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "Ab",
+          "root_pitch_class": 8,
+          "quality": "major_7",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Abmaj7"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: Db9",
+      "input": "Db9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "Db",
+          "root_pitch_class": 1,
+          "quality": "dominant_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Db9"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: B♭7♭9",
+      "input": "B♭7♭9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "Bb",
+          "root_pitch_class": 10,
+          "quality": "dominant_7_flat_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Bb7b9"
+        }
+      }
+    },
+    {
+      "name": "root and accidentals: G7♯9",
+      "input": "G7♯9",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "G",
+          "root_pitch_class": 7,
+          "quality": "dominant_7_sharp_9",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "G7#9"
+        }
+      }
+    },
+    {
+      "name": "slash chord: D/F#",
+      "input": "D/F#",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "D",
+          "root_pitch_class": 2,
+          "quality": "major",
+          "bass": "F#",
+          "bass_pitch_class": 6,
+          "canonical_symbol": "D/F#"
+        }
+      }
+    },
+    {
+      "name": "slash chord: C/G",
+      "input": "C/G",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major",
+          "bass": "G",
+          "bass_pitch_class": 7,
+          "canonical_symbol": "C/G"
+        }
+      }
+    },
+    {
+      "name": "slash chord: G/B",
+      "input": "G/B",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "G",
+          "root_pitch_class": 7,
+          "quality": "major",
+          "bass": "B",
+          "bass_pitch_class": 11,
+          "canonical_symbol": "G/B"
+        }
+      }
+    },
+    {
+      "name": "slash chord: Am/G",
+      "input": "Am/G",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "A",
+          "root_pitch_class": 9,
+          "quality": "minor",
+          "bass": "G",
+          "bass_pitch_class": 7,
+          "canonical_symbol": "Am/G"
+        }
+      }
+    },
+    {
+      "name": "slash chord: C/E",
+      "input": "C/E",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major",
+          "bass": "E",
+          "bass_pitch_class": 4,
+          "canonical_symbol": "C/E"
+        }
+      }
+    },
+    {
+      "name": "slash chord: Fmaj7/A",
+      "input": "Fmaj7/A",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "F",
+          "root_pitch_class": 5,
+          "quality": "major_7",
+          "bass": "A",
+          "bass_pitch_class": 9,
+          "canonical_symbol": "Fmaj7/A"
+        }
+      }
+    },
+    {
+      "name": "slash chord: Bb/D",
+      "input": "Bb/D",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "Bb",
+          "root_pitch_class": 10,
+          "quality": "major",
+          "bass": "D",
+          "bass_pitch_class": 2,
+          "canonical_symbol": "Bb/D"
+        }
+      }
+    },
+    {
+      "name": "slash chord: C/C",
+      "input": "C/C",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "C",
+          "root_pitch_class": 0,
+          "quality": "major",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "C"
+        }
+      }
+    },
+    {
+      "name": "slash chord: Am/A",
+      "input": "Am/A",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "A",
+          "root_pitch_class": 9,
+          "quality": "minor",
+          "bass": null,
+          "bass_pitch_class": null,
+          "canonical_symbol": "Am"
+        }
+      }
+    },
+    {
+      "name": "slash chord: D/F♯",
+      "input": "D/F♯",
+      "expected": {
+        "status": "parsed",
+        "parsed": {
+          "root": "D",
+          "root_pitch_class": 2,
+          "quality": "major",
+          "bass": "F#",
+          "bass_pitch_class": 6,
+          "canonical_symbol": "D/F#"
+        }
+      }
+    },
+    {
+      "name": "no chord: N.C.",
+      "input": "N.C.",
+      "expected": {
+        "status": "no_chord"
+      }
+    },
+    {
+      "name": "no chord: NC",
+      "input": "NC",
+      "expected": {
+        "status": "no_chord"
+      }
+    },
+    {
+      "name": "unparsed: German H is not a root",
+      "input": "H7",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unparsed_symbol"
+      }
+    },
+    {
+      "name": "unparsed: lowercase root",
+      "input": "cm",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unparsed_symbol"
+      }
+    },
+    {
+      "name": "unparsed: slash without a bass",
+      "input": "C/",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unparsed_symbol"
+      }
+    },
+    {
+      "name": "unparsed: bass is not a note",
+      "input": "C/H",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unparsed_symbol"
+      }
+    },
+    {
+      "name": "unparsed: bass is a chord, not a note",
+      "input": "C/Gm",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unparsed_symbol"
+      }
+    },
+    {
+      "name": "unparsed: leading space",
+      "input": " C",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unparsed_symbol"
+      }
+    },
+    {
+      "name": "unparsed: space inside",
+      "input": "C m7",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unparsed_symbol"
+      }
+    },
+    {
+      "name": "unparsed: incomplete no-chord marking",
+      "input": "N.C",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unparsed_symbol"
+      }
+    },
+    {
+      "name": "unparsed: no root",
+      "input": "7",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unparsed_symbol"
+      }
+    },
+    {
+      "name": "unsupported quality: sharp eleven is not a supported quality",
+      "input": "C7#11",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unsupported_quality"
+      }
+    },
+    {
+      "name": "unsupported quality: extra alteration",
+      "input": "Cm7b5b9",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unsupported_quality"
+      }
+    },
+    {
+      "name": "unsupported quality: add11 is not supported",
+      "input": "Cadd11",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unsupported_quality"
+      }
+    },
+    {
+      "name": "unsupported quality: double flat root reads as Bb plus an unknown suffix",
+      "input": "Bbb",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unsupported_quality"
+      }
+    },
+    {
+      "name": "unsupported quality: major thirteenth is not supported",
+      "input": "Cmaj13",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unsupported_quality"
+      }
+    },
+    {
+      "name": "unsupported quality: unknown suffix",
+      "input": "Csus24",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unsupported_quality"
+      }
+    },
+    {
+      "name": "unsupported quality: unknown alteration of maj7",
+      "input": "CM7b5",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unsupported_quality"
+      }
+    },
+    {
+      "name": "unsupported quality: solfège Dó is not read as a root, and o is not a diminished alias",
+      "input": "Do",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unsupported_quality"
+      }
+    },
+    {
+      "name": "unsupported quality: solfège Dó7 is not read as D diminished seventh",
+      "input": "Do7",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unsupported_quality"
+      }
+    }
+  ]
+}
