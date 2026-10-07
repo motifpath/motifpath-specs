@@ -1,0 +1,40 @@
+# Pattern: navigation
+
+**Source:** ADR-049 §1 and §5; decided in MOT-43 (2026-10-07)
+
+## When
+
+Every learner screen outside a practice run: the App Shell. A practice run uses the Practice Shell
+instead, with no global navigation (see the session pattern). Authoring screens keep their own app
+bar and are desktop-first.
+
+## Why
+
+A student on a phone, often with an instrument nearby, should reach every main place in one tap and
+always find it in the same spot. A menu behind a hamburger costs an extra tap and hides where the
+student can go.
+
+## How
+
+- **Five destinations, always in this order:** Home · Practice · My path · Learning · Discover.
+- **The container follows the size class, never the content:**
+  - Compact (< 600 px): a bottom navigation bar. Every item shows its icon and its label; the
+    current one gets an indicator pill behind the icon and a bolder label. Touch targets are at
+    least 48 px, and the bar sits above the home-indicator safe area.
+  - Medium (600–839 px): a navigation rail on the left, with the same items.
+  - Expanded (≥ 840 px): a sidebar with icon and label rows.
+- **Account and settings** sit behind the avatar: theme, language, sign out. On Compact the menu also
+  holds "Teach" for teachers and admins; on Expanded, "Teach" sits in the sidebar under a divider,
+  apart from the learner destinations.
+- **Practice** opens the session setup directly, never a page in between.
+- **Discover** joins the course and path catalogs behind a Courses | Paths segmented control.
+- **Back** closes the topmost layer (menu, sheet, dialog) before it leaves the destination.
+- Labels are short nouns that fit one line in pt-BR on a 360 px screen: Início, Praticar, Trilha,
+  Aprender, Explorar.
+
+## Do not
+
+- Add a sixth destination. A new place is reached from one of the five.
+- Hide navigation behind a menu button on any size class.
+- Mark the current destination by colour alone.
+- Show the learner navigation during a practice run, or before the visitor has signed in.

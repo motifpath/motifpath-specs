@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.28.0
+  version: 0.29.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -5666,8 +5666,10 @@ paths:
       description: |
         The first view of the home, before the student picks an instrument: on how
         many of the last 7 days they practised on any instrument and completed a content
-        node, and one card per instrument with that instrument's practice days and its top
-        next step. Each instrument's full picture is its practice summary.
+        node, how many minutes they practised this week and the week before, their current
+        and best day streak, how many skills improved this week, and one card per
+        instrument with that instrument's practice days and its top next step. Each
+        instrument's full picture is its practice summary.
 
         Derived from the student's activity; reading it changes nothing.
 
@@ -11853,6 +11855,41 @@ components:
             On how many of the last 7 calendar days, in the given time zone, the student
             completed at least one content node. Never a streak: a missed day is never a
             reset.
+        minutes_practised_last_7:
+          type: integer
+          minimum: 0
+          description: |
+            Whole minutes practised in sessions that started on the last 7 calendar days,
+            today included, in the given time zone, on any instrument or without one. Each
+            session counts from its start to its last practice event, including a session
+            left early or abandoned. The sum is rounded down to whole minutes.
+        minutes_practised_previous_7:
+          type: integer
+          minimum: 0
+          description: |
+            The same measure as minutes_practised_last_7, for the 7 calendar days before
+            those, so the home can show the change against the week before.
+        day_streak_current:
+          type: integer
+          minimum: 0
+          description: |
+            How many consecutive calendar days, in the given time zone, were practice days
+            (the same days practice_days_last_7 counts), ending today, or ending yesterday
+            while the student has not practised yet today. 0 when neither today nor
+            yesterday was a practice day.
+        day_streak_best:
+          type: integer
+          minimum: 0
+          description: |
+            The longest run of consecutive practice days the student has ever had, in the
+            given time zone. Never less than day_streak_current.
+        skills_up_last_7:
+          type: integer
+          minimum: 0
+          description: |
+            How many skills, counted once per instrument, have at least one improved measure
+            in that instrument's progress this week (accuracy, fluency or best clean tempo
+            higher now than 7 days ago). Concepts are not counted.
         instruments:
           type: array
           items:
@@ -11863,6 +11900,11 @@ components:
       required:
         - practice_days_last_7
         - learning_days_last_7
+        - minutes_practised_last_7
+        - minutes_practised_previous_7
+        - day_streak_current
+        - day_streak_best
+        - skills_up_last_7
         - instruments
 
     PracticeInstrumentCard:
