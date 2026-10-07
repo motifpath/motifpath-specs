@@ -1,5 +1,14 @@
 # PR Review — Changelog
 
+## [1.8.0] — 2026-10-07
+
+### Changed
+- `HEURISTICS.md` item 4 (second-order effect) also asks whether a change adds rows of a new kind
+  to a table that other code reads through a broad filter, so every existing reader picks them up.
+  From the core#95 review: chord voicings installed as basic diagrams with playback would have
+  entered the knowledge rollup and the practice composer, lowering students' levels on the chord
+  skills.
+
 ## [1.7.0] — 2026-10-06
 
 ### Changed

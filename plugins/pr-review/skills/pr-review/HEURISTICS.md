@@ -43,10 +43,15 @@ plus the five always-on items.
 3. **Reuse fit.** Does the reused routine return what I need, or does it carry weight (fields,
    ordering, no limit) my caller doesn't use — and does it change the scale it was built for? —
    *Smell:* reusing something built for dozens of items on a path that sees thousands.
-4. **Second-order effect / invariant.** Does the change alter a guarantee other code assumes? —
-   *Smell:* "just optimized," "just swapped a parameter," with no map of who depends on it. In
-   `motifpath-core` this is explicitly the monorepo boundary: does a change quietly make
-   `core-domain` and `event-ingestion` depend on each other?
+4. **Second-order effect / invariant.** Does the change alter a guarantee other code assumes —
+   including by adding rows of a new kind to a table or collection that other code reads through a
+   broad filter (by type, owner, classification), so every existing reader now picks them up? —
+   *Smell:* "just optimized," "just swapped a parameter," "just installed more reference data,"
+   with no map of who depends on it; a new discriminator column whose default only the new code
+   path filters on. In `motifpath-core` this is explicitly the monorepo boundary: does a change
+   quietly make `core-domain` and `event-ingestion` depend on each other? (From core#95: chord
+   voicings installed as basic diagrams with playback entered the knowledge rollup and session
+   composer, which select basic playable diagrams by skill.)
 
 23. **A pointer into a collection that someone else can change.** Does state that points at an item
     (a selection, cursor, focus, "current" item, pagination offset) hold its *position*, while
