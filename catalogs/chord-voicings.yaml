@@ -71,6 +71,21 @@ templates:
      strings: {6: [0, "3"], 4: [0, "3"], 3: [0, "4"], 2: [-2, "1"], 1: [-2, "1"]}}
   - {key: dominant-13-e-shape, quality: dominant_13, shape_family: e_shape, root_string: 6, difficulty: advanced, technique_tags: [],
      strings: {6: [0, "1"], 4: [0, "2"], 3: [1, "3"], 2: [2, "4"]}}
+  # ── Root on string 4 ──
+  - {key: major-d-shape, quality: major, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [],
+     strings: {4: [0, "1"], 3: [2, "2"], 2: [3, "4"], 1: [2, "3"]}}
+  - {key: minor-d-shape, quality: minor, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [],
+     strings: {4: [0, "1"], 3: [2, "3"], 2: [3, "4"], 1: [1, "2"]}}
+  - {key: dominant-7-d-shape, quality: dominant_7, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [],
+     strings: {4: [0, "1"], 3: [2, "3"], 2: [1, "2"], 1: [2, "4"]}}
+  - {key: major-7-d-shape, quality: major_7, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [partial_barre],
+     strings: {4: [0, "1"], 3: [2, "3"], 2: [2, "3"], 1: [2, "3"]}}
+  - {key: minor-7-d-shape, quality: minor_7, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [partial_barre],
+     strings: {4: [0, "1"], 3: [2, "3"], 2: [1, "2"], 1: [1, "2"]}}
+  - {key: sus2-d-shape, quality: sus2, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [partial_barre],
+     strings: {4: [0, "1"], 3: [2, "3"], 2: [3, "4"], 1: [0, "1"]}}
+  - {key: sus4-d-shape, quality: sus4, shape_family: d_shape, root_string: 4, difficulty: intermediate, technique_tags: [],
+     strings: {4: [0, "1"], 3: [2, "2"], 2: [3, "3"], 1: [3, "4"]}}
   # ── Root on string 5 ──
   - {key: major-a-shape, quality: major, shape_family: a_shape, root_string: 5, difficulty: intermediate, technique_tags: [barre],
      strings: {5: [0, "1"], 4: [2, "3"], 3: [2, "3"], 2: [2, "3"], 1: [0, "1"]}}

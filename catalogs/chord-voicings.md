@@ -76,7 +76,8 @@ guitar catalog.
 
 - **Names**, in `en` and `pt_BR`: the canonical symbol, then the shape.
   - Open voicings: "Am — open" / "Am — aberto".
-  - E- and A-shape templates: "Bbmaj7 — A shape, fret 1" / "Bbmaj7 — forma de Lá, casa 1".
+  - E-, A- and D-shape templates: "Bbmaj7 — A shape, fret 1" / "Bbmaj7 — forma de Lá, casa 1";
+    "F — D shape, fret 3" / "F — forma de Ré, casa 3".
   - Other templates: "Cm7b5 — root on string 5, fret 3" / "Cm7b5 — tônica na 5ª corda, casa 3".
 - **Root note** is the chord's root as the catalog spells it, and `mode` is null.
 - **Positions**, one per sounded string, each with the formula interval it sounds, or for a slash
@@ -143,9 +144,16 @@ UUID v5 under the catalog namespace (`reference-data.md`):
 
 ## Coverage in v1
 
-v1 has 35 templates and 36 open voicings, which give 454 voicings across 341 chords. Every one of
-the 336 non-slash chords has at least one voicing. D-shape, shell and drop-2/drop-3 families, and
-more inversions, are later additions.
+v1 has 42 templates and 36 open voicings, which give 538 voicings across 341 chords. Every one of
+the 336 non-slash chords has at least one voicing.
+
+- The E-shape (root on string 6) and A-shape (root on string 5) families cover the common triads
+  and sevenths.
+- The D-shape family (root on string 4) covers major, minor, 7, maj7, m7, sus2 and sus4.
+- The other qualities have one root-on-string-5 grip each.
+
+Shell and drop-2/drop-3 families for the seventh, extended and altered chords, and more inversions,
+are later additions.
 
 ## Acceptance
 
