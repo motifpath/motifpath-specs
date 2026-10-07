@@ -66,6 +66,7 @@ Feature: Derive a student's knowledge of an item from evidence
     When "alice" rates a take of "pentatonic-run" as "struggled" at 100 BPM
     Then the take is counted as a miss
 
+  # Parked until ADR-046 follow-up slice 5 (teacher notes): no teacher review exists yet.
   @wip
   Scenario: A teacher review resets the student's own best clean tempo
     Given "alice" rated "pentatonic-run" clean at 120 BPM

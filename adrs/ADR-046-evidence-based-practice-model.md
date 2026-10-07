@@ -559,6 +559,17 @@ shown from evidence (tempo history, speed per string, levels).
    Validate with a WhatsApp Wizard-of-Oz before building the review UI.
 6. **The feed into recommendations** (PB-8g). Authored exercises and the S7 challenge moved to slice 3.
 
+**Status, 2026-10-07 (PB-22 slices 1–4 closed):** slices 1–4 have shipped, apart from what needs real
+sessions or a teacher:
+
+- **Threshold calibration** and **the team benchmark (version 2)** wait for data. Calibration runs only
+  from about 100 felt-rated sessions by 20 students, and there are none before real students practise;
+  felt ratings are already collected, so nothing is lost meanwhile. The three calibration scenarios in
+  `timed-thresholds.feature` stay `@wip` until then.
+- **Teacher suggestions in sessions** and **a teacher review resetting the best clean tempo** belong to
+  slice 5: there is no teacher note yet to suggest or review from. Their scenarios in
+  `compose-practice-session.feature` and `knowledge-state.feature` stay `@wip` until slice 5.
+
 ## Related ADRs
 
 - **ADR-006** (Kafka topology): `student_id` partitioning makes the evidence processor a single writer

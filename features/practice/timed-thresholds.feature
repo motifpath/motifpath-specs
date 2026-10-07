@@ -14,6 +14,8 @@ Feature: Judge timed drills against versioned fluent times
     Then the answer took 1900 milliseconds net of tap time
     And it counts as within the fluent time
 
+  # Parked: calibration needs about 100 felt-rated sessions by 20 students (ADR-046 follow-up
+  # slices, status 2026-10-07), so it waits for real students. Same for the next two calibration scenarios.
   @wip
   Scenario: Calibration adds a version once the template has enough felt-rated sessions
     Given "fretboard_cell:name_the_note" has 120 felt-rated sessions from 25 students
