@@ -1,7 +1,7 @@
 # ADR-051: Minutes Practised and a Day Streak on the Home
 
-**Status:** Proposed
-**Date:** 2026-10-07
+**Status:** Accepted
+**Date:** 2026-10-07 (Proposed) · 2026-10-07 (Accepted, in review of specs#235)
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
 **Task:** MOT-43
 **Amends:** ADR-046 (the "counts, never streaks" decision for the home)
@@ -114,4 +114,4 @@ days, learning days and every other rule there remain.
 
 ---
 
-*This ADR was proposed on 2026-10-07. To revise, create a new ADR with Status: Supersedes ADR-051.*
+*This ADR was proposed and accepted on 2026-10-07. To revise, create a new ADR with Status: Supersedes ADR-051.*

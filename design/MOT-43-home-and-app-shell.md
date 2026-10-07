@@ -1,8 +1,8 @@
 # MOT-43 — App Shell, Home and Your progress
 
-**Status:** Proposed — for PO review
+**Status:** Approved by the PO (Gilson), 2026-10-07
 **Date:** 2026-10-07
-**Decides under:** ADR-049 (experience language), ADR-051 (minutes and day streak, Proposed)
+**Decides under:** ADR-049 (experience language), ADR-051 (minutes and day streak, Accepted)
 **Figma:** [MotifPath — Experience Language](https://www.figma.com/design/TJmPotheGhPe5npXMZWQEB):
 pages *App Shell* (Option A), *Home — exploration* (H3, revised) and *Components*. Figma explores;
 code and Storybook are the source of truth (ADR-049 §8).
@@ -75,8 +75,9 @@ Each new component gets a Storybook story (motifpath-web#100 enforces one per sh
 4. Home: Today's practice, PathCard, This week tiles, Your skills.
 5. Your progress page.
 
-## Open for PO review
+## Approved
 
+- The home (H3, revised) and Your progress, as above.
 - ADR-051's definitions: minutes count every session (even left early); the streak ends at yesterday
   until today is over; skills up count once per instrument.
-- Whether the "minutes vs last week" change shows on a lower week at all, or only when it went up.
+- A lower week's minutes still show the change, in a neutral colour (`features/web/home.feature`).
