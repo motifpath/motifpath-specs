@@ -26,17 +26,14 @@ Feature: Practise diagram shapes in the head
     When a shape of family "minor-pentatonic-box" is picked for practice
     Then it can be asked through "diagram_shape:name_the_shape" or "diagram_shape:find_the_degree"
 
-  @wip
   Scenario: Naming a shape offers every member of its family
     When the shape "C major — CAGED A, shift 3" is asked as name_the_shape
     Then the options are "C shape", "A shape", "G shape", "E shape" and "D shape", in that order
 
-  @wip
   Scenario: Finding a degree asks one of the shape's degrees other than its root
-    When the shape "A minor pentatonic — Box 1, fret 5" is asked as find_the_degree
+    When the shape "A Minor pentatonic — Box 1, fret 5" is asked as find_the_degree
     Then the asked degree is one of "b3", "4", "5" and "b7"
 
-  @wip
   Scenario: A shape counts toward its diagram's skill
     Given student "alice" plays "guitar"
     And the only practice items of skill "map-fretboard-caged" on guitar are 5 shapes
@@ -46,7 +43,6 @@ Feature: Practise diagram shapes in the head
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: The options include a member that doesn't fit at this root
     When the shape "B major — CAGED A, shift 2" is asked as name_the_shape
     Then the options include "C shape", although B has no C-shape grip inside frets 0–12
@@ -59,7 +55,6 @@ Feature: Practise diagram shapes in the head
     When the shapes of every family are listed
     Then the diagram "C Chromatic map — Frets 0–12" is not among them
 
-  @wip
   Scenario: A shape suits the instruments its diagram is linked to
     When the shape "C major — CAGED A, shift 3" is listed
     Then it suits "guitar" and "electric-guitar" and no other instrument
