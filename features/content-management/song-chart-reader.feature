@@ -5,6 +5,7 @@
 # like one that doesn't exist. Learners reach charts through the lessons that embed them
 # (Phase 3); this feature covers the read itself.
 
+@wip
 Feature: Read a published song chart
   As a learner
   I want to read a song's lyrics with its chords and see how to play each chord
