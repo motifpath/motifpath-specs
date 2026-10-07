@@ -108,13 +108,11 @@ Feature: Compose a practice session
   # In hand is for playing, in the head for recall on the screen: fretboard cells and diagram shapes
   # suit the instrument, but are only ever recalled in the head.
 
-  @wip
   Scenario: With an instrument in hand, no fretboard cell or diagram shape is picked
     Given "alice" has nothing due or weak, and 40 new fretboard cells and 20 new shapes on guitar
     When "alice" composes a 10-minute session with "guitar" in hand
     Then no item in the session is a fretboard cell or a diagram shape
 
-  @wip
   Scenario: An in-hand session with nothing to play is not found
     Given student "bob"'s only path skill is "find-notes-root-strings", practised by fretboard cells on guitar
     When "bob" composes a 10-minute session with "guitar" in hand
@@ -203,39 +201,33 @@ Feature: Compose a practice session
   # each, and its minutes are a ceiling. Equally urgent items come in random order, the drills take
   # turns, and two fretboard cells in a row are never on the same string.
 
-  @wip
   Scenario: A session asks at most 10 items of each generated drill, and may end early
     Given "alice" has nothing due or weak, and 40 new fretboard cells and 20 new shapes on guitar
     When "alice" composes a 30-minute session with no instrument in hand
     Then no drill has more than 10 items in the session
     And the session's items take less than 30 minutes
 
-  @wip
   Scenario: Authored exercises are not capped
     Given "alice" has plenty of due, weak and new items on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then the session has more than 10 exercises of one type
 
-  @wip
   Scenario: New fretboard cells come in random order, not string by string
     Given "alice" has nothing due or weak on guitar and new fretboard cells on the E and A strings
     When "alice" composes a 10-minute session with no instrument in hand
     Then the session's fretboard cells are not in string and fret order
 
-  @wip
   Scenario: Due items are taken most overdue day first, at random within a day
     Given "alice" has 4 fretboard cells due since 3 days ago and 30 due since yesterday on guitar
     When "alice" composes a 5-minute session with no instrument in hand
     Then the 4 cells due since 3 days ago are in the session
     And its other due cells are some of those due since yesterday
 
-  @wip
   Scenario: The drills take turns
     Given "alice" has nothing due or weak, and 40 new fretboard cells and 20 new shapes on guitar
     When "alice" composes a 10-minute session with no instrument in hand
     Then no two items in a row are of the same drill while another drill has items left
 
-  @wip
   Scenario: Two fretboard cells in a row are never on the same string while another string is left
     Given "alice" has nothing due or weak on guitar and new fretboard cells on the E and A strings
     When "alice" composes a 10-minute session with no instrument in hand
