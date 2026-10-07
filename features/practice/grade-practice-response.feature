@@ -40,7 +40,6 @@ Feature: Grade a practice answer into evidence
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "D" after 2500 milliseconds
     Then the evidence's answer key is string 5, fret 3, note "C"
 
-  @wip
   Scenario: Naming the right member of a diagram shape's family is a correct answer
     Given the catalog shape "C major — CAGED A, shift 3"
     When "alice" answers that shape by naming the shape "A" after 2600 milliseconds
@@ -48,7 +47,6 @@ Feature: Grade a practice answer into evidence
     And the evidence names the grader "diagram_shape.v1"
     And the evidence's answer key is the family "caged-grip", member "A"
 
-  @wip
   Scenario: Tapping a position of the asked degree is a correct answer
     Given the catalog shape "C major — CAGED A, shift 3"
     When "alice" answers that shape by finding the degree "3" on string 2 at fret 5 after 2400 milliseconds
@@ -114,19 +112,16 @@ Feature: Grade a practice answer into evidence
     When "alice" takes "open-chords-assessment" again and moves on from "minor-third-from-a" with its correct option selected
     Then "alice" has two pieces of evidence for "minor-third-from-a", the second one correct
 
-  @wip
   Scenario: Naming another member of a diagram shape's family is a wrong answer
     Given the catalog shape "C major — CAGED A, shift 3"
     When "alice" answers that shape by naming the shape "E" after 3100 milliseconds
     Then "alice" has auto-graded evidence for that shape that is wrong with a latency of 3100 milliseconds
 
-  @wip
   Scenario: Any position of the asked degree in the shape is a correct answer
     Given the catalog shape "C major — CAGED A, shift 3"
     When "alice" answers that shape by finding the degree "5" on string 1 at fret 3 after 2200 milliseconds
     Then "alice" has auto-graded evidence for that shape that is correct with a latency of 2200 milliseconds
 
-  @wip
   Scenario: Tapping the asked degree's pitch outside the shape is a wrong answer
     Given the catalog shape "C major — CAGED A, shift 3"
     When "alice" answers that shape by finding the degree "3" on string 4 at fret 2 after 3000 milliseconds
@@ -157,21 +152,18 @@ Feature: Grade a practice answer into evidence
     Then the answer is rejected because the cell is not on the instrument
     And "alice" has no evidence for that cell
 
-  @wip
   Scenario: Naming a shape its family doesn't have yields no evidence
     Given the catalog shape "C major — CAGED A, shift 3"
     When "alice" answers that shape by naming the shape "3" after 2000 milliseconds
     Then the answer is rejected because the option is unknown
     And "alice" has no evidence for that shape
 
-  @wip
   Scenario: Finding the root of a shape yields no evidence, since the root is shown
     Given the catalog shape "C major — CAGED A, shift 3"
     When "alice" answers that shape by finding the degree "R" on string 5 at fret 3 after 1500 milliseconds
     Then the answer is rejected because the degree is not in the shape
     And "alice" has no evidence for that shape
 
-  @wip
   Scenario: A diagram that isn't a drill shape yields no evidence
     Given the catalog diagram "C Chromatic map — Frets 0–12"
     When "alice" answers that diagram as a shape by naming the shape "A" after 2000 milliseconds
