@@ -116,8 +116,8 @@ Feature: Compose a practice session
 
   @wip
   Scenario: An in-hand session with nothing to play is not found
-    Given "alice"'s only practice on guitar is fretboard cells
-    When "alice" composes a 10-minute session with "guitar" in hand
+    Given student "bob"'s only path skill is "find-notes-root-strings", practised by fretboard cells on guitar
+    When "bob" composes a 10-minute session with "guitar" in hand
     Then the request is refused with a not-found error
 
   @web
