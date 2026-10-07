@@ -8245,8 +8245,7 @@ components:
         language:
           type: string
           description: |
-            The Language.code of the lyrics (not "any"). The chart's rights
-            record must cover it.
+            The Language.code of the lyrics (not "any").
         concert_key:
           type: [string, "null"]
           pattern: '^[A-G](b|#)?m?$'

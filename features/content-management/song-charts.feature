@@ -7,7 +7,6 @@
 # learners keep reading the previous one until then. What a learner reads is in
 # song-chart-reader.feature.
 
-@wip
 Feature: Author and publish song charts
   As an admin of the concierge team
   I want to write a song chart and publish it once its chords and rights are checked
