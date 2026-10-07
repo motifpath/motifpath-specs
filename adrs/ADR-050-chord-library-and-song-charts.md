@@ -15,6 +15,12 @@ It checks no territory: a rights record covers languages and, for a license, val
 Evidence is recorded as references, and no documents are uploaded. The learner reader reaches
 learners only through the `song_chart` atom (Phase 3), and "sections played" is a tap the
 learner makes. Territory returns with the license template, before the first licensed chart.
+**Amended:** 2026-10-07, by Gilson (MOT-45, during the Phase 2 spec): rights management leaves
+the application, and charts publish without a second admin (§5, §6). Clearing a song's rights
+happens outside MotifPath. A chart only records that an admin confirmed its rights were checked,
+with who and when, and it can't be published without that. Any admin publishes a chart. This
+supersedes the rights records, evidence, license dates and two-admin chart review described by
+the previous amendment.
 
 ---
 
@@ -178,10 +184,10 @@ basic-guitar diagrams are.
 
 ```
 SongChart
-  id, created_by, status (draft | in_review | published | withdrawn)
+  id, created_by, status (draft | published | withdrawn)
   title, artist, language, concert_key, capo_fret, tempo_bpm?, meter?
   tuning_fingerprint
-  rights_record_id                     → RightsRecord (§5)
+  rights_confirmation?                 // who confirmed the rights were checked, and when (§5)
   body: SongChartDocument              // versioned Tiptap/ProseMirror JSON, never HTML
 
 SongChartDocument blocks: section | lyric_paragraph | comment
@@ -193,8 +199,8 @@ chordAnchor mark on lyric text:
 
 - The learner reader derives its layout from the marked text. It never stores spaces that exist
   only to line chords up in a monospace font.
-- Publishing creates an **immutable revision**. A correction is a new revision with its own review;
-  it never rewrites what a learner was shown.
+- Publishing creates an **immutable revision**. A correction is published as a new revision; it
+  never rewrites what a learner was shown.
 - ChordPro import and export happen at the boundary. ChordPro is not a second canonical
   representation.
 - `chordAnchor` lives only in a chart-specific schema and validator. It is **not** added to
@@ -210,42 +216,30 @@ chordAnchor mark on lyric text:
 - One new rich-text node, a `song_chart` atom, references a published `SongChart` revision and
   previews it read-only.
 
-### 5. Rights gate: public domain, original or licensed — evidence recorded for every chart
+### 5. Rights are cleared outside MotifPath; a chart records that they were checked
 
-No chart can be published without a `RightsRecord` that passes the gate:
+Which songs MotifPath may show, and on what terms, is decided and documented outside the
+application. MotifPath keeps no rights records, evidence or license terms.
 
-| `basis` | Required evidence |
-| --- | --- |
-| `public_domain` | Composer and lyricist with dates, or a cited source establishing public-domain status where MotifPath serves learners; the specific lyric text used must also be in the public domain (not a later copyrighted arrangement or translation). |
-| `original` | The creator's identity and a signed permission covering lyric display and chord transcription on MotifPath. |
-| `licensed` | Licensor, license reference and a reference to the signed document, permitted uses (lyric display, chord transcription), languages, start date and end date (if any). |
-
-Gate rules:
-
-- Evidence is recorded as **references**: a source citation, or an identifier or link to where
-  the signed document is kept. MotifPath stores no evidence files. A rights record is read and
-  written by admins only and never appears in a learner response.
-- A chart is shown only when its language is one its rights record covers. A licensed chart is
-  **not** translated unless the license explicitly allows translation.
-- **No territory is checked.** A license limited to some territories can't be represented yet,
-  so no licensed chart is published until the license template (Follow-up 6) defines how
-  territory is recorded and checked.
-- When a license ends, the chart becomes unavailable to learners. The read path checks the
-  rights record at serve time, not only at publish time. Its published revisions are kept for
-  audit but not served. A `song_chart` embed whose chart is unavailable renders a neutral "not
-  available" state rather than a broken lesson.
-- A rights record belongs to the song, not to a chart revision, so a correction does not need new
-  evidence. A change of basis or license terms does need a new review.
+- A chart carries a **rights confirmation**: an admin states that the song's rights were checked.
+  The server records who confirmed and when. Clearing the confirmation removes it.
+- A chart **can't be published** without a rights confirmation. Each published revision keeps the
+  confirmation it was published with, for audit.
+- Once published, a chart is served until an admin withdraws it. Changing the draft's
+  confirmation doesn't change what learners are served; withdrawing is how a chart is taken
+  down, for rights or any other reason. Its published revisions are kept for audit but not
+  served. A `song_chart` embed whose chart is withdrawn renders a neutral "not available" state
+  rather than a broken lesson.
 
 ### 6. Roles and review
 
-- Only `admin` users (the concierge team) create and edit chord definitions, voicings, shape
-  templates, song charts and rights records. Teachers and students cannot author or publish any of
-  them.
-- Publishing a chart, and adding a voicing or template to the catalog, needs a **second admin**
-  as reviewer. The reviewer confirms rights, the musical correctness of anchors and voicings, and
-  the learner preview. The author can't approve their own submission. The review records reviewer,
-  timestamp and outcome.
+- Only `admin` users (the concierge team) create, edit and publish chord definitions, voicings,
+  shape templates and song charts. Teachers and students cannot author or publish any of them.
+- **Any admin publishes a chart**, with no second reviewer, once its rights are confirmed and
+  every chord in it resolves to a catalog chord with a voicing. The publication records who
+  published it.
+- Adding a voicing or template to the catalog needs a **second person's review**. The catalog is
+  a spec in motifpath-specs, so that review is the pull request's.
 - Learners read published charts and consult the selected chord's voicings. They can't browse the
   catalog as a directory, create, edit or share charts.
 - **Deferred, not decided:** audio-to-chart generation, including from a YouTube URL. A public
@@ -331,16 +325,22 @@ phone, and the anchor positions are only implied by spaces. HTML would lose the 
 and mix presentation with content. ChordPro gives interoperability without becoming our schema.
 Tiptap JSON with a typed mark is what the spike proved editable.
 
-**Licensed repertoire with a strict gate, instead of public domain only.** Public domain alone
-would leave informal students with mostly hymns and folk songs, which weakens the repertoire-first
-bet the feature exists to test. Licensing costs money and legal work. A rights record that is
-checked at serve time keeps an expired license from silently leaving content in front of learners.
-A self-attested checkbox was rejected because it gives no defence in a takedown.
+**Licensed repertoire, with rights cleared outside the application.** Public domain alone would
+leave informal students with mostly hymns and folk songs, which weakens the repertoire-first bet
+the feature exists to test. The first version of this decision modelled rights inside MotifPath:
+rights records with evidence per basis, license dates checked on every read, and a second admin's
+review. The Product Owner rejected that on 2026-10-07. Rights management isn't the product's
+focus, the concierge team already clears songs before charting them, and building it would delay
+the reader the hypothesis depends on. A recorded confirmation (who and when) keeps a chart from
+being published by accident without a check, and withdrawing is the takedown path.
 
-**Concierge authoring with a second reviewer.** Opening authoring to teachers would support the
-scaling thesis earlier, but it multiplies the rights exposure before the gate has been exercised. A
-single-step publish was rejected for the same reason, and because one wrong voicing is repeated in
-every chart that uses it.
+**Concierge authoring, published by one admin.** Opening authoring to teachers would support the
+scaling thesis earlier, but it multiplies the rights exposure before the concierge team has
+learned how charts go wrong. A second admin's review of every chart was dropped on 2026-10-07: the
+team is small, and the review would block publishing whenever only one admin is available. The
+risk it covered is narrower than it looks, because a wrong voicing is a catalog error and the
+catalog keeps its second-person review. A chart's own mistakes (a chord on the wrong word) are
+fixed by publishing a new revision.
 
 ## Consequences
 
@@ -360,7 +360,7 @@ every chart that uses it.
   published.
 - **A broad catalog is a larger curation and review load.** Shape templates, the transposition
   build and the musical validator have to be built and tested before the catalog exists, and every
-  template needs a second admin's review. Phase 1 is bigger than the spike's 30–50-voicing
+  template needs a second person's review. Phase 1 is bigger than the spike's 30–50-voicing
   recommendation.
 - **Materialization means many `Diagram` rows** (an estimated several hundred to low thousands), all
   owned by the catalog profile. They are hidden from the default diagram listing (§2a), so any
@@ -371,15 +371,13 @@ every chart that uses it.
 - **The squash resets every database** and loses whatever was authored only in development and
   staging. It also needs a one-time lint bypass, and the rewritten reference data has to be
   reviewed against the 8 data migrations it replaces, because a missed row disappears silently.
-- **Serve-time rights checks** add a lookup to every chart read and a learner-visible "not
-  available" state that lesson authors must expect.
-- **No territory control.** Public-domain status is confirmed by the reviewer for where
-  MotifPath serves learners, not checked per learner. A song in the public domain in Brazil but
-  not elsewhere is a reviewer's call. Licensed charts wait for the license template.
-- **Evidence lives outside MotifPath.** A reference can rot (a moved file, a revoked link), so
-  the evidence a review relied on isn't guaranteed to stay reachable.
-- **Two-admin review** slows publishing while the concierge team is small, and blocks it outright
-  when only one admin is available.
+- **MotifPath can't show why a chart was allowed.** A rights confirmation records who checked
+  and when, not what they checked. The evidence lives wherever the team keeps it, and nothing in
+  the application stops a chart from staying up after a license ends; the team has to withdraw
+  it. A withdrawn chart shows a learner-visible "not available" state that lesson authors must
+  expect.
+- **One admin can publish a chart with a mistake in it.** Nobody else checks the anchors or the
+  learner preview before learners see them. The fix is a new revision.
 - The concierge team is the only source of charts, so chart supply is limited by its capacity.
 
 ### Neutral
@@ -405,12 +403,12 @@ every chart that uses it.
    musical validator; `catalogs/chord-voicings.yaml`; `Diagram.purpose` and the `listDiagrams`
    `purpose` filter (default `general`); chord-symbol search; the read-only rule for `chord_voicing`
    diagrams in the diagram editor.
-4. Phase 2 — Gherkin and OpenAPI for `SongChart`, `RightsRecord`, review and publication, ChordPro
-   import and export, and the learner reader. Admins open the reader as a preview; learners reach
-   it through the Phase 3 atom.
+4. Phase 2 — Gherkin and OpenAPI for `SongChart`, its rights confirmation and publication,
+   ChordPro import and export, and the learner reader. Admins open the reader as a preview;
+   learners reach it through the Phase 3 atom.
 5. Phase 3 — the `song_chart` rich-text atom and the voicing picker for the `diagram` embed.
 6. Legal — a license template and review checklist for licensed songs, before the first licensed
-   chart. It also decides how a license's territory is recorded and checked.
+   chart. Both are kept outside MotifPath.
 
 ## Related ADRs
 
