@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.26.0
+  version: 0.26.1
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -10334,7 +10334,6 @@ components:
               description: The shape's family in the practice drill catalog, such as caged-grip.
             options:
               type: array
-              minItems: 2
               items:
                 type: object
                 properties:
@@ -10351,8 +10350,9 @@ components:
                   - name
               description: |
                 For name_the_shape: every member of the shape's family, in the catalog's
-                order, whichever of them exist at this root. The names never mention the root,
-                so the root shown never gives the answer away. Empty for find_the_degree.
+                order (at least two), including members that have no shape at this root, so
+                the choices never narrow the answer down. The names never mention the root, so
+                the root shown never gives the answer away either. Empty for find_the_degree.
             asked_interval:
               oneOf:
                 - $ref: './components/schemas/practice.yaml#/ShapeInterval'
