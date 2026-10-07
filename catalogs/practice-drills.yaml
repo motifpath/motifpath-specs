@@ -102,5 +102,5 @@ thresholds:
   - {template: "exercise:audio_selection", version: 1, effective_from: "2026-10-01", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 61b55338-dee3-5391-b556-dc8fe121ea6d}
   - {template: "fretboard_cell:name_the_note", version: 1, effective_from: "2026-10-06", fluent_net_ms: 3000, source: default, sessions: 0, students: 0, id: bf63ad0e-f1c7-52ba-a303-230472134f6c}
   - {template: "fretboard_cell:find_the_note", version: 1, effective_from: "2026-10-06", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: b4038212-bd6e-5749-8b39-cc8862e1974e}
-  - {template: "diagram_shape:name_the_shape", version: 1, effective_from: "2026-10-06", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 1d23d8ce-4370-5f08-9fcb-13c617874643}
-  - {template: "diagram_shape:find_the_degree", version: 1, effective_from: "2026-10-06", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 9015ea31-c12f-5cd5-a5ce-6e0c0b507644}
+  - {template: "diagram_shape:name_the_shape", version: 1, effective_from: "2026-10-07", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 1d23d8ce-4370-5f08-9fcb-13c617874643}
+  - {template: "diagram_shape:find_the_degree", version: 1, effective_from: "2026-10-07", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 9015ea31-c12f-5cd5-a5ce-6e0c0b507644}
