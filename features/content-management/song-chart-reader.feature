@@ -1,10 +1,9 @@
 # Reading a published song chart (ADR-050 §3, §5).
 #
 # A learner reads a chart's latest published revision with every chord it uses and that chord's
-# voicings, in one response. Whether a chart can be read is checked on every read, from its status
-# and its rights record as they stand then. A chart that can't be read answers exactly like one
-# that doesn't exist; admins see why in the chart's availability. Learners reach charts through
-# the lessons that embed them (Phase 3); this feature covers the read itself.
+# voicings, in one response. A chart that was never published, or was withdrawn, answers exactly
+# like one that doesn't exist. Learners reach charts through the lessons that embed them
+# (Phase 3); this feature covers the read itself.
 
 @wip
 Feature: Read a published song chart
@@ -22,7 +21,6 @@ Feature: Read a published song chart
       | voicing      | rank |
       | c-open       | 1    |
     And the song chart "Asa Branca" in "pt_BR" is published at revision 1 with the line "[G]Quando olhei a [C]terra ardendo"
-    And its rights record "asa-branca-rights" is approved and covers "pt_BR"
     And "alice" is authenticated as a student
 
   # ── Reading ──────────────────────────────────────────────────────────────────
@@ -42,30 +40,19 @@ Feature: Read a published song chart
 
   Scenario: The learner's chart carries nothing about its rights or its authors
     When "alice" reads the song chart "Asa Branca"
-    Then the chart "alice" gets holds no rights record, evidence, submitter or reviewer
+    Then the chart "alice" gets holds no rights confirmation and no author or publisher
 
-  # ── Availability, checked on every read ──────────────────────────────────────
+  # ── Charts that aren't published ─────────────────────────────────────────────
 
   Scenario: A withdrawn chart can't be read
     Given "Asa Branca" has been withdrawn
     When "alice" reads the song chart "Asa Branca"
     Then the chart is not found
 
-  Scenario: A chart whose rights record was changed and awaits review can't be read
-    Given the rights record "asa-branca-rights" has been changed and is pending review
+  Scenario: A withdrawn chart is readable again once it is published again
+    Given "Asa Branca" was withdrawn and then published again at revision 2
     When "alice" reads the song chart "Asa Branca"
-    Then the chart is not found
-
-  Scenario: An admin sees why a chart can't be read
-    Given the rights record "asa-branca-rights" has been changed and is pending review
-    And "ana" is authenticated as an admin
-    When "ana" gets the song chart "Asa Branca"
-    Then its availability is unavailable, because "rights_record_not_approved"
-
-  Scenario: A chart is readable again once its changed rights record is approved
-    Given the rights record "asa-branca-rights" was changed and then approved by a second admin
-    When "alice" reads the song chart "Asa Branca"
-    Then "alice" gets revision 1 of "Asa Branca"
+    Then "alice" gets revision 2 of "Asa Branca"
 
   Scenario: A chart that was never published can't be read
     Given the song chart "Carinhoso" has never been published

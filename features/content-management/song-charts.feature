@@ -1,30 +1,28 @@
-# Song charts: authoring, review and publication (ADR-050 §3, §5, §6).
+# Song charts: authoring and publication (ADR-050 §3, §5, §6, as amended on 2026-10-07).
 #
-# A song chart is lyrics with chords anchored to the words they fall on. Only admins author
-# charts, and a second admin approves each publication. Publishing makes an immutable revision;
-# a correction is a new revision with its own review, and learners keep reading the previous one
-# until it is approved. Rights records and their review are in rights-records.feature; what a
-# learner reads, and when, is in song-chart-reader.feature.
+# A song chart is lyrics with chords anchored to the words they fall on. Only admins author and
+# publish charts, with no second reviewer. A song's rights are cleared outside MotifPath; a chart
+# only records that an admin confirmed they were checked, and can't be published without it.
+# Publishing makes an immutable revision; a correction is published as a new revision, and
+# learners keep reading the previous one until then. What a learner reads is in
+# song-chart-reader.feature.
 
 @wip
-Feature: Author, review and publish song charts
+Feature: Author and publish song charts
   As an admin of the concierge team
-  I want to write a song chart and have a second admin approve it before learners see it
-  So that every chart a learner reads has had its chords and rights checked by two people
+  I want to write a song chart and publish it once its chords and rights are checked
+  So that every chart a learner reads plays the right chords and was cleared to be shown
 
   Background:
     Given the Core Domain Service is operational and ready to accept requests
     And the chord catalog has the chords "G", "C", "D", "Em" and "D/F#", each with an active voicing
     And "ana" is authenticated as an admin
-    And "rui" is an admin
-    And an approved public-domain rights record "asa-branca-rights" covers the language "pt_BR"
 
   # ── Authoring ────────────────────────────────────────────────────────────────
 
   Scenario: An admin starts a song chart
     When "ana" creates a song chart "Asa Branca" in "pt_BR" with the line "[G]Quando olhei a [C]terra ardendo"
     Then the chart is a draft that has never been published
-    And its draft is being edited
     And the anchor on "Quando olhei a " has the written symbol "G" and resolves to the catalog chord "G"
 
   Scenario: A chord spelled another way resolves to the catalog chord and keeps its spelling
@@ -33,31 +31,31 @@ Feature: Author, review and publish song charts
     And the anchor's written symbol is still "Gmaj"
 
   Scenario: A symbol that can't be parsed is saved as written, with a warning
-    Given "ana" has a song chart "Asa Branca" with rights record "asa-branca-rights"
+    Given "ana" has a song chart "Asa Branca"
     When "ana" changes a chord anchor of "Asa Branca" to "H7"
     Then the draft is saved
     And the anchor keeps the written symbol "H7" and resolves to no chord
     And the draft has the warning "unparsed_symbol" on that anchor, which blocks publication
 
   Scenario: A chord the catalog doesn't have is saved with a warning
-    Given "ana" has a song chart "Asa Branca" with rights record "asa-branca-rights"
+    Given "ana" has a song chart "Asa Branca"
     When "ana" changes a chord anchor of "Asa Branca" to "C#7"
     Then the draft has the warning "chord_not_in_catalog" on that anchor, which blocks publication
 
   Scenario: A slash chord the catalog doesn't have resolves to the chord without its bass
-    Given "ana" has a song chart "Asa Branca" with rights record "asa-branca-rights"
+    Given "ana" has a song chart "Asa Branca"
     When "ana" changes a chord anchor of "Asa Branca" to "C/G"
     Then the anchor resolves to the catalog chord "C"
     And the draft has the warning "bass_not_in_catalog" on that anchor, which doesn't block publication
 
   Scenario: A no-chord marking is not a warning
-    Given "ana" has a song chart "Asa Branca" with rights record "asa-branca-rights"
+    Given "ana" has a song chart "Asa Branca"
     When "ana" changes a chord anchor of "Asa Branca" to "N.C."
     Then the anchor resolves to no chord
     And the draft has no warnings
 
   Scenario: A picked voicing must belong to the anchor's chord
-    Given "ana" has a song chart "Asa Branca" with rights record "asa-branca-rights"
+    Given "ana" has a song chart "Asa Branca"
     When "ana" picks a voicing of "D" for an anchor written "G" in "Asa Branca"
     Then the draft is refused as invalid
     And the rejection identifies the anchor's chordVoicingId as the source of the error
@@ -76,102 +74,71 @@ Feature: Author, review and publish song charts
     When "alice" tries to create a song chart "Asa Branca"
     Then the request is refused because only admins author song charts
 
-  # ── Submitting for review ────────────────────────────────────────────────────
+  # ── Rights confirmation ──────────────────────────────────────────────────────
 
-  Scenario: An admin submits a draft with resolved chords and an approved rights record
-    Given "ana" has a song chart "Asa Branca" with rights record "asa-branca-rights"
-    When "ana" submits "Asa Branca" for review
-    Then the draft is in review, submitted by "ana"
+  Scenario: Confirming a chart's rights records who confirmed and when
+    Given "ana" has a song chart "Asa Branca"
+    When "ana" confirms that the rights of "Asa Branca" were checked
+    Then the draft's rights are confirmed by "ana", with the time of confirming
 
-  Scenario: A draft in review cannot be edited
-    Given "ana" has submitted the song chart "Asa Branca" for review
-    When "ana" tries to change the title of "Asa Branca"
-    Then the request is refused because the draft is in review
+  Scenario: Clearing the confirmation removes who confirmed it
+    Given "ana" has a song chart "Asa Branca" whose rights are confirmed
+    When "ana" clears the rights confirmation of "Asa Branca"
+    Then the draft's rights are not confirmed
 
-  Scenario: A draft without a rights record cannot be submitted
-    Given "ana" has a song chart "Asa Branca" with no rights record
-    When "ana" submits "Asa Branca" for review
-    Then the submission is refused as not publishable, because "missing_rights_record"
+  # ── Publishing ───────────────────────────────────────────────────────────────
 
-  Scenario: A draft whose language its rights record doesn't cover cannot be submitted
-    Given "ana" has a song chart "Asa Branca" in "en" with rights record "asa-branca-rights"
-    When "ana" submits "Asa Branca" for review
-    Then the submission is refused as not publishable, because "language_not_covered"
-
-  Scenario: A draft with a chord that blocks publication cannot be submitted, and every such chord is listed
-    Given "ana" has a song chart "Asa Branca" with rights record "asa-branca-rights"
-    And the chart has chord anchors written "H7" and "C#7"
-    When "ana" submits "Asa Branca" for review
-    Then the submission is refused as not publishable, because "unresolved_chords"
-    And the refusal lists the anchors written "H7" and "C#7"
-
-  Scenario: A draft under a licensed rights record cannot be submitted yet
-    Given an approved licensed rights record "licensed-song-rights" covers the language "pt_BR"
-    And "ana" has a song chart "Licensed Song" with rights record "licensed-song-rights"
-    When "ana" submits "Licensed Song" for review
-    Then the submission is refused as not publishable, because "licensed_basis_not_enabled"
-
-  # ── Review ───────────────────────────────────────────────────────────────────
-
-  Scenario: A second admin approves a submission, publishing revision 1
-    Given "ana" has submitted the song chart "Asa Branca" for review
-    And "rui" is authenticated as an admin
-    When "rui" approves "Asa Branca"
-    Then the chart is published at revision 1, submitted by "ana" and approved by "rui"
-    And its draft is being edited again, holding the published content
+  Scenario: An admin publishes a chart with confirmed rights and resolved chords, as revision 1
+    Given "ana" has a song chart "Asa Branca" whose rights are confirmed
+    When "ana" publishes "Asa Branca"
+    Then the chart is published at revision 1, published by "ana"
+    And revision 1 keeps the rights confirmation by "ana"
     And learners can read "Asa Branca"
 
-  Scenario: The submitter cannot approve their own submission
-    Given "ana" has submitted the song chart "Asa Branca" for review
-    When "ana" approves "Asa Branca"
-    Then the request is refused because the submitter cannot review their own submission
-    And the draft is still in review
-
-  Scenario: A reviewer sends a submission back with notes
-    Given "ana" has submitted the song chart "Asa Branca" for review
+  Scenario: Another admin can publish a chart they didn't write
+    Given "ana" has a song chart "Asa Branca" whose rights are confirmed
     And "rui" is authenticated as an admin
-    When "rui" requests changes to "Asa Branca" with the notes "The chord on 'terra' is C, not G"
-    Then the draft is being edited again
-    And its last review is "changes_requested" by "rui" with the notes "The chord on 'terra' is C, not G"
+    When "rui" publishes "Asa Branca"
+    Then the chart is published at revision 1, published by "rui"
+
+  Scenario: A chart whose rights aren't confirmed cannot be published
+    Given "ana" has a song chart "Asa Branca" whose rights are not confirmed
+    When "ana" publishes "Asa Branca"
+    Then publishing is refused as not publishable, because "rights_not_confirmed"
     And the chart is still a draft that has never been published
 
-  Scenario: Requesting changes without notes is refused
-    Given "ana" has submitted the song chart "Asa Branca" for review
-    And "rui" is authenticated as an admin
-    When "rui" requests changes to "Asa Branca" with no notes
-    Then the review is refused as invalid
-    And the rejection identifies "notes" as the source of the error
+  Scenario: A chart with a chord that blocks publication cannot be published, and every such chord is listed
+    Given "ana" has a song chart "Asa Branca" whose rights are confirmed
+    And the chart has chord anchors written "H7" and "C#7"
+    When "ana" publishes "Asa Branca"
+    Then publishing is refused as not publishable, because "unresolved_chords"
+    And the refusal lists the anchors written "H7" and "C#7"
 
-  Scenario: Approval is refused when the rights record is no longer approved
-    Given "ana" has submitted the song chart "Asa Branca" for review
-    And the rights record "asa-branca-rights" has since been changed and is pending review
-    And "rui" is authenticated as an admin
-    When "rui" approves "Asa Branca"
-    Then the approval is refused as not publishable, because "rights_record_not_approved"
-    And the draft is still in review
-
-  Scenario: Approval is refused when a picked voicing was withdrawn after submission
-    Given "ana" has submitted the song chart "Asa Branca" with voicing "g-open" picked for an anchor
+  Scenario: A chart whose picked voicing was withdrawn cannot be published
+    Given "ana" has a song chart "Asa Branca" whose rights are confirmed, with voicing "g-open" picked for an anchor
     And voicing "g-open" has been withdrawn from the chord catalog
-    And "rui" is authenticated as an admin
-    When "rui" approves "Asa Branca"
-    Then the approval is refused as not publishable, because "unresolved_chords"
+    When "ana" publishes "Asa Branca"
+    Then publishing is refused as not publishable, because "unresolved_chords"
     And the refusal lists the anchor with the warning "voicing_unavailable"
 
-  Scenario: Reviewing a draft that isn't in review is refused
-    Given "ana" has a song chart "Asa Branca" with rights record "asa-branca-rights"
-    And "rui" is authenticated as an admin
-    When "rui" approves "Asa Branca"
-    Then the request is refused because the draft is not in review
+  Scenario: A chart with a slash chord missing from the catalog can be published
+    Given "ana" has a song chart "Asa Branca" whose rights are confirmed
+    And the chart has a chord anchor written "C/G"
+    When "ana" publishes "Asa Branca"
+    Then the chart is published at revision 1
+
+  Scenario: A teacher cannot publish a song chart
+    Given "ana" has a song chart "Asa Branca" whose rights are confirmed
+    And "bob" is authenticated as a teacher
+    When "bob" publishes "Asa Branca"
+    Then the request is refused because only admins author song charts
 
   # ── Corrections and revisions ────────────────────────────────────────────────
 
   Scenario: A correction is published as a new revision and the old one never changes
     Given the song chart "Asa Branca" is published at revision 1
     And "ana" has changed the chord on "terra" in the draft of "Asa Branca" from "C" to "Em"
-    And "ana" has submitted "Asa Branca" for review
-    And "rui" is authenticated as an admin
-    When "rui" approves "Asa Branca"
+    When "ana" publishes "Asa Branca"
     Then the chart is published at revision 2
     And revision 1 still has the chord "C" on "terra"
     And the chart's revisions are listed as 2 then 1
@@ -181,45 +148,42 @@ Feature: Author, review and publish song charts
     When "ana" changes the title of the draft of "Asa Branca" to "Asa Branca (Luiz Gonzaga)"
     Then learners still read "Asa Branca" at revision 1, titled "Asa Branca"
 
-  Scenario: A correction waiting for review doesn't change what learners read
+  Scenario: Clearing the rights confirmation of a published chart doesn't take it down
     Given the song chart "Asa Branca" is published at revision 1
-    And "ana" has changed the draft of "Asa Branca"
-    When "ana" submits "Asa Branca" for review
+    When "ana" clears the rights confirmation of "Asa Branca"
     Then learners still read "Asa Branca" at revision 1
 
   Scenario: A chart that was never published has no revisions
-    Given "ana" has a song chart "Asa Branca" with rights record "asa-branca-rights"
+    Given "ana" has a song chart "Asa Branca"
     When "ana" lists the revisions of "Asa Branca"
     Then no revisions are listed
 
   # ── Withdrawal ───────────────────────────────────────────────────────────────
 
-  Scenario: An admin withdraws a published chart without a second reviewer
+  Scenario: An admin withdraws a published chart
     Given the song chart "Asa Branca" is published at revision 1
-    When "ana" withdraws "Asa Branca" because "Lyric source disputed"
-    Then the chart is withdrawn by "ana" because "Lyric source disputed"
+    When "ana" withdraws "Asa Branca" because "Rights disputed"
+    Then the chart is withdrawn by "ana" because "Rights disputed"
     And learners can't read "Asa Branca"
     And revision 1 is still listed
 
-  Scenario: Approving a new submission republishes a withdrawn chart
+  Scenario: Publishing a withdrawn chart serves it again
     Given the song chart "Asa Branca" was published at revision 1 and then withdrawn
-    And "ana" has submitted "Asa Branca" for review
-    And "rui" is authenticated as an admin
-    When "rui" approves "Asa Branca"
+    When "ana" publishes "Asa Branca"
     Then the chart is published at revision 2
     And learners can read "Asa Branca"
 
   Scenario: A chart that isn't published cannot be withdrawn
-    Given "ana" has a song chart "Asa Branca" with rights record "asa-branca-rights"
+    Given "ana" has a song chart "Asa Branca"
     When "ana" withdraws "Asa Branca" because "Not ready"
     Then the request is refused because the chart is not published
 
   # ── Listing ──────────────────────────────────────────────────────────────────
 
-  Scenario: An admin lists the charts waiting for review
-    Given "ana" has submitted the song chart "Asa Branca" for review
-    And "ana" has a song chart "Carinhoso" with rights record "asa-branca-rights"
-    When "ana" lists song charts whose draft is in review
+  Scenario: An admin lists the published charts
+    Given the song chart "Asa Branca" is published at revision 1
+    And "ana" has a song chart "Carinhoso"
+    When "ana" lists song charts that are published
     Then the list holds "Asa Branca" only
 
   Scenario: A teacher cannot list song charts
@@ -230,7 +194,7 @@ Feature: Author, review and publish song charts
   # ── Preview ──────────────────────────────────────────────────────────────────
 
   Scenario: An admin previews a draft as a learner would read it
-    Given "ana" has a song chart "Asa Branca" with rights record "asa-branca-rights"
+    Given "ana" has a song chart "Asa Branca"
     When "ana" previews "Asa Branca"
     Then the preview holds the draft's lyrics and chords, with no revision number
     And it includes the catalog chords "G" and "C" with their voicings and diagrams

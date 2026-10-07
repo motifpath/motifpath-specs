@@ -47,10 +47,10 @@ Feature: Import and export a song chart as ChordPro
     Then the import is refused as invalid
     And the draft is unchanged
 
-  Scenario: A draft in review can't be replaced by an import
-    Given "ana" has submitted "Draft" for review
+  Scenario: Importing doesn't change the draft's rights confirmation
+    Given the rights of "Draft" are confirmed by "ana"
     When "ana" imports into "Draft" a line "[G]La la"
-    Then the request is refused because the draft is in review
+    Then the draft's rights are still confirmed by "ana"
 
   Scenario: An admin exports the draft as ChordPro
     Given the draft of "Draft" is titled "Asa Branca" by "Luiz Gonzaga", with one verse "[G]Quando olhei a [C]terra ardendo"
