@@ -5,10 +5,7 @@
 # platform, not authored through the API. How a symbol is parsed is pinned by the shared golden
 # cases in golden/chord-symbols/, which core and web both run; these scenarios cover what the
 # catalog does with the result.
-#
-# Not yet implemented in core-domain: every scenario is @wip.
 
-@wip
 Feature: Find chords in the chord catalog
   As a teacher or admin writing content
   I want to type a chord symbol the way I'd write it and get that chord's fingerings
