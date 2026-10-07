@@ -16,11 +16,11 @@ Evidence is recorded as references, and no documents are uploaded. The learner r
 learners only through the `song_chart` atom (Phase 3), and "sections played" is a tap the
 learner makes. Territory returns with the license template, before the first licensed chart.
 **Amended:** 2026-10-07, by Gilson (MOT-45, during the Phase 2 spec): rights management leaves
-the application, and charts publish without a second admin (§5, §6). Clearing a song's rights
-happens outside MotifPath. A chart only records that an admin confirmed its rights were checked,
-with who and when, and it can't be published without that. Any admin publishes a chart. This
-supersedes the rights records, evidence, license dates and two-admin chart review described by
-the previous amendment.
+the application, and nothing needs a second admin (§5, §6). Clearing a song's rights happens
+outside MotifPath. A chart only records that an admin confirmed its rights were checked, with who
+and when, and it can't be published without that. Any admin publishes a chart, and any admin adds
+to the chord catalog. This supersedes the rights records, evidence, license dates and two-admin
+reviews described by the decision and the previous amendment.
 
 ---
 
@@ -238,8 +238,8 @@ application. MotifPath keeps no rights records, evidence or license terms.
 - **Any admin publishes a chart**, with no second reviewer, once its rights are confirmed and
   every chord in it resolves to a catalog chord with a voicing. The publication records who
   published it.
-- Adding a voicing or template to the catalog needs a **second person's review**. The catalog is
-  a spec in motifpath-specs, so that review is the pull request's.
+- **Any admin adds a voicing or template to the catalog**, with no second reviewer. The musical
+  validator (§1) still refuses any voicing that doesn't sound its chord.
 - Learners read published charts and consult the selected chord's voicings. They can't browse the
   catalog as a directory, create, edit or share charts.
 - **Deferred, not decided:** audio-to-chart generation, including from a YouTube URL. A public
@@ -338,9 +338,10 @@ being published by accident without a check, and withdrawing is the takedown pat
 scaling thesis earlier, but it multiplies the rights exposure before the concierge team has
 learned how charts go wrong. A second admin's review of every chart was dropped on 2026-10-07: the
 team is small, and the review would block publishing whenever only one admin is available. The
-risk it covered is narrower than it looks, because a wrong voicing is a catalog error and the
-catalog keeps its second-person review. A chart's own mistakes (a chord on the wrong word) are
-fixed by publishing a new revision.
+same holds for catalog additions, and there the musical validator already catches the costliest
+error: a voicing that doesn't sound its chord, which every chart using it would repeat. What no
+validator catches (an awkward fingering, a chord on the wrong word) is fixed by a catalog
+correction or a new chart revision.
 
 ## Consequences
 
@@ -358,10 +359,9 @@ fixed by publishing a new revision.
 - **Licensing is a real cost and a legal dependency.** Licensed songs need negotiation, records and
   renewal tracking. Until a license is signed, only public-domain and original songs can be
   published.
-- **A broad catalog is a larger curation and review load.** Shape templates, the transposition
-  build and the musical validator have to be built and tested before the catalog exists, and every
-  template needs a second person's review. Phase 1 is bigger than the spike's 30–50-voicing
-  recommendation.
+- **A broad catalog is a larger curation load.** Shape templates, the transposition build and the
+  musical validator have to be built and tested before the catalog exists. Phase 1 is bigger than
+  the spike's 30–50-voicing recommendation.
 - **Materialization means many `Diagram` rows** (an estimated several hundred to low thousands), all
   owned by the catalog profile. They are hidden from the default diagram listing (§2a), so any
   surface that *should* list them has to opt in with `purpose`, and chord voicings need their own
