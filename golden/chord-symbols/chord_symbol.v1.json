@@ -1513,6 +1513,14 @@
       }
     },
     {
+      "name": "unparsed: whitespace other than an ASCII space (em space)",
+      "input": "C\u2003m7",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unparsed_symbol"
+      }
+    },
+    {
       "name": "unparsed: incomplete no-chord marking",
       "input": "N.C",
       "expected": {
