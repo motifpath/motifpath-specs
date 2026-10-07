@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motifpath.io/specs/golden/chordpro/schema.json",
+  "title": "ChordPro import and export golden cases",
+  "description": "One file per rule version: ChordPro text -> the song chart draft it imports as -> the ChordPro that draft exports as. Each body must also be valid against SongChartDocument, and each warning against ChordProImportWarning, in openapi/core-domain-service.yaml.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "description", "cases"],
+  "properties": {
+    "format": {
+      "type": "string",
+      "pattern": "^[a-z][a-z_]*\\.v[1-9][0-9]*$",
+      "description": "The rule version these cases pin, as <name>.v<version>. Matches the file name."
+    },
+    "description": { "type": "string", "minLength": 1 },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "input", "expected", "export"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "input": { "type": "string", "minLength": 1, "description": "The ChordPro text, exactly as imported." },
+          "expected": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["metadata", "body", "import_warnings"],
+            "properties": {
+              "metadata": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "The draft fields the text sets; a field the text doesn't set is absent.",
+                "properties": {
+                  "title": { "type": "string", "minLength": 1 },
+                  "artist": { "type": "string", "minLength": 1 },
+                  "concert_key": { "type": "string", "pattern": "^[A-G](b|#)?m?$" },
+                  "capo_fret": { "type": "integer", "minimum": 0, "maximum": 12 },
+                  "tempo_bpm": { "type": "integer", "minimum": 20, "maximum": 300 },
+                  "time_signature": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["beats", "beat_value"],
+                    "properties": {
+                      "beats": { "type": "integer" },
+                      "beat_value": { "type": "integer" }
+                    }
+                  }
+                }
+              },
+              "body": { "type": "object", "description": "A SongChartDocument." },
+              "import_warnings": {
+                "type": "array",
+                "items": { "type": "object", "description": "A ChordProImportWarning." }
+              }
+            }
+          },
+          "export": { "type": "string", "minLength": 1, "description": "The ChordPro the imported draft exports as." }
+        }
+      }
+    }
+  }
+}

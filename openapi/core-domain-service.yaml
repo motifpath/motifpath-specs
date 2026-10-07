@@ -9165,6 +9165,7 @@ components:
             - malformed_directive
             - unclosed_chord
             - unbalanced_section
+            - empty_section
           description: |
             unsupported_directive: a directive outside the supported subset
             (e.g. {define}). malformed_directive: a line starting with "{"
@@ -9172,6 +9173,8 @@ components:
             on its line; the line is read as plain text.
             unbalanced_section: an end_of_ with no matching start_of_, or a
             start_of_ inside another section; the section is closed there.
+            empty_section: a section environment with no lines; it is
+            dropped.
         text:
           type: string
           description: The skipped text, as written.
