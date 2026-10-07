@@ -93,6 +93,24 @@ anyone authoring each exercise:
   tie, takes about 10 seconds, and is picked in the head and with the instrument in hand, like a
   fretboard cell. A plan with a shape offers the tap check like one with a cell.
 
+**Amended:** 2026-10-07, after the diagram shape smoke, by Gilson. Sessions were too long and too
+predictable: a 10-minute session held 57 to 69 items, nearly all fretboard cells asked string by
+string, fret by fret, and the run of cells on one string was easy to count up even for a beginner.
+So:
+- a session asks **at most 10 items of each generated drill** (`fretboard_cell:name_the_note`,
+  `fretboard_cell:find_the_note`, `diagram_shape:name_the_shape`, `diagram_shape:find_the_degree`).
+  The minutes become a **ceiling**: a session whose drills are capped ends early. Authored
+  exercises and play-alongs aren't capped, since each one is different content;
+- items **equally urgent are picked in random order**: due ones by the day they fell due, most
+  overdue day first, then at random within the day; weak, new and stretch ones in their nodes'
+  order, then at random within a node; review-ahead ones by the day they come due;
+- the picks are **interleaved by drill**: the next item comes from the drill with the most items
+  left, other than the previous item's drill while another drill has items left. Each exercise type
+  counts as a drill, and play-alongs as one. Teacher suggestions still come first, the warm-up
+  before them and the application ending last;
+- **two fretboard cells in a row are never on the same string** of the same layout when another
+  cell could go there.
+
 ---
 
 ## Context
@@ -316,6 +334,15 @@ One piece of evidence per observation, the only stored learning state:
   note on a tie. A session may mix layouts; each question then names its instrument.
 - **Never empty, or no plan** (amended 2026-10-06): a plan has at least one item. A student with
   nothing connected to what they are learning gets no plan, never an unconnected stretch.
+- **Short and shuffled** (amended 2026-10-07): at most 10 items of each generated drill (a fretboard
+  cell or diagram shape drill) per session, so the minutes are a ceiling, not a target; authored
+  exercises and play-alongs aren't capped. Equally urgent items are picked at random: due by the day
+  they fell due, most overdue first; weak, new and stretch in node order; review ahead by the day
+  they come due. The picks are then interleaved by drill (each exercise type and the play-alongs
+  each count as one): the next comes from the drill with the most left, never the previous item's
+  drill while another has items left. Two fretboard cells in a row are never on the same string of
+  the same layout when another cell could go there. Teacher suggestions come first after the
+  warm-up, and the application ending last.
 - **Item time:** a play-along is sized by its takes at its start tempo; an exercise by its authored
   `estimated_duration_seconds`, or 30 seconds without one; a fretboard cell by 8 seconds; a
   diagram shape by 10 seconds.
