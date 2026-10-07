@@ -34,7 +34,8 @@ ALWAYS use domain language — never HTTP status codes, SQL, or framework names 
 ALWAYS reference domain events by exact names: lesson.started, lesson.resumed, lesson.completed,
 exercise.started, exercise.progress, exercise.ended,
 practice.session_started, practice.item_answered, practice.session_ended,
-practice.tap_check_completed.
+practice.tap_check_completed, song_chart.opened, song_chart.chord_viewed,
+song_chart.section_completed.
 One scenario = one behavior. Never test multiple behaviors in a single scenario.
 Steps must be concrete and specific — avoid vague steps like "the system processes the request".
 Two tags keep motifpath-core's strict godog runs honest; both are skipped there:
