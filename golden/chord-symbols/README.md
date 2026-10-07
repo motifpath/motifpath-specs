@@ -18,6 +18,9 @@ Each case is an `input` and the `expected` result: `parsed` with a `ParsedChordS
 ## Rules
 
 A symbol is read exactly as sent. Nothing is trimmed, and any whitespace makes it unparsed.
+Whitespace means a character with the Unicode `White_Space` property: it includes U+0085
+(next line) and excludes U+FEFF (zero-width no-break space). Go's `unicode.IsSpace` matches
+this set; JavaScript's `\s` doesn't, so use `\p{White_Space}` with the `u` flag.
 
 1. **No chord.** `N.C.` and `NC` are `no_chord`. Nothing else is.
 2. **Root.** An uppercase letter `A`–`G`, then at most one accidental: `b` or `♭`, `#` or `♯`.

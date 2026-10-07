@@ -1513,6 +1513,30 @@
       }
     },
     {
+      "name": "unparsed: whitespace other than an ASCII space (em space)",
+      "input": "C\u2003m7",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unparsed_symbol"
+      }
+    },
+    {
+      "name": "unparsed: next line (U+0085) is whitespace",
+      "input": "C\u0085m7",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unparsed_symbol"
+      }
+    },
+    {
+      "name": "unsupported quality: zero-width no-break space (U+FEFF) is not whitespace",
+      "input": "C\ufeff",
+      "expected": {
+        "status": "unparsed",
+        "warning": "unsupported_quality"
+      }
+    },
+    {
       "name": "unparsed: incomplete no-chord marking",
       "input": "N.C",
       "expected": {
