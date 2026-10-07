@@ -10,6 +10,11 @@ ADR-005 (a one-time squash of the migration history before the first production 
 showed the authoring interaction works, and the Product Owner accepts the hypothesis without a
 separate learner test, so Phases 1–3 proceed directly. Learner value is read from the shipped
 reader's usage instead (see Follow-up work).
+**Amended:** 2026-10-07, by Gilson (MOT-45, before Phase 2): the rights gate is simplified (§5).
+It checks no territory: a rights record covers languages and, for a license, validity dates.
+Evidence is recorded as references, and no documents are uploaded. The learner reader reaches
+learners only through the `song_chart` atom (Phase 3), and "sections played" is a tap the
+learner makes. Territory returns with the license template, before the first licensed chart.
 
 ---
 
@@ -211,19 +216,24 @@ No chart can be published without a `RightsRecord` that passes the gate:
 
 | `basis` | Required evidence |
 | --- | --- |
-| `public_domain` | Composer and lyricist with dates, or a cited source establishing public-domain status in the territories served; the specific lyric text used must also be in the public domain (not a later copyrighted arrangement or translation). |
+| `public_domain` | Composer and lyricist with dates, or a cited source establishing public-domain status where MotifPath serves learners; the specific lyric text used must also be in the public domain (not a later copyrighted arrangement or translation). |
 | `original` | The creator's identity and a signed permission covering lyric display and chord transcription on MotifPath. |
-| `licensed` | Licensor, license reference and document, permitted uses (lyric display, chord transcription), territories, languages, start date and end date (if any). |
+| `licensed` | Licensor, license reference and a reference to the signed document, permitted uses (lyric display, chord transcription), languages, start date and end date (if any). |
 
 Gate rules:
 
-- Rights evidence documents are stored privately, never in learner-facing media.
-- A chart is shown only in the territories, and in the language, that its rights record covers. A
-  licensed chart is **not** translated unless the license explicitly allows translation.
-- When a license ends, or its territory no longer covers the learner, the chart becomes unavailable
-  to learners. The read path checks the rights record at serve time, not only at publish time. Its
-  published revisions are kept for audit but not served. A `song_chart` embed whose chart is
-  unavailable renders a neutral "not available" state rather than a broken lesson.
+- Evidence is recorded as **references**: a source citation, or an identifier or link to where
+  the signed document is kept. MotifPath stores no evidence files. A rights record is read and
+  written by admins only and never appears in a learner response.
+- A chart is shown only when its language is one its rights record covers. A licensed chart is
+  **not** translated unless the license explicitly allows translation.
+- **No territory is checked.** A license limited to some territories can't be represented yet,
+  so no licensed chart is published until the license template (Follow-up 6) defines how
+  territory is recorded and checked.
+- When a license ends, the chart becomes unavailable to learners. The read path checks the
+  rights record at serve time, not only at publish time. Its published revisions are kept for
+  audit but not served. A `song_chart` embed whose chart is unavailable renders a neutral "not
+  available" state rather than a broken lesson.
 - A rights record belongs to the song, not to a chart revision, so a correction does not need new
   evidence. A change of basis or license terms does need a new review.
 
@@ -363,6 +373,11 @@ every chart that uses it.
   reviewed against the 8 data migrations it replaces, because a missed row disappears silently.
 - **Serve-time rights checks** add a lookup to every chart read and a learner-visible "not
   available" state that lesson authors must expect.
+- **No territory control.** Public-domain status is confirmed by the reviewer for where
+  MotifPath serves learners, not checked per learner. A song in the public domain in Brazil but
+  not elsewhere is a reviewer's call. Licensed charts wait for the license template.
+- **Evidence lives outside MotifPath.** A reference can rot (a moved file, a revoked link), so
+  the evidence a review relied on isn't guaranteed to stay reachable.
 - **Two-admin review** slows publishing while the concierge team is small, and blocks it outright
   when only one admin is available.
 - The concierge team is the only source of charts, so chart supply is limited by its capacity.
@@ -380,7 +395,8 @@ every chart that uses it.
 
 1. ~~Phase 0 — concierge test with 5–8 students on 3–5 rights-cleared charts.~~ Dropped
    (2026-10-06, MOT-45). The learner reader emits tracking events for chart opens, chord views
-   and sections played (Phase 2), so the song-first hypothesis is checked against real use.
+   and sections the learner marks as played (Phase 2), so the song-first hypothesis is checked
+   against real use.
 2. Phase 1a — Gherkin and OpenAPI for plural playbacks (`Diagram.playbacks`,
    `default_playback_id`, `DiagramRef.playback.playback_id`) and the diagram editor's playback
    list; in motifpath-core, the one-time migration squash (§7) with `playbacks` in the baseline.
@@ -390,10 +406,11 @@ every chart that uses it.
    `purpose` filter (default `general`); chord-symbol search; the read-only rule for `chord_voicing`
    diagrams in the diagram editor.
 4. Phase 2 — Gherkin and OpenAPI for `SongChart`, `RightsRecord`, review and publication, ChordPro
-   import and export, and the learner reader.
+   import and export, and the learner reader. Admins open the reader as a preview; learners reach
+   it through the Phase 3 atom.
 5. Phase 3 — the `song_chart` rich-text atom and the voicing picker for the `diagram` embed.
 6. Legal — a license template and review checklist for licensed songs, before the first licensed
-   chart.
+   chart. It also decides how a license's territory is recorded and checked.
 
 ## Related ADRs
 
