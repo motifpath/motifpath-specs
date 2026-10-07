@@ -133,6 +133,36 @@ Feature: Compose a practice session
     When "alice" composes a 5-minute session with no instrument in hand
     Then every fretboard cell in the session is estimated at 8 seconds
 
+  @wip
+  Scenario: A session in the head picks diagram shapes of the student's instruments
+    Given "alice" has new shapes of skill "map-fretboard-caged" on guitar
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the session may include diagram shapes linked to "guitar"
+    And no diagram shape in the session is linked only to instruments "alice" doesn't play
+
+  @wip
+  Scenario: With an instrument in hand, diagram shapes linked to it can be picked
+    Given "alice" has nothing due or weak on guitar and new shapes of skill "map-fretboard-caged"
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the session includes diagram shapes linked to "guitar"
+
+  @wip
+  Scenario: A diagram shape is asked the way it has fewer right answers
+    Given "alice" has named the shape "C major — CAGED A, shift 3" correctly 3 times and found its degrees correctly once
+    When the shape is picked for "alice"'s session in the head
+    Then it is asked as find_the_degree
+
+  @wip
+  Scenario: A diagram shape never answered right is asked to name the shape
+    Given "alice" has never answered the shape "C major — CAGED A, shift 3" correctly
+    When the shape is picked for "alice"'s session in the head
+    Then it is asked as name_the_shape
+
+  @wip
+  Scenario: A diagram shape takes about 10 seconds of the session
+    When "alice" composes a 5-minute session with no instrument in hand
+    Then every diagram shape in the session is estimated at 10 seconds
+
   @web
   Scenario: In a session mixing layouts, each fretboard question names its instrument
     Given "alice"'s session in the head has cells of both "guitar" and "electric-bass"
