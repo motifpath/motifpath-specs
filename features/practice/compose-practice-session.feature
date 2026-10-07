@@ -26,6 +26,7 @@ Feature: Compose a practice session
     When "alice" composes a 20-minute session with "guitar" in hand
     Then about 60% of the focus time goes to due items, 25% to weak items and 15% to new items
 
+  # Parked until ADR-046 follow-up slice 5 (teacher notes): no teacher note exists yet to suggest from.
   @wip
   Scenario: A teacher's suggestion comes before everything else
     Given a teacher suggested the play-along "pentatonic-run" to "alice"
@@ -105,10 +106,25 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with "electric-bass" in hand
     Then every item in the session suits "electric-bass" or every instrument
 
-  Scenario: With an instrument in hand, fretboard cells of its layout can be picked
-    Given "alice" has nothing due or weak on guitar and new fretboard cells on the E and A strings
+  # In hand is for playing, in the head for recall on the screen: fretboard cells and diagram shapes
+  # suit the instrument, but are only ever recalled in the head.
+
+  Scenario: With an instrument in hand, no fretboard cell or diagram shape is picked
+    Given "alice" has nothing due or weak, and 40 new fretboard cells and 20 new shapes on guitar
     When "alice" composes a 10-minute session with "guitar" in hand
-    Then the session includes fretboard cells of the "guitar" layout
+    Then no item in the session is a fretboard cell or a diagram shape
+
+  Scenario: An in-hand session with nothing to play is not found
+    Given student "bob"'s only path skill is "find-notes-root-strings", practised by fretboard cells on guitar
+    When "bob" composes a 10-minute session with "guitar" in hand
+    Then the request is refused with a not-found error
+
+  @web
+  Scenario: With nothing to play in hand, a session in the head is offered instead
+    Given "alice"'s session with "guitar" in hand can't be composed, since there is nothing to play
+    When the session setup says there is nothing to play on guitar yet
+    Then it offers a session in the head
+    And choosing it composes a session with no instrument in hand
 
   Scenario: A session in the head picks only items that need no instrument in hand
     When "alice" composes a 5-minute session with no instrument in hand
@@ -138,11 +154,6 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with no instrument in hand
     Then the session may include diagram shapes linked to "guitar"
     And no diagram shape in the session is linked only to instruments "alice" doesn't play
-
-  Scenario: With an instrument in hand, diagram shapes linked to it can be picked
-    Given "alice" has nothing due or weak on guitar and new shapes of skill "map-fretboard-caged"
-    When "alice" composes a 10-minute session with "guitar" in hand
-    Then the session includes diagram shapes linked to "guitar"
 
   Scenario: A diagram shape is asked the way it has fewer right answers
     Given "alice" has named the shape "C major — CAGED A, shift 3" correctly 3 times and found its degrees correctly once
@@ -185,6 +196,43 @@ Feature: Compose a practice session
     Given "alice"'s next session will practise only play-alongs
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the plan asks no felt questions
+
+  # ── Short and shuffled ─────────────────────────────────────────────────────
+  # A generated drill asks the same kind of question over and over, so a session asks at most 10 of
+  # each, and its minutes are a ceiling. Equally urgent items come in random order, the drills take
+  # turns, and two fretboard cells in a row are never on the same string.
+
+  Scenario: A session asks at most 10 items of each generated drill, and may end early
+    Given "alice" has nothing due or weak, and 40 new fretboard cells and 20 new shapes on guitar
+    When "alice" composes a 30-minute session with no instrument in hand
+    Then no drill has more than 10 items in the session
+    And the session's items take less than 30 minutes
+
+  Scenario: Authored exercises are not capped
+    Given "alice" has plenty of due, weak and new items on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then the session has more than 10 exercises of one type
+
+  Scenario: New fretboard cells come in random order, not string by string
+    Given "alice" has nothing due or weak on guitar and new fretboard cells on the E and A strings
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the session's fretboard cells are not in string and fret order
+
+  Scenario: Due items are taken most overdue day first, at random within a day
+    Given "alice" has 4 fretboard cells due since 3 days ago and 30 due since yesterday on guitar
+    When "alice" composes a 5-minute session with no instrument in hand
+    Then the 4 cells due since 3 days ago are in the session
+    And its other due cells are some of those due since yesterday
+
+  Scenario: The drills take turns
+    Given "alice" has nothing due or weak, and 40 new fretboard cells and 20 new shapes on guitar
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then no two items in a row are of the same drill while another drill has items left
+
+  Scenario: Two fretboard cells in a row are never on the same string while another string is left
+    Given "alice" has nothing due or weak on guitar and new fretboard cells on the E and A strings
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then no two fretboard cells in a row are on the same string while a cell on another string is left
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 

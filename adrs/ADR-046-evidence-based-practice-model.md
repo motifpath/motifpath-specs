@@ -93,6 +93,32 @@ anyone authoring each exercise:
   tie, takes about 10 seconds, and is picked in the head and with the instrument in hand, like a
   fretboard cell. A plan with a shape offers the tap check like one with a cell.
 
+**Amended:** 2026-10-07, after the diagram shape smoke, by Gilson. Sessions were too long and too
+predictable: a 10-minute session held 57 to 69 items, nearly all fretboard cells asked string by
+string, fret by fret, and the run of cells on one string was easy to count up even for a beginner.
+So:
+- a session asks **at most 10 items of each generated drill** (`fretboard_cell:name_the_note`,
+  `fretboard_cell:find_the_note`, `diagram_shape:name_the_shape`, `diagram_shape:find_the_degree`).
+  The minutes become a **ceiling**: a session whose drills are capped ends early. Authored
+  exercises and play-alongs aren't capped, since each one is different content;
+- items **equally urgent are picked in random order**: due ones by the day they fell due, most
+  overdue day first, then at random within the day; weak, new and stretch ones in their nodes'
+  order, then at random within a node; review-ahead ones by the day they come due;
+- the picks are **interleaved by drill**: the next item comes from the drill with the most items
+  left, other than the previous item's drill while another drill has items left. Each exercise type
+  counts as a drill, and play-alongs as one. Teacher suggestions still come first, the warm-up
+  before them and the application ending last;
+- **two fretboard cells in a row are never on the same string** of the same layout when another
+  cell could go there.
+
+**Amended:** 2026-10-07, same smoke, by Gilson. The two kinds of practice are kept apart: a session
+with the instrument in hand is for **playing** — play-alongs and authored exercises — and a session
+in the head is for **recall on the screen** — fretboard cells, diagram shapes and authored
+exercises. This reverses the 2026-10-06 amendments that let cells and shapes into in-hand
+sessions. The home's Start for an instrument opens the session setup with that instrument chosen,
+where "In my head" is one tap away, so every next step stays reachable. An in-hand session with
+nothing to play is not found, and the client then offers a session in the head instead.
+
 ---
 
 ## Context
@@ -307,15 +333,25 @@ One piece of evidence per observation, the only stored learning state:
   the session has no ending and the time stays with the focus block. Like the warm-up, a due
   play-along is never the ending (its review belongs in the focus block), and an ending longer than
   a quarter of the session is skipped.
-- **Fretboard cells with the instrument in hand too** (amended 2026-10-06, by Gilson): a cell suits
-  every instrument of its layout, so an in-hand session may pick it like any focus item. Every
-  next step the home offers for an instrument is then reachable from that instrument's Start.
+- **Playing in hand, recall in the head** (amended 2026-10-07, by Gilson, reversing 2026-10-06): a
+  session with the instrument in hand picks play-alongs and authored exercises, never a fretboard
+  cell or a diagram shape, though they suit the instrument; those are recalled in the head only.
+  With nothing to play, an in-hand session is not found, and the client offers one in the head.
 - **In the head** (amended 2026-10-06): fretboard cells of every layout among the student's
   instruments, diagram shapes of their instruments, and exercises; no warm-up and no application ending, since both are play-alongs.
   Each cell pick is asked the way (drill) with the fewer right answers on that cell, name the
   note on a tie. A session may mix layouts; each question then names its instrument.
 - **Never empty, or no plan** (amended 2026-10-06): a plan has at least one item. A student with
   nothing connected to what they are learning gets no plan, never an unconnected stretch.
+- **Short and shuffled** (amended 2026-10-07): at most 10 items of each generated drill (a fretboard
+  cell or diagram shape drill) per session, so the minutes are a ceiling, not a target; authored
+  exercises and play-alongs aren't capped. Equally urgent items are picked at random: due by the day
+  they fell due, most overdue first; weak, new and stretch in node order; review ahead by the day
+  they come due. The picks are then interleaved by drill (each exercise type and the play-alongs
+  each count as one): the next comes from the drill with the most left, never the previous item's
+  drill while another has items left. Two fretboard cells in a row are never on the same string of
+  the same layout when another cell could go there. Teacher suggestions come first after the
+  warm-up, and the application ending last.
 - **Item time:** a play-along is sized by its takes at its start tempo; an exercise by its authored
   `estimated_duration_seconds`, or 30 seconds without one; a fretboard cell by 8 seconds; a
   diagram shape by 10 seconds.
@@ -522,6 +558,17 @@ shown from evidence (tempo history, speed per string, levels).
 5. **Teacher notes** for videos received over WhatsApp: rubric, comments, needs-work, suggestions.
    Validate with a WhatsApp Wizard-of-Oz before building the review UI.
 6. **The feed into recommendations** (PB-8g). Authored exercises and the S7 challenge moved to slice 3.
+
+**Status, 2026-10-07 (PB-22 slices 1–4 closed):** slices 1–4 have shipped, apart from what needs real
+sessions or a teacher:
+
+- **Threshold calibration** and **the team benchmark (version 2)** wait for data. Calibration runs only
+  from about 100 felt-rated sessions by 20 students, and there are none before real students practise;
+  felt ratings are already collected, so nothing is lost meanwhile. The three calibration scenarios in
+  `timed-thresholds.feature` stay `@wip` until then.
+- **Teacher suggestions in sessions** and **a teacher review resetting the best clean tempo** belong to
+  slice 5: there is no teacher note yet to suggest or review from. Their scenarios in
+  `compose-practice-session.feature` and `knowledge-state.feature` stay `@wip` until slice 5.
 
 ## Related ADRs
 
