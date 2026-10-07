@@ -208,7 +208,7 @@ Feature: Compose a practice session
   Scenario: New fretboard cells come in random order, not string by string
     Given "alice" has nothing due or weak on guitar and new fretboard cells on the E and A strings
     When "alice" composes a 10-minute session with no instrument in hand
-    Then the session's fretboard cells don't run fret by fret along a string
+    Then the session's fretboard cells are not in string and fret order
 
   @wip
   Scenario: Due items are taken most overdue day first, at random within a day
@@ -224,10 +224,10 @@ Feature: Compose a practice session
     Then no two items in a row are of the same drill while another drill has items left
 
   @wip
-  Scenario: Two fretboard cells in a row are never on the same string
+  Scenario: Two fretboard cells in a row are never on the same string while another string is left
     Given "alice" has nothing due or weak on guitar and new fretboard cells on the E and A strings
     When "alice" composes a 10-minute session with no instrument in hand
-    Then no two fretboard cells in a row are on the same string
+    Then no two fretboard cells in a row are on the same string while a cell on another string is left
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
