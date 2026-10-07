@@ -105,10 +105,27 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with "electric-bass" in hand
     Then every item in the session suits "electric-bass" or every instrument
 
-  Scenario: With an instrument in hand, fretboard cells of its layout can be picked
-    Given "alice" has nothing due or weak on guitar and new fretboard cells on the E and A strings
+  # In hand is for playing, in the head for recall on the screen: fretboard cells and diagram shapes
+  # suit the instrument, but are only ever recalled in the head.
+
+  @wip
+  Scenario: With an instrument in hand, no fretboard cell or diagram shape is picked
+    Given "alice" has nothing due or weak, and 40 new fretboard cells and 20 new shapes on guitar
     When "alice" composes a 10-minute session with "guitar" in hand
-    Then the session includes fretboard cells of the "guitar" layout
+    Then no item in the session is a fretboard cell or a diagram shape
+
+  @wip
+  Scenario: An in-hand session with nothing to play is not found
+    Given "alice"'s only practice on guitar is fretboard cells and diagram shapes
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the request is refused with a not-found error
+
+  @web
+  Scenario: With nothing to play in hand, a session in the head is offered instead
+    Given "alice"'s session with "guitar" in hand can't be composed, since there is nothing to play
+    When the session setup says there is nothing to play on guitar yet
+    Then it offers a session in the head
+    And choosing it composes a session with no instrument in hand
 
   Scenario: A session in the head picks only items that need no instrument in hand
     When "alice" composes a 5-minute session with no instrument in hand
@@ -138,11 +155,6 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with no instrument in hand
     Then the session may include diagram shapes linked to "guitar"
     And no diagram shape in the session is linked only to instruments "alice" doesn't play
-
-  Scenario: With an instrument in hand, diagram shapes linked to it can be picked
-    Given "alice" has nothing due or weak on guitar and new shapes of skill "map-fretboard-caged"
-    When "alice" composes a 10-minute session with "guitar" in hand
-    Then the session includes diagram shapes linked to "guitar"
 
   Scenario: A diagram shape is asked the way it has fewer right answers
     Given "alice" has named the shape "C major — CAGED A, shift 3" correctly 3 times and found its degrees correctly once

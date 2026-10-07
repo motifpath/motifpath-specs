@@ -111,6 +111,14 @@ So:
 - **two fretboard cells in a row are never on the same string** of the same layout when another
   cell could go there.
 
+**Amended:** 2026-10-07, same smoke, by Gilson. The two kinds of practice are kept apart: a session
+with the instrument in hand is for **playing** — play-alongs and authored exercises — and a session
+in the head is for **recall on the screen** — fretboard cells, diagram shapes and authored
+exercises. This reverses the 2026-10-06 amendments that let cells and shapes into in-hand
+sessions. The home's Start for an instrument opens the session setup with that instrument chosen,
+where "In my head" is one tap away, so every next step stays reachable. An in-hand session with
+nothing to play is not found, and the client then offers a session in the head instead.
+
 ---
 
 ## Context
@@ -325,9 +333,10 @@ One piece of evidence per observation, the only stored learning state:
   the session has no ending and the time stays with the focus block. Like the warm-up, a due
   play-along is never the ending (its review belongs in the focus block), and an ending longer than
   a quarter of the session is skipped.
-- **Fretboard cells with the instrument in hand too** (amended 2026-10-06, by Gilson): a cell suits
-  every instrument of its layout, so an in-hand session may pick it like any focus item. Every
-  next step the home offers for an instrument is then reachable from that instrument's Start.
+- **Playing in hand, recall in the head** (amended 2026-10-07, by Gilson, reversing 2026-10-06): a
+  session with the instrument in hand picks play-alongs and authored exercises, never a fretboard
+  cell or a diagram shape, though they suit the instrument; those are recalled in the head only.
+  With nothing to play, an in-hand session is not found, and the client offers one in the head.
 - **In the head** (amended 2026-10-06): fretboard cells of every layout among the student's
   instruments, diagram shapes of their instruments, and exercises; no warm-up and no application ending, since both are play-alongs.
   Each cell pick is asked the way (drill) with the fewer right answers on that cell, name the
