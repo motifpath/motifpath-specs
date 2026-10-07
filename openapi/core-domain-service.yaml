@@ -8391,21 +8391,7 @@ components:
             the chart is published; null when the chart was never published.
         withdrawal:
           oneOf:
-            - type: object
-              properties:
-                withdrawn_by:
-                  $ref: '#/components/schemas/UserRef'
-                withdrawn_at:
-                  type: string
-                  format: date-time
-                  description: When the chart was withdrawn.
-                reason:
-                  type: string
-                  description: Why it was withdrawn, as the admin wrote it.
-              required:
-                - withdrawn_by
-                - withdrawn_at
-                - reason
+            - $ref: '#/components/schemas/SongChartWithdrawal'
             - type: "null"
           description: Who withdrew the chart, when and why; null unless status is withdrawn.
         draft:
@@ -8424,6 +8410,24 @@ components:
         - draft
         - created_by
         - created_at
+
+    SongChartWithdrawal:
+      type: object
+      description: Who withdrew a song chart, when and why.
+      properties:
+        withdrawn_by:
+          $ref: '#/components/schemas/UserRef'
+        withdrawn_at:
+          type: string
+          format: date-time
+          description: When the chart was withdrawn.
+        reason:
+          type: string
+          description: Why it was withdrawn, as the admin wrote it.
+      required:
+        - withdrawn_by
+        - withdrawn_at
+        - reason
 
     SongChartSummary:
       type: object
