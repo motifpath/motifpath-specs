@@ -4,7 +4,6 @@
 # How text becomes a document, and a document text, is pinned by the shared golden cases in
 # golden/chordpro/, which core runs; these scenarios cover what the operations do with a chart.
 
-@wip
 Feature: Import and export a song chart as ChordPro
   As an admin of the concierge team
   I want to bring a chart in from ChordPro and take it out again
