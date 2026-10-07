@@ -74,6 +74,25 @@ past the target.
 - the **fretboard heatmap** is on each instrument's tab of the home, one cell per string and fret
   generated for the instrument's layout, coloured by level.
 
+**Amended:** 2026-10-06, planning slice 4's diagram drills, by Gilson. Sessions in the head also
+recall **diagram shapes** from the diagram catalog, so a student memorises useful shapes without
+anyone authoring each exercise:
+- a new item kind, `diagram_shape:<diagram id>`: one catalog diagram is one item, since the same
+  shape at another root has other positions; it suits the diagram's linked instruments and rolls up
+  to the diagram's skill and concept;
+- two drills: **name the shape** (shown without its name; the options are every member of its
+  family, such as the five CAGED grips, pentatonic boxes 1–5 or the four triad qualities, so the
+  root never gives it away) and **find the degree** (shown with its root marked and its other
+  positions unlabelled; the student taps the asked degree, picked at random among the shape's
+  intervals other than the root). "Name the degree" comes later;
+- v1 families are tier A of the catalog: CAGED major grips, major and minor pentatonic boxes, the
+  four triads, and the major and natural-minor scale windows. Tiers B and C come later;
+- graded by `diagram_shape.v1`; both drills start from default fluent times of 4 s (net), with the
+  team benchmark as version 2;
+- a shape pick is asked the way with the fewer right answers on that shape, name the shape on a
+  tie, takes about 10 seconds, and is picked in the head and with the instrument in hand, like a
+  fretboard cell. A plan with a shape offers the tap check like one with a cell.
+
 ---
 
 ## Context
@@ -144,6 +163,7 @@ No other part of the model changes. The first kinds:
 | Authored exercise | `exercise:<exercise_id>` | the exercise's own (PB-86) |
 | Play-along (diagram + tempo ladder) | `play_along:<diagram_id>` | the diagram's linked instruments (ADR-045) |
 | Chord change (two diagrams, changes per minute) | `chord_change:<from>:<to>` | the diagrams' common instruments |
+| Diagram shape (a catalog shape recalled in the head; amended 2026-10-06) | `diagram_shape:<diagram_id>` | the diagram's linked instruments |
 
 A fretboard cell is keyed by the **layout instrument** (ADR-045), not by each instrument: a student
 who plays acoustic and electric guitar knows one fretboard, not two. A drill template's generated items
@@ -154,7 +174,8 @@ follow the same classification rule as content (nodes must suit the item's instr
 - The client sends the **raw response**, never a verdict: the note named, the cell tapped, the option
   picked, or a self-rating with its tempo or change count.
 - The **server grades it** against reference data (tuning, the exercise's options) through a registry
-  of **versioned graders** (`fretboard_cell.v1`, `exercise_option.v1`, `self_rating.v1`). A grader
+  of **versioned graders** (`fretboard_cell.v1`, `exercise_option.v1`, `self_rating.v1`, and
+  `diagram_shape.v1` since 2026-10-06). A grader
   either returns the evidence payload or rejects the response, and stores nothing when it rejects.
 - The client grades only for instant feedback, with the same rules. **Golden cases** (item, response,
   expected result) live in motifpath-specs as language-neutral JSON and are run by both the Go grader
@@ -290,13 +311,14 @@ One piece of evidence per observation, the only stored learning state:
   every instrument of its layout, so an in-hand session may pick it like any focus item. Every
   next step the home offers for an instrument is then reachable from that instrument's Start.
 - **In the head** (amended 2026-10-06): fretboard cells of every layout among the student's
-  instruments, and exercises; no warm-up and no application ending, since both are play-alongs.
+  instruments, diagram shapes of their instruments, and exercises; no warm-up and no application ending, since both are play-alongs.
   Each cell pick is asked the way (drill) with the fewer right answers on that cell, name the
   note on a tie. A session may mix layouts; each question then names its instrument.
 - **Never empty, or no plan** (amended 2026-10-06): a plan has at least one item. A student with
   nothing connected to what they are learning gets no plan, never an unconnected stretch.
 - **Item time:** a play-along is sized by its takes at its start tempo; an exercise by its authored
-  `estimated_duration_seconds`, or 30 seconds without one; a fretboard cell by 8 seconds.
+  `estimated_duration_seconds`, or 30 seconds without one; a fretboard cell by 8 seconds; a
+  diagram shape by 10 seconds.
 - **Focus time:** the session minus the warm-up and the application ending (one play-along at its
   estimated time). The mix shares the focus time. A warm-up
   play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the
@@ -495,7 +517,8 @@ shown from evidence (tempo history, speed per string, levels).
 4. **Mental fretboard drill and heatmap**, with sessions in the head, the tap check, felt questions and
    benchmark thresholds; calibration runs once real sessions accumulate. Amended 2026-10-06: the
    drill ships on default thresholds and the benchmark follows as version 2; the slice starts by
-   moving the home's dashboard to the app's general home.
+   moving the home's dashboard to the app's general home. Amended 2026-10-06: also diagram shapes
+  in the head (name the shape, find the degree), after the notes.
 5. **Teacher notes** for videos received over WhatsApp: rubric, comments, needs-work, suggestions.
    Validate with a WhatsApp Wizard-of-Oz before building the review UI.
 6. **The feed into recommendations** (PB-8g). Authored exercises and the S7 challenge moved to slice 3.
