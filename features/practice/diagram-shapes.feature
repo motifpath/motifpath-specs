@@ -30,6 +30,12 @@ Feature: Practise diagram shapes in the head
     When the shape "C major — CAGED A, shift 3" is asked as name_the_shape
     Then the options are "C shape", "A shape", "G shape", "E shape" and "D shape", in that order
 
+  @wip
+  Scenario: A shape's item names its member and the instrument it is drawn on
+    When the shape "C major — CAGED A, shift 3" is asked
+    Then the item's shape is "A"
+    And the item is drawn on the diagram's layout instrument
+
   Scenario: Finding a degree asks one of the shape's degrees other than its root
     When the shape "A Minor pentatonic — Box 1, fret 5" is asked as find_the_degree
     Then the asked degree is one of "b3", "4", "5" and "b7"

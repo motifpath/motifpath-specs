@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.26.1
+  version: 0.27.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -10319,13 +10319,26 @@ components:
           type: object
           description: |
             Present when kind is diagram_shape. The client loads the diagram to draw it, with
-            its labels hidden. The drill is the way of asking the shape has the fewer right
+            its labels hidden, and gives instant feedback from it and from shape, graded the
+            way the server grades. The drill is the way of asking the shape has the fewer right
             answers so far, name_the_shape on a tie.
           properties:
             diagram_id:
               type: string
               format: uuid
               description: The catalog diagram whose shape is asked.
+            layout_instrument_id:
+              type: string
+              format: uuid
+              description: |
+                The instrument whose fretboard layout and tuning the diagram is drawn on, so a
+                tap check can be shown before the diagram has loaded.
+            shape:
+              type: string
+              pattern: '^[A-Za-z0-9][A-Za-z0-9-]*$'
+              description: |
+                The member of its family this diagram is, by its key in the practice drill
+                catalog: the right answer to name_the_shape, one of the options' shape.
             drill:
               $ref: './components/schemas/practice.yaml#/DiagramShapeDrill'
             shape_family:
@@ -10363,8 +10376,10 @@ components:
           additionalProperties: false
           required:
             - diagram_id
+            - layout_instrument_id
             - drill
             - shape_family
+            - shape
             - options
             - asked_interval
       required:
