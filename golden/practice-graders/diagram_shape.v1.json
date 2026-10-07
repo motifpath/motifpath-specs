@@ -1,0 +1,617 @@
+{
+  "grader": "diagram_shape.v1",
+  "description": "Diagram shapes recalled in the head: name the shape among its family's members, or find an asked degree among the shape's positions. The diagram comes from the item key; its family, member and positions come from the reference data.",
+  "reference": {
+    "instruments": {
+      "6ea2d087-ab9c-59dc-9657-8546025414d2": {
+        "name": "Acoustic guitar (standard tuning)",
+        "tuning": [
+          "E2",
+          "A2",
+          "D3",
+          "G3",
+          "B3",
+          "E4"
+        ]
+      }
+    },
+    "diagrams": {
+      "928330d5-903e-572c-9d41-5fde99d51ed1": {
+        "name": "C major — CAGED A, shift 3",
+        "layout_instrument_id": "6ea2d087-ab9c-59dc-9657-8546025414d2",
+        "shape_family": "caged-grip",
+        "shape": "A",
+        "positions": [
+          {
+            "string": 5,
+            "fret": 3,
+            "interval": "R"
+          },
+          {
+            "string": 4,
+            "fret": 5,
+            "interval": "5"
+          },
+          {
+            "string": 3,
+            "fret": 5,
+            "interval": "R"
+          },
+          {
+            "string": 2,
+            "fret": 5,
+            "interval": "3"
+          },
+          {
+            "string": 1,
+            "fret": 3,
+            "interval": "5"
+          }
+        ]
+      },
+      "6d371133-39a7-504b-9a32-1b087fb44569": {
+        "name": "A Minor pentatonic — Box 1, fret 5",
+        "layout_instrument_id": "6ea2d087-ab9c-59dc-9657-8546025414d2",
+        "shape_family": "minor-pentatonic-box",
+        "shape": "1",
+        "positions": [
+          {
+            "string": 6,
+            "fret": 5,
+            "interval": "R"
+          },
+          {
+            "string": 6,
+            "fret": 8,
+            "interval": "b3"
+          },
+          {
+            "string": 5,
+            "fret": 5,
+            "interval": "4"
+          },
+          {
+            "string": 5,
+            "fret": 7,
+            "interval": "5"
+          },
+          {
+            "string": 4,
+            "fret": 5,
+            "interval": "b7"
+          },
+          {
+            "string": 4,
+            "fret": 7,
+            "interval": "R"
+          },
+          {
+            "string": 3,
+            "fret": 5,
+            "interval": "b3"
+          },
+          {
+            "string": 3,
+            "fret": 7,
+            "interval": "4"
+          },
+          {
+            "string": 2,
+            "fret": 5,
+            "interval": "5"
+          },
+          {
+            "string": 2,
+            "fret": 8,
+            "interval": "b7"
+          },
+          {
+            "string": 1,
+            "fret": 5,
+            "interval": "R"
+          },
+          {
+            "string": 1,
+            "fret": 8,
+            "interval": "b3"
+          }
+        ]
+      },
+      "16c315eb-f682-5c6e-a847-19e2a6fba8f6": {
+        "name": "A Minor triad — Frets 0–12",
+        "layout_instrument_id": "6ea2d087-ab9c-59dc-9657-8546025414d2",
+        "shape_family": "triad",
+        "shape": "minor",
+        "positions": [
+          {
+            "string": 6,
+            "fret": 0,
+            "interval": "5"
+          },
+          {
+            "string": 6,
+            "fret": 5,
+            "interval": "R"
+          },
+          {
+            "string": 6,
+            "fret": 8,
+            "interval": "b3"
+          },
+          {
+            "string": 6,
+            "fret": 12,
+            "interval": "5"
+          },
+          {
+            "string": 5,
+            "fret": 0,
+            "interval": "R"
+          },
+          {
+            "string": 5,
+            "fret": 3,
+            "interval": "b3"
+          },
+          {
+            "string": 5,
+            "fret": 7,
+            "interval": "5"
+          },
+          {
+            "string": 5,
+            "fret": 12,
+            "interval": "R"
+          },
+          {
+            "string": 4,
+            "fret": 2,
+            "interval": "5"
+          },
+          {
+            "string": 4,
+            "fret": 7,
+            "interval": "R"
+          },
+          {
+            "string": 4,
+            "fret": 10,
+            "interval": "b3"
+          },
+          {
+            "string": 3,
+            "fret": 2,
+            "interval": "R"
+          },
+          {
+            "string": 3,
+            "fret": 5,
+            "interval": "b3"
+          },
+          {
+            "string": 3,
+            "fret": 9,
+            "interval": "5"
+          },
+          {
+            "string": 2,
+            "fret": 1,
+            "interval": "b3"
+          },
+          {
+            "string": 2,
+            "fret": 5,
+            "interval": "5"
+          },
+          {
+            "string": 2,
+            "fret": 10,
+            "interval": "R"
+          },
+          {
+            "string": 1,
+            "fret": 0,
+            "interval": "5"
+          },
+          {
+            "string": 1,
+            "fret": 5,
+            "interval": "R"
+          },
+          {
+            "string": 1,
+            "fret": 8,
+            "interval": "b3"
+          },
+          {
+            "string": 1,
+            "fret": 12,
+            "interval": "5"
+          }
+        ]
+      },
+      "67ff6d61-d8ba-5f44-96e1-c3b520f04ffa": {
+        "name": "C Chromatic map — Frets 0–12",
+        "layout_instrument_id": "6ea2d087-ab9c-59dc-9657-8546025414d2"
+      }
+    },
+    "shape_families": {
+      "caged-grip": {
+        "members": [
+          "C",
+          "A",
+          "G",
+          "E",
+          "D"
+        ]
+      },
+      "minor-pentatonic-box": {
+        "members": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ]
+      },
+      "triad": {
+        "members": [
+          "major",
+          "minor",
+          "diminished",
+          "augmented"
+        ]
+      }
+    }
+  },
+  "cases": [
+    {
+      "name": "name the shape: right",
+      "item_key": "diagram_shape:928330d5-903e-572c-9d41-5fde99d51ed1",
+      "response": {
+        "response_type": "name_the_shape",
+        "shape": "A",
+        "latency_ms": 2600
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2600,
+          "answer_key": {
+            "shape_family": "caged-grip",
+            "shape": "A"
+          }
+        }
+      }
+    },
+    {
+      "name": "name the shape: wrong",
+      "item_key": "diagram_shape:928330d5-903e-572c-9d41-5fde99d51ed1",
+      "response": {
+        "response_type": "name_the_shape",
+        "shape": "E",
+        "latency_ms": 3100
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 3100,
+          "answer_key": {
+            "shape_family": "caged-grip",
+            "shape": "A"
+          }
+        }
+      }
+    },
+    {
+      "name": "name the shape: a pentatonic box by its number",
+      "item_key": "diagram_shape:6d371133-39a7-504b-9a32-1b087fb44569",
+      "response": {
+        "response_type": "name_the_shape",
+        "shape": "1",
+        "latency_ms": 2900
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2900,
+          "answer_key": {
+            "shape_family": "minor-pentatonic-box",
+            "shape": "1"
+          }
+        }
+      }
+    },
+    {
+      "name": "name the shape: a triad by its quality",
+      "item_key": "diagram_shape:16c315eb-f682-5c6e-a847-19e2a6fba8f6",
+      "response": {
+        "response_type": "name_the_shape",
+        "shape": "major",
+        "latency_ms": 3300
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 3300,
+          "answer_key": {
+            "shape_family": "triad",
+            "shape": "minor"
+          }
+        }
+      }
+    },
+    {
+      "name": "name the shape: a member of another family is not an option",
+      "item_key": "diagram_shape:928330d5-903e-572c-9d41-5fde99d51ed1",
+      "response": {
+        "response_type": "name_the_shape",
+        "shape": "3",
+        "latency_ms": 2000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_option"
+      }
+    },
+    {
+      "name": "find the degree: right",
+      "item_key": "diagram_shape:928330d5-903e-572c-9d41-5fde99d51ed1",
+      "response": {
+        "response_type": "find_the_degree",
+        "interval": "3",
+        "string": 2,
+        "fret": 5,
+        "latency_ms": 2400
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2400,
+          "answer_key": {
+            "interval": "3",
+            "cells": [
+              {
+                "string": 2,
+                "fret": 5
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "find the degree: any position of the asked degree is right",
+      "item_key": "diagram_shape:928330d5-903e-572c-9d41-5fde99d51ed1",
+      "response": {
+        "response_type": "find_the_degree",
+        "interval": "5",
+        "string": 1,
+        "fret": 3,
+        "latency_ms": 2200
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2200,
+          "answer_key": {
+            "interval": "5",
+            "cells": [
+              {
+                "string": 4,
+                "fret": 5
+              },
+              {
+                "string": 1,
+                "fret": 3
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "find the degree: another degree of the shape is wrong",
+      "item_key": "diagram_shape:928330d5-903e-572c-9d41-5fde99d51ed1",
+      "response": {
+        "response_type": "find_the_degree",
+        "interval": "3",
+        "string": 3,
+        "fret": 5,
+        "latency_ms": 2700
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2700,
+          "answer_key": {
+            "interval": "3",
+            "cells": [
+              {
+                "string": 2,
+                "fret": 5
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "find the degree: the asked pitch outside the shape is wrong",
+      "item_key": "diagram_shape:928330d5-903e-572c-9d41-5fde99d51ed1",
+      "response": {
+        "response_type": "find_the_degree",
+        "interval": "3",
+        "string": 4,
+        "fret": 2,
+        "latency_ms": 3000
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 3000,
+          "answer_key": {
+            "interval": "3",
+            "cells": [
+              {
+                "string": 2,
+                "fret": 5
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "find the degree: a cell with no marker is wrong",
+      "item_key": "diagram_shape:6d371133-39a7-504b-9a32-1b087fb44569",
+      "response": {
+        "response_type": "find_the_degree",
+        "interval": "b3",
+        "string": 5,
+        "fret": 8,
+        "latency_ms": 3500
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 3500,
+          "answer_key": {
+            "interval": "b3",
+            "cells": [
+              {
+                "string": 6,
+                "fret": 8
+              },
+              {
+                "string": 3,
+                "fret": 5
+              },
+              {
+                "string": 1,
+                "fret": 8
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "find the degree: the root is never asked",
+      "item_key": "diagram_shape:928330d5-903e-572c-9d41-5fde99d51ed1",
+      "response": {
+        "response_type": "find_the_degree",
+        "interval": "R",
+        "string": 5,
+        "fret": 3,
+        "latency_ms": 1500
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "degree_not_in_shape"
+      }
+    },
+    {
+      "name": "find the degree: a degree the shape does not have",
+      "item_key": "diagram_shape:928330d5-903e-572c-9d41-5fde99d51ed1",
+      "response": {
+        "response_type": "find_the_degree",
+        "interval": "b3",
+        "string": 2,
+        "fret": 4,
+        "latency_ms": 1800
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "degree_not_in_shape"
+      }
+    },
+    {
+      "name": "find the degree: a tap on a string the instrument does not have",
+      "item_key": "diagram_shape:928330d5-903e-572c-9d41-5fde99d51ed1",
+      "response": {
+        "response_type": "find_the_degree",
+        "interval": "3",
+        "string": 7,
+        "fret": 5,
+        "latency_ms": 2000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_cell"
+      }
+    },
+    {
+      "name": "a fretboard cell response does not fit a diagram shape",
+      "item_key": "diagram_shape:928330d5-903e-572c-9d41-5fde99d51ed1",
+      "response": {
+        "response_type": "name_the_note",
+        "note_name": "C",
+        "latency_ms": 1500
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "an option choice does not fit a diagram shape",
+      "item_key": "diagram_shape:928330d5-903e-572c-9d41-5fde99d51ed1",
+      "response": {
+        "response_type": "option_choice",
+        "option_ids": [
+          "0f0b1c4e-5d1a-4b7e-9c2a-3e8f6a7b9c01"
+        ],
+        "latency_ms": 1500
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "an unknown diagram",
+      "item_key": "diagram_shape:00000000-0000-4000-8000-000000000000",
+      "response": {
+        "response_type": "name_the_shape",
+        "shape": "A",
+        "latency_ms": 2000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "a diagram that is not a drill shape",
+      "item_key": "diagram_shape:67ff6d61-d8ba-5f44-96e1-c3b520f04ffa",
+      "response": {
+        "response_type": "name_the_shape",
+        "shape": "A",
+        "latency_ms": 2000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    }
+  ]
+}

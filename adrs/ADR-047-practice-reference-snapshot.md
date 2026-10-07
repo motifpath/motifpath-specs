@@ -8,6 +8,9 @@
 **Amended:** 2026-10-05, PB-22 slice 3. The snapshot also holds every fluent time version, as
 `drill_threshold` documents, and the sync on start writes them first and runs each part regardless
 of the others.
+**Amended:** 2026-10-06, PB-22 slice 4 (diagram shapes). A `diagram` document that is a drill shape
+also holds its layout instrument, its shape family and member, its family's members, and its
+positions (string, fret, interval), which `diagram_shape.v1` grades from.
 
 ---
 
@@ -47,7 +50,9 @@ snapshot.**
 - **Core is the only writer.** The worker and every other reader treat the collection as read-only.
 - **One document per reference row a grader can need,** keyed by `{kind, id}`:
   - `instrument`: tuning, string count, and the layout instrument whose cells it shares;
-  - `diagram`: linked instrument ids and playback `tempo_bpm` (null when it has no sequence);
+  - `diagram`: linked instrument ids and playback `tempo_bpm` (null when it has no sequence); for
+    a drill shape, also its layout instrument, shape family, member, the family's members and its
+    positions;
   - `exercise`: exercise type, option ids, correct option ids and instrument ids;
   - `drill_threshold`: one version of a drill template's fluent time: the template key, version,
     `effective_from` and `fluent_net_ms`. Timed answers are judged by the version in force when they

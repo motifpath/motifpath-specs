@@ -1,5 +1,5 @@
-# MotifPath practice drill catalog v1 — the drill templates, the generated fretboard cells
-# and the timed thresholds installed in every environment. Rules: practice-drills.md.
+# MotifPath practice drill catalog v1 — the drill templates, the generated fretboard cells,
+# the diagram shape families and the timed thresholds installed in every environment. Rules: practice-drills.md.
 #
 # IDs are UUID v5 under the catalog namespace, from "drill-template/<key>" and
 # "drill-threshold/<template key>/v<version>" (reference-data.md).
@@ -7,6 +7,8 @@
 templates:
   - {key: "fretboard_cell:name_the_note", item_kind: fretboard_cell, response_type: name_the_note, timed: true, names: {en: "Name the note", pt_BR: "Diga a nota"}, id: 4c6ffb77-ee8b-5fda-b243-784f4209bc65}
   - {key: "fretboard_cell:find_the_note", item_kind: fretboard_cell, response_type: find_the_note, timed: true, names: {en: "Find the note", pt_BR: "Ache a nota"}, id: 6e38da0b-df26-5aa8-ab14-3b6640582174}
+  - {key: "diagram_shape:name_the_shape", item_kind: diagram_shape, response_type: name_the_shape, timed: true, names: {en: "Name the shape", pt_BR: "Diga a forma"}, id: 30abb724-d181-56d0-8255-889411531213}
+  - {key: "diagram_shape:find_the_degree", item_kind: diagram_shape, response_type: find_the_degree, timed: true, names: {en: "Find the degree", pt_BR: "Ache o grau"}, id: c11e550e-1612-5414-ba78-298e158700d0}
   - {key: "exercise:text_response", item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Text exercises", pt_BR: "Exercícios de texto"}, id: eee88cdc-8c03-5246-b798-3ccf6941875f}
   - {key: "exercise:audio_recognition", item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Listening exercises", pt_BR: "Exercícios de escuta"}, id: e11fdaf6-8f60-5348-ab8b-0333cb31c31f}
   - {key: "exercise:image_recognition", item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Image recognition exercises", pt_BR: "Exercícios de reconhecimento de imagem"}, id: bfe9f72d-a2e9-5f43-a774-115b7da268f8}
@@ -27,6 +29,67 @@ fretboard_cells:
       guitar: {strings: [4, 3, 2, 1], frets: [0, 11]}
       electric-bass: {strings: [2, 1], frets: [0, 11]}
 
+# Which catalog diagrams are practised as shapes in the head. A family takes the catalog
+# diagrams whose key matches its pattern (the keys of basic-guitar-diagrams.md's generator);
+# the {shape} part names the member the diagram is, and members are listed in the order a
+# name_the_shape question offers them. A shape is one item per diagram, keyed by its diagram
+# id, and rolls up to its diagram's skill and concept. Every shape is asked through both
+# diagram_shape templates.
+diagram_shapes:
+  - family: caged-grip
+    diagrams: "caged/{root}/{shape}/{shift}"
+    names: {en: "CAGED grips", pt_BR: "Formas do CAGED"}
+    members:
+      - {shape: "C", names: {en: "C shape", pt_BR: "Forma de C"}}
+      - {shape: "A", names: {en: "A shape", pt_BR: "Forma de A"}}
+      - {shape: "G", names: {en: "G shape", pt_BR: "Forma de G"}}
+      - {shape: "E", names: {en: "E shape", pt_BR: "Forma de E"}}
+      - {shape: "D", names: {en: "D shape", pt_BR: "Forma de D"}}
+  - family: major-pentatonic-box
+    diagrams: "pentatonic-box/major-pentatonic/{root}/{shape}/{fret}"
+    names: {en: "Major pentatonic boxes", pt_BR: "Desenhos da pentatônica maior"}
+    members:
+      - {shape: "1", names: {en: "Box 1", pt_BR: "Desenho 1"}}
+      - {shape: "2", names: {en: "Box 2", pt_BR: "Desenho 2"}}
+      - {shape: "3", names: {en: "Box 3", pt_BR: "Desenho 3"}}
+      - {shape: "4", names: {en: "Box 4", pt_BR: "Desenho 4"}}
+      - {shape: "5", names: {en: "Box 5", pt_BR: "Desenho 5"}}
+  - family: minor-pentatonic-box
+    diagrams: "pentatonic-box/minor-pentatonic/{root}/{shape}/{fret}"
+    names: {en: "Minor pentatonic boxes", pt_BR: "Desenhos da pentatônica menor"}
+    members:
+      - {shape: "1", names: {en: "Box 1", pt_BR: "Desenho 1"}}
+      - {shape: "2", names: {en: "Box 2", pt_BR: "Desenho 2"}}
+      - {shape: "3", names: {en: "Box 3", pt_BR: "Desenho 3"}}
+      - {shape: "4", names: {en: "Box 4", pt_BR: "Desenho 4"}}
+      - {shape: "5", names: {en: "Box 5", pt_BR: "Desenho 5"}}
+  - family: triad
+    diagrams: "arpeggio/{shape}-triad/{root}/frets-0-12"
+    names: {en: "Triads", pt_BR: "Tríades"}
+    members:
+      - {shape: "major", names: {en: "Major triad", pt_BR: "Tríade maior"}}
+      - {shape: "minor", names: {en: "Minor triad", pt_BR: "Tríade menor"}}
+      - {shape: "diminished", names: {en: "Diminished triad", pt_BR: "Tríade diminuta"}}
+      - {shape: "augmented", names: {en: "Augmented triad", pt_BR: "Tríade aumentada"}}
+  - family: major-scale-window
+    diagrams: "caged-window/major/{root}/{shape}/{shift}"
+    names: {en: "Major scale windows", pt_BR: "Regiões da escala maior"}
+    members:
+      - {shape: "C", names: {en: "C shape window", pt_BR: "Região da forma de C"}}
+      - {shape: "A", names: {en: "A shape window", pt_BR: "Região da forma de A"}}
+      - {shape: "G", names: {en: "G shape window", pt_BR: "Região da forma de G"}}
+      - {shape: "E", names: {en: "E shape window", pt_BR: "Região da forma de E"}}
+      - {shape: "D", names: {en: "D shape window", pt_BR: "Região da forma de D"}}
+  - family: natural-minor-scale-window
+    diagrams: "caged-window/natural-minor/{root}/{shape}/{shift}"
+    names: {en: "Natural minor scale windows", pt_BR: "Regiões da escala menor natural"}
+    members:
+      - {shape: "C", names: {en: "C shape window", pt_BR: "Região da forma de C"}}
+      - {shape: "A", names: {en: "A shape window", pt_BR: "Região da forma de A"}}
+      - {shape: "G", names: {en: "G shape window", pt_BR: "Região da forma de G"}}
+      - {shape: "E", names: {en: "E shape window", pt_BR: "Região da forma de E"}}
+      - {shape: "D", names: {en: "D shape window", pt_BR: "Região da forma de D"}}
+
 # Versioned fluent times, net of the student's tap time (and, for exercises with audio, of the
 # audio heard once). Adjust a fluent time by adding a version with a later effective_from; never
 # edit an installed one. Every template starts from a team-set default (source: default); the
@@ -39,3 +102,5 @@ thresholds:
   - {template: "exercise:audio_selection", version: 1, effective_from: "2026-10-01", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 61b55338-dee3-5391-b556-dc8fe121ea6d}
   - {template: "fretboard_cell:name_the_note", version: 1, effective_from: "2026-10-06", fluent_net_ms: 3000, source: default, sessions: 0, students: 0, id: bf63ad0e-f1c7-52ba-a303-230472134f6c}
   - {template: "fretboard_cell:find_the_note", version: 1, effective_from: "2026-10-06", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: b4038212-bd6e-5749-8b39-cc8862e1974e}
+  - {template: "diagram_shape:name_the_shape", version: 1, effective_from: "2026-10-06", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 1d23d8ce-4370-5f08-9fcb-13c617874643}
+  - {template: "diagram_shape:find_the_degree", version: 1, effective_from: "2026-10-06", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 9015ea31-c12f-5cd5-a5ce-6e0c0b507644}

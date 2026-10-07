@@ -20,7 +20,9 @@ Each file holds:
   missing here counts as unknown.
   - `instruments`: layout instruments with their tuning, lowest string first.
   - `exercises`: options, and which of them are correct.
-  - `diagrams`: the diagrams that exist.
+  - `diagrams`: the diagrams that exist. A drill shape also has its layout instrument, its
+    family and member, and its positions with their intervals.
+  - `shape_families`: each shape family's members, in the order they are offered.
 - `cases`: each case is an `item_key`, a raw `response` (as a client sends it in
   `practice.item_answered`) and the `expected` result. The result is either
   `{"result": "graded", "evidence": {...}}` or `{"result": "rejected", "reason": "..."}`.
@@ -31,10 +33,12 @@ Each file holds:
   - `fretboard_cell` → `fretboard_cell.v1`
   - `exercise` → `exercise_option.v1`
   - `play_along` and `chord_change` → `self_rating.v1`
+  - `diagram_shape` → `diagram_shape.v1`
 - **Checks run in this order, and the first failure is the rejection:**
   1. The response type fits the item kind (`response_does_not_fit_item`).
   2. What the key points at exists (`unknown_reference`).
-  3. The cell or the selected options exist (`invalid_cell`, `unknown_option`).
+  3. The cell, the selected options, the named shape or the asked degree exist
+     (`invalid_cell`, `unknown_option`, `degree_not_in_shape`).
   4. The response carries the measure its kind needs, and no other (`measure_missing`,
      `response_does_not_fit_item`).
 - **A rejection stores no evidence.**
@@ -48,6 +52,9 @@ Each file holds:
   copies each option's content (label, image, audio, region, diagram), which these cases
   don't pin since their reference has none. The server stores it; a client's instant
   feedback may ignore it.
+  For a named diagram shape, its `shape_family` and `shape`. For a degree found on one, the
+  asked `interval` and the `cells` (string and fret) of every position of the shape that is
+  that interval, in the diagram's position order.
   Adding it to `exercise_option.v1`'s cases changes no grading rule.
 - **Self-assessed evidence** is `source`, `rating` and the one measure its kind takes:
   `tempo_bpm` for a play-along, `changes_per_minute` for a chord change.
@@ -70,6 +77,18 @@ Each file holds:
 - Right only when the selected options are exactly the exercise's correct options, in any
   order. Selecting fewer or more is wrong.
 - Selecting an option the exercise doesn't have is `unknown_option`.
+
+### `diagram_shape.v1`
+
+- The item key names a diagram. A diagram that isn't a drill shape (it has no family) is
+  `unknown_reference`.
+- **Name the shape:** right when the named member is the diagram's member. A member its
+  family doesn't have is `unknown_option`.
+- **Find the degree:** right when the tap is one of the diagram's positions with the asked
+  interval; any of them counts. A tap anywhere else is wrong, the same pitch outside the
+  shape included. The root is shown, so asking `R`, or an interval the shape doesn't have,
+  is `degree_not_in_shape`. A string outside 1 to the layout instrument's string count is
+  `invalid_cell`.
 
 ### `self_rating.v1`
 
