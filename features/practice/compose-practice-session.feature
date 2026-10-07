@@ -116,7 +116,7 @@ Feature: Compose a practice session
 
   @wip
   Scenario: An in-hand session with nothing to play is not found
-    Given "alice"'s only practice on guitar is fretboard cells and diagram shapes
+    Given "alice"'s only practice on guitar is fretboard cells
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the request is refused with a not-found error
 
