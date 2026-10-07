@@ -16,14 +16,12 @@ Feature: Practise diagram shapes in the head
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: Every CAGED major grip in the catalog is a shape of the caged-grip family
     When the shapes of family "caged-grip" are listed
     Then there are 52 shapes, one per catalog diagram "caged/{root}/{shape}/{shift}"
     And each shape's item key names its diagram
     And the diagram "C major — CAGED A, shift 3" is the member "A"
 
-  @wip
   Scenario: Every shape can be asked both ways
     When a shape of family "minor-pentatonic-box" is picked for practice
     Then it can be asked through "diagram_shape:name_the_shape" or "diagram_shape:find_the_degree"
@@ -53,12 +51,10 @@ Feature: Practise diagram shapes in the head
     When the shape "B major — CAGED A, shift 2" is asked as name_the_shape
     Then the options include "C shape", although B has no C-shape grip inside frets 0–12
 
-  @wip
   Scenario: The same shape at another root is another item
     When the shapes "C major — CAGED A, shift 3" and "D major — CAGED A, shift 5" are listed
     Then they have different item keys
 
-  @wip
   Scenario: A catalog map that belongs to no family is not a shape
     When the shapes of every family are listed
     Then the diagram "C Chromatic map — Frets 0–12" is not among them
@@ -70,13 +66,11 @@ Feature: Practise diagram shapes in the head
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A family that matches no catalog diagram fails to install
     Given a drill catalog listing the family "lydian-window" with the pattern "caged-window/lydian/{root}/{shape}/{shift}"
     When the drill catalog is installed
     Then the installation fails, naming the family "lydian-window"
 
-  @wip
   Scenario: A catalog diagram whose shape isn't a member of its family fails to install
     Given a drill catalog listing the family "caged-grip" with only the members "C", "A", "G" and "E"
     When the drill catalog is installed
