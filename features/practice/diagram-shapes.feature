@@ -30,7 +30,6 @@ Feature: Practise diagram shapes in the head
     When the shape "C major — CAGED A, shift 3" is asked as name_the_shape
     Then the options are "C shape", "A shape", "G shape", "E shape" and "D shape", in that order
 
-  @wip
   Scenario: A shape's item names its member and the instrument it is drawn on
     When the shape "C major — CAGED A, shift 3" is asked
     Then the item's shape is "A"
