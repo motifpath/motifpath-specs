@@ -11,10 +11,13 @@ PracticeItemKey:
     - exercise:<exercise id> — an authored exercise.
     - play_along:<diagram id> — playing a diagram along with its playback, at a tempo.
     - chord_change:<from diagram id>:<to diagram id> — changing between two chord diagrams.
+    - diagram_shape:<diagram id> — a catalog shape recalled in the head: naming it among its
+      family, or finding one of its degrees. One diagram is one item: the same shape in
+      another key has other positions, so it is another item.
 
     Item kinds are an open set: a new kind adds its own prefix and key scheme here, a
     grader, and its golden cases.
-  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$'
+  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diagram_shape:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$'
   example: 'fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:3'
 
 PracticeResponse:
@@ -30,11 +33,15 @@ PracticeResponse:
       find_the_note: '#/FindTheNoteResponse'
       option_choice: '#/OptionChoiceResponse'
       self_rating: '#/SelfRatingResponse'
+      name_the_shape: '#/NameTheShapeResponse'
+      find_the_degree: '#/FindTheDegreeResponse'
   oneOf:
     - $ref: '#/NameTheNoteResponse'
     - $ref: '#/FindTheNoteResponse'
     - $ref: '#/OptionChoiceResponse'
     - $ref: '#/SelfRatingResponse'
+    - $ref: '#/NameTheShapeResponse'
+    - $ref: '#/FindTheDegreeResponse'
 
 NameTheNoteResponse:
   type: object
@@ -167,6 +174,75 @@ SelfRatingResponse:
     - response_type
     - rating
 
+NameTheShapeResponse:
+  type: object
+  description: |
+    Answer to a diagram shape shown without its name: the student picks which member of its
+    family it is (a CAGED shape, a pentatonic box, a triad quality).
+  properties:
+    response_type:
+      type: string
+      enum:
+        - name_the_shape
+      description: Discriminator. The student named the shape shown.
+    shape:
+      type: string
+      pattern: '^[A-Za-z0-9][A-Za-z0-9-]*$'
+      description: |
+        The member of the shape's family the student picked, by its key in the practice
+        drill catalog (for example "A" for the CAGED A shape, "2" for pentatonic box 2,
+        "minor" for a minor triad).
+    latency_ms:
+      type: integer
+      minimum: 0
+      description: Milliseconds from the moment the shape was shown to the answer.
+  additionalProperties: false
+  required:
+    - response_type
+    - shape
+    - latency_ms
+
+FindTheDegreeResponse:
+  type: object
+  description: |
+    Answer to a degree asked on a diagram shape shown with its root marked and its other
+    positions unlabelled: the student taps the position that is the asked degree.
+  properties:
+    response_type:
+      type: string
+      enum:
+        - find_the_degree
+      description: Discriminator. The student tapped a position to find the degree asked.
+    interval:
+      $ref: '#/ShapeInterval'
+    string:
+      type: integer
+      minimum: 1
+      description: The string tapped, 1 being the highest-pitched.
+    fret:
+      type: integer
+      minimum: 0
+      description: The fret tapped; 0 is the open string.
+    latency_ms:
+      type: integer
+      minimum: 0
+      description: Milliseconds from the moment the degree was asked to the tap.
+  additionalProperties: false
+  required:
+    - response_type
+    - interval
+    - string
+    - fret
+    - latency_ms
+
+ShapeInterval:
+  type: string
+  enum: [R, b2, '2', '#2', b3, '3', '4', '#4', b5, '5', '#5', b6, '6', bb7, b7, '7', b9, '9', '#9', '11', '#11', b13, '13']
+  description: |
+    A diagram position's interval code, as in Position.interval. In a find the degree
+    response, the degree that was asked: one of the shape's intervals other than R, since
+    the root is shown.
+
 PracticePickReason:
   type: string
   enum:
@@ -236,6 +312,7 @@ PracticeItemKind:
     - exercise
     - play_along
     - chord_change
+    - diagram_shape
   description: |
     The kind of a practice item, the prefix of its item key. The set is open: a new kind
     is added with its key scheme, grader and golden cases.
@@ -371,7 +448,9 @@ AnswerKey:
     or its options deleted. For a fretboard cell: the asked string and fret and the cell's note,
     spelled with sharps (any spelling of that pitch is right, and when finding the note, any
     octave on that string). For an exercise: every option as the student was shown it, each
-    with whether it was correct, so both their pick and the right answer can be read.
+    with whether it was correct, so both their pick and the right answer can be read. For a
+    diagram shape named: its family and the member it is. For a degree found on a diagram
+    shape: the asked interval and every position of the shape that is that interval.
   properties:
     string:
       type: integer
@@ -393,6 +472,33 @@ AnswerKey:
       description: |
         Every option of the exercise as it was when the answer was graded, in the exercise's
         order, with its content and whether it was correct. Exercises only.
+    shape_family:
+      type: string
+      pattern: '^[a-z][a-z0-9-]*$'
+      description: The shape's family in the practice drill catalog. Diagram shapes named only.
+    shape:
+      type: string
+      pattern: '^[A-Za-z0-9][A-Za-z0-9-]*$'
+      description: The member of its family the shape is. Diagram shapes named only.
+    interval:
+      $ref: '#/ShapeInterval'
+    cells:
+      type: array
+      minItems: 1
+      items:
+        type: object
+        properties:
+          string:
+            type: integer
+            minimum: 1
+          fret:
+            type: integer
+            minimum: 0
+        additionalProperties: false
+        required: [string, fret]
+      description: |
+        Every position of the shape that is the asked interval, in the diagram's position
+        order. Degrees found on a diagram shape only.
   additionalProperties: false
 
 FretboardDrill:
@@ -403,3 +509,13 @@ FretboardDrill:
   description: |
     How a fretboard cell is asked. name_the_note = the cell is shown and the student names
     its note; find_the_note = the note and string are named and the student taps the cell.
+
+DiagramShapeDrill:
+  type: string
+  enum:
+    - name_the_shape
+    - find_the_degree
+  description: |
+    How a diagram shape is asked. name_the_shape = the shape is shown without its name and the
+    student picks it among its family's members; find_the_degree = the shape is shown with its
+    root marked and its other positions unlabelled, and the student taps the asked degree.
