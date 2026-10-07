@@ -108,6 +108,16 @@ guitar catalog.
   Open voicings also take `open-chord-shapes`, voicings tagged `barre` take
   `barre-chord-shapes`, and slash chords take `slash-chords`.
 
+## Practice
+
+A voicing's diagram plays like a play-along but is not a practice item of its own.
+- Knowledge levels and coverage don't count it.
+- Practice sessions don't offer it.
+- It is practised only where content embeds it.
+
+Any change to this needs a decision of its own, since counting 538 unpractised voicings would lower
+every student's standing on the chord skills.
+
 ## Ranking
 
 Within a chord, `recommended_rank` orders voicings by:
@@ -125,8 +135,7 @@ UUID v5 under the catalog namespace (`reference-data.md`):
 | Rows | Name hashed |
 |---|---|
 | Chord definition | `chord-definition/<canonical symbol>` |
-| Chord template | `chord-template/<key>` |
-| Chord voicing (template) | `chord-voicing/<template key>/<root>` |
+| Chord voicing (template) | `chord-voicing/<template key>/<root>`; the template key is also the voicing's `template_key`. Templates aren't rows of their own. |
 | Chord voicing (open) | `chord-voicing/<open voicing key>` |
 | Voicing diagram | `chord-diagram/<voicing name hashed above>` |
 | Voicing position | `chord-diagram/<voicing name hashed above>/string-<n>` |
