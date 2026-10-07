@@ -1,0 +1,1125 @@
+{
+  "format": "chordpro.v1",
+  "description": "ChordPro text -> the song chart draft it imports as (metadata, document, warnings) -> the ChordPro that draft exports as. Rules in README.md.",
+  "cases": [
+    {
+      "name": "metadata, a verse and a chorus",
+      "input": "{title: Asa Branca}\n{artist: Luiz Gonzaga}\n{key: G}\n{capo: 2}\n{tempo: 96}\n{time: 2/4}\n\n{start_of_verse}\n[G]Quando olhei a [C]terra ardendo\n{end_of_verse}\n\n{start_of_chorus}\n[D]Que braseiro, que for[G]nalha\n{end_of_chorus}\n",
+      "expected": {
+        "metadata": {
+          "title": "Asa Branca",
+          "artist": "Luiz Gonzaga",
+          "concert_key": "G",
+          "capo_fret": 2,
+          "tempo_bpm": 96,
+          "time_signature": {
+            "beats": 2,
+            "beat_value": 4
+          }
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "verse",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Quando olhei a ",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "terra ardendo",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a2",
+                            "writtenSymbol": "C",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "chorus",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Que braseiro, que for",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a3",
+                            "writtenSymbol": "D",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "nalha",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a4",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": []
+      },
+      "export": "{title: Asa Branca}\n{artist: Luiz Gonzaga}\n{key: G}\n{capo: 2}\n{tempo: 96}\n{time: 2/4}\n\n{start_of_verse}\n[G]Quando olhei a [C]terra ardendo\n{end_of_verse}\n\n{start_of_chorus}\n[D]Que braseiro, que for[G]nalha\n{end_of_chorus}\n"
+    },
+    {
+      "name": "a chord at the end of a line anchors to a single space",
+      "input": "{title: Song}\n{artist: Someone}\n{start_of_verse}\nI [C]love you[G]\n{end_of_verse}\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "verse",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "I "
+                    },
+                    {
+                      "type": "text",
+                      "text": "love you",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "C",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": " ",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a2",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": []
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n{start_of_verse}\nI [C]love you[G]\n{end_of_verse}\n"
+    },
+    {
+      "name": "a chords-only line anchors each chord to a space",
+      "input": "{title: Song}\n{artist: Someone}\n{start_of_verse}\n[C] [G] [Am]\n{end_of_verse}\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "verse",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": " ",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "C",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": " ",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a2",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": " ",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a3",
+                            "writtenSymbol": "Am",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": []
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n{start_of_verse}\n[C] [G] [Am]\n{end_of_verse}\n"
+    },
+    {
+      "name": "two chords with nothing between them",
+      "input": "{title: Song}\n{artist: Someone}\n{start_of_verse}\n[C][G]Hello\n{end_of_verse}\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "verse",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": " ",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "C",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "Hello",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a2",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": []
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n{start_of_verse}\n[C] [G]Hello\n{end_of_verse}\n"
+    },
+    {
+      "name": "a chord inside a word",
+      "input": "{title: Song}\n{artist: Someone}\n{start_of_verse}\nHel[C]lo there\n{end_of_verse}\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "verse",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Hel"
+                    },
+                    {
+                      "type": "text",
+                      "text": "lo there",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "C",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": []
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n{start_of_verse}\nHel[C]lo there\n{end_of_verse}\n"
+    },
+    {
+      "name": "lines outside any section form one unlabelled section, across blank lines",
+      "input": "{title: Song}\n{artist: Someone}\n[G]First line\n\n[C]Second line\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "other",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "First line",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Second line",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a2",
+                            "writtenSymbol": "C",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": []
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n[G]First line\n[C]Second line\n"
+    },
+    {
+      "name": "a section label and a comment inside the section",
+      "input": "{title: Song}\n{artist: Someone}\n{start_of_chorus: Refrão}\n{comment: Repeat twice}\n[G]La la la\n{end_of_chorus}\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "chorus",
+                "label": "Refrão"
+              },
+              "content": [
+                {
+                  "type": "comment",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Repeat twice"
+                    }
+                  ]
+                },
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "La la la",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": []
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n{start_of_chorus: Refrão}\n{comment: Repeat twice}\n[G]La la la\n{end_of_chorus}\n"
+    },
+    {
+      "name": "short forms and case-insensitive names",
+      "input": "{t: Song}\n{ARTIST: Someone}\n{soc}\n{c: Softly}\n[G]La\n{eoc}\n{sov: Verse 1}\n[C]Lo\n{eov}\n{sob}\n[D]Li\n{eob}\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "chorus",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "comment",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Softly"
+                    }
+                  ]
+                },
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "La",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "verse",
+                "label": "Verse 1"
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Lo",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a2",
+                            "writtenSymbol": "C",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "bridge",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Li",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a3",
+                            "writtenSymbol": "D",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": []
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n{start_of_chorus}\n{comment: Softly}\n[G]La\n{end_of_chorus}\n\n{start_of_verse: Verse 1}\n[C]Lo\n{end_of_verse}\n\n{start_of_bridge}\n[D]Li\n{end_of_bridge}\n"
+    },
+    {
+      "name": "an unsupported directive is skipped with a warning; an editor comment is skipped silently",
+      "input": "{title: Song}\n{subtitle: Live}\n{artist: Someone}\n# tabbed by me\n{define: G base-fret 1 frets 3 2 0 0 0 3}\n[G]La\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "other",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "La",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": [
+          {
+            "line": 2,
+            "kind": "unsupported_directive",
+            "text": "{subtitle: Live}"
+          },
+          {
+            "line": 5,
+            "kind": "unsupported_directive",
+            "text": "{define: G base-fret 1 frets 3 2 0 0 0 3}"
+          }
+        ]
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n[G]La\n"
+    },
+    {
+      "name": "an unclosed chord bracket makes the line plain text",
+      "input": "{title: Song}\n{artist: Someone}\n[G Quando olhei\n[C]terra\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "other",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[G Quando olhei"
+                    }
+                  ]
+                },
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "terra",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "C",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": [
+          {
+            "line": 3,
+            "kind": "unclosed_chord",
+            "text": "[G Quando olhei"
+          }
+        ]
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n[G Quando olhei\n[C]terra\n"
+    },
+    {
+      "name": "metadata values that don't fit are skipped",
+      "input": "{title: Song}\n{artist: Someone}\n{key: H}\n{capo: 15}\n{tempo: fast}\n{time: 4-4}\n{comment}\n{title\n[G]La\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "other",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "La",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": [
+          {
+            "line": 3,
+            "kind": "malformed_directive",
+            "text": "{key: H}"
+          },
+          {
+            "line": 4,
+            "kind": "malformed_directive",
+            "text": "{capo: 15}"
+          },
+          {
+            "line": 5,
+            "kind": "malformed_directive",
+            "text": "{tempo: fast}"
+          },
+          {
+            "line": 6,
+            "kind": "malformed_directive",
+            "text": "{time: 4-4}"
+          },
+          {
+            "line": 7,
+            "kind": "malformed_directive",
+            "text": "{comment}"
+          },
+          {
+            "line": 8,
+            "kind": "malformed_directive",
+            "text": "{title"
+          }
+        ]
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n[G]La\n"
+    },
+    {
+      "name": "unbalanced section directives close the open section",
+      "input": "{title: Song}\n{artist: Someone}\n{end_of_chorus}\n{start_of_verse}\n[G]One\n{start_of_chorus}\n[C]Two\n{end_of_bridge}\n[D]Three\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "verse",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "One",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "chorus",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Two",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a2",
+                            "writtenSymbol": "C",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "other",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Three",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a3",
+                            "writtenSymbol": "D",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": [
+          {
+            "line": 3,
+            "kind": "unbalanced_section",
+            "text": "{end_of_chorus}"
+          },
+          {
+            "line": 6,
+            "kind": "unbalanced_section",
+            "text": "{start_of_chorus}"
+          },
+          {
+            "line": 8,
+            "kind": "unbalanced_section",
+            "text": "{end_of_bridge}"
+          }
+        ]
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n{start_of_verse}\n[G]One\n{end_of_verse}\n\n{start_of_chorus}\n[C]Two\n{end_of_chorus}\n\n[D]Three\n"
+    },
+    {
+      "name": "a section with no lines is dropped",
+      "input": "{title: Song}\n{artist: Someone}\n{start_of_bridge}\n{end_of_bridge}\n{start_of_verse}\n[G]La\n{end_of_verse}\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "verse",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "La",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": [
+          {
+            "line": 3,
+            "kind": "empty_section",
+            "text": "{start_of_bridge}"
+          }
+        ]
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n{start_of_verse}\n[G]La\n{end_of_verse}\n"
+    },
+    {
+      "name": "a chord symbol is kept exactly as written",
+      "input": "{title: Song}\n{artist: Someone}\n[B♭maj7]Um [ G ]dois []três\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "other",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Um ",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "B♭maj7",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "text": "dois []três",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a2",
+                            "writtenSymbol": " G ",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": []
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n[B♭maj7]Um [ G ]dois []três\n"
+    },
+    {
+      "name": "CRLF line endings and trailing whitespace",
+      "input": "{title: Song}\r\n{artist: Someone}\r\n[G]La la   \r\n",
+      "expected": {
+        "metadata": {
+          "title": "Song",
+          "artist": "Someone"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "other",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "La la",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "G",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": []
+      },
+      "export": "{title: Song}\n{artist: Someone}\n\n[G]La la\n"
+    },
+    {
+      "name": "metadata set twice keeps the last value; a value without a space after the colon",
+      "input": "{title:First}\n{title: Second}\n{artist:Someone}\n{key:F#m}\n[F#m]La\n",
+      "expected": {
+        "metadata": {
+          "title": "Second",
+          "artist": "Someone",
+          "concert_key": "F#m"
+        },
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "section",
+              "attrs": {
+                "kind": "other",
+                "label": null
+              },
+              "content": [
+                {
+                  "type": "lyricLine",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "La",
+                      "marks": [
+                        {
+                          "type": "chordAnchor",
+                          "attrs": {
+                            "anchorId": "a1",
+                            "writtenSymbol": "F#m",
+                            "chordDefinitionId": null,
+                            "chordVoicingId": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "import_warnings": []
+      },
+      "export": "{title: Second}\n{artist: Someone}\n{key: F#m}\n\n[F#m]La\n"
+    }
+  ]
+}

@@ -92,6 +92,32 @@ for (const file of chordFiles) {
 }
 if (chordFiles.length === 0) fail(`no golden-case files in ${chordDir}`)
 
+// ChordPro import/export cases in golden/chordpro/: each file against its schema.json, its file
+// name against its format id, every imported body against SongChartDocument and every warning
+// against ChordProImportWarning, so the cases can't drift from what the import returns.
+const chordProDir = 'golden/chordpro'
+const validateChordProFile = ajv.compile(JSON.parse(readFileSync(join(chordProDir, 'schema.json'), 'utf8')))
+const validateDocument = ajv.compile({ $ref: 'core.yaml#/$defs/SongChartDocument' })
+const validateImportWarning = ajv.compile({ $ref: 'core.yaml#/$defs/ChordProImportWarning' })
+
+const chordProFiles = readdirSync(chordProDir).filter((f) => f.endsWith('.json') && f !== 'schema.json')
+for (const file of chordProFiles) {
+  const golden = JSON.parse(readFileSync(join(chordProDir, file), 'utf8'))
+  if (!validateChordProFile(golden)) {
+    fail(`${file}: not a valid ChordPro golden-case file`, validateChordProFile.errors)
+    continue
+  }
+  if (`${golden.format}.json` !== file) fail(`${file}: format "${golden.format}" doesn't match the file name`)
+  for (const c of golden.cases) {
+    if (!validateDocument(c.expected.body)) fail(`${file} / ${c.name}: body`, validateDocument.errors)
+    for (const w of c.expected.import_warnings) {
+      if (!validateImportWarning(w)) fail(`${file} / ${c.name}: import warning`, validateImportWarning.errors)
+    }
+  }
+  console.log(`${file}: ${golden.cases.length} cases`)
+}
+if (chordProFiles.length === 0) fail(`no golden-case files in ${chordProDir}`)
+
 if (failures > 0) {
   console.error(`${failures} problem(s)`)
   process.exit(1)

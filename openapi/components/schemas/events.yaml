@@ -25,6 +25,9 @@ TrackingEventBase:
         - practice.item_answered
         - practice.session_ended
         - practice.tap_check_completed
+        - song_chart.opened
+        - song_chart.chord_viewed
+        - song_chart.section_completed
       description: |
         Discriminator field. Determines which event-specific payload fields are present.
         The set of valid values is closed — adding a new event type requires a spec change
@@ -76,6 +79,9 @@ TrackingEvent:
       practice.item_answered: '#/PracticeItemAnsweredEvent'
       practice.session_ended: '#/PracticeSessionEndedEvent'
       practice.tap_check_completed: '#/PracticeTapCheckCompletedEvent'
+      song_chart.opened: '#/SongChartOpenedEvent'
+      song_chart.chord_viewed: '#/SongChartChordViewedEvent'
+      song_chart.section_completed: '#/SongChartSectionCompletedEvent'
   oneOf:
     - $ref: '#/LessonStartedEvent'
     - $ref: '#/LessonResumedEvent'
@@ -87,6 +93,9 @@ TrackingEvent:
     - $ref: '#/PracticeItemAnsweredEvent'
     - $ref: '#/PracticeSessionEndedEvent'
     - $ref: '#/PracticeTapCheckCompletedEvent'
+    - $ref: '#/SongChartOpenedEvent'
+    - $ref: '#/SongChartChordViewedEvent'
+    - $ref: '#/SongChartSectionCompletedEvent'
 
 ContentContext:
   type: object
@@ -489,3 +498,97 @@ PracticeTapCheckCompletedEvent:
         - event_type
         - median_tap_ms
         - tap_count
+
+SongChartContext:
+  type: object
+  description: |
+    The song chart revision a song_chart event happened in. Required on every song_chart
+    event, so a reading is tied to the exact lyrics and chords the student saw.
+  properties:
+    song_chart_id:
+      type: string
+      format: uuid
+      description: ID of the song chart being read.
+    revision_number:
+      type: integer
+      minimum: 1
+      description: The published revision being read, as returned with the chart.
+  additionalProperties: false
+  required:
+    - song_chart_id
+    - revision_number
+
+SongChartOpenedEvent:
+  allOf:
+    - $ref: '#/TrackingEventBase'
+    - type: object
+      description: |
+        Emitted when a student opens a published song chart in the reader, once per
+        opening. Reopening the chart later emits it again.
+      properties:
+        event_type:
+          type: string
+          enum:
+            - song_chart.opened
+        song_chart_context:
+          $ref: '#/SongChartContext'
+      required:
+        - event_type
+        - song_chart_context
+
+SongChartChordViewedEvent:
+  allOf:
+    - $ref: '#/TrackingEventBase'
+    - type: object
+      description: |
+        Emitted when a student taps a chord in a song chart and its voicing sheet opens.
+        Switching voicings or playbacks inside the open sheet emits nothing more.
+      properties:
+        event_type:
+          type: string
+          enum:
+            - song_chart.chord_viewed
+        song_chart_context:
+          $ref: '#/SongChartContext'
+        anchor_id:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: The anchorId of the chord the student tapped.
+        chord_definition_id:
+          type: string
+          format: uuid
+          description: The catalog chord the tapped anchor resolves to.
+        chord_voicing_id:
+          type: string
+          format: uuid
+          description: The voicing the sheet opened on.
+      required:
+        - event_type
+        - song_chart_context
+        - anchor_id
+        - chord_definition_id
+        - chord_voicing_id
+
+SongChartSectionCompletedEvent:
+  allOf:
+    - $ref: '#/TrackingEventBase'
+    - type: object
+      description: |
+        Emitted when a student marks a section of a song chart as played, with the
+        section's "played it" control. Marking it again in the same opening emits nothing.
+      properties:
+        event_type:
+          type: string
+          enum:
+            - song_chart.section_completed
+        song_chart_context:
+          $ref: '#/SongChartContext'
+        section_index:
+          type: integer
+          minimum: 0
+          description: The section marked as played, numbered from 0 in document order.
+      required:
+        - event_type
+        - song_chart_context
+        - section_index

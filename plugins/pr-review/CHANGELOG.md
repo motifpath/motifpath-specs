@@ -1,5 +1,12 @@
 # PR Review — Changelog
 
+## [1.10.0] — 2026-10-07
+
+### Changed
+- `profiles/motifpath-specs.md`: the exact event names now include `song_chart.opened`,
+  `song_chart.chord_viewed` and `song_chart.section_completed` (MOT-45, Phase 2).
+- `SKILL.md` version brought back in line with `plugin.json`; 1.9.0 bumped only the latter.
+
 ## [1.9.0] — 2026-10-07
 
 ### Added

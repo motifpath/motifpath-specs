@@ -2889,6 +2889,567 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+  /song-charts:
+    post:
+      operationId: createSongChart
+      summary: Start a new song chart
+      description: |
+        Creates a song chart with its first draft. A chart is lyrics with
+        chords anchored to the words they fall on, plus the song's key,
+        capo and tempo. Only admins author song charts. The new chart is
+        unpublished: learners can't read it until an admin publishes it.
+
+        Every chord anchor's written symbol is read by the same parser as
+        searchChords. The server sets each anchor's chordDefinitionId from
+        the result and ignores the value sent. A symbol that can't be
+        resolved is kept as written and reported in draft.warnings; it
+        doesn't stop the draft from being saved.
+      tags:
+        - Song charts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SongChartDraftInput'
+      responses:
+        "201":
+          description: The new song chart, with its draft.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongChart'
+        "400":
+          description: |
+            The request body failed schema validation: a missing or
+            out-of-range field, a language that doesn't exist, a body that
+            isn't a valid SongChartDocument, a chordVoicingId that isn't a
+            voicing of the chord its symbol names.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+    get:
+      operationId: listSongCharts
+      summary: List song charts for authoring and review
+      description: |
+        Returns song charts, most recently updated first, then by id, in
+        the {items, total, limit, offset} envelope. Only admins may list
+        song charts; learners reach a chart only through the content that
+        embeds it. Every filter is optional and they combine with AND.
+      tags:
+        - Song charts
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+          description: |
+            Case- and accent-insensitive substring match against the
+            draft's title and artist.
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/SongChartStatus'
+          description: Restricts the results to charts with this status.
+      responses:
+        "200":
+          description: A page of song charts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedSongCharts'
+        "400":
+          description: A query parameter is out of range or not one of its allowed values.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /song-charts/{song_chart_id}:
+    parameters:
+      - $ref: '#/components/parameters/SongChartId'
+    get:
+      operationId: getSongChart
+      summary: Get a song chart with its draft
+      description: |
+        Returns a song chart as its authors see it: its draft, the draft's
+        warnings and rights confirmation, and a summary of the revision
+        learners are served, if any. Only admins may read a chart this
+        way.
+      tags:
+        - Song charts
+      responses:
+        "200":
+          description: The song chart.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongChart'
+        "400":
+          description: song_chart_id is not a UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No song chart exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+    put:
+      operationId: updateSongChartDraft
+      summary: Replace a song chart's draft
+      description: |
+        Replaces the draft's metadata, body and rights confirmation. Chord
+        anchors are resolved as on createSongChart. When rights_confirmed
+        turns true, the server records the caller and the time as the
+        confirmation; when it turns false, the confirmation is cleared.
+        Editing the draft never changes what learners are served: a
+        published chart keeps serving its published revision until the
+        draft is published again.
+      tags:
+        - Song charts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SongChartDraftInput'
+      responses:
+        "200":
+          description: The song chart, with its updated draft.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongChart'
+        "400":
+          description: The request body failed schema validation, as on createSongChart.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No song chart exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /song-charts/{song_chart_id}/publish:
+    parameters:
+      - $ref: '#/components/parameters/SongChartId'
+    post:
+      operationId: publishSongChart
+      summary: Publish a song chart's draft
+      description: |
+        Publishes the draft as a new immutable revision, numbered one past
+        the chart's last, and learners are served it from then on. The
+        chart becomes published, also when it was withdrawn. The revision
+        records who published it and the rights confirmation it was
+        published with. The draft stays as it is, for the next change.
+
+        Any admin may publish, with no second reviewer. The draft must be
+        publishable as it stands: its rights are confirmed, and every chord
+        anchor is either a no-chord marking or resolves to a catalog chord
+        with a voicing to show. Anything else is refused with the full list
+        of what blocks it. A slash chord whose bass the catalog doesn't
+        have (bass_not_in_catalog) doesn't block: the learner is shown the
+        voicings of the chord without its bass.
+      tags:
+        - Song charts
+      responses:
+        "201":
+          description: The new revision.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongChartRevision'
+        "400":
+          description: song_chart_id is not a UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No song chart exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: The draft can't be published as it stands.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongChartNotPublishableError'
+
+  /song-charts/{song_chart_id}/withdraw:
+    parameters:
+      - $ref: '#/components/parameters/SongChartId'
+    post:
+      operationId: withdrawSongChart
+      summary: Stop serving a published song chart
+      description: |
+        Takes a published chart away from learners at once, for its rights
+        or any other reason. Its revisions are kept for audit. Content that
+        embeds the chart shows it as not available. Any admin may withdraw
+        a chart. A withdrawn chart is served again once it is published
+        again.
+      tags:
+        - Song charts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawSongChartRequest'
+      responses:
+        "200":
+          description: The withdrawn song chart.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongChart'
+        "400":
+          description: The request body failed schema validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No song chart exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: The chart is not published.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+
+  /song-charts/{song_chart_id}/revisions:
+    parameters:
+      - $ref: '#/components/parameters/SongChartId'
+    get:
+      operationId: listSongChartRevisions
+      summary: List a song chart's published revisions
+      description: |
+        Returns every revision the chart has been published as, newest
+        first, with who published each and its rights confirmation. A
+        chart that was
+        never published returns an empty array. Revisions never change
+        once published. Only admins may list them.
+      tags:
+        - Song charts
+      responses:
+        "200":
+          description: The chart's revisions, newest first, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SongChartRevision'
+        "400":
+          description: song_chart_id is not a UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No song chart exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /song-charts/{song_chart_id}/preview:
+    parameters:
+      - $ref: '#/components/parameters/SongChartId'
+    get:
+      operationId: previewSongChart
+      summary: Preview a song chart's draft as a learner would read it
+      description: |
+        Returns the draft in the shape learners are served, with its
+        chords and voicings, so authors and reviewers see exactly what a
+        learner would. The rights check doesn't apply: the preview is
+        never shown to learners. A chord anchor that doesn't resolve has
+        no entry in chords. Only admins may preview.
+      tags:
+        - Song charts
+      responses:
+        "200":
+          description: The draft as a learner would read it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearnerSongChart'
+        "400":
+          description: song_chart_id is not a UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No song chart exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /song-charts/{song_chart_id}/published:
+    parameters:
+      - $ref: '#/components/parameters/SongChartId'
+    get:
+      operationId: getPublishedSongChart
+      summary: Read a published song chart
+      description: |
+        Returns the chart's latest published revision for reading, with
+        every chord it uses and that chord's voicings, so the reader needs
+        no further call. Any signed-in user may read a published chart. A
+        chart that was never published, or was withdrawn, answers exactly
+        as one that doesn't exist.
+      tags:
+        - Song charts
+      responses:
+        "200":
+          description: The chart's latest published revision, with its chords and voicings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearnerSongChart'
+        "400":
+          description: song_chart_id is not a UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No song chart exists with the given ID, or it isn't published.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /song-charts/{song_chart_id}/chordpro:
+    parameters:
+      - $ref: '#/components/parameters/SongChartId'
+    get:
+      operationId: exportSongChartChordPro
+      summary: Export a song chart's draft as ChordPro
+      description: |
+        Writes the draft as ChordPro text, in the subset that
+        importSongChartChordPro reads: metadata directives, section
+        environments, comments, and chords inline in the lyrics as
+        written by the author. Only admins may export.
+      tags:
+        - Song charts
+      responses:
+        "200":
+          description: The draft as ChordPro text, UTF-8.
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: song_chart_id is not a UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No song chart exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+    put:
+      operationId: importSongChartChordPro
+      summary: Replace a song chart's draft from ChordPro
+      description: |
+        Reads ChordPro text into the draft, replacing its body and every
+        metadata field the text sets; fields the text doesn't set keep
+        their draft values. Chord anchors are resolved as on
+        updateSongChartDraft. ChordPro is only an exchange format: the
+        draft stores the document it produces, never the text.
+
+        Supported: the title (t), artist, key, capo, tempo and time
+        directives, start_of_ and end_of_
+        verse, chorus and bridge (with sov, eov, soc, eoc, sob, eob),
+        comment (c), and inline [chord] symbols. Lines outside any section
+        environment form an unlabelled section. Anything else (another
+        directive, a malformed directive, a chord bracket that isn't
+        closed) is skipped and reported in import_warnings with its line
+        number, never dropped silently.
+      tags:
+        - Song charts
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+              minLength: 1
+              maxLength: 100000
+      responses:
+        "200":
+          description: The song chart with its imported draft, and what the import skipped.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongChartChordProImport'
+        "400":
+          description: |
+            The text is empty or too long, or what it describes isn't a
+            valid draft (for example a capo outside 0–12, or no lyric
+            line at all).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No song chart exists with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /learning-paths:
     get:
       operationId: listLearningPaths
@@ -5312,6 +5873,14 @@ components:
         Case-insensitive substring match against the item's title (and
         summary, where it has one).
 
+    SongChartId:
+      name: song_chart_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID of the song chart.
   schemas:
     PageMeta:
       type: object
@@ -7438,6 +8007,760 @@ components:
         - recommended_rank
         - catalog_status
         - provenance
+
+    SongChartStatus:
+      type: string
+      enum:
+        - draft
+        - published
+        - withdrawn
+      description: |
+        Where a chart stands with learners. draft: never published.
+        published: learners are served its latest published revision.
+        withdrawn: taken away from learners until it is published again.
+
+    SongChartDocument:
+      type: object
+      description: |
+        The body of a song chart: lyrics with chords anchored to the words
+        they fall on, as ProseMirror JSON from the song chart editor. It is
+        its own document type, not a PromptDocument: it holds only
+        sections, lyric lines and comments, and its only mark is the
+        chordAnchor. Lines are kept as written; the reader lays chords out
+        over the words itself, so the document never holds spaces that
+        exist only to line chords up.
+      properties:
+        type:
+          type: string
+          enum:
+            - doc
+          description: Discriminates this object as a song chart document's root node.
+        content:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/SongChartSection'
+          description: The chart's sections, in the order they are played.
+      required:
+        - type
+        - content
+
+    SongChartSection:
+      type: object
+      description: |
+        A section of a song (a verse, a chorus, ...), holding its lines.
+        Sections are numbered from 0 in document order; the reader reports
+        a section the learner marks as played by that number.
+      properties:
+        type:
+          type: string
+          enum:
+            - section
+          description: Discriminates this node as a section.
+        attrs:
+          type: object
+          properties:
+            kind:
+              type: string
+              enum:
+                - verse
+                - chorus
+                - bridge
+                - intro
+                - outro
+                - instrumental
+                - other
+              description: What part of the song this is. other is a section with no standard kind.
+            label:
+              type: [string, "null"]
+              maxLength: 100
+              description: |
+                The section's heading as the author wrote it (e.g. "Verse 2",
+                "Refrão"); null shows no heading.
+          required:
+            - kind
+            - label
+        content:
+          type: array
+          minItems: 1
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/SongChartLyricLine'
+              - $ref: '#/components/schemas/SongChartComment'
+          description: The section's lines and comments, in order.
+      required:
+        - type
+        - attrs
+        - content
+
+    SongChartLyricLine:
+      type: object
+      description: |
+        One line of lyrics. Its text runs may carry a chordAnchor; a chord
+        with no lyric under it (an instrumental bar, a chord at the end of a
+        line) anchors to a single space.
+      properties:
+        type:
+          type: string
+          enum:
+            - lyricLine
+          description: Discriminates this node as a lyric line.
+        content:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/SongChartText'
+          description: The line's text runs, in order.
+      required:
+        - type
+        - content
+
+    SongChartComment:
+      type: object
+      description: |
+        A performance note between lines (e.g. "Repeat twice", "Slower").
+        Shown to the learner; carries no chords.
+      properties:
+        type:
+          type: string
+          enum:
+            - comment
+          description: Discriminates this node as a comment.
+        content:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                  - text
+                description: Discriminates this node as text.
+              text:
+                type: string
+                minLength: 1
+                description: The comment's text.
+            required:
+              - type
+              - text
+          description: The comment's text.
+      required:
+        - type
+        - content
+
+    SongChartText:
+      type: object
+      description: |
+        A run of lyric text. With a chordAnchor mark, the chord is played
+        at the start of the run.
+      properties:
+        type:
+          type: string
+          enum:
+            - text
+          description: Discriminates this node as text.
+        text:
+          type: string
+          minLength: 1
+          description: The literal text.
+        marks:
+          type: array
+          maxItems: 1
+          items:
+            $ref: '#/components/schemas/SongChartChordAnchor'
+          description: The run's chord anchor; absent when no chord falls on it.
+      required:
+        - type
+        - text
+
+    SongChartChordAnchor:
+      type: object
+      description: |
+        A chord played at the start of the text run it marks. attrs keys are
+        camelCase, the rich-text editor's convention.
+      properties:
+        type:
+          type: string
+          enum:
+            - chordAnchor
+          description: Discriminates this mark as a chord anchor.
+        attrs:
+          type: object
+          properties:
+            anchorId:
+              type: string
+              minLength: 1
+              maxLength: 64
+              description: |
+                Identifies the anchor, unique within its document. It keeps
+                two neighbouring runs with the same chord as two anchors, and
+                warnings point at an anchor by it.
+            writtenSymbol:
+              type: string
+              minLength: 1
+              maxLength: 32
+              description: |
+                The chord symbol as the author wrote it. This is what the
+                learner sees, whatever it resolves to.
+            chordDefinitionId:
+              type: [string, "null"]
+              format: uuid
+              description: |
+                The catalog chord the symbol resolves to, set by the server
+                whenever the document is saved; a value sent by a client is
+                ignored. null when the symbol is a no-chord marking or
+                doesn't resolve. For a slash chord the catalog doesn't have,
+                it is the chord without the bass.
+            chordVoicingId:
+              type: [string, "null"]
+              format: uuid
+              description: |
+                The voicing the author picked for this anchor, offered first
+                to the learner; null offers the chord's top-ranked voicing.
+                Must be a voicing of the chord the symbol resolves to.
+          required:
+            - anchorId
+            - writtenSymbol
+            - chordDefinitionId
+            - chordVoicingId
+      required:
+        - type
+        - attrs
+
+    SongChartDraftInput:
+      type: object
+      description: The fields of a song chart's draft that authors write.
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: The song's title as shown to learners.
+        artist:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: The performer or composer the song is known by.
+        language:
+          type: string
+          description: |
+            The Language.code of the lyrics (not "any"). The chart's rights
+            record must cover it.
+        concert_key:
+          type: [string, "null"]
+          pattern: '^[A-G](b|#)?m?$'
+          description: |
+            The key the song sounds in, regardless of capo (e.g. "G", "F#m");
+            null when not stated.
+        capo_fret:
+          type: integer
+          minimum: 0
+          maximum: 12
+          description: |
+            The fret the capo goes on; 0 means no capo. Chord symbols are
+            written as fingered with the capo on.
+        tempo_bpm:
+          type: [integer, "null"]
+          minimum: 20
+          maximum: 300
+          description: Beats per minute; null when not stated.
+        time_signature:
+          oneOf:
+            - $ref: '#/components/schemas/TimeSignature'
+            - type: "null"
+          description: The song's meter; null when not stated.
+        rights_confirmed:
+          type: boolean
+          description: |
+            Whether an admin confirms that the song's rights were checked.
+            Rights are cleared outside MotifPath; this only records that
+            they were. Required to be true before the draft can be
+            published.
+        body:
+          $ref: '#/components/schemas/SongChartDocument'
+      required:
+        - title
+        - artist
+        - language
+        - concert_key
+        - capo_fret
+        - tempo_bpm
+        - time_signature
+        - rights_confirmed
+        - body
+
+    SongChartDraft:
+      allOf:
+        - $ref: '#/components/schemas/SongChartDraftInput'
+        - type: object
+          description: |
+            A song chart's working copy, with its rights confirmation and
+            what the server found in its chord anchors.
+          properties:
+            rights_confirmation:
+              oneOf:
+                - $ref: '#/components/schemas/RightsConfirmation'
+                - type: "null"
+              description: Who confirmed the rights and when; null exactly when rights_confirmed is false.
+            warnings:
+              type: array
+              items:
+                $ref: '#/components/schemas/SongChartAnchorWarning'
+              description: |
+                Every chord anchor the server couldn't fully resolve, in
+                document order; empty when every anchor resolved.
+            updated_by:
+              $ref: '#/components/schemas/UserRef'
+            updated_at:
+              type: string
+              format: date-time
+              description: When the draft was last changed.
+          required:
+            - rights_confirmation
+            - warnings
+            - updated_by
+            - updated_at
+
+    SongChartAnchorWarning:
+      type: object
+      description: |
+        A chord anchor whose symbol didn't fully resolve to a playable
+        catalog chord.
+      properties:
+        anchor_id:
+          type: string
+          description: The anchor's anchorId.
+        section_index:
+          type: integer
+          minimum: 0
+          description: The section the anchor is in, numbered from 0.
+        line_index:
+          type: integer
+          minimum: 0
+          description: The line within that section, numbered from 0, comments included.
+        written_symbol:
+          type: string
+          description: The anchor's symbol as written.
+        warning:
+          type: string
+          enum:
+            - unparsed_symbol
+            - unsupported_quality
+            - chord_not_in_catalog
+            - voicing_unavailable
+            - bass_not_in_catalog
+          description: |
+            unparsed_symbol and unsupported_quality: the symbol isn't a
+            supported chord (as in searchChords). chord_not_in_catalog: it
+            parses, but the catalog has no such chord, or no voicing of it.
+            voicing_unavailable: the picked voicing has been withdrawn
+            from the catalog. bass_not_in_catalog: a slash chord the catalog
+            doesn't have; the learner is shown the chord without its bass.
+        blocks_publication:
+          type: boolean
+          description: |
+            Whether the warning stops the draft from being published. Only
+            bass_not_in_catalog doesn't.
+      required:
+        - anchor_id
+        - section_index
+        - line_index
+        - written_symbol
+        - warning
+        - blocks_publication
+
+    SongChart:
+      type: object
+      description: |
+        A song chart as admins see it: its draft and what learners are
+        served.
+      properties:
+        song_chart_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this chart.
+        status:
+          $ref: '#/components/schemas/SongChartStatus'
+        published_revision:
+          oneOf:
+            - $ref: '#/components/schemas/SongChartRevisionSummary'
+            - type: "null"
+          description: |
+            The latest published revision, the one learners are served while
+            the chart is published; null when the chart was never published.
+        withdrawal:
+          oneOf:
+            - type: object
+              properties:
+                withdrawn_by:
+                  $ref: '#/components/schemas/UserRef'
+                withdrawn_at:
+                  type: string
+                  format: date-time
+                  description: When the chart was withdrawn.
+                reason:
+                  type: string
+                  description: Why it was withdrawn, as the admin wrote it.
+              required:
+                - withdrawn_by
+                - withdrawn_at
+                - reason
+            - type: "null"
+          description: Who withdrew the chart, when and why; null unless status is withdrawn.
+        draft:
+          $ref: '#/components/schemas/SongChartDraft'
+        created_by:
+          $ref: '#/components/schemas/UserRef'
+        created_at:
+          type: string
+          format: date-time
+          description: When the chart was created.
+      required:
+        - song_chart_id
+        - status
+        - published_revision
+        - withdrawal
+        - draft
+        - created_by
+        - created_at
+
+    SongChartSummary:
+      type: object
+      description: A song chart in a list, without its body.
+      properties:
+        song_chart_id:
+          type: string
+          format: uuid
+          description: Stable identifier for this chart.
+        title:
+          type: string
+          description: The draft's title.
+        artist:
+          type: string
+          description: The draft's artist.
+        language:
+          type: string
+          description: The draft's Language.code.
+        status:
+          $ref: '#/components/schemas/SongChartStatus'
+        rights_confirmed:
+          type: boolean
+          description: Whether the draft's rights are confirmed.
+        published_revision_number:
+          type: [integer, "null"]
+          minimum: 1
+          description: The latest published revision's number; null when never published.
+        updated_by:
+          $ref: '#/components/schemas/UserRef'
+        updated_at:
+          type: string
+          format: date-time
+          description: When the draft was last changed.
+      required:
+        - song_chart_id
+        - title
+        - artist
+        - language
+        - status
+        - rights_confirmed
+        - published_revision_number
+        - updated_by
+        - updated_at
+
+    PagedSongCharts:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/SongChartSummary'
+              description: The charts on this page, most recently updated first, then by id.
+          required:
+            - items
+
+    SongChartRevisionSummary:
+      type: object
+      description: Which revision learners are served, and who published it.
+      properties:
+        revision_number:
+          type: integer
+          minimum: 1
+          description: The revision's number, 1 for the chart's first publication.
+        title:
+          type: string
+          description: The revision's title.
+        language:
+          type: string
+          description: The revision's Language.code.
+        published_by:
+          $ref: '#/components/schemas/UserRef'
+        published_at:
+          type: string
+          format: date-time
+          description: When the revision was published.
+      required:
+        - revision_number
+        - title
+        - language
+        - published_by
+        - published_at
+
+    SongChartRevision:
+      type: object
+      description: |
+        A published revision of a song chart. A revision never changes: a
+        correction is published as a new revision.
+      properties:
+        song_chart_id:
+          type: string
+          format: uuid
+          description: The chart this is a revision of.
+        revision_number:
+          type: integer
+          minimum: 1
+          description: The revision's number, 1 for the chart's first publication.
+        title:
+          type: string
+          description: The song's title in this revision.
+        artist:
+          type: string
+          description: The song's artist in this revision.
+        language:
+          type: string
+          description: The Language.code of this revision's lyrics.
+        concert_key:
+          type: [string, "null"]
+          description: The key the song sounds in; null when not stated.
+        capo_fret:
+          type: integer
+          minimum: 0
+          maximum: 12
+          description: The fret the capo goes on; 0 means no capo.
+        tempo_bpm:
+          type: [integer, "null"]
+          description: Beats per minute; null when not stated.
+        time_signature:
+          oneOf:
+            - $ref: '#/components/schemas/TimeSignature'
+            - type: "null"
+          description: The song's meter; null when not stated.
+        tuning_fingerprint:
+          type: string
+          description: |
+            The open-string pitches the chords are written for, lowest
+            string first (e.g. "E2-A2-D3-G3-B3-E4", standard guitar tuning).
+        body:
+          $ref: '#/components/schemas/SongChartDocument'
+        rights_confirmation:
+          $ref: '#/components/schemas/RightsConfirmation'
+        published_by:
+          $ref: '#/components/schemas/UserRef'
+        published_at:
+          type: string
+          format: date-time
+          description: When the revision was published.
+      required:
+        - song_chart_id
+        - revision_number
+        - title
+        - artist
+        - language
+        - concert_key
+        - capo_fret
+        - tempo_bpm
+        - time_signature
+        - tuning_fingerprint
+        - body
+        - rights_confirmation
+        - published_by
+        - published_at
+
+    LearnerSongChart:
+      type: object
+      description: |
+        A song chart as a learner reads it: the lyrics with their chords,
+        and every chord it uses with that chord's voicings and their
+        diagrams, so the reader needs no further call. It carries nothing
+        about who wrote or published the chart, or about its rights.
+      properties:
+        song_chart_id:
+          type: string
+          format: uuid
+          description: The chart's identifier.
+        revision_number:
+          type: [integer, "null"]
+          minimum: 1
+          description: |
+            The published revision being read; tracking events carry it.
+            null in a preview of the draft.
+        title:
+          type: string
+          description: The song's title.
+        artist:
+          type: string
+          description: The song's artist.
+        language:
+          type: string
+          description: The Language.code of the lyrics.
+        concert_key:
+          type: [string, "null"]
+          description: The key the song sounds in; null when not stated.
+        capo_fret:
+          type: integer
+          minimum: 0
+          maximum: 12
+          description: The fret the capo goes on; 0 means no capo.
+        tempo_bpm:
+          type: [integer, "null"]
+          description: Beats per minute; null when not stated.
+        time_signature:
+          oneOf:
+            - $ref: '#/components/schemas/TimeSignature'
+            - type: "null"
+          description: The song's meter; null when not stated.
+        tuning_fingerprint:
+          type: string
+          description: The open-string pitches the chords are written for, lowest string first.
+        body:
+          $ref: '#/components/schemas/SongChartDocument'
+        chords:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChordDefinition'
+          description: |
+            Every catalog chord an anchor resolves to, once each. A chord's
+            voicings are its active voicings, best first, plus any voicing
+            an anchor picked that has since been withdrawn, last.
+        diagrams:
+          type: array
+          items:
+            $ref: '#/components/schemas/Diagram'
+          description: The diagram of every voicing in chords, once each.
+      required:
+        - song_chart_id
+        - revision_number
+        - title
+        - artist
+        - language
+        - concert_key
+        - capo_fret
+        - tempo_bpm
+        - time_signature
+        - tuning_fingerprint
+        - body
+        - chords
+        - diagrams
+
+    SongChartNotPublishableError:
+      type: object
+      description: |
+        Returned when a song chart's draft can't be published as it stands,
+        with everything that stops it.
+      properties:
+        message:
+          type: string
+          description: Human-readable summary of the refusal.
+        reasons:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum:
+              - rights_not_confirmed
+              - unresolved_chords
+          description: |
+            rights_not_confirmed: no admin has confirmed the song's rights
+            were checked. unresolved_chords: at least one anchor has a
+            warning that blocks publication (see anchor_warnings).
+        anchor_warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/SongChartAnchorWarning'
+          description: The anchors whose warnings block publication; empty unless reasons has unresolved_chords.
+      required:
+        - message
+        - reasons
+        - anchor_warnings
+
+    SongChartChordProImport:
+      type: object
+      description: The result of importing ChordPro text into a song chart's draft.
+      properties:
+        song_chart:
+          $ref: '#/components/schemas/SongChart'
+        import_warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChordProImportWarning'
+          description: What the import skipped, in line order; empty when it read everything.
+      required:
+        - song_chart
+        - import_warnings
+
+    ChordProImportWarning:
+      type: object
+      description: A part of a ChordPro text the import skipped.
+      properties:
+        line:
+          type: integer
+          minimum: 1
+          description: The line of the text it is on, numbered from 1.
+        kind:
+          type: string
+          enum:
+            - unsupported_directive
+            - malformed_directive
+            - unclosed_chord
+            - unbalanced_section
+            - empty_section
+          description: |
+            unsupported_directive: a directive outside the supported subset
+            (e.g. {define}). malformed_directive: a line starting with "{"
+            that isn't a whole directive. unclosed_chord: a "[" with no "]"
+            on its line; the line is read as plain text.
+            unbalanced_section: an end_of_ with no matching start_of_, or a
+            start_of_ inside another section; the section is closed there.
+            empty_section: a section environment with no lines; it is
+            dropped.
+        text:
+          type: string
+          description: The skipped text, as written.
+      required:
+        - line
+        - kind
+        - text
+
+    WithdrawSongChartRequest:
+      type: object
+      description: Payload for withdrawing a published song chart.
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          description: Why the chart is withdrawn, kept with the chart for audit.
+      required:
+        - reason
+
+    RightsConfirmation:
+      type: object
+      description: |
+        An admin's statement that a song's rights were checked. Rights are
+        cleared outside MotifPath; this records only who confirmed it, and
+        when.
+      properties:
+        confirmed_by:
+          $ref: '#/components/schemas/UserRef'
+        confirmed_at:
+          type: string
+          format: date-time
+          description: When the rights were confirmed.
+      required:
+        - confirmed_by
+        - confirmed_at
 
     DiagramRef:
       type: object
