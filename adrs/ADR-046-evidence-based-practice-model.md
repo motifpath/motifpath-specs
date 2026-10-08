@@ -119,6 +119,23 @@ sessions. The home's Start for an instrument opens the session setup with that i
 where "In my head" is one tap away, so every next step stays reachable. An in-hand session with
 nothing to play is not found, and the client then offers a session in the head instead.
 
+**Amended:** 2026-10-08, from the Practice Shell design (MOT-55, decisions D9, D10, D21 and row 12;
+written in MOT-78), by Gilson:
+- **name the note offers four choices** (D9): the right note and three near distractors, instead of
+  a twelve-note keypad. The client picks the distractors (one semitone either side, and the note at
+  the same fret on an adjacent string), and the response keeps the four choices. A new grader,
+  `fretboard_cell.v2`, checks them and keeps them in the answer key;
+- **a wrong pick among k choices costs 1/(k−1)** of accuracy (guess correction), so a lucky guess
+  doesn't make a cell accurate. For now this applies to name-the-note answers that record their
+  choices; it is a new version of the mastery rules. Fluency is unchanged, since it is measured by
+  response time on right answers;
+- **sound options** (audio_selection) commit with Check, and their latency runs from the end of the
+  last clip played (D10, ADR-049 §3), so no audio is taken off it;
+- **a skipped or unavailable item is "not answered"** (row 12, D21): it sends a `not_answered`
+  response with its reason, which is kept as an event and yields no evidence: no accuracy, no
+  response time, no level change. While its stimulus is missing, an item's options stay locked, so
+  an answer is never given unheard or unseen.
+
 ---
 
 ## Context
@@ -201,8 +218,20 @@ follow the same classification rule as content (nodes must suit the item's instr
   picked, or a self-rating with its tempo or change count.
 - The **server grades it** against reference data (tuning, the exercise's options) through a registry
   of **versioned graders** (`fretboard_cell.v1`, `exercise_option.v1`, `self_rating.v1`, and
-  `diagram_shape.v1` since 2026-10-06). A grader
+  `diagram_shape.v1` since 2026-10-06; `fretboard_cell.v2` replaces `fretboard_cell.v1` since
+  2026-10-08). A grader
   either returns the evidence payload or rejects the response, and stores nothing when it rejects.
+- **Name the note offers four choices** (amended 2026-10-08, D9): the right note and three near
+  distractors, in random order. The client picks the distractors: the notes a semitone below and
+  above the cell's note, and the note at the same fret on an adjacent string (the string numbered
+  one lower, or string 2 for a cell on string 1). When that note repeats one already
+  offered, a note a tone away from the cell's note takes its place. The response keeps the four
+  choices as shown. `fretboard_cell.v2` rejects choices that aren't four different pitches, that
+  leave out the cell's note, or that don't include the note named, and keeps the choices in the
+  answer key. A name-the-note response without choices was answered on the twelve-note keypad and
+  is graded as `fretboard_cell.v1` graded it.
+- **Not answered is not graded** (amended 2026-10-08, row 12): a `not_answered` response never
+  reaches a grader and yields no evidence (see Events).
 - The client grades only for instant feedback, with the same rules. **Golden cases** (item, response,
   expected result) live in motifpath-specs as language-neutral JSON and are run by both the Go grader
   and the web client.
@@ -235,6 +264,14 @@ One piece of evidence per observation, the only stored learning state:
   - the practice session;
   - or, for an exercise answered elsewhere on the platform such as a node's challenge, the trigger
     context.
+- **A skipped or unavailable item is "not answered"** (amended 2026-10-08, row 12 and D21). When an
+  item's stimulus failed to load and the student skips it, or the item can't be shown on this
+  device, the client sends `practice.item_answered` with a `not_answered` response and its reason
+  (`failed_to_load` or `unavailable`). The event is kept, so broken content can be found, but it
+  yields **no evidence**: no accuracy, no response time, no level change, no Leitner move. A
+  not-answered item isn't in the session's answered count. While an item's stimulus is missing,
+  its options stay **locked**, so a not-answered item can never carry a guess. Skip is offered only
+  then, never as a way past a hard question.
 - `practice.session_ended`: the answered count, whether the student left early, and how each timed
   drill felt (below). Sent once per session: when the student finishes the plan, leaves the session
   inside the app, or closes or reloads the page. It's sent on page close as best effort, so it can
@@ -260,6 +297,14 @@ One piece of evidence per observation, the only stored learning state:
 - **One rule set, reduced to three readings.** Each piece of evidence becomes a hit, a miss or a hold,
   plus an accuracy value and a fluency ratio against the item's goal: the timed threshold, the target
   tempo, or the target change count. Ratings map clean → hit, almost → hold, struggled → miss.
+- **A guess among few choices is corrected** (amended 2026-10-08, D9). A right answer's accuracy
+  value is 1. A wrong one is 0, or **−1/(k−1)** when the answer key records the k choices the
+  student picked from: −⅓ with four choices. A pure guesser then averages 0, and an item's accuracy
+  (the weighted average below) is floored at 0. So 0.8 needs about 85% of four-choice picks right,
+  and 0.9 about 93%. For now this applies only to name-the-note answers with choices; single-answer
+  exercises and name the shape still count a wrong pick as 0 (see Consequences). It is a new
+  version of the mastery rules, so folds rebuild from evidence. A miss is still a miss for the
+  Leitner boxes, and fluency still reads only right answers' latencies.
 - **Weighted averages by source:** auto-graded 0.3, self-assessed 0.3, teacher-reviewed 0.6.
 - **Spaced repetition:** Leitner boxes with waits of 1, 2, 4, 8, 16 and 32 days. A hit moves the item up
   one box only once it is due, a miss sends it back to box 1, and a hold changes nothing.
@@ -392,7 +437,9 @@ One piece of evidence per observation, the only stored learning state:
   adds a version with a later start date, with no code change.
 - **Audio is not knowing time:** for an exercise with audio, the client reports the length of the
   audio the student must hear once (the sound, or all sound options together). It's taken off the
-  latency with the tap time. Replays are not taken off.
+  latency with the tap time. Replays are not taken off. Amended 2026-10-08 (D10): with **sound
+  options** (audio_selection), latency runs from the end of the last clip played to the commit
+  (ADR-049 §3), so listening is already outside it and no audio is reported or taken off.
 - **Tap baseline:** a 20-second "tap the highlighted fret" check gives each student's tap time,
   sent as `practice.tap_check_completed`. Ingestion stamps the latest one on every timed answer,
   so replays stay stable. Amended 2026-10-06: a plan with a fretboard cell asks for one when the
@@ -500,6 +547,26 @@ shown from evidence (tempo history, speed per string, levels).
   stories. FSRS needs fitted parameters and review data the platform doesn't have yet.
 - **Practice days, over streaks.** Streak resets punish a missed day; the home shows practice without
   penalty.
+- **Guess correction, over more attempts or a streak, for four choices** (decided 2026-10-08). With
+  four choices, a student who knows 75% of a string's notes gets about 81% right and would read as
+  `accurate`. Requiring 5+ attempts delays that but doesn't stop it. A rule like "the last four
+  right" is easy to say but sits outside the fold's averages. Charging a wrong pick 1/(k−1) takes
+  the expected gain from guessing to zero for any k, so 0.8 and 0.9 keep meaning what they meant
+  on the keypad, and evidence keeps k in its answer key for any future kind with choices.
+- **Distractors picked by the client and checked by the server, over core picking them in the
+  plan.** The client draws the item and knows the layout; the near-note rule is a presentation
+  choice that may change with tests. The grader still checks what grading needs (four pitches, the
+  right one included), and the choices kept in the evidence make every grade reproducible.
+- **Near notes, over random ones.** Random distractors make a cell easy to name by elimination.
+  A semitone either side is the commonest slip (a fret off), and the same fret on the next string
+  is the string confusion beginners make.
+- **A `not_answered` record, over sending nothing** (decided 2026-10-08). Silence would already
+  keep a skipped item out of the evidence, but it would hide broken content: the stimulus that
+  couldn't be shown (MOT-28) was found in a smoke, not by anything the platform records. Keeping the
+  event with its reason lets the team find items that fail, while the evidence stays honest.
+- **Latency from the end of the last clip for sound options, over subtracting their lengths.**
+  Subtracting every option's length assumed each clip is heard once, in full. A student who
+  replays a clip to compare would be counted as slow, and one who stops a clip early as fast.
 
 ## Consequences
 
@@ -530,6 +597,15 @@ shown from evidence (tempo history, speed per string, levels).
 - **Requirements on empty nodes stay unmet** until content exists, which the map editor has to surface.
 - **Small-sample instability.** Below the calibration gate, thresholds don't move at all, even when the
   benchmark is visibly off.
+- **Guess correction is uneven for now** (2026-10-08). Single-answer exercises (2–5 options) and
+  name the shape (4–5 family members) have the same guess problem but still count a wrong pick as 0,
+  so they can read as `accurate` somewhat earlier than name the note. Extending the correction to
+  them is a follow-up and another mastery-rules version.
+- **The name-the-note fluent time was set for the keypad.** Picking among four is likely faster than
+  finding a note among twelve, so the 3-second default may be lax until MOT-53 benchmarks and
+  calibrates it.
+- **An unavailable item keeps coming back.** It yields no evidence, so it stays due or new and the
+  composer may pick it again on the same device. Not-answered events are what flag it to the team.
 
 ### Neutral
 
@@ -586,6 +662,8 @@ sessions or a teacher:
   play-alongs.
 - **ADR-045** (catalog guitar instrument scope): fretboard cells are keyed by layout; play-alongs take
   the diagram's linked instruments.
+- **ADR-049** (practice-first experience language): the Practice Shell's commit point; §3 is where
+  sound options commit with Check (amended 2026-10-08).
 
 ---
 

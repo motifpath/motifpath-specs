@@ -389,7 +389,12 @@ PracticeItemAnsweredEvent:
         works through it. Selecting, deselecting or changing options before moving on is not
         an answer, and changing a selection after going back is not a new one: a later
         selection may follow what the student learned since, so it is not evidence of what
-        they knew. latency_ms runs from the moment the exercise was shown to moving on.
+        they knew. latency_ms runs from the moment the exercise was shown to moving on, or,
+        when the options are sounds, from the end of the last clip played.
+
+        An item that couldn't be answered (its sound or image failed to load and the student
+        skipped it, or it can't be shown on this device) sends a not_answered response with
+        its reason instead. It is kept as an event and yields no evidence.
       properties:
         event_type:
           type: string
@@ -451,7 +456,9 @@ PracticeSessionEndedEvent:
         answered_count:
           type: integer
           minimum: 0
-          description: How many items the student answered in the session.
+          description: |
+            How many items the student answered in the session. Items sent as not answered
+            (skipped because they couldn't be shown) are not counted.
         left_early:
           type: boolean
           description: |

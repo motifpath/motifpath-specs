@@ -75,10 +75,11 @@ Feature: Judge timed drills against versioned fluent times
     Then the answer took 3700 milliseconds net of tap time and audio
     And it counts as within the fluent time
 
-  Scenario: A sound-choice exercise is judged on the time after all its sound options
+  @wip
+  Scenario: A sound-choice exercise is judged on the time after its last clip, with no audio taken off
     Given the drill template "exercise:audio_selection" has version 1 from source "default" with a fluent time of 4000 milliseconds
-    When "alice" answers a sound-choice exercise with 3 sound options of 2000 milliseconds each correctly in 11000 milliseconds
-    Then the answer took 4700 milliseconds net of tap time and audio
+    When "alice" answers a sound-choice exercise correctly 4500 milliseconds after the end of the last clip played
+    Then the answer took 4200 milliseconds net of tap time
     And it counts as slower than fluent
 
   Scenario: A benchmark added after a default applies from its start date on

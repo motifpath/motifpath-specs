@@ -10,6 +10,10 @@ general home, and Practice opens the session setup directly (see §10 and ADR-04
 are practising. A session shows **today's plan** before its first item, every item is **named**,
 and a play-along hands over to the next item with a **Next up** card (§2, and the session pattern).
 The plan costs one tap at the start, accepted for knowing what the session holds.
+**Amended:** 2026-10-08, by Gilson, from the Practice Shell design (MOT-55, D10; written in MOT-78):
+an exercise whose options are sounds (audio_selection) commits with **Check**, even with one right
+option, and its latency runs from the end of the last clip played (§3). While a stimulus is
+missing, the options stay locked (§4, D21; ADR-046).
 **Amends:** ADR-018 (decision points 1 and 3, and the deferred documentation site; see Relation to
 ADR-018)
 
@@ -113,6 +117,12 @@ graded:
   step, because latency counts from the prompt and an extra tap would be measured as slowness.
 - **An explicit commit** for MultipleChoice and Sequence, and for every exercise in an S7 challenge:
   the answer is the selection the student moves on with (ADR-046).
+- **Check for sound options** (amended 2026-10-08, D10): an audio_selection exercise commits with
+  Check even with one right option, an exception to "the tap is the answer", because listening is
+  not answering. An option's play button only plays; tapping the rest of the option selects it. The
+  latency runs from the end of the last clip played to Check, not from the prompt: a clip still
+  playing at Check ends there (latency 0), and with no clip played it runs from the prompt. No audio
+  length is taken off it (ADR-046).
 - **SelfRating closes** a play-along take or a chord change.
 - **Retry** follows each mode's existing rule and never produces new evidence where ADR-046 says it
   does not.
@@ -124,6 +134,9 @@ written down as patterns.
 
 - The primary action sits at the bottom, at least 48 px tall; no hover-only affordance anywhere.
 - **No modal inside a run.** Feedback and explanations render in place.
+- **Options lock while the stimulus is missing** (amended 2026-10-08, D21): a sound or image that
+  didn't load leaves the item's options locked, and the item can only be retried or skipped. A
+  skipped item is "not answered" (ADR-046), never wrong.
 - The screen stays on during a run (Screen Wake Lock, released when the run ends).
 - Keyboard shortcuts for answer, continue, replay and exit, so a Bluetooth page-turner pedal works.
 - Audio is unlocked by the tap that starts the run, since iOS allows audio only after a gesture.
@@ -223,6 +236,10 @@ The app ships first as an installable **PWA**. Everything is built so that wrapp
   interchangeable: ADR-046 measures latency from the prompt, which rules out a Check step on timed
   taps, while the challenge's "selection the student moves on with" requires one. Picking one global
   flow would break grading on one side or the other.
+- **Check for sound options, over the tap as the answer** (decided 2026-10-08, D10). With sound
+  options the student must play clips before choosing, so a tap is ambiguous (play or answer?) and
+  a mis-tap near a play button would commit an answer the student never meant. The extra tap costs
+  no fluency, since latency starts after the last clip.
 - **Not Flutter or React Native (a)**: a rewrite would discard a working Vue SPA — SVG diagrams,
   Canvas runners, `smplr` Web Audio, Vidstack, Tiptap, hundreds of tests — for a solo developer, while
   the product hypotheses, not the stack, are what is unproven. The content is SVG, audio and video,

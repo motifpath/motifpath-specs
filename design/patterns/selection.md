@@ -23,7 +23,7 @@ learns one way to answer and can answer with a pedal or a keyboard as well as a 
   | Option kind | Component | Compact layout |
   |---|---|---|
   | Text (exercise options, chord names) | `OptionTile` | one column |
-  | Note names (name the note) | `OptionTile` | **four** choices in a 2 × 2 grid: the right note and three near distractors (D9) |
+  | Note names (name the note) | `OptionTile` | **four** choices in a 2 × 2 grid: the right note, a semitone either side, and the same fret on an adjacent string, shuffled (D9, ADR-046) |
   | Picture or diagram (image_choice, chord boxes) | `ImageOption` | two-column grid |
   | Sound (audio_selection) | `AudioOption` | one column |
   | Image region / diagram cell | the stimulus itself | numbered, outlined regions or markers, each at least 48 px |
@@ -61,4 +61,6 @@ learns one way to answer and can answer with a pedal or a keyboard as well as a 
 - Give a different look to options of different exercise types.
 - Accept an answer while the stimulus is missing.
 
-Open in spec: the four-choice guess rate needs ADR-046's accuracy rule amended (MOT-78).
+The four-choice guess rate is absorbed by ADR-046's guess correction (amended 2026-10-08): a wrong
+pick among four costs a third of a right one. The distractors and what the answer sends are in
+`features/practice/answer-a-practice-item.feature`.
