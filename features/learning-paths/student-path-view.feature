@@ -82,7 +82,6 @@ Feature: Student path view
   # ── Lock reasons ──────────────────────────────────────────────────────────
   # Per ADR-024 (amendment 2026-10-08): a locked item says why in lock_reason.
 
-  @wip
   Scenario: An item behind an unfinished item is locked for the previous step
     Given "alice" is authenticated as a student
     And "alice" has "beginner-guitar-path" assigned as her current path with no progress recorded
@@ -105,7 +104,6 @@ Feature: Student path view
   # the item in a language it has, and finishing it completes the item like
   # any other.
 
-  @wip
   Scenario: A node with no content in the student's locale is locked for language even though it is the first item
     Given "alice" is authenticated as a student
     And "alice" has locale "pt_BR"
@@ -132,7 +130,6 @@ Feature: Student path view
     When "alice" retrieves her current path
     Then "node-01" has status "not_started"
 
-  @wip
   Scenario: A node otherwise unlocked by progress is locked for language when its locale is missing
     Given "alice" is authenticated as a student
     And "alice" has locale "pt_BR"
@@ -146,7 +143,6 @@ Feature: Student path view
     And "node-03" has status "locked" with lock_reason "previous_step"
     And the current_position is 2
 
-  @wip
   Scenario: A node missing the locale but behind an unfinished item is locked for the previous step
     Given "alice" is authenticated as a student
     And "alice" has locale "pt_BR"
@@ -157,7 +153,6 @@ Feature: Student path view
     Then "node-02" has status "locked" with lock_reason "previous_step"
     And "node-02" has no available_languages
 
-  @wip
   Scenario: A node whose required exercise lacks the locale is locked for language with the exercise's languages
     Given "alice" is authenticated as a student
     And "alice" has locale "pt_BR"
