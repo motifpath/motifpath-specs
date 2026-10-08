@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.30.0
+  version: 0.31.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -2946,9 +2946,15 @@ paths:
       summary: List song charts for authoring and review
       description: |
         Returns song charts, most recently updated first, then by id, in
-        the {items, total, limit, offset} envelope. Only admins may list
-        song charts; learners reach a chart only through the content that
-        embeds it. Every filter is optional and they combine with AND.
+        the {items, total, limit, offset} envelope. Every filter is
+        optional and they combine with AND.
+
+        What a caller may list depends on their role. Admins list every
+        chart, to author and publish them. Teachers list only the charts
+        learners can read, to embed them in lesson content with a songChart
+        node (see PromptNode): a teacher must ask for status=published, and
+        is refused any other status or none. Students may not list song
+        charts; they reach a chart through the content that embeds it.
       tags:
         - Song charts
       parameters:
@@ -2963,7 +2969,8 @@ paths:
             maxLength: 200
           description: |
             Case- and accent-insensitive substring match against the
-            draft's title and artist.
+            draft's title and artist, and against the latest published
+            revision's title and artist.
         - name: status
           in: query
           required: false
@@ -2990,7 +2997,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "403":
-          description: The caller is not an admin.
+          description: |
+            The caller is a student, or a teacher who didn't ask for
+            status=published.
           content:
             application/json:
               schema:
@@ -8506,6 +8515,14 @@ components:
           type: [integer, "null"]
           minimum: 1
           description: The latest published revision's number; null when never published.
+        published_revision:
+          oneOf:
+            - $ref: '#/components/schemas/SongChartRevisionSummary'
+            - type: "null"
+          description: |
+            The latest published revision, as learners read it; null when
+            the chart was never published. A teacher picking a chart to
+            embed sees this, not the draft.
         updated_by:
           $ref: '#/components/schemas/UserRef'
         updated_at:
@@ -8520,6 +8537,7 @@ components:
         - status
         - rights_confirmed
         - published_revision_number
+        - published_revision
         - updated_by
         - updated_at
 
@@ -8547,9 +8565,15 @@ components:
         title:
           type: string
           description: The revision's title.
+        artist:
+          type: string
+          description: The revision's artist.
         language:
           type: string
           description: The revision's Language.code.
+        concert_key:
+          type: [string, "null"]
+          description: The key the revision's song sounds in; null when not stated.
         published_by:
           $ref: '#/components/schemas/UserRef'
         published_at:
@@ -8559,7 +8583,9 @@ components:
       required:
         - revision_number
         - title
+        - artist
         - language
+        - concert_key
         - published_by
         - published_at
 
@@ -10812,13 +10838,21 @@ components:
             - audio
             - video
             - diagram
+            - songChart
           description: |
             The kind of node this is. audio, video, and diagram are
             available to rich_text expanded content and remediation
             content; the exercise-prompt authoring toolbar does not offer
             audio/video, but does offer diagram — a diagram can be embedded
             inline in any PromptDocument, including an exercise's own
-            prompt.
+            prompt. songChart embeds a published song chart, and is
+            available only in lesson content: an article's body and
+            rich_text expanded content. Its attrs hold songChartId, the
+            chart's id (a UUID). It always shows the chart's latest
+            published revision; a chart withdrawn after it was embedded
+            shows to nobody. A songChart node naming a chart that doesn't
+            exist, or was never published, is refused when the content is
+            saved.
         attrs:
           type: object
           additionalProperties: true

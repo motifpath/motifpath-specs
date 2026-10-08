@@ -185,7 +185,7 @@ Feature: Author and publish song charts
     When "ana" lists song charts that are published
     Then the list holds "Asa Branca" only
 
-  Scenario: A teacher cannot list song charts
+  Scenario: A teacher cannot list song charts without asking for the published ones
     Given "bob" is authenticated as a teacher
     When "bob" lists song charts
     Then the request is refused because only admins author song charts
