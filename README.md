@@ -154,7 +154,7 @@ lesson.started              lesson.resumed            lesson.completed
 exercise.started            exercise.progress         exercise.ended
 practice.session_started    practice.item_answered    practice.session_ended
 practice.tap_check_completed
-song_chart.opened           song_chart.chord_viewed   song_chart.section_completed
+song_chart.opened           song_chart.chord_viewed   song_chart.completed
 ```
 
 Event schemas live in `openapi/components/schemas/events.yaml`, referenced via

@@ -27,7 +27,7 @@ TrackingEventBase:
         - practice.tap_check_completed
         - song_chart.opened
         - song_chart.chord_viewed
-        - song_chart.section_completed
+        - song_chart.completed
       description: |
         Discriminator field. Determines which event-specific payload fields are present.
         The set of valid values is closed — adding a new event type requires a spec change
@@ -81,7 +81,7 @@ TrackingEvent:
       practice.tap_check_completed: '#/PracticeTapCheckCompletedEvent'
       song_chart.opened: '#/SongChartOpenedEvent'
       song_chart.chord_viewed: '#/SongChartChordViewedEvent'
-      song_chart.section_completed: '#/SongChartSectionCompletedEvent'
+      song_chart.completed: '#/SongChartCompletedEvent'
   oneOf:
     - $ref: '#/LessonStartedEvent'
     - $ref: '#/LessonResumedEvent'
@@ -95,7 +95,7 @@ TrackingEvent:
     - $ref: '#/PracticeTapCheckCompletedEvent'
     - $ref: '#/SongChartOpenedEvent'
     - $ref: '#/SongChartChordViewedEvent'
-    - $ref: '#/SongChartSectionCompletedEvent'
+    - $ref: '#/SongChartCompletedEvent'
 
 ContentContext:
   type: object
@@ -570,25 +570,20 @@ SongChartChordViewedEvent:
         - chord_definition_id
         - chord_voicing_id
 
-SongChartSectionCompletedEvent:
+SongChartCompletedEvent:
   allOf:
     - $ref: '#/TrackingEventBase'
     - type: object
       description: |
-        Emitted when a student marks a section of a song chart as played, with the
-        section's "played it" control. Marking it again in the same opening emits nothing.
+        Emitted when a student marks a song chart as played, with the reader's "I played it"
+        control. Marking it again in the same opening emits nothing.
       properties:
         event_type:
           type: string
           enum:
-            - song_chart.section_completed
+            - song_chart.completed
         song_chart_context:
           $ref: '#/SongChartContext'
-        section_index:
-          type: integer
-          minimum: 0
-          description: The section marked as played, numbered from 0 in document order.
       required:
         - event_type
         - song_chart_context
-        - section_index

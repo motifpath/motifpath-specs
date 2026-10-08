@@ -1,7 +1,7 @@
 # Song chart reading events (ADR-050 Follow-up 1, as amended on 2026-10-07).
 #
 # The song chart reader emits song_chart.opened, song_chart.chord_viewed and
-# song_chart.section_completed, so the song-first hypothesis is checked against real use. When the
+# song_chart.completed, so the song-first hypothesis is checked against real use. When the
 # reader emits each one is client behaviour, in features/web/song-chart-reader.feature.
 
 Feature: Ingest song chart reading events
@@ -23,8 +23,9 @@ Feature: Ingest song chart reading events
     When "alice" submits a song_chart.chord_viewed event for anchor "a3" of revision 2 of song chart "asa-branca", resolving to chord "G" and opening on voicing "g-open"
     Then the event is accepted and stored in the event log
 
-  Scenario: A song_chart.section_completed event is accepted
-    When "alice" submits a song_chart.section_completed event for section 0 of revision 2 of song chart "asa-branca"
+  @wip
+  Scenario: A song_chart.completed event is accepted
+    When "alice" submits a song_chart.completed event for revision 2 of song chart "asa-branca"
     Then the event is accepted and stored in the event log
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
@@ -34,9 +35,10 @@ Feature: Ingest song chart reading events
     When "alice" submits the same song_chart.opened event again with identifier "evt-chart-001"
     Then the event is accepted without error
 
-  Scenario: A song_chart.section_completed event for a later section is accepted
-    When "alice" submits a song_chart.section_completed event for section 4 of revision 2 of song chart "asa-branca"
-    Then the event is accepted and stored in the event log
+  @wip
+  Scenario: A song_chart.section_completed event is no longer accepted
+    When "alice" submits an event with event type "song_chart.section_completed"
+    Then the submission is rejected as invalid
 
   # ── Validation failures ─────────────────────────────────────────────────────
 
@@ -50,7 +52,8 @@ Feature: Ingest song chart reading events
     Then the submission is rejected as invalid
     And the rejection identifies "chord_voicing_id" as the source of the error
 
-  Scenario: A song_chart.section_completed event with a negative section is rejected
-    When "alice" submits a song_chart.section_completed event for section -1 of revision 2 of song chart "asa-branca"
+  @wip
+  Scenario: A song_chart.completed event without a song chart context is rejected
+    When "alice" submits a song_chart.completed event with the song chart context omitted
     Then the submission is rejected as invalid
-    And the rejection identifies "section_index" as the source of the error
+    And the rejection identifies "song_chart_context" as the source of the error
