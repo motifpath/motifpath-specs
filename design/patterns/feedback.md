@@ -27,8 +27,8 @@ them that they failed, not what to learn.
 | Any exercise in an S7 challenge | the selection the student moves on with (Next / Finish) | no feedback until the end |
 
 The answer's latency is taken at the commit. For audio_selection, listening is not answering: it is
-counted from the end of the last clip played, not from the prompt (exception to ADR-049 §3, to be
-written down by MOT-78).
+counted from the end of the last clip played, not from the prompt (ADR-049 §3, amended 2026-10-08).
+A clip still playing at Check stops there, and the latency is 0.
 
 ### Feedback
 
@@ -46,7 +46,7 @@ written down by MOT-78).
 
 A skipped or unavailable item is **not answered**, never wrong: no accuracy, no response time, no
 level change. While a stimulus is missing (a clip that didn't load), the options stay locked, so a
-guess can't become evidence (D21; ADR-046 amendment in MOT-78). See `unavailable-and-errors.md`.
+guess can't become evidence (D21; ADR-046, amended 2026-10-08). See `unavailable-and-errors.md`.
 
 ### Challenge review
 

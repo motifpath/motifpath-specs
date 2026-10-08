@@ -1,7 +1,7 @@
 # Pattern: errors and unavailable items in a run
 
 **Source:** ADR-049 §4 (no modal inside a run) and §5 (standard states) · ADR-046 ("not answered",
-amendment in MOT-78) · MOT-55 (Figma "Practice Shell — flows", row 12; decisions D20, D21) ·
+amended 2026-10-08) · MOT-55 (Figma "Practice Shell — flows", row 12; decisions D20, D21) ·
 implements MOT-28 (PB-69)
 
 ## When
@@ -23,7 +23,8 @@ student for the app's problem and corrupts their levels.
 - **One primary action only:** the way forward. × still leaves at any time; Esc, Enter and the pedal
   work as usual.
 - **Never a wrong answer.** A skipped or unavailable item is "not answered": no accuracy, no response
-  time, no level change (MOT-78).
+  time, no level change. Skip sends a `not_answered` response with its reason (`failed_to_load` or
+  `unavailable`), which is kept as an event but yields no evidence (ADR-046).
 - **Options lock** while the stimulus is missing (a clip that didn't load), so a guess can't be
   recorded (D21).
 - **Composing failed:** the student's choices on the setup are kept; Try again sends them again.
