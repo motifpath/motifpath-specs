@@ -1,7 +1,7 @@
 # Pattern: selection (options in a practice item)
 
 **Source:** ADR-049 §2 (Choice, MultipleChoice, Region) and §5 (Selection) · MOT-55 (Figma
-"Practice Shell — flows", rows 2, 6, 7, 10; decisions D9, D10, D16, D21, P4)
+"Practice Shell — flows", rows 2, 6, 7, 10; decisions D9, D10, D16, D21; phone prototypes P2, P4)
 
 ## When
 
@@ -30,6 +30,9 @@ learns one way to answer and can answer with a pedal or a keyboard as well as a 
 
   On Medium and Expanded the same layouts sit in the 560 px column; image regions, diagram cells and
   song charts get their own pane on Expanded (`session.md`, D26).
+- **Several right options (MultipleChoice) say how many** (P2): the prompt ends with "Choose N"
+  and the item still commits with **Check**. Committing at the Nth pick was rejected: one mis-tap
+  would commit an answer the student can't take back.
 - **Up to about five options** show as tiles. More (the focus picker, a long list) become a searchable
   list (ADR-049 §5).
 - **Sound options (AudioOption):** the play button only plays; tapping the rest of the row selects.
