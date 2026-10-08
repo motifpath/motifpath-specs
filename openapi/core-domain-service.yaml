@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.29.0
+  version: 0.30.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -3342,6 +3342,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+
+  /song-charts/chordpro/read:
+    post:
+      operationId: readSongChartChordPro
+      summary: Read ChordPro text as a song chart, without saving it
+      description: |
+        Reads ChordPro text the same way importSongChartChordPro does and
+        returns what it describes: the song's details the text sets, the
+        lyrics with their chords as a SongChartDocument, and what was
+        skipped. Nothing is stored. The song chart editor loads the result,
+        and the author saves it with createSongChart or
+        updateSongChartDraft. Chord anchors carry only their written
+        symbols; they are resolved to catalog chords when the chart is
+        saved. Only admins author song charts.
+      tags:
+        - Song charts
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+              minLength: 1
+              maxLength: 100000
+      responses:
+        "200":
+          description: What the text describes, and what the reading skipped.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongChartChordProReading'
+        "400":
+          description: |
+            The text is empty or too long, or has no lyric line at all.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
 
   /song-charts/{song_chart_id}/chordpro:
     parameters:
@@ -8703,6 +8753,53 @@ components:
           description: What the import skipped, in line order; empty when it read everything.
       required:
         - song_chart
+        - import_warnings
+
+    SongChartChordProReading:
+      type: object
+      description: |
+        What a ChordPro text describes, read without saving anything. Each
+        detail is null when the text doesn't set it.
+      properties:
+        title:
+          type: [string, "null"]
+          description: The title the text sets with {title} or {t}.
+        artist:
+          type: [string, "null"]
+          description: The artist the text sets with {artist}.
+        concert_key:
+          type: [string, "null"]
+          description: The key the text sets with {key}.
+        capo_fret:
+          type: [integer, "null"]
+          minimum: 0
+          maximum: 12
+          description: The capo fret the text sets with {capo}.
+        tempo_bpm:
+          type: [integer, "null"]
+          minimum: 20
+          maximum: 300
+          description: The tempo the text sets with {tempo}.
+        time_signature:
+          oneOf:
+            - $ref: '#/components/schemas/TimeSignature'
+            - type: "null"
+          description: The meter the text sets with {time}.
+        body:
+          $ref: '#/components/schemas/SongChartDocument'
+        import_warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChordProImportWarning'
+          description: What the reading skipped, in line order; empty when it read everything.
+      required:
+        - title
+        - artist
+        - concert_key
+        - capo_fret
+        - tempo_bpm
+        - time_signature
+        - body
         - import_warnings
 
     ChordProImportWarning:

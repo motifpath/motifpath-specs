@@ -69,3 +69,43 @@ Feature: Import and export a song chart as ChordPro
     Given "bob" is authenticated as a teacher
     When "bob" exports "Draft" as ChordPro
     Then the request is refused because only admins author song charts
+
+  # ── Reading ChordPro without saving it ────────────────────────────────────
+  # The song chart editor loads what the text describes; the author saves it like any other edit.
+
+  @wip
+  Scenario: Reading ChordPro returns the song it describes and saves nothing
+    When "ana" reads the ChordPro:
+      """
+      {title: Asa Branca}
+      {artist: Luiz Gonzaga}
+      {capo: 2}
+      {start_of_verse}
+      [G]Quando olhei a [C]terra ardendo
+      {end_of_verse}
+      """
+    Then the reading is titled "Asa Branca" by "Luiz Gonzaga", with a capo on fret 2
+    And the reading has one verse with the line "Quando olhei a terra ardendo", with chords written "G" and "C"
+    And the reading reported no warnings
+    And no song chart is created
+
+  @wip
+  Scenario: A detail the text doesn't set is read as not set
+    When "ana" reads ChordPro that has no title directive
+    Then the reading has no title
+
+  @wip
+  Scenario: Reading reports what it skipped with its line
+    When "ana" reads ChordPro whose line 2 is "{define: G base-fret 1 frets 3 2 0 0 0 3}"
+    Then the reading reported the warning "unsupported_directive" on line 2
+
+  @wip
+  Scenario: ChordPro with no lyric line can't be read as a song chart
+    When "ana" reads ChordPro that has only directives
+    Then the reading is refused as invalid
+
+  @wip
+  Scenario: A teacher can't read ChordPro as a song chart
+    Given "bob" is authenticated as a teacher
+    When "bob" reads ChordPro that has only a line "[G]La la"
+    Then the request is refused because only admins author song charts
