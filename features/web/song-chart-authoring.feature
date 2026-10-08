@@ -36,7 +36,7 @@ Feature: Author song charts
     Scenario Outline: Other roles neither see nor open song charts
       Given the signed-in user is a <role>
       Then the navigation does not offer "Song charts"
-      And opening the song chart list shows that the page was not found
+      And opening the song chart list sends the user away like any other role-gated page
 
       Examples:
         | role    |
