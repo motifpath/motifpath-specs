@@ -30,7 +30,8 @@ Each file holds:
 ## Rules every grader follows
 
 - **The grader for an item comes from its key's kind:**
-  - `fretboard_cell` → `fretboard_cell.v1`
+  - `fretboard_cell` → `fretboard_cell.v2` (`fretboard_cell.v1` before 2026-10-08; its file stays
+    for the evidence it graded)
   - `exercise` → `exercise_option.v1`
   - `play_along` and `chord_change` → `self_rating.v1`
   - `diagram_shape` → `diagram_shape.v1`
@@ -38,16 +39,20 @@ Each file holds:
   1. The response type fits the item kind (`response_does_not_fit_item`).
   2. What the key points at exists (`unknown_reference`).
   3. The cell, the selected options, the named shape or the asked degree exist
-     (`invalid_cell`, `unknown_option`, `degree_not_in_shape`).
+     (`invalid_cell`, `unknown_option`, `degree_not_in_shape`), and a note's choices are
+     valid (`invalid_choices`), in that order.
   4. The response carries the measure its kind needs, and no other (`measure_missing`,
      `response_does_not_fit_item`).
 - **A rejection stores no evidence.**
+- **A `not_answered` response is never graded.** It fits every item kind, reaches no grader and
+  yields no evidence, so it has no cases here.
 - **Auto-graded evidence** is `source`, `correct` and `latency_ms`, with `latency_ms` copied
   from the response, plus `audio_ms` copied from it when the response carries one.
 - **Auto-graded evidence keeps its `answer_key`:** what a right answer was when it was graded,
   so a disputed answer can be checked from the evidence alone. For a fretboard cell, the asked
   `string` and `fret` and the cell's `note_name`, spelled with sharps (any spelling of that
-  pitch is right, and for find the note any octave on that string). For an exercise, its
+  pitch is right, and for find the note any octave on that string), plus the `choices` exactly
+  as sent when the note was named among them. For an exercise, its
   `options` in the exercise's order, each with `option_id` and `is_correct`; the server also
   copies each option's content (label, image, audio, region, diagram), which these cases
   don't pin since their reference has none. The server stores it; a client's instant
@@ -71,6 +76,18 @@ Each file holds:
   another string is wrong.
 - A string outside 1 to the tuning's string count, in the key or in a tap, is
   `invalid_cell`.
+
+### `fretboard_cell.v2`
+
+Every `fretboard_cell.v1` rule, plus four choices for name the note:
+
+- **Name the note with `choices`:** the four choices must be four different pitches (`C` and
+  `B#` are one pitch), include the cell's pitch and include the note named; otherwise
+  `invalid_choices`. The choices are kept in the answer key in the order and spelling sent.
+  Which near notes a client offers is the client's rule (ADR-046) and isn't checked here.
+- **Name the note without `choices`:** an answer given on the earlier twelve-note keypad,
+  graded exactly as `fretboard_cell.v1` graded it, with no choices in the answer key.
+- A string outside the tuning is `invalid_cell` before any check of the choices.
 
 ### `exercise_option.v1`
 

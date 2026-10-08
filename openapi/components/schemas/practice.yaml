@@ -35,6 +35,7 @@ PracticeResponse:
       self_rating: '#/SelfRatingResponse'
       name_the_shape: '#/NameTheShapeResponse'
       find_the_degree: '#/FindTheDegreeResponse'
+      not_answered: '#/NotAnsweredResponse'
   oneOf:
     - $ref: '#/NameTheNoteResponse'
     - $ref: '#/FindTheNoteResponse'
@@ -42,11 +43,13 @@ PracticeResponse:
     - $ref: '#/SelfRatingResponse'
     - $ref: '#/NameTheShapeResponse'
     - $ref: '#/FindTheDegreeResponse'
+    - $ref: '#/NotAnsweredResponse'
 
 NameTheNoteResponse:
   type: object
   description: |
-    Answer to a fretboard cell shown on the fretboard: the student names its note.
+    Answer to a fretboard cell shown on the fretboard: the student names its note, picking it
+    among four choices.
   properties:
     response_type:
       type: string
@@ -59,6 +62,22 @@ NameTheNoteResponse:
       description: |
         The note named, as a letter with an optional sharp (#) or flat (b), without an
         octave. Any spelling of the right pitch counts as right (F# and Gb alike).
+    choices:
+      type: array
+      minItems: 4
+      maxItems: 4
+      uniqueItems: true
+      items:
+        type: string
+        pattern: '^[A-G][#b]?$'
+      description: |
+        The four notes the student picked from, in the order shown: the cell's note and
+        three near notes (a semitone below, a semitone above, and the note at the same fret
+        on an adjacent string, or a note a tone away when that one repeats). They must be
+        four different pitches and include both the cell's note and the note named; otherwise
+        the answer is rejected. Kept with the evidence, so a wrong pick among four can be
+        weighed against the chance of guessing it. Absent only for an answer given on the
+        earlier twelve-note keypad.
     latency_ms:
       type: integer
       minimum: 0
@@ -121,17 +140,21 @@ OptionChoiceResponse:
     latency_ms:
       type: integer
       minimum: 0
-      description: Milliseconds from the moment the exercise was shown to the answer.
+      description: |
+        Milliseconds from the moment the exercise was shown to the answer. When the options
+        are sounds, it runs instead from the end of the last clip the student played to
+        Check: listening is not answering. A clip still playing at Check ends there, so the
+        latency is 0; with no clip played, it runs from the moment the exercise was shown.
     audio_ms:
       type: integer
       minimum: 0
       description: |
-        Milliseconds of audio the exercise asks the student to hear once before answering:
-        the length of the exercise's sound for a listening exercise, or the lengths of all
-        its sound options added together when the options are sounds. Hearing it is not
-        part of the time spent knowing the answer, so it is taken off the latency before
-        the answer is judged against the drill's fluent time. Replays are not taken off.
-        Absent for exercises without audio.
+        Milliseconds of audio a listening exercise asks the student to hear once before
+        answering: the length of its sound. Hearing it is not part of the time spent knowing
+        the answer, so it is taken off the latency before the answer is judged against the
+        drill's fluent time. Replays are not taken off. Absent for exercises without audio,
+        and for exercises whose options are sounds, whose latency already starts after the
+        last clip played.
   additionalProperties: false
   required:
     - response_type
@@ -234,6 +257,34 @@ FindTheDegreeResponse:
     - string
     - fret
     - latency_ms
+
+NotAnsweredResponse:
+  type: object
+  description: |
+    Sent instead of an answer when an item couldn't be answered: its sound or image failed to
+    load and the student skipped it, or it can't be shown on this device. It fits every item
+    kind. It is never graded and yields no evidence, so it changes no accuracy, response time,
+    level or review schedule; the event is kept so items that fail can be found. The item's
+    options stay locked while its stimulus is missing, so it never carries a guess.
+  properties:
+    response_type:
+      type: string
+      enum:
+        - not_answered
+      description: Discriminator. The item was skipped without an answer.
+    reason:
+      type: string
+      enum:
+        - failed_to_load
+        - unavailable
+      description: |
+        Why the item wasn't answered. failed_to_load = its sound or image didn't load, and
+        the student skipped it instead of trying again; unavailable = it can't be shown on
+        this device, so skipping was the only way on.
+  additionalProperties: false
+  required:
+    - response_type
+    - reason
 
 ShapeInterval:
   type: string
@@ -447,7 +498,8 @@ AnswerKey:
     disputed answer can be checked from the evidence alone, even after the exercise was edited
     or its options deleted. For a fretboard cell: the asked string and fret and the cell's note,
     spelled with sharps (any spelling of that pitch is right, and when finding the note, any
-    octave on that string). For an exercise: every option as the student was shown it, each
+    octave on that string), plus the four choices when the note was named among them. For an
+    exercise: every option as the student was shown it, each
     with whether it was correct, so both their pick and the right answer can be read. For a
     diagram shape named: its family and the member it is. For a degree found on a diagram
     shape: the asked interval and every position of the shape that is that interval.
@@ -464,6 +516,17 @@ AnswerKey:
       type: string
       enum: [C, C#, D, D#, E, F, F#, G, G#, A, A#, B]
       description: The asked cell's note, spelled with sharps. Fretboard cells only.
+    choices:
+      type: array
+      minItems: 2
+      uniqueItems: true
+      items:
+        type: string
+        pattern: '^[A-G][#b]?$'
+      description: |
+        The notes the student picked from, as shown, when the note was named among choices.
+        A wrong pick among k choices counts against accuracy by 1/(k-1), the chance of
+        guessing being 1/k. Fretboard cells named among choices only.
     options:
       type: array
       minItems: 1

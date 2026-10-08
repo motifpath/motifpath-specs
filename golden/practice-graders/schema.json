@@ -128,7 +128,7 @@
                           "latency_ms": { "type": "integer", "minimum": 0 },
                           "audio_ms": { "type": "integer", "minimum": 0 },
                           "answer_key": {
-                            "description": "What a right answer was, kept so a disputed answer can be checked without the reference data of the day: the asked cell and its note (spelled with sharps); every option of the exercise as shown, each with whether it was correct; a named shape's family and member; or a found degree's interval and every position of the shape that is it.",
+                            "description": "What a right answer was, kept so a disputed answer can be checked without the reference data of the day: the asked cell and its note (spelled with sharps), with the choices when it was named among them; every option of the exercise as shown, each with whether it was correct; a named shape's family and member; or a found degree's interval and every position of the shape that is it.",
                             "oneOf": [
                               {
                                 "type": "object",
@@ -137,7 +137,14 @@
                                 "properties": {
                                   "string": { "type": "integer", "minimum": 1 },
                                   "fret": { "type": "integer", "minimum": 0 },
-                                  "note_name": { "enum": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] }
+                                  "note_name": { "enum": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] },
+                                  "choices": {
+                                    "type": "array",
+                                    "minItems": 2,
+                                    "uniqueItems": true,
+                                    "description": "The notes the student picked from, as shown, when the note was named among choices.",
+                                    "items": { "type": "string", "pattern": "^[A-G][#b]?$" }
+                                  }
                                 }
                               },
                               {
@@ -222,7 +229,8 @@
                       "invalid_cell",
                       "unknown_option",
                       "measure_missing",
-                      "degree_not_in_shape"
+                      "degree_not_in_shape",
+                      "invalid_choices"
                     ]
                   }
                 }
