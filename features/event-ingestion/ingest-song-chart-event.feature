@@ -4,7 +4,6 @@
 # song_chart.section_completed, so the song-first hypothesis is checked against real use. When the
 # reader emits each one is client behaviour, in features/web/song-chart-reader.feature.
 
-@wip
 Feature: Ingest song chart reading events
   As the MotifPath platform
   I want to store what students do in a song chart
