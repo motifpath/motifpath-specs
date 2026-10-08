@@ -223,8 +223,8 @@ follow the same classification rule as content (nodes must suit the item's instr
   either returns the evidence payload or rejects the response, and stores nothing when it rejects.
 - **Name the note offers four choices** (amended 2026-10-08, D9): the right note and three near
   distractors, in random order. The client picks the distractors: the notes a semitone below and
-  above the cell's note, and the note at the same fret on an adjacent string (the next
-  higher-pitched string, or the next lower one on string 1). When that note repeats one already
+  above the cell's note, and the note at the same fret on an adjacent string (the string numbered
+  one lower, or string 2 for a cell on string 1). When that note repeats one already
   offered, a note a tone away from the cell's note takes its place. The response keeps the four
   choices as shown. `fretboard_cell.v2` rejects choices that aren't four different pitches, that
   leave out the cell's note, or that don't include the note named, and keeps the choices in the
