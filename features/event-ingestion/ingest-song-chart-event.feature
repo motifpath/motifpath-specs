@@ -23,7 +23,6 @@ Feature: Ingest song chart reading events
     When "alice" submits a song_chart.chord_viewed event for anchor "a3" of revision 2 of song chart "asa-branca", resolving to chord "G" and opening on voicing "g-open"
     Then the event is accepted and stored in the event log
 
-  @wip
   Scenario: A song_chart.completed event is accepted
     When "alice" submits a song_chart.completed event for revision 2 of song chart "asa-branca"
     Then the event is accepted and stored in the event log
@@ -35,7 +34,6 @@ Feature: Ingest song chart reading events
     When "alice" submits the same song_chart.opened event again with identifier "evt-chart-001"
     Then the event is accepted without error
 
-  @wip
   Scenario: A song_chart.section_completed event is no longer accepted
     When "alice" submits an event with event type "song_chart.section_completed"
     Then the submission is rejected as invalid
@@ -52,7 +50,6 @@ Feature: Ingest song chart reading events
     Then the submission is rejected as invalid
     And the rejection identifies "chord_voicing_id" as the source of the error
 
-  @wip
   Scenario: A song_chart.completed event without a song chart context is rejected
     When "alice" submits a song_chart.completed event with the song chart context omitted
     Then the submission is rejected as invalid
