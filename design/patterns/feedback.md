@@ -1,7 +1,7 @@
 # Pattern: answer feedback and the commit point
 
 **Source:** ADR-049 §2 (Feedback, Flow) and §3, ADR-046 (latency from the prompt) · first used by
-PB-22 slice 3 Phase 7
+PB-22 slice 3 Phase 7 · MOT-55 phone prototypes P1–P3
 
 ## When
 
@@ -21,7 +21,7 @@ them that they failed, not what to learn.
 |---|---|---|
 | Choice (one right option) in a session | **the tap is the answer** | feedback in place |
 | Region / diagram cell (one right cell) in a session | the tap is the answer | feedback in place |
-| MultipleChoice (several right options) | **Check**, once at least one option is chosen | feedback in place |
+| MultipleChoice (several right options) | **Check**, once at least one option is chosen; the prompt says how many (P2) | feedback in place |
 | audio_selection (options are sounds), even with one right option | **Check** (D10, P4) | feedback in place |
 | SelfRating (a play-along take, a chord change, a song) | the rating tap (`self-rating.md`) | the next take, or Next up |
 | Any exercise in an S7 challenge | the selection the student moves on with (Next / Finish) | no feedback until the end |
@@ -34,6 +34,8 @@ written down by MOT-78).
 
 - **Right:** a check icon and "Right!" next to the action bar. The chosen option is marked right. The
   session moves on after a short pause (900 ms). When reduced motion is on, Continue shows instead.
+  Listening items keep the same 900 ms (P1): on an iPhone, no clip was replayed after a right
+  answer (one tester), and when the item waited for Next it was pressed 0.3–0.7 s after the answer.
 - **Wrong:** a cross icon and "Not quite.". The chosen option is marked wrong, **the right option(s)
   are revealed**, and the session waits for **Continue**.
 - **Locked:** once committed, the item's options can't be changed.
@@ -62,6 +64,7 @@ exercise.
 ## Do not
 
 - Add a Check step to a single-answer exercise in a session.
+- Commit a MultipleChoice by itself when the chosen count is reached (P2).
 - Reveal answers in an S7 challenge before its end.
 - Let a changed selection after the commit become a new answer.
 - Grade a play tap: an audio option's play button only plays.
