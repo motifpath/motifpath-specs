@@ -46,6 +46,14 @@ learns one way to answer and can answer with a pedal or a keyboard as well as a 
 - **Commit and feedback** follow `feedback.md`: the tap is the answer for one right option, Check for
   several, and the right options are revealed after a wrong answer.
 
+### Outside a practice run (MOT-60, D9)
+
+- **`ChoiceChip`** for a short choice or a filter (one or several): 40 px tall in a 48 px row, and a
+  check mark when selected, so selection never relies on colour.
+- **`Chip`** (Tone) is a status label only ("Current", "Draft") and is never tappable.
+- Up to about five options: ChoiceChips or a segmented control. More: a searchable list in a sheet
+  (Compact) or a dialog (Medium+) (`overlays.md`). A native `<select>` stays allowed for plain lists.
+
 ## Do not
 
 - Draw a twelve-note keypad for a name-the-note item (D9).

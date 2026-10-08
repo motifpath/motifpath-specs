@@ -42,5 +42,8 @@ student for the app's problem and corrupts their levels.
 - Leave the student with no action but ×.
 - Show an error code.
 
+Outside a run, pages and sections use the standard states in `states.md` and the overlay rules in
+`overlays.md`.
+
 Out of scope: going offline or losing the connection mid-run (answers queued, "saved when you're back
 online") is designed in MOT-62.
