@@ -13,8 +13,13 @@ equal-looking buttons make the student stop and read.
 
 ## How
 
-- **One primary action per screen,** styled with `PrimaryButton`. Secondary actions are outline
-  buttons; tertiary ones are text links. A destructive action has its own variant.
+- **One primary action per screen,** styled with `PrimaryButton`. The `Button` variants (MOT-60,
+  D10):
+  - Primary: the one next step.
+  - Secondary (outlined): the other choice, or Try again.
+  - Tertiary (text): low emphasis, such as Cancel in a dialog.
+  - Destructive: only the confirm button of an irreversible action (`overlays.md`).
+  - States: Default · Disabled · Busy · Focused (a 2 px ring outside, for keyboard focus only).
 - **Compact:** in a practice run, the primary action sits in the bottom action bar and spans its
   width. Elsewhere, it sits at the end of the content, never above the fold-only area.
 - **Medium and Expanded:** in a practice run, the action bar stays at the bottom; its content lines
@@ -24,7 +29,9 @@ equal-looking buttons make the student stop and read.
 - **Size:** at least 48 px tall, a touch target of at least 48 × 48 px.
 - **Disabled:** a disabled primary action says why nearby (for example "Choose at least one
   option"), or isn't shown until it can be used.
-- **Busy:** while the action runs, it shows the busy label ("Starting…") and ignores further taps.
+- **Busy:** while the action runs, it shows a spinner before its label (the label may change, e.g.
+  "Starting…"), keeps its width and ignores further taps. The page itself doesn't show a loading
+  state for a short action (`states.md`).
 
 ## Do not
 

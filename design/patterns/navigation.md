@@ -1,6 +1,7 @@
 # Pattern: navigation
 
-**Source:** ADR-049 §1 and §5; decided in MOT-43 (2026-10-07); lessons revised in MOT-56 (D1, D12)
+**Source:** ADR-049 §1 and §5; decided in MOT-43 (2026-10-07); lessons revised in MOT-56 (D1, D12);
+account menu decided in MOT-60 (D1–D4)
 
 ## When
 
@@ -23,9 +24,19 @@ student can go.
     least 48 px, and the bar sits above the home-indicator safe area.
   - Medium (600–839 px): a navigation rail on the left, with the same items.
   - Expanded (≥ 840 px): a sidebar with icon and label rows.
-- **Account and settings** sit behind the avatar: theme, language, sign out. On Compact the menu also
-  holds "Teach" for teachers and admins; on Expanded, "Teach" sits in the sidebar under a divider,
-  apart from the learner destinations.
+- **Account and settings** sit behind the avatar (MOT-60, D1–D4):
+  - Content, at every size: who is signed in (name, and the role for teachers and admins) ·
+    Appearance (Auto | Light | Dark; Auto follows the device and is the default) · Language › ·
+    Teach (teachers and admins only) · Sign out.
+  - Compact: a bottom sheet. Medium and Expanded: a menu anchored to the avatar — at the foot of the
+    rail, or the "Account" row at the foot of the sidebar (`overlays.md`).
+  - "Teach" is in the menu on Compact and Medium; on Expanded it sits in the sidebar under a divider,
+    apart from the learner destinations, and the menu drops it.
+  - Language opens a list in the same sheet or menu (back arrow); a choice applies at once and
+    returns. It changes the app only, not the lesson content's language.
+  - Appearance and language apply at once, with no Save.
+  - Sign out happens at once, with no confirm and no toast, and lands on the landing page ("You're
+    signed out. Your practice and progress are saved.").
 - **Practice** opens the session setup directly, never a page in between.
 - **Discover** joins the course and path catalogs behind a Courses | Paths segmented control.
 - **A lesson** is a pushed page (back arrow to My path): on Compact it hides the bottom bar so the
