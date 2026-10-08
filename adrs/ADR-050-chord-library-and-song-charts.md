@@ -27,6 +27,12 @@ tracking events start before lessons can embed charts. The atom stays the intend
 page is kept as a direct link once it exists. "Sections played" becomes one "I played it" for the
 whole song: the reader sends `song_chart.completed` once per opening, and
 `song_chart.section_completed`, never sent by a released client, is removed.
+**Amended:** 2026-10-08, by Gilson (MOT-45, before Phase 3): a `songChart` node in lesson content
+names the chart, not a revision, and always shows the chart's latest published revision, so a
+correction reaches every lesson; a chart withdrawn since shows to nobody. It shows as a card, a
+shared component placed wherever content is shown, that opens the reader; lessons are its first
+place. It is allowed in an article's body and rich expanded content, not in exercise prompts.
+Teachers find published charts through their own list, since authoring charts stays with admins.
 
 ---
 
@@ -219,8 +225,8 @@ chordAnchor mark on lyric text:
   diagram editor keeps ownership of the physical fingering.
 - In lesson content, a chord voicing is inserted with the existing `diagram` embed (ADR-030): the
   picker chooses a `ChordVoicing` and inserts its `diagram_ref`.
-- One new rich-text node, a `song_chart` atom, references a published `SongChart` revision and
-  previews it read-only.
+- One new rich-text node, a `songChart` atom, references a published `SongChart` and shows its
+  latest published revision as a card that opens the reader (see the 2026-10-08 amendment).
 
 ### 5. Rights are cleared outside MotifPath; a chart records that they were checked
 
