@@ -24,7 +24,7 @@ code and Storybook are the source of truth (ADR-049 §8).
 
 1. *Today's practice*: the top next step across instruments (`PracticeOverview.instruments[].top_next_step`,
    first card), its instrument and length, and the screen's only primary action, "Start practice".
-2. *Your path*: path name, "8 of 14", a progress bar, and the next step with its kind and length.
+2. *Your path*: path name, "8 of 14", a progress bar, and the next step with its kind. No length: lessons carry no duration (MOT-56, D4).
    The whole card opens the step. No second primary button.
 3. *This week*: three `MetricTile`s from the overview (new fields, ADR-051). Tapping a tile opens
    Your progress.

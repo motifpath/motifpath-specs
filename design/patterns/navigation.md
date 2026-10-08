@@ -1,6 +1,6 @@
 # Pattern: navigation
 
-**Source:** ADR-049 §1 and §5; decided in MOT-43 (2026-10-07)
+**Source:** ADR-049 §1 and §5; decided in MOT-43 (2026-10-07); lessons revised in MOT-56 (D1, D12)
 
 ## When
 
@@ -28,6 +28,8 @@ student can go.
   apart from the learner destinations.
 - **Practice** opens the session setup directly, never a page in between.
 - **Discover** joins the course and path catalogs behind a Courses | Paths segmented control.
+- **A lesson** is a pushed page (back arrow to My path): on Compact it hides the bottom bar so the
+  lesson gets the height; the rail and the sidebar stay on Medium and Expanded (see `lesson.md`).
 - **Back** closes the topmost layer (menu, sheet, dialog) before it leaves the destination.
 - Labels are short nouns that fit one line in pt-BR on a 360 px screen: Início, Praticar, Trilha,
   Aprender, Explorar.
@@ -38,3 +40,4 @@ student can go.
 - Hide navigation behind a menu button on any size class.
 - Mark the current destination by colour alone.
 - Show the learner navigation during a practice run, or before the visitor has signed in.
+- Show the bottom bar under a lesson on Compact.
