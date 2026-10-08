@@ -17,6 +17,10 @@ equal-looking buttons make the student stop and read.
   buttons; tertiary ones are text links. A destructive action has its own variant.
 - **Compact:** in a practice run, the primary action sits in the bottom action bar and spans its
   width. Elsewhere, it sits at the end of the content, never above the fold-only area.
+- **Medium and Expanded:** in a practice run, the action bar stays at the bottom; its content lines
+  up with the 560 px content column instead of spanning the screen (D25, `session.md`).
+- **Replaced by a rating:** where SelfRating is the commit, its tiles take the action bar's place;
+  there is no separate primary button (`self-rating.md`).
 - **Size:** at least 48 px tall, a touch target of at least 48 × 48 px.
 - **Disabled:** a disabled primary action says why nearby (for example "Choose at least one
   option"), or isn't shown until it can be used.
