@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.29.0
+  version: 0.30.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -3342,6 +3342,66 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+
+  /song-charts/chordpro:
+    post:
+      operationId: createSongChartFromChordPro
+      summary: Start a new song chart from ChordPro
+      description: |
+        Creates a song chart whose first draft is read from ChordPro text,
+        the same way importSongChartChordPro reads it into an existing
+        draft. The text must set the title and the artist; the key, capo,
+        tempo and time are set when the text gives them. The language is
+        given separately, since ChordPro doesn't carry one. Chord anchors
+        are resolved as on createSongChart, and the rights are not
+        confirmed. What the import skipped is reported in import_warnings.
+        Only admins author song charts.
+      tags:
+        - Song charts
+      parameters:
+        - name: language
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The Language.code of the lyrics, other than "any".
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+              minLength: 1
+              maxLength: 100000
+      responses:
+        "201":
+          description: The new song chart with its imported draft, and what the import skipped.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongChartChordProImport'
+        "400":
+          description: |
+            The text is empty or too long, or what it describes isn't a
+            valid draft: no title or artist, no lyric line at all, or a
+            value outside a draft's bounds. Or the language is missing,
+            "any", or not an existing language.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
 
   /song-charts/{song_chart_id}/chordpro:
     parameters:

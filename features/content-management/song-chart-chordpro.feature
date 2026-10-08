@@ -69,3 +69,46 @@ Feature: Import and export a song chart as ChordPro
     Given "bob" is authenticated as a teacher
     When "bob" exports "Draft" as ChordPro
     Then the request is refused because only admins author song charts
+
+  # ── Starting a chart from ChordPro ─────────────────────────────────────────
+
+  @wip
+  Scenario: An admin starts a chart from ChordPro
+    When "ana" starts a song chart in "pt_BR" from the ChordPro:
+      """
+      {title: Asa Branca}
+      {artist: Luiz Gonzaga}
+      {capo: 2}
+      {start_of_verse}
+      [G]Quando olhei a [C]terra ardendo
+      {end_of_verse}
+      """
+    Then a song chart "Asa Branca" by "Luiz Gonzaga" in "pt_BR" is created as a draft that has never been published
+    And the draft has a capo on fret 2
+    And the anchors resolve to the catalog chords "G" and "C"
+    And the draft's rights are not confirmed
+    And the import reported no warnings
+
+  @wip
+  Scenario: Starting a chart reports what the import skipped
+    When "ana" starts a song chart in "pt_BR" from ChordPro whose line 3 is "{define: G base-fret 1 frets 3 2 0 0 0 3}"
+    Then the import reported the warning "unsupported_directive" on line 3
+
+  @wip
+  Scenario: ChordPro without a title can't start a chart
+    When "ana" starts a song chart in "pt_BR" from ChordPro that has no title directive
+    Then the import is refused as invalid
+    And the rejection identifies "title" as the source of the error
+    And no song chart is created
+
+  @wip
+  Scenario: A chart can't be started without a language
+    When "ana" starts a song chart in "any" from the ChordPro of "Asa Branca"
+    Then the import is refused as invalid
+    And the rejection identifies "language" as the source of the error
+
+  @wip
+  Scenario: A teacher can't start a chart from ChordPro
+    Given "bob" is authenticated as a teacher
+    When "bob" starts a song chart in "pt_BR" from the ChordPro of "Asa Branca"
+    Then the request is refused because only admins author song charts
