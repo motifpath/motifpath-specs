@@ -3343,28 +3343,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
-  /song-charts/chordpro:
+  /song-charts/chordpro/read:
     post:
-      operationId: createSongChartFromChordPro
-      summary: Start a new song chart from ChordPro
+      operationId: readSongChartChordPro
+      summary: Read ChordPro text as a song chart, without saving it
       description: |
-        Creates a song chart whose first draft is read from ChordPro text,
-        the same way importSongChartChordPro reads it into an existing
-        draft. The text must set the title and the artist; the key, capo,
-        tempo and time are set when the text gives them. The language is
-        given separately, since ChordPro doesn't carry one. Chord anchors
-        are resolved as on createSongChart, and the rights are not
-        confirmed. What the import skipped is reported in import_warnings.
-        Only admins author song charts.
+        Reads ChordPro text the same way importSongChartChordPro does and
+        returns what it describes: the song's details the text sets, the
+        lyrics with their chords as a SongChartDocument, and what was
+        skipped. Nothing is stored. The song chart editor loads the result,
+        and the author saves it with createSongChart or
+        updateSongChartDraft. Chord anchors carry only their written
+        symbols; they are resolved to catalog chords when the chart is
+        saved. Only admins author song charts.
       tags:
         - Song charts
-      parameters:
-        - name: language
-          in: query
-          required: true
-          schema:
-            type: string
-          description: The Language.code of the lyrics, other than "any".
       requestBody:
         required: true
         content:
@@ -3374,18 +3367,15 @@ paths:
               minLength: 1
               maxLength: 100000
       responses:
-        "201":
-          description: The new song chart with its imported draft, and what the import skipped.
+        "200":
+          description: What the text describes, and what the reading skipped.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SongChartChordProImport'
+                $ref: '#/components/schemas/SongChartChordProReading'
         "400":
           description: |
-            The text is empty or too long, or what it describes isn't a
-            valid draft: no title or artist, no lyric line at all, or a
-            value outside a draft's bounds. Or the language is missing,
-            "any", or not an existing language.
+            The text is empty or too long, or has no lyric line at all.
           content:
             application/json:
               schema:
@@ -8763,6 +8753,53 @@ components:
           description: What the import skipped, in line order; empty when it read everything.
       required:
         - song_chart
+        - import_warnings
+
+    SongChartChordProReading:
+      type: object
+      description: |
+        What a ChordPro text describes, read without saving anything. Each
+        detail is null when the text doesn't set it.
+      properties:
+        title:
+          type: [string, "null"]
+          description: The title the text sets with {title} or {t}.
+        artist:
+          type: [string, "null"]
+          description: The artist the text sets with {artist}.
+        concert_key:
+          type: [string, "null"]
+          description: The key the text sets with {key}.
+        capo_fret:
+          type: [integer, "null"]
+          minimum: 0
+          maximum: 12
+          description: The capo fret the text sets with {capo}.
+        tempo_bpm:
+          type: [integer, "null"]
+          minimum: 20
+          maximum: 300
+          description: The tempo the text sets with {tempo}.
+        time_signature:
+          oneOf:
+            - $ref: '#/components/schemas/TimeSignature'
+            - type: "null"
+          description: The meter the text sets with {time}.
+        body:
+          $ref: '#/components/schemas/SongChartDocument'
+        import_warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChordProImportWarning'
+          description: What the reading skipped, in line order; empty when it read everything.
+      required:
+        - title
+        - artist
+        - concert_key
+        - capo_fret
+        - tempo_bpm
+        - time_signature
+        - body
         - import_warnings
 
     ChordProImportWarning:
