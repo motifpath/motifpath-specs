@@ -58,6 +58,7 @@ without scrolling, and show where the student is in the path without a wall of f
 
 ## Spec changes this needs
 
-- **D3:** today a language lock also locks every later step, and `current_position` points at the
-  locked step (core `BuildStudentPathItems`). The lock reason (MOT-39) and "open it in the language
-  it has" need an ADR-017 amendment and OpenAPI changes before implementation.
+- **D3:** specified in MOT-39. ADR-024 (amendment 2026-10-08) lets the student open a
+  language-locked step in the language it has. `StudentPathItem.lock_reason` (`previous_step` |
+  `language`) and `available_languages` give the row and the sheet their wording. Only the step at
+  `current_position` can be locked for `language`.

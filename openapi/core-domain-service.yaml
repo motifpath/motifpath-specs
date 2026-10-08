@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.31.0
+  version: 0.32.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -5177,7 +5177,10 @@ paths:
         - completed — the student has finished this content node.
         - in_progress — the student has started but not finished this content node.
         - not_started — the student has not yet reached this content node.
-        - locked — the student must complete an earlier node before accessing this one.
+        - locked — not available yet. lock_reason says why: previous_step
+          (complete an earlier node first) or language (no version in the
+          caller's locale; the student can open it in one of
+          available_languages, and finishing it unlocks the next item).
 
         Accessible by authenticated users with role student, teacher, or admin,
         returning the caller's own current StudentPath in every case. Returns
@@ -9529,7 +9532,31 @@ components:
           description: |
             The student's current progress state for this item. completed — finished.
             in_progress — started but not finished. not_started — not yet reached.
-            locked — a preceding item must be completed first.
+            locked — not available yet; lock_reason says why.
+        lock_reason:
+          type: string
+          enum:
+            - previous_step
+            - language
+          description: |
+            Why the item is locked. Present only when status is locked.
+            previous_step — an earlier item isn't completed yet.
+            language — every earlier item is completed, but this item (its
+            content node or a required exercise) has no version in the
+            caller's locale. The student can open it in one of
+            available_languages, and finishing it completes the item and
+            unlocks the next. Only the item at current_position can have
+            this reason: when both reasons apply, it is previous_step.
+        available_languages:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Language'
+          description: |
+            The languages the student can open this item in. Present only
+            when lock_reason is language. Holds the content node's languages
+            when the node lacks the caller's locale, and otherwise the
+            languages of the first required exercise that lacks it.
         section_label:
           type: string
           description: >-

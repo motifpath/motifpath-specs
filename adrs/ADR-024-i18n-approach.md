@@ -3,6 +3,10 @@
 **Status:** Accepted
 **Date:** 2026-09-18
 **Deciders:** Gilson (Product Owner)
+**Amended:** 2026-10-08, by Gilson, from the My path design (MOT-56, D3 option A; written in
+MOT-39): a language-locked path step is no longer a dead end. The student can open it in the
+language it has, and finishing it completes the step. The path says why a step is locked
+(`lock_reason`). See "Amendment — 2026-10-08".
 
 ---
 
@@ -179,6 +183,9 @@ This resolution governs the content-filtering read path referenced in Decision p
 Gherkin scenario (`motifpath-specs/features/`) covering the lock/skip behavior before that read
 path is implemented, per this repo's Definition of Ready.
 
+**Amended 2026-10-08:** "no opt-in prompt" no longer holds for path steps. See "Amendment —
+2026-10-08". Content is still never *silently* substituted.
+
 ## Amendment — 2026-09-18: `Exercise` gets its own `Language` edge
 
 Decision part 3, as originally written, edged only `ContentNode` to `Language` and treated
@@ -200,8 +207,63 @@ required by that item does, or both.
 This does not change Decision parts 1 or 2, or the `any`-row convention, which apply unchanged to
 `Exercise`.
 
+## Amendment — 2026-10-08: a language-locked step opens in the language it has
+
+**Context.** The 2026-09-30 smoke test (pt-BR profile, English-only lessons) showed what the
+lock/skip resolution does in practice. `BuildStudentPathItems` locks the step, and since it
+can't be completed, the prerequisite rule then locks every later step. `current_position` points at
+the locked step. The student is stuck with no way through it, and every lock reads "Complete the
+previous step", which is false here. The trade-off accepted above, "a path being able to stall on
+translation lag", turned out to be a dead end for the student, not a delay. We can't close the
+translation gap faster than students reach those steps.
+
+**Decision.**
+
+- **The student can open a language-locked step in the language it has** ("Watch in English").
+  They choose to. Content is still never substituted without asking. Finishing the step completes
+  it the usual way (ADR-011), and the next step unlocks. A language lock is never skipped, so the
+  path keeps its order.
+- **Status stays `locked`**, and a new `lock_reason` on `StudentPathItem` gives the reason:
+  - `previous_step`: an earlier step isn't completed.
+  - `language`: every earlier step is completed, but this step (its `ContentNode` or a required
+    `Exercise`) has no version in the student's locale and no `any` edge.
+  - When both apply, the reason is `previous_step`, because that's what the student can act on
+    now. A step shows `language` only when it's the next one, at `current_position`.
+  - `lock_reason` is present only when status is `locked`.
+- **`available_languages` on `StudentPathItem`** lists the languages the student can open the
+  step in. It's present only when `lock_reason` is `language`. It holds the `ContentNode`'s
+  languages if the node lacks the locale, and otherwise the languages of the first required
+  `Exercise` that lacks it.
+- **Unchanged:** a completed step is never locked by language. Prerequisite locking, the `any`
+  convention, and the per-entity rule from the 2026-09-18 amendment all stay as they are. Lesson
+  content was never gated by the lock, so no endpoint changes access.
+
+**Rationale.** We rejected three alternatives:
+
+- **Keep the hard lock and only fix the message.** The student would know why they're stuck, but
+  they'd still be stuck.
+- **Skip the step.** That breaks the path's order and leaves a gap the student never filled.
+- **Fall back silently.** The student never chose a different language, so this would break the
+  guarantee the original resolution was protecting.
+
+Opening the step by choice keeps the student moving. The lock still tells them they're leaving
+their language.
+
+**Consequences.**
+
+- Positive: no path dead-ends on translation lag. The message on the row and in the sheet is true.
+- Negative: a student can finish a step in a language they didn't pick, so a "completed" step no
+  longer guarantees the content was in their locale. `StudentPathItem` gains two conditional
+  fields, which every client has to handle.
+- Neutral: `current_position` still points at the language-locked step, which is now correct
+  because that step is the way forward.
+
 ## Related ADRs
 
+- [ADR-011: Minimal aggregation worker](./ADR-011-minimal-aggregation-worker.md) — completing a
+  step opened in another language records completion like any other step.
+- [ADR-017: Student path as a copied instance](./ADR-017-student-path-copied-instance.md) — the
+  derived `StudentPathItem` status that `lock_reason` qualifies.
 - [ADR-005: Ent migration strategy](./ADR-005-ent-migration-strategy.md) — governs how `Language`
   and the new edges are migrated via Atlas.
 - [ADR-010: Ent/Atlas migration workflow](./ADR-010-ent-atlas-migration-workflow.md) — the
