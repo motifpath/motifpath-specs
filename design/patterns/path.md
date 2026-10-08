@@ -36,8 +36,8 @@ without scrolling, and show where the student is in the path without a wall of f
   completes the step and unlocks the next one (D3, option A). No skipping.
 - **Path complete (standalone):** a celebration above the folded path, with "Find your next path"
   (Discover → Paths) as the primary action and "Practise what you learned" (Practice) as the quiet
-  one. A course part that completes moves on to the next part. A completed course uses the Learning
-  screen (MOT-57).
+  one. A course part that completes moves on to the next part. A completed course shows the course
+  completed screen (`learning.md`).
 - **No path:** says what a path is and offers "Explore courses and paths" (Discover).
 - **States:** loading shows skeleton rows. A load error shows an `InlineNotice` with "Try again", and
   the shell stays.
