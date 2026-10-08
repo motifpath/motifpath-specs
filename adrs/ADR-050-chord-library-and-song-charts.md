@@ -21,6 +21,12 @@ outside MotifPath. A chart only records that an admin confirmed its rights were 
 and when, and it can't be published without that. Any admin publishes a chart, and any admin adds
 to the chord catalog. This supersedes the rights records, evidence, license dates and two-admin
 reviews described by the decision and the previous amendment.
+**Amended:** 2026-10-07, by Gilson (MOT-45, after Phase 2): until the `song_chart` atom
+(Phase 3), a learner also reaches a published chart on its own page, from a link, so the reader's
+tracking events start before lessons can embed charts. The atom stays the intended route, and the
+page is kept as a direct link once it exists. "Sections played" becomes one "I played it" for the
+whole song: the reader sends `song_chart.completed` once per opening, and
+`song_chart.section_completed`, never sent by a released client, is removed.
 
 ---
 
@@ -393,7 +399,7 @@ correction or a new chart revision.
 
 1. ~~Phase 0 — concierge test with 5–8 students on 3–5 rights-cleared charts.~~ Dropped
    (2026-10-06, MOT-45). The learner reader emits tracking events for chart opens, chord views
-   and sections the learner marks as played (Phase 2), so the song-first hypothesis is checked
+   and the songs the learner marks as played (Phase 2), so the song-first hypothesis is checked
    against real use.
 2. Phase 1a — Gherkin and OpenAPI for plural playbacks (`Diagram.playbacks`,
    `default_playback_id`, `DiagramRef.playback.playback_id`) and the diagram editor's playback
@@ -405,7 +411,7 @@ correction or a new chart revision.
    diagrams in the diagram editor.
 4. Phase 2 — Gherkin and OpenAPI for `SongChart`, its rights confirmation and publication,
    ChordPro import and export, and the learner reader. Admins open the reader as a preview;
-   learners reach it through the Phase 3 atom.
+   learners open a published chart on its own page, from a link, until the Phase 3 atom.
 5. Phase 3 — the `song_chart` rich-text atom and the voicing picker for the `diagram` embed.
 6. Legal — a license template and review checklist for licensed songs, before the first licensed
    chart. Both are kept outside MotifPath.

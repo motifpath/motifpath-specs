@@ -1,5 +1,11 @@
 # PR Review — Changelog
 
+## [1.10.1] — 2026-10-07
+
+### Changed
+- `profiles/motifpath-specs.md`: `song_chart.section_completed` is replaced by
+  `song_chart.completed` in the exact event names (MOT-45: "I played it" marks the whole chart).
+
 ## [1.10.0] — 2026-10-07
 
 ### Changed
