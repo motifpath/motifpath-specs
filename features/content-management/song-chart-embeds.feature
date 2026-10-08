@@ -4,7 +4,6 @@
 # content. It always shows the chart's latest published revision. How a learner sees it, a card
 # that opens the reader, is client behaviour in features/web/song-chart-embeds.feature.
 
-@wip
 Feature: Embed song charts in lesson content
   As a teacher
   I want to find published song charts and embed them in my lessons
