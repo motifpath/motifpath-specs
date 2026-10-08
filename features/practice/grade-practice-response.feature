@@ -30,15 +30,25 @@ Feature: Grade a practice answer into evidence
     When "alice" rates a take of play-along "pentatonic-run" as "clean" at 90 BPM
     Then "alice" has self-assessed evidence for play-along "pentatonic-run" rated "clean" at 90 BPM
 
-  Scenario: Evidence keeps the raw response and the grader that graded it
+  Scenario: Evidence keeps the raw response and the event that sent it
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "C" after 1800 milliseconds
     Then the evidence keeps the response exactly as "alice" sent it
-    And the evidence names the grader "fretboard_cell.v1"
     And the evidence is identified by the identifier of the practice.item_answered event
+
+  @wip
+  Scenario: A fretboard cell answer is graded by fretboard_cell.v2
+    When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "C" among "B", "F", "C" and "C#" after 1500 milliseconds
+    Then the evidence names the grader "fretboard_cell.v2"
 
   Scenario: Evidence keeps what a right answer was for a fretboard cell
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "D" after 2500 milliseconds
     Then the evidence's answer key is string 5, fret 3, note "C"
+
+  @wip
+  Scenario: Naming the note among four choices keeps the choices in the answer key
+    When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "C#" among "B", "F", "C" and "C#" after 1700 milliseconds
+    Then "alice" has auto-graded evidence for that cell that is wrong with a latency of 1700 milliseconds
+    And the evidence's answer key is string 5, fret 3, note "C", with the choices "B", "F", "C" and "C#"
 
   Scenario: Naming the right member of a diagram shape's family is a correct answer
     Given the catalog shape "C major — CAGED A, shift 3"
@@ -128,6 +138,38 @@ Feature: Grade a practice answer into evidence
     Then "alice" has auto-graded evidence for that shape that is wrong with a latency of 3000 milliseconds
 
   # ── Failure cases ──────────────────────────────────────────────────────────
+
+  @wip
+  Scenario: Choices that leave out the cell's note yield no evidence
+    When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "D" among "B", "C#", "D" and "F" after 1600 milliseconds
+    Then the answer is rejected because the choices are invalid
+    And "alice" has no evidence for that cell
+
+  @wip
+  Scenario: A note named that isn't among the choices yields no evidence
+    When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "D" among "B", "F", "C" and "C#" after 1600 milliseconds
+    Then the answer is rejected because the choices are invalid
+    And "alice" has no evidence for that cell
+
+  @wip
+  Scenario: Two choices spelling the same pitch yield no evidence
+    When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "C" among "C", "B#", "C#" and "F" after 1600 milliseconds
+    Then the answer is rejected because the choices are invalid
+    And "alice" has no evidence for that cell
+
+  @wip
+  Scenario: An item skipped because its sound failed to load yields no evidence
+    Given the exercise "hear-the-fifth" whose correct option is "Perfect fifth" out of "Perfect fourth" and "Perfect fifth"
+    When "alice" sends exercise "hear-the-fifth" as not answered because its stimulus failed to load
+    Then the practice.item_answered event is kept with the reason "failed_to_load"
+    And "alice" has no evidence for exercise "hear-the-fifth"
+
+  @wip
+  Scenario: An item that can't be shown leaves its level and review as they were
+    Given "alice" is accurate on the guitar cell on string 5 at fret 3, in box 2 and due today
+    When "alice" sends that cell as not answered because it is unavailable
+    Then "alice"'s level for that cell is still "accurate"
+    And the cell stays in box 2 and due today
 
   Scenario: A response that doesn't fit the item yields no evidence
     Given the exercise "c-major-triad" whose correct options are "C" and "E" out of "C", "D", "E" and "F"
