@@ -32,7 +32,8 @@ names the chart, not a revision, and always shows the chart's latest published r
 correction reaches every lesson; a chart withdrawn since shows to nobody. It shows as a card, a
 shared component placed wherever content is shown, that opens the reader; lessons are its first
 place. It is allowed in an article's body and rich expanded content, not in exercise prompts.
-Teachers find published charts through their own list, since authoring charts stays with admins.
+Teachers find charts to embed by listing the song charts with `status=published`, the one status
+they may list, since authoring charts stays with admins.
 
 ---
 

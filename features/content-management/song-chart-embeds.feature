@@ -20,18 +20,33 @@ Feature: Embed song charts in lesson content
 
   # ── Finding charts ───────────────────────────────────────────────────────────
 
-  Scenario: A teacher finds the published charts
-    When "bob" lists the published song charts
-    Then the list holds "Asa Branca" only, at revision 1
+  Scenario: A teacher finds the published charts, as learners read them
+    When "bob" lists the song charts that are published
+    Then the list holds "Asa Branca" only, with its published revision 1
 
   Scenario: A teacher searches the published charts by title or artist
-    When "bob" searches the published song charts for "gonzaga"
-    Then the list holds "Asa Branca" only, at revision 1
+    When "bob" searches the song charts that are published for "gonzaga"
+    Then the list holds "Asa Branca" only, with its published revision 1
 
-  Scenario: A student can't list the published charts
+  Scenario: A teacher searching finds a chart by its published title
+    Given the draft of "Asa Branca" has been retitled "Asa Branca (ao vivo)" and not published
+    When "bob" searches the song charts that are published for "Asa Branca"
+    Then the list holds "Asa Branca" with its published title "Asa Branca"
+
+  Scenario Outline: A teacher can't list charts learners can't read
+    When "bob" lists song charts <filter>
+    Then the request is refused because only admins author song charts
+
+    Examples:
+      | filter                  |
+      | that are drafts         |
+      | that are withdrawn      |
+      | without choosing status |
+
+  Scenario: A student can't list song charts
     Given "alice" is authenticated as a student
-    When "alice" lists the published song charts
-    Then the request is refused because students can't browse content to embed
+    When "alice" lists the song charts that are published
+    Then the request is refused because only admins author song charts
 
   # ── Embedding ────────────────────────────────────────────────────────────────
 
