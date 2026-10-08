@@ -79,18 +79,42 @@ Feature: Student path view
     Then "node-01" and "node-02" have section_label "Open chords"
     And "node-03" has section_label "Strumming patterns"
 
-  # ── Language availability ────────────────────────────────────────────────
-  # Per ADR-024: a node with no content available in the student's locale is
-  # locked, the same as an unmet prerequisite — never silently substituted
-  # with another language, never surfaced as an opt-in choice.
+  # ── Lock reasons ──────────────────────────────────────────────────────────
+  # Per ADR-024 (amendment 2026-10-08): a locked item says why in lock_reason.
 
-  Scenario: A node with no content in the student's locale is locked even though it is the first item
+  @wip
+  Scenario: An item behind an unfinished item is locked for the previous step
+    Given "alice" is authenticated as a student
+    And "alice" has "beginner-guitar-path" assigned as her current path with no progress recorded
+    When "alice" retrieves her current path
+    Then "node-02" has status "locked" with lock_reason "previous_step"
+    And "node-02" has no available_languages
+
+  Scenario: An item that is not locked has no lock reason
+    Given "alice" is authenticated as a student
+    And "alice" has "beginner-guitar-path" assigned as her current path
+    And "alice" has completed "node-01"
+    When "alice" retrieves her current path
+    Then "node-01" has no lock_reason
+    And "node-02" has no lock_reason
+
+  # ── Language availability ────────────────────────────────────────────────
+  # Per ADR-024 (amended 2026-10-08): an item with no content in the student's
+  # locale is locked with lock_reason "language" and lists the languages it
+  # has. Content is never silently substituted. The student can choose to open
+  # the item in a language it has, and finishing it completes the item like
+  # any other.
+
+  @wip
+  Scenario: A node with no content in the student's locale is locked for language even though it is the first item
     Given "alice" is authenticated as a student
     And "alice" has locale "pt_BR"
     And "alice" has "beginner-guitar-path" assigned as her current path with no progress recorded
     And "node-01" has content available only in locale "en"
     When "alice" retrieves her current path
-    Then "node-01" has status "locked"
+    Then "node-01" has status "locked" with lock_reason "language"
+    And "node-01" has available_languages "en"
+    And the current_position is 1
 
   Scenario: A node available in the student's locale is not locked for language reasons
     Given "alice" is authenticated as a student
@@ -108,7 +132,8 @@ Feature: Student path view
     When "alice" retrieves her current path
     Then "node-01" has status "not_started"
 
-  Scenario: A node otherwise unlocked by progress stays locked when its locale is missing
+  @wip
+  Scenario: A node otherwise unlocked by progress is locked for language when its locale is missing
     Given "alice" is authenticated as a student
     And "alice" has locale "pt_BR"
     And "alice" has "beginner-guitar-path" assigned as her current path
@@ -116,7 +141,44 @@ Feature: Student path view
     And "node-02" has content available only in locale "en"
     When "alice" retrieves her current path
     Then "node-01" has status "completed"
-    And "node-02" has status "locked"
+    And "node-02" has status "locked" with lock_reason "language"
+    And "node-02" has available_languages "en"
+    And "node-03" has status "locked" with lock_reason "previous_step"
+    And the current_position is 2
+
+  @wip
+  Scenario: A node missing the locale but behind an unfinished item is locked for the previous step
+    Given "alice" is authenticated as a student
+    And "alice" has locale "pt_BR"
+    And "alice" has "beginner-guitar-path" assigned as her current path with no progress recorded
+    And "node-01" has content available in locale "pt_BR"
+    And "node-02" has content available only in locale "en"
+    When "alice" retrieves her current path
+    Then "node-02" has status "locked" with lock_reason "previous_step"
+    And "node-02" has no available_languages
+
+  @wip
+  Scenario: A node whose required exercise lacks the locale is locked for language with the exercise's languages
+    Given "alice" is authenticated as a student
+    And "alice" has locale "pt_BR"
+    And "alice" has "beginner-guitar-path" assigned as her current path with no progress recorded
+    And "node-01" has content available in locale "pt_BR"
+    And "node-01" requires an exercise available only in locale "en"
+    When "alice" retrieves her current path
+    Then "node-01" has status "locked" with lock_reason "language"
+    And "node-01" has available_languages "en"
+
+  Scenario: Completing a language-locked item in the language it has unlocks the next item
+    Given "alice" is authenticated as a student
+    And "alice" has locale "pt_BR"
+    And "alice" has "beginner-guitar-path" assigned as her current path
+    And "node-01" has content available only in locale "en"
+    And "node-02" has content available in locale "pt_BR"
+    And "alice" has completed "node-01"
+    When "alice" retrieves her current path
+    Then "node-01" has status "completed"
+    And "node-02" has status "not_started"
+    And the current_position is 2
 
   # ── Not found ─────────────────────────────────────────────────────────────
 
