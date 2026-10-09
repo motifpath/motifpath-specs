@@ -1,6 +1,6 @@
 # MOT-63 — Design sign-off review
 
-**Status:** Review done, decisions pending (PO)
+**Status:** Decisions taken (PO, 2026-10-09); D5 rows being drawn, then the final PO pass
 **Date:** 2026-10-09
 **Gate for:** every MOT-43 implementation slice (MOT-64…MOT-97)
 **Figma:** [MotifPath — Experience Language](https://www.figma.com/design/TJmPotheGhPe5npXMZWQEB)
@@ -18,7 +18,23 @@ contrast computed from the variable values, and the Linear slices and specs as o
 | Accessibility | **One real failure:** `ink-subtle` text (D1). Small fixes: level colours (D2), warning (D3), two tap targets (D4). Colour is never the only cue. |
 | Slices vs final designs | **Home lost "Skills up" to Songs today**, but MOT-65/66, ADR-051, `home.feature` and OpenAPI still say Skills up (D6). No implementation ticket for the Practice Shell itself (D7). |
 
-## Decisions for the PO
+## Decisions taken (Gilson, 2026-10-09)
+
+| # | Decision | Where it landed |
+|---|---|---|
+| D1 | A: change the `ink-subtle` token | Figma variables (Light `#70698A`, Dark `#8682A1`); code in MOT-71 |
+| D2 | Per-mode level colours | Figma variables (accurate Dark `#6959C5`, fluent Light `#19A472`); code with LevelBar in MOT-66 |
+| D3 | Light `warning` `#B25209` | Figma variables; code in MOT-71 |
+| D4 | 40 px reason chips; 8 px star gap | Figma Overlays (12 chips, all copies) and Learning (8 star rows); 48 px hit areas noted in MOT-82 |
+| D5 | **Draw the missing rows before any implementation** | Home, Your progress and Install rows in Figma |
+| D6.1 | **Keep `skills_up_last_7`**; it moves to Your progress | MOT-65 unchanged; MOT-67 shows Skills up |
+| D6.2 | **Songs = songs played from `song_chart.completed` now; repertoire (MOT-76) later** | New core ticket MOT-99; ADR-051 amendment, OpenAPI and features in their own spec PR |
+| D7 | Clean up and organise the tickets | New MOT-98 (Practice Shell) and MOT-99; MOT-64/66/67/71/82 updated; "Blocked" label on every slice MOT-63 blocks |
+
+Song charts carry no instrument (the chord catalog is guitar-only, ADR-045), so the Songs count
+isn't per instrument until MOT-76 decides it (song-chart.md D19).
+
+## Decisions for the PO (as proposed)
 
 ### D1 — `ink-subtle` fails as text (blocking)
 
