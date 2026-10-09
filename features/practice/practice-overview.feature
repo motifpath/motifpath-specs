@@ -156,13 +156,11 @@ Feature: Show the student's practice overview across instruments
   # Songs played (ADR-051 amendment 2026-10-09): distinct song charts marked as played with the
   # reader's "I played it" (song_chart.completed). Across instruments: charts have none.
 
-  @wip
   Scenario: Songs played counts each chart the student marked as played
     Given "alice" marked the song charts "Asa Branca" and "Amazing Grace" as played
     When "alice" reads their practice overview
     Then the overview shows 2 songs played
 
-  @wip
   Scenario: A song first played this week counts in this week's songs
     Given "alice" first marked "Asa Branca" as played 10 days ago
     And "alice" first marked "Amazing Grace" as played yesterday
@@ -170,7 +168,6 @@ Feature: Show the student's practice overview across instruments
     Then the overview shows 2 songs played
     And the overview shows 1 song played in the last 7 days
 
-  @wip
   Scenario: Marking the same chart as played again counts it once
     Given "alice" first marked "Asa Branca" as played 10 days ago
     And "alice" marked "Asa Branca" as played again today
@@ -178,14 +175,12 @@ Feature: Show the student's practice overview across instruments
     Then the overview shows 1 song played
     And the overview shows 0 songs played in the last 7 days
 
-  @wip
   Scenario: A chart withdrawn after it was played still counts
     Given "alice" marked the song chart "Asa Branca" as played
     And "Asa Branca" was withdrawn afterwards
     When "alice" reads their practice overview
     Then the overview shows 1 song played
 
-  @wip
   Scenario: A played mark for a song chart that doesn't exist is not counted
     Given a song_chart.completed event from "alice" names a song chart that doesn't exist
     When "alice" reads their practice overview
