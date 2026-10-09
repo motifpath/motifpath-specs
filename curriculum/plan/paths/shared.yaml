@@ -1,0 +1,185 @@
+# Paths for every instrument: rhythm, ear, charts, harmony in use, practice and stage.
+# Written once, used as checkpoints in every instrument's courses. As in the app, their
+# lessons may use only knowledge-map nodes that are for every instrument.
+# Format and workflow: ../../README.md.
+
+paths:
+
+  - key: sh-steady-time
+    title: "Toque no tempo, junto com uma base"
+    language: pt_BR
+    level: beginner
+    instruments: []
+    status: planned
+    intent:
+      anchor: play-with-metronome
+      supporting: [count-beats, practise-slowly]
+      assumes: []
+      ends_with: play-with-backing-track
+    lessons:
+      - {title: "Pulsação, tempo e andamento", type: video, section: Tempo, skills: [count-beats], concepts: [pulse-and-tempo, note-values]}
+      - {title: "Contando os tempos do compasso", type: video, section: Tempo, skills: [count-beats], concepts: [time-signatures, note-values]}
+      - {title: "Tocando com metrônomo", type: video, section: Tempo, skills: [play-with-metronome], concepts: [pulse-and-tempo]}
+      - {title: "Devagar e subindo o andamento", type: video, section: Como estudar, skills: [practise-slowly], concepts: [pulse-and-tempo]}
+      - {title: "Tocando junto com uma base", type: video, section: Com a base, skills: [play-with-backing-track], concepts: [song-form, pulse-and-tempo]}
+
+  - key: sh-read-chart
+    title: "Leia a cifra e aprenda uma música por partes"
+    language: pt_BR
+    level: beginner
+    instruments: []
+    status: planned
+    intent:
+      anchor: learn-song-by-sections
+      supporting: [read-chord-charts, memorise-song]
+      assumes: []
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Lendo uma cifra", type: article, section: A cifra, skills: [read-chord-charts], concepts: [chord-charts, song-form]}
+      - {title: "A cifra brasileira: 7M, m7, °, ø, 7(9)", type: article, section: A cifra, skills: [read-chord-charts], concepts: [brazilian-cifra]}
+      - {title: "Verso, refrão e ponte: uma parte de cada vez", type: video, section: A música, skills: [learn-song-by-sections], concepts: [song-form, chord-charts]}
+      - {title: "Decorando a música", type: video, section: A música, skills: [memorise-song], concepts: [song-form]}
+      - {title: "A música inteira com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form, road-map-symbols]}
+
+  - key: sh-ear-first
+    title: "Comece a tocar de ouvido"
+    language: pt_BR
+    level: beginner
+    instruments: []
+    status: planned
+    intent:
+      anchor: echo-phrases
+      supporting: [match-pitch, sing-what-you-play]
+      assumes: []
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Os nomes das notas: dó, ré, mi e C, D, E", type: article, section: Notas, skills: [match-pitch], concepts: [note-names, sharps-and-flats]}
+      - {title: "Achando uma nota de ouvido", type: video, section: Ouvido, skills: [match-pitch], concepts: [note-names, octaves]}
+      - {title: "Cantando o que você toca", type: video, section: Ouvido, skills: [sing-what-you-play], concepts: [major-scale]}
+      - {title: "Repetindo frases curtas de ouvido", type: video, section: Ouvido, skills: [echo-phrases], concepts: [call-and-response]}
+      - {title: "Pergunta e resposta com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form, call-and-response]}
+
+  - key: sh-rhythm-groove
+    title: "Sinta o groove: subdivisões e contratempo"
+    language: pt_BR
+    level: early_intermediate
+    instruments: []
+    status: idea
+    intent:
+      anchor: play-syncopation
+      supporting: [play-subdivisions, repeat-rhythms, read-rhythm-notation]
+      assumes: [count-beats]
+      ends_with: play-with-backing-track
+    lessons:
+      - {title: "Colcheias e semicolcheias", type: video, section: Subdivisão, skills: [play-subdivisions], concepts: [note-values, rests-and-ties]}
+      - {title: "Lendo divisão rítmica", type: article, section: Leitura, skills: [read-rhythm-notation], concepts: [rhythm-notation, note-values, dotted-notes]}
+      - {title: "Contratempo e síncope", type: video, section: Groove, skills: [play-syncopation], concepts: [syncopation, rests-and-ties]}
+      - {title: "Repetindo ritmos de ouvido", type: video, section: Groove, skills: [repeat-rhythms], concepts: [note-values, syncopation]}
+      - {title: "O groove com a base", type: video, section: Com a base, skills: [play-with-backing-track], concepts: [groove, song-form]}
+
+  - key: sh-swing-and-three
+    title: "Toque com swing e em compassos de três"
+    language: pt_BR
+    level: early_intermediate
+    instruments: []
+    status: idea
+    intent:
+      anchor: swing-straight
+      supporting: [play-triplets, play-in-three-and-six]
+      assumes: [count-beats]
+      ends_with: play-with-backing-track
+    lessons:
+      - {title: "Tercinas", type: video, section: Swing, skills: [play-triplets], concepts: [triplets]}
+      - {title: "Swing e reto", type: video, section: Swing, skills: [swing-straight], concepts: [swing-feel, triplets]}
+      - {title: "Valsa e 6/8: contando em três", type: video, section: Compassos, skills: [play-in-three-and-six], concepts: [time-signatures]}
+      - {title: "Swing e valsa com a base", type: video, section: Com a base, skills: [play-with-backing-track], concepts: [song-form]}
+
+  - key: sh-song-map
+    title: "Siga o roteiro da música e não pare de tocar"
+    language: pt_BR
+    level: early_intermediate
+    instruments: []
+    status: idea
+    intent:
+      anchor: follow-road-map
+      supporting: [keep-going-after-mistakes, learn-song-by-sections]
+      assumes: [read-chord-charts]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Ritornelo, casa 1 e 2, D.S. e coda", type: article, section: Roteiro, skills: [follow-road-map], concepts: [road-map-symbols, song-form]}
+      - {title: "Seguindo o roteiro na gravação", type: video, section: Roteiro, skills: [follow-road-map], concepts: [road-map-symbols]}
+      - {title: "Mapeando as partes antes de tocar", type: video, section: Roteiro, skills: [learn-song-by-sections], concepts: [song-form]}
+      - {title: "Errou? Continue tocando", type: video, section: Na hora de tocar, skills: [keep-going-after-mistakes], concepts: [pulse-and-tempo, song-form]}
+      - {title: "A música inteira sem parar, com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: sh-key-by-ear
+    title: "Ache o tom e os acordes de uma música de ouvido"
+    language: pt_BR
+    level: early_intermediate
+    instruments: []
+    status: idea
+    intent:
+      anchor: find-key-by-ear
+      supporting: [hear-chord-quality, hear-intervals, hear-licks, loop-recording]
+      assumes: [match-pitch, echo-phrases]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Intervalos de ouvido", type: video, section: Ouvido, skills: [hear-intervals], concepts: [interval-names, interval-quality]}
+      - {title: "Maior, menor ou com sétima?", type: video, section: Ouvido, skills: [hear-chord-quality], concepts: [major-triads, minor-triads, dominant-seventh]}
+      - {title: "O tom da música e os acordes que cabem nele", type: video, section: Tirar a música, skills: [find-key-by-ear], concepts: [key-center, major-minor-tonality, diatonic-chords]}
+      - {title: "Usando loop e câmera lenta na gravação", type: article, section: Tirar a música, skills: [loop-recording], concepts: [song-form]}
+      - {title: "Reconhecendo frases de ouvido", type: video, section: Tirar a música, skills: [hear-licks], concepts: [lick, scale-degrees]}
+      - {title: "A música que você tirou, com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: sh-harmony-in-use
+    title: "Campo harmônico na prática: escreva sua progressão e seu riff"
+    language: pt_BR
+    level: early_intermediate
+    instruments: []
+    status: idea
+    intent:
+      anchor: write-progression
+      supporting: [find-key-by-ear, write-riff]
+      assumes: [read-chord-charts]
+      ends_with: play-with-backing-track
+    lessons:
+      - {title: "O campo harmônico maior, pelo som", type: video, section: Harmonia, skills: [write-progression], concepts: [diatonic-chords, major-scale]}
+      - {title: "Os graus: I, IV, V e vi", type: video, section: Harmonia, skills: [write-progression], concepts: [roman-numerals, common-progressions]}
+      - {title: "Mudando o tom de uma progressão", type: video, section: Harmonia, skills: [find-key-by-ear], concepts: [transposition, key-center]}
+      - {title: "Compondo um riff com um motivo", type: video, section: Compor, skills: [write-riff], concepts: [motif, minor-pentatonic]}
+      - {title: "Sua progressão e seu riff com a base", type: video, section: Com a base, skills: [play-with-backing-track], concepts: [song-form]}
+
+  - key: sh-practice-habits
+    title: "Grave sua música e ouça como você evoluiu"
+    language: pt_BR
+    level: early_intermediate
+    instruments: []
+    status: idea
+    intent:
+      anchor: record-and-self-assess
+      supporting: [plan-practice, loop-recording, practise-slowly]
+      assumes: []
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Montando uma rotina de estudo", type: article, section: Como estudar, skills: [plan-practice], concepts: [song-form]}
+      - {title: "Trechos difíceis: loop e câmera lenta", type: video, section: Como estudar, skills: [loop-recording, practise-slowly], concepts: [pulse-and-tempo]}
+      - {title: "Gravando-se e se autoavaliando", type: video, section: Como estudar, skills: [record-and-self-assess], concepts: [dynamics, song-form]}
+      - {title: "A música gravada, do começo ao fim", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: sh-perform
+    title: "Apresente uma música para outras pessoas"
+    language: pt_BR
+    level: early_intermediate
+    instruments: []
+    status: idea
+    intent:
+      anchor: perform-song
+      supporting: [memorise-song, keep-going-after-mistakes, use-space-dynamics]
+      assumes: [learn-song-by-sections]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Escolhendo e decorando o repertório", type: video, section: Preparação, skills: [memorise-song], concepts: [song-form]}
+      - {title: "Dinâmica e respiro: tocar com intenção", type: video, section: Preparação, skills: [use-space-dynamics], concepts: [dynamics, space]}
+      - {title: "Errou? Continue tocando", type: video, section: Palco, skills: [keep-going-after-mistakes], concepts: [pulse-and-tempo, song-form]}
+      - {title: "Tocando para outras pessoas", type: video, section: Palco, skills: [perform-song], concepts: [dynamics, song-form]}
+      - {title: "A apresentação com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}

@@ -1,0 +1,414 @@
+# Acoustic guitar (violão) paths: what depends on the hands. Courses: ../courses/.
+# Format and workflow: ../../README.md.
+
+paths:
+
+  - key: ac-first-song
+    title: "Toque sua primeira música com dois acordes"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: planned
+    intent:
+      anchor: change-chords
+      supporting: [hold-violao, tune-with-tuner, play-open-chords, strum-steady]
+      assumes: []
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Como segurar o violão", type: video, section: Primeiros passos, skills: [hold-violao], concepts: [parts-of-the-instrument, finger-numbering]}
+      - {title: "Afinando com afinador", type: video, section: Primeiros passos, skills: [tune-with-tuner], concepts: [standard-tuning, string-names]}
+      - {title: "Seus dois primeiros acordes", type: video, section: Dois acordes, skills: [play-open-chords], concepts: [open-chord-shapes, chord-diagrams]}
+      - {title: "Trocando de acorde sem parar", type: video, section: Dois acordes, skills: [change-chords], concepts: [open-chord-shapes, pulse-and-tempo]}
+      - {title: "Contando os tempos com o metrônomo", type: video, section: Levada, skills: [count-beats, play-with-metronome], concepts: [pulse-and-tempo, note-values]}
+      - {title: "Uma batida constante", type: video, section: Levada, skills: [strum-steady], concepts: [strumming-patterns, pulse-and-tempo]}
+      - {title: "Sua primeira música do começo ao fim", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-worship-seventh
+    title: "Toque um louvor com acordes de sétima"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: play-open-seventh-chords
+      supporting: [change-chords, strum-steady, learn-song-by-sections]
+      assumes: [play-open-chords]
+      ends_with: play-along-recording
+      styles: [gospel]
+    lessons:
+      - {title: "Acordes com sétima: o 7 que puxa o refrão", type: video, section: Acordes, skills: [play-open-seventh-chords], concepts: [dominant-seventh, open-chord-shapes]}
+      - {title: "Trocando de acorde na batida", type: video, section: Acordes, skills: [change-chords], concepts: [open-chord-shapes, pulse-and-tempo]}
+      - {title: "A batida do louvor", type: video, section: Levada, skills: [strum-steady], concepts: [strumming-patterns, pulse-and-tempo]}
+      - {title: "O louvor por partes", type: video, section: A música, skills: [learn-song-by-sections], concepts: [song-form, chord-charts]}
+      - {title: "O louvor com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-clean-fingers
+    title: "Toque uma música inteira com som limpo e sem dor"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: fret-cleanly
+      supporting: [finger-independence, practise-slowly, choose-strings]
+      assumes: [play-open-chords]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Por que dói no começo e como passar dessa fase", type: video, section: Dedos, skills: [fret-cleanly], concepts: [finger-numbering, parts-of-the-instrument]}
+      - {title: "Som limpo: onde apertar a corda", type: video, section: Dedos, skills: [fret-cleanly], concepts: [finger-numbering]}
+      - {title: "Exercício cromático para os quatro dedos", type: video, section: Dedos, skills: [finger-independence], concepts: [chromatic-scale, finger-numbering]}
+      - {title: "Devagar e subindo o andamento", type: video, section: Como estudar, skills: [practise-slowly], concepts: [pulse-and-tempo]}
+      - {title: "Cordas de aço ou de náilon?", type: article, section: O violão, skills: [choose-strings], concepts: [string-types]}
+      - {title: "A música inteira, sem trastejar", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-baiao
+    title: "Toque um forró com levada de baião"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: baiao-levada
+      supporting: [play-open-seventh-chords, change-chords, practise-slowly, play-with-backing-track]
+      assumes: [play-open-chords]
+      ends_with: play-along-recording
+      styles: [forro, mpb]
+    lessons:
+      - {title: "O ritmo do baião", type: video, section: Levada, skills: [baiao-levada], concepts: [baiao-rhythm]}
+      - {title: "Acordes com sétima: o 7 do baião", type: video, section: Acordes, skills: [play-open-seventh-chords], concepts: [dominant-seventh, open-chord-shapes]}
+      - {title: "A levada de baião no violão", type: video, section: Levada, skills: [baiao-levada], concepts: [baiao-rhythm, strumming-patterns]}
+      - {title: "Subindo o andamento aos poucos", type: video, section: Como estudar, skills: [practise-slowly], concepts: [pulse-and-tempo]}
+      - {title: "Trocando acordes sem perder o balanço", type: video, section: Acordes, skills: [change-chords], concepts: [pulse-and-tempo]}
+      - {title: "Tocando com a base", type: video, section: A música, skills: [play-with-backing-track], concepts: [song-form, pulse-and-tempo]}
+      - {title: "O forró inteiro com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-first-dedilhado
+    title: "Toque uma música com seu primeiro dedilhado"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: play-arpeggio-patterns
+      supporting: [place-pima, free-stroke, rest-stroke, pluck-chord-plaque]
+      assumes: [play-open-chords]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Os dedos da mão direita: p-i-m-a", type: video, section: Mão direita, skills: [place-pima], concepts: [rh-finger-names]}
+      - {title: "Toque sem apoio", type: video, section: Mão direita, skills: [free-stroke], concepts: [rh-strokes]}
+      - {title: "Toque com apoio", type: video, section: Mão direita, skills: [rest-stroke], concepts: [rh-strokes]}
+      - {title: "Pinçando o acorde (plaqué)", type: video, section: Dedilhado, skills: [pluck-chord-plaque], concepts: [arpeggio-pattern]}
+      - {title: "Seu primeiro dedilhado", type: video, section: Dedilhado, skills: [play-arpeggio-patterns], concepts: [arpeggio-pattern, open-chord-shapes]}
+      - {title: "A música dedilhada com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-first-melody
+    title: "Toque uma melodia conhecida no violão"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: play-major-scale-open
+      supporting: [read-tab, alternate-index-middle, match-pitch, sing-what-you-play]
+      assumes: [fret-cleanly]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Lendo tablatura", type: article, section: Leitura, skills: [read-tab], concepts: [tablature, tab-symbols]}
+      - {title: "Achando uma nota de ouvido", type: video, section: Ouvido, skills: [match-pitch], concepts: [note-names, octaves]}
+      - {title: "A escala maior na primeira região", type: video, section: Melodia, skills: [play-major-scale-open], concepts: [major-scale, tones-and-semitones]}
+      - {title: "Alternando indicador e médio", type: video, section: Melodia, skills: [alternate-index-middle], concepts: [rh-finger-names, note-values]}
+      - {title: "Cantando o que você toca", type: video, section: Ouvido, skills: [sing-what-you-play], concepts: [major-scale]}
+      - {title: "A melodia com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-ligados
+    title: "Enfeite uma melodia com ligados e slides"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: hammer-ons
+      supporting: [pull-offs, slides, finger-independence]
+      assumes: [read-tab, fret-cleanly]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Hammer-on", type: video, section: Ligados, skills: [hammer-ons], concepts: [articulation, tab-symbols]}
+      - {title: "Pull-off", type: video, section: Ligados, skills: [pull-offs], concepts: [articulation, tab-symbols]}
+      - {title: "Slide", type: video, section: Ligados, skills: [slides], concepts: [articulation, tab-symbols]}
+      - {title: "Ligados com os quatro dedos", type: video, section: Ligados, skills: [finger-independence], concepts: [chromatic-scale, finger-numbering]}
+      - {title: "A melodia enfeitada com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form, articulation]}
+
+  - key: ac-first-improv
+    title: "Improvise sua primeira frase sobre uma base"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: improvise-one-chord
+      supporting: [play-pentatonic-position-1, alternate-picking, echo-phrases, learn-lick]
+      assumes: [read-tab]
+      ends_with: play-with-backing-track
+    lessons:
+      - {title: "Repetindo frases de ouvido", type: video, section: Ouvido, skills: [echo-phrases], concepts: [call-and-response, minor-pentatonic]}
+      - {title: "Palhetada alternada", type: video, section: Técnica, skills: [alternate-picking], concepts: [note-values]}
+      - {title: "A pentatônica menor no formato 1", type: video, section: Escala, skills: [play-pentatonic-position-1], concepts: [minor-pentatonic, pentatonic-shapes]}
+      - {title: "Seu primeiro lick", type: video, section: Frases, skills: [learn-lick], concepts: [lick, tablature]}
+      - {title: "Improvisando sobre um acorde", type: video, section: Frases, skills: [improvise-one-chord], concepts: [minor-pentatonic, key-center]}
+      - {title: "Seu improviso com a base", type: video, section: A música, skills: [play-with-backing-track], concepts: [song-form, pulse-and-tempo]}
+
+  - key: ac-rock-riffs
+    title: "Toque um rock nacional no violão com riffs e power chords"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: play-riffs
+      supporting: [hold-guitar-and-pick, downstrokes, find-notes-root-strings, play-power-chords, palm-muting]
+      assumes: []
+      ends_with: play-along-recording
+      styles: [rock-brasileiro]
+    lessons:
+      - {title: "Segurando a palheta", type: video, section: Palheta, skills: [hold-guitar-and-pick], concepts: [finger-numbering]}
+      - {title: "Palhetada para baixo", type: video, section: Palheta, skills: [downstrokes], concepts: [note-values, pulse-and-tempo]}
+      - {title: "As notas nas cordas Mi e Lá", type: video, section: O braço, skills: [find-notes-root-strings], concepts: [note-names, sharps-and-flats, fretboard-landmarks]}
+      - {title: "Power chords", type: video, section: Rock, skills: [play-power-chords], concepts: [power-chord, interval-shapes]}
+      - {title: "Abafando com a palma (palm mute)", type: video, section: Rock, skills: [palm-muting], concepts: [power-chord, tab-symbols]}
+      - {title: "Lendo tablatura", type: article, section: Rock, skills: [read-tab], concepts: [tablature, tab-symbols]}
+      - {title: "O riff", type: video, section: Rock, skills: [play-riffs], concepts: [power-chord, tablature]}
+      - {title: "O rock inteiro com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-barre
+    title: "Toque a música com o acorde de Fá"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: play-e-shape-barre
+      supporting: [find-notes-root-strings, play-a-shape-barre, fretting-hand-muting, practise-slowly]
+      assumes: [play-open-chords, fret-cleanly]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "As notas nas cordas Mi e Lá: onde fica a tônica da pestana", type: video, section: O braço, skills: [find-notes-root-strings], concepts: [note-names, sharps-and-flats, fretboard-landmarks]}
+      - {title: "A pestana sem dor: posição e força", type: video, section: Pestana, skills: [play-e-shape-barre], concepts: [barre-chord-shapes, finger-numbering]}
+      - {title: "O Fá e a pestana no formato de Mi", type: video, section: Pestana, skills: [play-e-shape-barre], concepts: [barre-chord-shapes, major-triads, minor-triads]}
+      - {title: "Pestana no formato de Lá", type: video, section: Pestana, skills: [play-a-shape-barre], concepts: [barre-chord-shapes, major-triads, minor-triads]}
+      - {title: "Abafando com a mão esquerda", type: video, section: Som limpo, skills: [fretting-hand-muting], concepts: [string-names]}
+      - {title: "Treinando a troca para a pestana", type: video, section: Como estudar, skills: [practise-slowly], concepts: [pulse-and-tempo]}
+      - {title: "A música com o Fá, com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-sing-and-play
+    title: "Cante e toque uma música inteira"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: sing-while-playing
+      supporting: [tune-by-ear, follow-road-map, memorise-song, keep-going-after-mistakes]
+      assumes: [strum-steady, change-chords]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Afinando de ouvido", type: video, section: Antes de cantar, skills: [tune-by-ear], concepts: [standard-tuning, octaves]}
+      - {title: "Cantar e tocar: comece pela batida", type: video, section: Cantar e tocar, skills: [sing-while-playing], concepts: [song-form, pulse-and-tempo]}
+      - {title: "Seguindo o roteiro: ritornelo, casas e coda", type: article, section: A música, skills: [follow-road-map], concepts: [road-map-symbols, song-form]}
+      - {title: "Decorando a música", type: video, section: A música, skills: [memorise-song], concepts: [song-form]}
+      - {title: "Errou? Continue tocando", type: video, section: Cantar e tocar, skills: [keep-going-after-mistakes], concepts: [pulse-and-tempo, song-form]}
+      - {title: "Cantando a música inteira com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-accompany-singer
+    title: "Acompanhe alguém cantando, no tom da pessoa"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: accompany-singer
+      supporting: [use-capo-and-tunings, find-key-by-ear, play-shapes-in-any-key, choose-capo-for-singer, improvise-rhythm-part]
+      assumes: [read-chord-charts, strum-steady]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "O capotraste", type: video, section: Tom, skills: [use-capo-and-tunings], concepts: [transposition, alternate-tunings]}
+      - {title: "Achando o tom da música de ouvido", type: video, section: Tom, skills: [find-key-by-ear], concepts: [key-center, major-minor-tonality]}
+      - {title: "Os mesmos desenhos em qualquer tom", type: video, section: Tom, skills: [play-shapes-in-any-key], concepts: [transposition, diatonic-chords]}
+      - {title: "Escolhendo a casa do capo para quem canta", type: video, section: Tom, skills: [choose-capo-for-singer], concepts: [key-center, transposition]}
+      - {title: "Criando a levada a partir da cifra", type: video, section: Acompanhar, skills: [improvise-rhythm-part], concepts: [chord-charts, strumming-patterns, groove]}
+      - {title: "Acompanhando um cantor", type: video, section: Acompanhar, skills: [accompany-singer], concepts: [key-center, song-form]}
+      - {title: "A música no tom do cantor, com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-worship-strums
+    title: "Dê dinâmica ao louvor com batidas variadas"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: percussive-strums
+      supporting: [fretting-hand-muting, staccato-chords, play-subdivisions, embellish-open-chords, picking-dynamics]
+      assumes: [strum-steady]
+      ends_with: play-along-recording
+      styles: [gospel]
+    lessons:
+      - {title: "Abafando com a mão esquerda", type: video, section: Abafamento, skills: [fretting-hand-muting], concepts: [string-names]}
+      - {title: "Batida percussiva (\"chuck\")", type: video, section: Abafamento, skills: [percussive-strums], concepts: [strumming-patterns, groove]}
+      - {title: "Acordes curtos (staccato)", type: video, section: Abafamento, skills: [staccato-chords], concepts: [articulation, rests-and-ties]}
+      - {title: "Colcheias e semicolcheias na batida", type: video, section: Ritmo, skills: [play-subdivisions], concepts: [note-values, rests-and-ties]}
+      - {title: "Sus e add9: enfeitando os acordes", type: video, section: Acordes, skills: [embellish-open-chords], concepts: [sus-add-chords]}
+      - {title: "Do verso suave ao refrão forte", type: video, section: Dinâmica, skills: [picking-dynamics], concepts: [dynamics, articulation]}
+      - {title: "O louvor com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form, dynamics]}
+
+  - key: ac-live-ready
+    title: "Prepare o violão para tocar no culto e no palco"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: amplify-acoustic
+      supporting: [change-strings, keep-going-after-mistakes]
+      assumes: []
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Trocando as cordas", type: video, section: O violão, skills: [change-strings], concepts: [parts-of-the-instrument, standard-tuning]}
+      - {title: "Captador, microfone e DI", type: video, section: Som, skills: [amplify-acoustic], concepts: [acoustic-amplification]}
+      - {title: "Passagem de som: o violão na mesa", type: video, section: Som, skills: [amplify-acoustic], concepts: [acoustic-amplification, dynamics]}
+      - {title: "Errou? Continue tocando", type: video, section: Palco, skills: [keep-going-after-mistakes], concepts: [pulse-and-tempo, song-form]}
+      - {title: "A música amplificada, com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-bossa
+    title: "Toque uma bossa nova"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: bossa-levada
+      supporting: [play-mpb-voicings, play-syncopation, play-slash-chords]
+      assumes: [pluck-chord-plaque, play-open-seventh-chords]
+      ends_with: play-along-recording
+      styles: [bossa-nova, mpb]
+    lessons:
+      - {title: "Acordes de MPB: 7M, m7, 7, m7(♭5) e °", type: video, section: Acordes, skills: [play-mpb-voicings], concepts: [seventh-chords, diminished-seventh, brazilian-cifra]}
+      - {title: "Contratempo", type: video, section: Ritmo, skills: [play-syncopation], concepts: [syncopation, rests-and-ties]}
+      - {title: "A levada de bossa nova", type: video, section: Levada, skills: [bossa-levada], concepts: [samba-rhythms]}
+      - {title: "Baixo invertido (C/E)", type: video, section: Acordes, skills: [play-slash-chords], concepts: [slash-chords]}
+      - {title: "A bossa com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-samba
+    title: "Toque um samba com baixarias"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: samba-levada
+      supporting: [strum-with-bass-note, play-bass-runs, repeat-rhythms]
+      assumes: [bossa-levada]
+      ends_with: play-along-recording
+      styles: [samba]
+    lessons:
+      - {title: "Batida com baixo: bordão e acorde", type: video, section: Levada, skills: [strum-with-bass-note], concepts: [alternating-bass, strumming-patterns]}
+      - {title: "Repetindo ritmos de ouvido", type: video, section: Ritmo, skills: [repeat-rhythms], concepts: [note-values, syncopation]}
+      - {title: "A levada de samba", type: video, section: Levada, skills: [samba-levada], concepts: [samba-rhythms]}
+      - {title: "Baixarias e passagens", type: video, section: Baixarias, skills: [play-bass-runs], concepts: [approach-notes]}
+      - {title: "O samba com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-fingerstyle-bass
+    title: "Toque um dedilhado com baixo alternado"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: alternate-thumb
+      supporting: [play-in-three-and-six, embellish-with-ligados, nail-and-flesh-tone, natural-harmonics]
+      assumes: [play-arpeggio-patterns]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Baixo alternado com o polegar", type: video, section: Dedilhado, skills: [alternate-thumb], concepts: [alternating-bass]}
+      - {title: "Dedilhado em 3/4 e 6/8", type: video, section: Dedilhado, skills: [play-in-three-and-six], concepts: [time-signatures, arpeggio-pattern]}
+      - {title: "Enfeitando o dedilhado com ligados", type: video, section: Dedilhado, skills: [embellish-with-ligados], concepts: [arpeggio-pattern, articulation]}
+      - {title: "Timbre com unha e polpa", type: video, section: Timbre, skills: [nail-and-flesh-tone], concepts: [string-types, dynamics]}
+      - {title: "Harmônicos naturais", type: video, section: Timbre, skills: [natural-harmonics], concepts: [fretboard-landmarks]}
+      - {title: "O dedilhado completo com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ac-blues
+    title: "Improvise sobre um blues no violão"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: improvise-blues
+      supporting: [play-triplets, swing-straight, play-blues-shuffle, play-blues-scale-positions, silence-unused-strings]
+      assumes: [play-pentatonic-position-1, improvise-one-chord]
+      ends_with: play-with-backing-track
+      styles: [blues]
+    lessons:
+      - {title: "Tercinas", type: video, section: Ritmo, skills: [play-triplets], concepts: [triplets]}
+      - {title: "Swing e reto", type: video, section: Ritmo, skills: [swing-straight], concepts: [swing-feel, triplets]}
+      - {title: "A levada de blues (shuffle)", type: video, section: Blues, skills: [play-blues-shuffle], concepts: [blues-form, swing-feel, dominant-seventh]}
+      - {title: "Silenciando as cordas que sobram", type: video, section: Blues, skills: [silence-unused-strings], concepts: [string-names]}
+      - {title: "A escala blues", type: video, section: Blues, skills: [play-blues-scale-positions], concepts: [blues-scale]}
+      - {title: "Improvisando nos 12 compassos", type: video, section: Blues, skills: [improvise-blues], concepts: [blues-form, blues-scale, minor-pentatonic]}
+      - {title: "Seu blues com a base", type: video, section: A música, skills: [play-with-backing-track], concepts: [song-form]}
+
+  - key: ac-whole-neck
+    title: "Solte o solo pelo braço todo"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: play-all-pentatonic-positions
+      supporting: [find-notes-top-strings, find-octaves, position-shifts, vibrato, play-triad-arpeggios]
+      assumes: [play-pentatonic-position-1]
+      ends_with: play-with-backing-track
+    lessons:
+      - {title: "As notas da corda Ré para cima", type: video, section: O braço, skills: [find-notes-top-strings], concepts: [note-names, fretboard-landmarks]}
+      - {title: "As oitavas de qualquer nota", type: video, section: O braço, skills: [find-octaves], concepts: [octaves, fretboard-landmarks]}
+      - {title: "Os cinco formatos da pentatônica", type: video, section: Escala, skills: [play-all-pentatonic-positions], concepts: [pentatonic-shapes, major-pentatonic]}
+      - {title: "Mudando de região", type: video, section: Escala, skills: [position-shifts], concepts: [fretboard-landmarks]}
+      - {title: "Vibrato", type: video, section: Expressão, skills: [vibrato], concepts: [articulation, dynamics]}
+      - {title: "Arpejos de tríades", type: video, section: Escala, skills: [play-triad-arpeggios], concepts: [major-triads, minor-triads, interval-shapes]}
+      - {title: "Solo pelo braço com a base", type: video, section: A música, skills: [play-with-backing-track], concepts: [song-form]}
+
+  - key: ac-licks
+    title: "Monte um solo com licks"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: play-lick-in-time
+      supporting: [move-lick, vary-lick, phrase-call-response, use-space-dynamics]
+      assumes: [learn-lick, play-all-pentatonic-positions]
+      ends_with: play-with-backing-track
+    lessons:
+      - {title: "O lick no tempo", type: video, section: Licks, skills: [play-lick-in-time], concepts: [lick, pulse-and-tempo]}
+      - {title: "Os mesmos desenhos em qualquer tom", type: video, section: Licks, skills: [play-shapes-in-any-key], concepts: [transposition, key-center]}
+      - {title: "Levando o lick para outro tom", type: video, section: Licks, skills: [move-lick], concepts: [transposition, pentatonic-shapes]}
+      - {title: "Variando o lick", type: video, section: Licks, skills: [vary-lick], concepts: [repetition-variation, motif]}
+      - {title: "Pergunta e resposta", type: video, section: Fraseado, skills: [phrase-call-response], concepts: [call-and-response, space]}
+      - {title: "Respiro e dinâmica no solo", type: video, section: Fraseado, skills: [use-space-dynamics], concepts: [space, dynamics]}
+      - {title: "Seu solo com a base", type: video, section: A música, skills: [play-with-backing-track], concepts: [song-form]}
+
+  - key: ac-minor-melody
+    title: "Toque uma melodia em tom menor com notas duplas"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    intent:
+      anchor: play-natural-minor-positions
+      supporting: [string-crossing, hand-sync, double-stops]
+      assumes: [play-major-scale-open]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "A escala menor natural", type: video, section: Escala, skills: [play-natural-minor-positions], concepts: [natural-minor, relative-keys]}
+      - {title: "Trocando de corda sem perder o tempo", type: video, section: Técnica, skills: [string-crossing], concepts: [string-names]}
+      - {title: "Sincronizando as mãos", type: video, section: Técnica, skills: [hand-sync], concepts: [pulse-and-tempo, note-values]}
+      - {title: "Notas duplas", type: video, section: Arpejos, skills: [double-stops], concepts: [interval-shapes]}
+      - {title: "A melodia com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}

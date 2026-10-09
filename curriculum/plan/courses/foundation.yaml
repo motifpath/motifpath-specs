@@ -1,0 +1,31 @@
+# Fundamentos: the base track. Each instrument's foundation course comes first, and every
+# other track builds on it. Format and workflow: ../../README.md.
+
+courses:
+
+  - key: ac-foundation
+    track: foundation
+    title: "Fundamentos do violão"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: planned
+    checkpoints: [ac-first-song, sh-steady-time, ac-clean-fingers, sh-read-chart, sh-ear-first]
+
+  - key: el-foundation
+    track: foundation
+    title: "Fundamentos da guitarra"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-guitar]
+    status: planned
+    checkpoints: [el-first-riff, sh-steady-time, el-clean-fingers, el-first-chords, sh-read-chart, sh-ear-first]
+
+  - key: ba-foundation
+    track: foundation
+    title: "Fundamentos do baixo"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-bass]
+    status: planned
+    checkpoints: [ba-first-song, sh-steady-time, ba-two-fingers, sh-read-chart, sh-ear-first]

@@ -1,0 +1,309 @@
+# Electric bass (baixo) paths: what depends on the hands and the gear. Courses: ../courses/.
+# Format and workflow: ../../README.md.
+
+paths:
+
+  - key: ba-first-song
+    title: "Toque sua primeira música só com as tônicas"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-bass]
+    status: planned
+    intent:
+      anchor: play-root-notes
+      supporting: [hold-bass, tune-with-tuner, play-root-eighths, plucking-hand-muting]
+      assumes: []
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Segurando o baixo", type: video, section: Primeiros passos, skills: [hold-bass], concepts: [parts-of-the-instrument, finger-numbering]}
+      - {title: "Afinando o baixo", type: video, section: Primeiros passos, skills: [tune-with-tuner], concepts: [bass-tuning, string-names]}
+      - {title: "A tônica: a nota que dá nome ao acorde", type: video, section: Tônicas, skills: [play-root-notes], concepts: [root-note, role-of-bass]}
+      - {title: "Colcheias constantes", type: video, section: Tônicas, skills: [play-root-eighths], concepts: [note-values, pulse-and-tempo]}
+      - {title: "Abafando com a mão direita", type: video, section: Tônicas, skills: [plucking-hand-muting], concepts: [string-names]}
+      - {title: "Sua primeira música", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ba-two-fingers
+    title: "Toque com dois dedos e som firme"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: alternate-index-middle
+      supporting: [cross-strings-plucking, bass-fingering, control-note-length, set-bass-amp-tone]
+      assumes: [play-root-notes]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Alternando indicador e médio", type: video, section: Mão direita, skills: [alternate-index-middle], concepts: [note-values]}
+      - {title: "Trocando de corda com os dedos", type: video, section: Mão direita, skills: [cross-strings-plucking], concepts: [string-names]}
+      - {title: "Digitação 1-2-4 e um dedo por casa", type: video, section: Mão esquerda, skills: [bass-fingering], concepts: [finger-numbering]}
+      - {title: "Controlando a duração das notas", type: video, section: Som, skills: [control-note-length], concepts: [articulation, rests-and-ties]}
+      - {title: "Regulando o timbre no amplificador", type: video, section: Som, skills: [set-bass-amp-tone], concepts: [gear-and-signal]}
+      - {title: "A música com som firme, com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ba-worship-band
+    title: "Toque baixo no louvor a partir da cifra"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: build-line-from-chart
+      supporting: [read-chord-charts, count-beats, play-with-metronome, play-root-fifth-lines, learn-song-by-sections]
+      assumes: [play-root-notes]
+      ends_with: play-along-recording
+      styles: [gospel]
+    lessons:
+      - {title: "Lendo a cifra no baixo", type: article, section: A cifra, skills: [read-chord-charts], concepts: [chord-charts, song-form]}
+      - {title: "Contando os tempos", type: video, section: Tempo, skills: [count-beats], concepts: [note-values, time-signatures]}
+      - {title: "Tocando com metrônomo", type: video, section: Tempo, skills: [play-with-metronome], concepts: [pulse-and-tempo]}
+      - {title: "Tônica e quinta", type: video, section: A linha, skills: [play-root-fifth-lines], concepts: [root-fifth-octave-shape]}
+      - {title: "Criando a linha a partir da cifra", type: video, section: A linha, skills: [build-line-from-chart], concepts: [role-of-bass, chord-charts]}
+      - {title: "Uma parte de cada vez", type: video, section: A música, skills: [learn-song-by-sections], concepts: [song-form]}
+      - {title: "O louvor com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ba-root-fifth-octave
+    title: "Toque linhas com tônica, quinta e oitava"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: play-root-fifth-octave-lines
+      supporting: [play-root-fifth-lines, find-notes-root-strings, find-root-fifth-octave, downstrokes, palm-muting]
+      assumes: [play-root-notes]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "As notas nas cordas Mi e Lá", type: video, section: O braço, skills: [find-notes-root-strings], concepts: [note-names, sharps-and-flats]}
+      - {title: "Achando tônica, quinta e oitava", type: video, section: O braço, skills: [find-root-fifth-octave], concepts: [root-fifth-octave-shape]}
+      - {title: "Tônica e quinta", type: video, section: A linha, skills: [play-root-fifth-lines], concepts: [root-fifth-octave-shape]}
+      - {title: "Baixo com palheta", type: video, section: Palheta, skills: [downstrokes], concepts: [note-values, pulse-and-tempo]}
+      - {title: "Palm mute no baixo", type: video, section: Palheta, skills: [palm-muting], concepts: [tab-symbols]}
+      - {title: "Linhas de tônica, quinta e oitava", type: video, section: A linha, skills: [play-root-fifth-octave-lines], concepts: [root-fifth-octave-shape, octaves]}
+      - {title: "A linha com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ba-blues-line
+    title: "Toque um blues de 12 compassos no baixo"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: play-blues-bass-line
+      supporting: [slides, practise-slowly, memorise-song]
+      assumes: [play-root-fifth-lines]
+      ends_with: play-along-recording
+      styles: [blues]
+    lessons:
+      - {title: "A forma do blues", type: video, section: Blues, skills: [play-blues-bass-line], concepts: [blues-form]}
+      - {title: "A levada com swing", type: video, section: Blues, skills: [play-blues-bass-line], concepts: [swing-feel]}
+      - {title: "Slide", type: video, section: Técnica, skills: [slides], concepts: [articulation, tab-symbols]}
+      - {title: "Devagar e subindo o andamento", type: video, section: Como estudar, skills: [practise-slowly], concepts: [pulse-and-tempo]}
+      - {title: "Tocando sem olhar", type: video, section: A música, skills: [memorise-song], concepts: [song-form]}
+      - {title: "O blues com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form, blues-form]}
+
+  - key: ba-first-riff
+    title: "Toque seu primeiro riff no baixo"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: play-riffs
+      supporting: [read-tab, alternate-picking, natural-harmonics]
+      assumes: [downstrokes]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Tablatura de baixo", type: article, section: Leitura, skills: [read-tab], concepts: [tablature, tab-symbols]}
+      - {title: "Palhetada alternada", type: video, section: Técnica, skills: [alternate-picking], concepts: [note-values]}
+      - {title: "Seu primeiro riff", type: video, section: O riff, skills: [play-riffs], concepts: [tablature, note-values]}
+      - {title: "Harmônicos naturais", type: video, section: Técnica, skills: [natural-harmonics], concepts: [octaves]}
+      - {title: "O riff com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ba-read-line
+    title: "Leia e toque uma linha escrita"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: read-bass-clef
+      supporting: [match-pitch, sing-what-you-play, find-notes-root-strings]
+      assumes: [count-beats]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Achando uma nota de ouvido", type: video, section: Ouvido, skills: [match-pitch], concepts: [note-names, octaves]}
+      - {title: "Cantando o que você toca", type: video, section: Ouvido, skills: [sing-what-you-play], concepts: [major-scale]}
+      - {title: "Revendo as notas nas cordas Mi e Lá", type: video, section: Leitura, skills: [find-notes-root-strings], concepts: [note-names, sharps-and-flats]}
+      - {title: "A clave de fá", type: article, section: Leitura, skills: [read-bass-clef], concepts: [bass-clef, note-names]}
+      - {title: "A linha escrita com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ba-first-phrase
+    title: "Faça sua primeira frase sobre uma base"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: improvise-one-chord
+      supporting: [echo-phrases, learn-lick]
+      assumes: [play-root-notes]
+      ends_with: play-with-backing-track
+    lessons:
+      - {title: "Repetindo frases de ouvido", type: video, section: Ouvido, skills: [echo-phrases], concepts: [call-and-response, minor-pentatonic]}
+      - {title: "Seu primeiro lick no baixo", type: video, section: Frases, skills: [learn-lick], concepts: [lick, tablature]}
+      - {title: "Tocando junto com uma base", type: video, section: Frases, skills: [play-with-backing-track], concepts: [song-form, pulse-and-tempo]}
+      - {title: "Improvisando sobre um acorde", type: video, section: Frases, skills: [improvise-one-chord], concepts: [minor-pentatonic, key-center]}
+      - {title: "Sua frase com a base", type: video, section: A música, skills: [play-with-backing-track], concepts: [song-form, pulse-and-tempo]}
+
+  - key: ba-lock-with-drums
+    title: "Trave uma levada com a bateria"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: lock-with-kick
+      supporting: [play-subdivisions, fretting-hand-muting, silence-unused-strings]
+      assumes: [play-root-eighths, play-root-fifth-lines]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Ouvindo o bumbo", type: video, section: Groove, skills: [lock-with-kick], concepts: [kick-bass-relationship, groove]}
+      - {title: "Colcheias e semicolcheias", type: video, section: Ritmo, skills: [play-subdivisions], concepts: [note-values, rests-and-ties]}
+      - {title: "Abafando com a mão esquerda", type: video, section: Som limpo, skills: [fretting-hand-muting], concepts: [string-names]}
+      - {title: "Silenciando as cordas que sobram", type: video, section: Som limpo, skills: [silence-unused-strings], concepts: [string-names]}
+      - {title: "A levada travada com a bateria, na gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form, groove]}
+
+  - key: ba-chord-tones
+    title: "Toque uma linha com as notas do acorde"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: play-chord-tone-lines
+      supporting: [find-notes-top-strings, find-octaves, hear-chord-quality]
+      assumes: [play-root-fifth-octave-lines]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "As notas da corda Ré para cima", type: video, section: O braço, skills: [find-notes-top-strings], concepts: [note-names, sharps-and-flats]}
+      - {title: "As oitavas de qualquer nota", type: video, section: O braço, skills: [find-octaves], concepts: [octaves]}
+      - {title: "Maior, menor ou com sétima?", type: video, section: Ouvido, skills: [hear-chord-quality], concepts: [major-triads, minor-triads, dominant-seventh]}
+      - {title: "Linhas com as notas do acorde", type: video, section: A linha, skills: [play-chord-tone-lines], concepts: [chord-tones, major-triads, minor-triads]}
+      - {title: "A linha com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ba-walking-blues
+    title: "Faça um walking bass num blues"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: walk-blues
+      supporting: [play-triplets, swing-straight, use-approach-notes]
+      assumes: [play-blues-bass-line, play-chord-tone-lines]
+      ends_with: play-along-recording
+      styles: [blues]
+    lessons:
+      - {title: "Tercinas", type: video, section: Ritmo, skills: [play-triplets], concepts: [triplets]}
+      - {title: "Swing e reto", type: video, section: Ritmo, skills: [swing-straight], concepts: [swing-feel, triplets]}
+      - {title: "Notas de aproximação", type: video, section: A linha, skills: [use-approach-notes], concepts: [approach-notes]}
+      - {title: "Walking bass no blues", type: video, section: A linha, skills: [walk-blues], concepts: [walking-bass, blues-form]}
+      - {title: "O walking com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ba-ghost-notes
+    title: "Toque um groove com ghost notes"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: ghost-notes
+      supporting: [rake, play-syncopation, repeat-rhythms, picking-dynamics]
+      assumes: [control-note-length]
+      ends_with: play-along-recording
+    lessons:
+      - {title: "Ghost notes", type: video, section: Groove, skills: [ghost-notes], concepts: [ghost-note]}
+      - {title: "Rake: a troca de corda descendente", type: video, section: Técnica, skills: [rake], concepts: [string-names]}
+      - {title: "Contratempo", type: video, section: Ritmo, skills: [play-syncopation], concepts: [syncopation, rests-and-ties]}
+      - {title: "Repetindo ritmos de ouvido", type: video, section: Ritmo, skills: [repeat-rhythms], concepts: [note-values, syncopation]}
+      - {title: "Acentos e dinâmica", type: video, section: Groove, skills: [picking-dynamics], concepts: [dynamics, articulation]}
+      - {title: "O groove com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [groove, song-form]}
+
+  - key: ba-bossa
+    title: "Toque baixo numa bossa nova"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: play-bossa-bass
+      supporting: [read-rhythm-notation, use-space-dynamics, follow-road-map]
+      assumes: [play-root-fifth-lines]
+      ends_with: play-along-recording
+      styles: [bossa-nova, mpb]
+    lessons:
+      - {title: "Lendo divisão rítmica", type: article, section: Leitura, skills: [read-rhythm-notation], concepts: [rhythm-notation, note-values, dotted-notes]}
+      - {title: "A levada de baixo da bossa nova", type: video, section: Levada, skills: [play-bossa-bass], concepts: [samba-rhythms]}
+      - {title: "Espaço e dinâmica na bossa", type: video, section: Levada, skills: [use-space-dynamics], concepts: [space, dynamics]}
+      - {title: "Seguindo o roteiro", type: article, section: A música, skills: [follow-road-map], concepts: [road-map-symbols, song-form]}
+      - {title: "A bossa com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ba-baiao
+    title: "Toque baixo num forró"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: play-baiao-bass
+      supporting: [play-syncopation, hammer-ons, pull-offs]
+      assumes: [play-root-fifth-lines]
+      ends_with: play-along-recording
+      styles: [forro]
+    lessons:
+      - {title: "O ritmo do baião no baixo", type: video, section: Levada, skills: [play-baiao-bass], concepts: [baiao-rhythm]}
+      - {title: "Contratempo no baião", type: video, section: Levada, skills: [play-syncopation], concepts: [syncopation]}
+      - {title: "Hammer-on", type: video, section: Ligados, skills: [hammer-ons], concepts: [articulation, tab-symbols]}
+      - {title: "Pull-off", type: video, section: Ligados, skills: [pull-offs], concepts: [articulation, tab-symbols]}
+      - {title: "O forró com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ba-worship-fills
+    title: "Conduza a banda do louvor com viradas"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: play-fills
+      supporting: [vary-bass-line, follow-road-map, keep-going-after-mistakes]
+      assumes: [build-line-from-chart]
+      ends_with: play-along-recording
+      styles: [gospel]
+    lessons:
+      - {title: "Viradas no fim das partes", type: video, section: Viradas, skills: [play-fills], concepts: [fill, song-form]}
+      - {title: "Variando a linha sem perder o groove", type: video, section: A linha, skills: [vary-bass-line], concepts: [role-of-bass, repetition-variation]}
+      - {title: "Seguindo o roteiro do louvor", type: article, section: Na banda, skills: [follow-road-map], concepts: [road-map-symbols]}
+      - {title: "Errou? Continue tocando", type: video, section: Na banda, skills: [keep-going-after-mistakes], concepts: [pulse-and-tempo, song-form]}
+      - {title: "O louvor com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}
+
+  - key: ba-blues-solo
+    title: "Faça um solo de baixo num blues"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-bass]
+    status: idea
+    intent:
+      anchor: improvise-blues
+      supporting: [play-lick-in-time, vary-lick, move-lick, vibrato, phrase-call-response]
+      assumes: [improvise-one-chord, play-blues-bass-line]
+      ends_with: play-with-backing-track
+      styles: [blues]
+    lessons:
+      - {title: "O lick no tempo", type: video, section: Licks, skills: [play-lick-in-time], concepts: [lick, pulse-and-tempo]}
+      - {title: "Variando o lick", type: video, section: Licks, skills: [vary-lick], concepts: [repetition-variation, motif]}
+      - {title: "Levando o lick para outro tom", type: video, section: Licks, skills: [move-lick], concepts: [transposition]}
+      - {title: "Vibrato no baixo", type: video, section: Expressão, skills: [vibrato], concepts: [articulation]}
+      - {title: "Pergunta e resposta", type: video, section: Fraseado, skills: [phrase-call-response], concepts: [call-and-response, space]}
+      - {title: "Improvisando nos 12 compassos", type: video, section: Blues, skills: [improvise-blues], concepts: [blues-form, blues-scale]}
+      - {title: "Seu solo com a base", type: video, section: A música, skills: [play-with-backing-track], concepts: [song-form]}
