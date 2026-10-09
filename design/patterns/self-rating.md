@@ -27,7 +27,7 @@ take.
   | Clean | No slips |
 
 - **The question names what was played:** "How was that take at 72 BPM?", "How did Amazing Grace go?".
-  A song has no tempo, so its question has no BPM (D17).
+  A song's question names no BPM (D17): the chart has no timing to grade the take against.
 - **Restart without rating** is a tertiary link above the tiles: it throws the take away and goes
   back to the tempo, recording nothing.
 - **TempoControl (the tempo ladder):** one 48 px row — metronome toggle (on by default), a slider
@@ -41,10 +41,13 @@ take.
 - **Song chart:** no timing in the chart, so no tempo ladder, auto-scroll or "now / next chord": the
   student scrolls (the pedal moves a line), opens chords on the chord card (`chord-card.md`) and rates
   the whole song once. Clean on two separate days puts the song "in your repertoire".
+- **Song chart metronome (MOT-73 D2):** the chart's tempo is a practice aid — `TempoControl` with the
+  song's tempo as the target tick, so a student can start slower and work up to it. It is never
+  tracked or rated (`song-chart.md`).
 
 ## Do not
 
 - Add a Continue or Check after the rating.
 - Use more than three ratings, or stars or numbers.
-- Show a tempo for a song from a song chart.
+- Put a BPM in a song's rating question, or record the metronome tempo for a song.
 - Rate a take the student restarted.
