@@ -1,0 +1,25 @@
+# Learner tracks: what a learner comes to MotifPath to play. Planning only; the app has
+# no track entity. Every course belongs to one track. A `base` track comes first on its
+# instrument, and every other track builds on it. Format and workflow: ../README.md.
+
+tracks:
+
+  - key: foundation
+    title: "Fundamentos"
+    base: true
+    description: "Segurar, afinar, a primeira música, dedos limpos, tempo firme, ler cifra e começar a tocar de ouvido."
+
+  - key: worship
+    title: "Louvor"
+    styles: [gospel]
+    description: "Tocar na igreja e no ministério de louvor: cifra, tom do cantor, dinâmica, tocar em banda."
+
+  - key: rock-nacional
+    title: "Rock nacional"
+    styles: [rock-brasileiro, blues]
+    description: "Riffs, power chords, pestanas, solos e o timbre certo."
+
+  - key: mpb
+    title: "MPB, bossa e samba"
+    styles: [mpb, bossa-nova, samba, forro]
+    description: "Dedilhado, levadas brasileiras, acordes de MPB, baixarias e cantar acompanhando."
