@@ -1,6 +1,6 @@
 # MOT-63 — Design sign-off review
 
-**Status:** Decisions taken and applied (2026-10-09); library hygiene, then the final PO pass
+**Status:** **Signed off by the PO (Gilson), 2026-10-09.** Every MOT-43 implementation slice is unblocked by design.
 **Date:** 2026-10-09
 **Gate for:** every MOT-43 implementation slice (MOT-64…MOT-97)
 **Figma:** [MotifPath — Experience Language](https://www.figma.com/design/TJmPotheGhPe5npXMZWQEB)
@@ -128,7 +128,26 @@ Then: ADR-051 amendment, OpenAPI, `home.feature`, MOT-65 and MOT-66 updated toge
 - **MOT-66 (written 2026-10-07)** predates MOT-59/60/73: add the first-run hand-off (MOT-88 owns
   the first run), the standard states from MOT-82, the Songs tile (D6) and the size classes (D5).
 
-## Library hygiene (no decision needed; fixed with the sign-off)
+## Library hygiene — done 2026-10-09
+
+- **Text styles:** 199 text nodes in components and screens now use the Manrope text styles, but
+  only where a style matches the font, weight, size, letter spacing and case, and only where binding
+  doesn't change the owner's size. 51 were left unbound because the styles' fixed line heights would
+  grow them by 2–3 px (NavItem, LevelBar, SkillProgressRow, PathStep, WeekSummary, PathCard,
+  FocusRow, the Home screens). Off-scale combinations with no style: Medium 14, Medium 11,
+  SemiBold 11–13 and 15, sentence-case SemiBold 12, Bold 15/16/18/20 (mostly the wordmark and
+  annotations), plus the scaled diagram labels. **For implementation:** code uses the token scale;
+  map these to the nearest style rather than adding sizes, and keep the line height the component
+  needs (MOT-71 rechecks).
+- **Scrim:** one variable `color/scrim/scrim` (Light `#0F0D1F`, Dark `#000000`, web
+  `rgb(var(--color-scrim))`) at 40% on every scrim (67 across 7 pages; 16 were at 45%). Add
+  `scrim` to `tokens.json` in MOT-71.
+- **Icons:** all 84 `Icon/*` components now live in one Icons grid on the Components page, every
+  instance still linked. Three unused duplicates were deleted (`rotate-ccw`, `file-text`,
+  `ellipsis-vertical`). The two chevrons weren't duplicates (20 px for compact rows, 24 px), so the
+  20 px one is now `Icon/chevron-right-20`.
+
+### Hygiene as found in the review
 
 - Base components set text without text styles: Button, Chip, NavItem, Segment, MetricTile,
   LevelBar, PathStep and others (about 100 text nodes). Same in a few feature components
