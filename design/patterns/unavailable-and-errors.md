@@ -47,4 +47,4 @@ Outside a run, pages and sections use the standard states in `states.md` and the
 `overlays.md`.
 
 Out of scope: going offline or losing the connection mid-run (answers queued, "saved when you're back
-online") is designed in MOT-62.
+online") is out of the MVP and comes after the store apps (MOT-89).
