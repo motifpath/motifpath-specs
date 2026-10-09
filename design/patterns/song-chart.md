@@ -168,6 +168,9 @@ lesson's challenge, next to the exercises.
 - **Songs in a challenge (MOT-76):** ADR-019 amendment (a challenge item is an exercise or a song
   chart, `song:<chart id>`); ADR-046 song item kind; scenarios for adding a song, the run, the pass
   mark and a withdrawn chart.
-- **Your songs (MOT-76):** ADR-051 amendment (Songs replaces Skills up); `PracticeOverview` gains a
+- **Songs tile, first stage (MOT-99, done 2026-10-09):** ADR-051 amendment (Songs replaces Skills
+  up, counted as songs played from `song_chart.completed`); `PracticeOverview.songs_played_total` /
+  `songs_played_last_7`; `features/web/home.feature`.
+- **Your songs (MOT-76):** a further ADR-051 amendment (songs played → in your repertoire); `PracticeOverview` gains a
   songs summary per instrument and Your progress a song list; `features/web/home.feature`; core
   consumes `song_chart.completed` to add a song (D18).

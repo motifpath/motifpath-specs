@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.32.0
+  version: 0.33.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -12048,6 +12048,20 @@ components:
             How many skills, counted once per instrument, have at least one improved measure
             in that instrument's progress this week (accuracy, fluency or best clean tempo
             higher now than 7 days ago). Concepts are not counted.
+        songs_played_total:
+          type: integer
+          minimum: 0
+          description: |
+            How many distinct song charts the student has ever marked as played with the
+            reader's "I played it", on any instrument. Marking the same chart again counts
+            once, and a chart withdrawn later still counts.
+        songs_played_last_7:
+          type: integer
+          minimum: 0
+          description: |
+            How many of the songs counted in songs_played_total were first marked as played on
+            the last 7 calendar days, today included, in the given time zone. Never more than
+            songs_played_total.
         instruments:
           type: array
           items:
@@ -12063,6 +12077,8 @@ components:
         - day_streak_current
         - day_streak_best
         - skills_up_last_7
+        - songs_played_total
+        - songs_played_last_7
         - instruments
 
     PracticeInstrumentCard:

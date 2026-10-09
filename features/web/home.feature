@@ -8,7 +8,8 @@
 #   1. Today's practice — the top next step across instruments, with the only primary action.
 #   2. Your path — the path's progress and its next step; the whole card opens that step.
 #   3. This week — three tiles: minutes practised (with the change against the week before), day
-#      streak (with the best), skills up.
+#      streak (with the best), songs played (with this week's). Songs replaced skills up on
+#      2026-10-09 (ADR-051 amendment, MOT-63 D6); skills up moved to Your progress.
 #   4. Your skills — how many skills sit at each knowledge level on today's practice instrument,
 #      and how many are fading.
 #
@@ -46,14 +47,19 @@ Feature: The home and Your progress
     When "alice" taps the path card
     Then the lesson "Inversions" opens
 
-  Scenario: This week shows minutes, day streak and skills up
+  Scenario: This week shows minutes, day streak and songs played
     Given "alice" practised 48 minutes this week and 33 minutes the week before
     And "alice"'s day streak is 3 and their best is 9
-    And 3 of "alice"'s skills went up this week
+    And "alice" has played 5 songs, 1 of them first this week
     When "alice" opens the home
     Then This week shows 48 minutes, 15 more than the week before
     And This week shows a day streak of 3, best 9
-    And This week shows 3 skills up
+    And This week shows 5 songs, 1 more this week
+
+  Scenario: Your progress shows skills up with the other This week tiles
+    Given 3 of "alice"'s skills went up this week
+    When "alice" opens Your progress
+    Then This week on Your progress shows minutes, the day streak, songs and 3 skills up
 
   Scenario: Your skills counts the skills at each level on today's practice instrument
     Given on "guitar" "alice" has 5 skills learning, 7 accurate, 4 fluent and 2 retained, and 2 of them are fading
@@ -101,6 +107,11 @@ Feature: The home and Your progress
     When "alice" opens Your progress
     Then the instrument choices are "guitar", "electric-bass" and "Any instrument"
     And there is no choice that sums every instrument
+
+  Scenario: A student who has played no song yet sees 0 songs without alarm
+    Given "bruno" has never marked a song chart as played
+    When "bruno" opens the home
+    Then the songs tile shows 0 in the same colours as the other tiles
 
   Scenario: A student with no path has no path card
     Given student "bruno" follows no path
