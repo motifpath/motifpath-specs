@@ -30,7 +30,8 @@ empty session.
   language link.
 - **Copy (D3):** headline "Practise a little every day. See your skills grow." — line "Short
   sessions on your instrument, picked for what you need next — and lessons when you want to learn
-  something new." Never promise a feature the app doesn't have (an earlier "Hear yourself get
+  something new." pt-BR: "Pratique um pouco todo dia. Acompanhe sua evolução." (not a literal
+  "crescerem"). Never promise a feature the app doesn't have (an earlier "Hear yourself get
   better" implied listening back to recordings).
 - **One action (D1):** `GoogleButton` "Continue with Google" starts Google sign-in through Clerk
   directly (no Clerk sign-in card). The G sits on a white disc, as Google's branding rules require.
