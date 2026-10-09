@@ -1,6 +1,6 @@
 # MOT-63 — Design sign-off review
 
-**Status:** Decisions taken (PO, 2026-10-09); D5 rows being drawn, then the final PO pass
+**Status:** Decisions taken and applied (2026-10-09); library hygiene, then the final PO pass
 **Date:** 2026-10-09
 **Gate for:** every MOT-43 implementation slice (MOT-64…MOT-97)
 **Figma:** [MotifPath — Experience Language](https://www.figma.com/design/TJmPotheGhPe5npXMZWQEB)
@@ -26,10 +26,16 @@ contrast computed from the variable values, and the Linear slices and specs as o
 | D2 | Per-mode level colours | Figma variables (accurate Dark `#6959C5`, fluent Light `#19A472`); code with LevelBar in MOT-66 |
 | D3 | Light `warning` `#B25209` | Figma variables; code in MOT-71 |
 | D4 | 40 px reason chips; 8 px star gap | Figma Overlays (12 chips, all copies) and Learning (8 star rows); 48 px hit areas noted in MOT-82 |
-| D5 | **Draw the missing rows before any implementation** | Home, Your progress and Install rows in Figma |
+| D5 | **Draw the missing rows before any implementation** | Done 2026-10-09. Home page: Dark·pt-BR (Compact), Medium (rail, one 560 px column) and Expanded (sidebar, two columns) rows for Home and Your progress. Offline & install: Dark·pt-BR copy of row 3 and a new row 4, Expanded desktop Chrome (summary + InstallCard, Chrome's own dialog, the account menu's Install row) |
 | D6.1 | **Keep `skills_up_last_7`**; it moves to Your progress | MOT-65 unchanged; MOT-67 shows Skills up |
 | D6.2 | **Songs = songs played from `song_chart.completed` now; repertoire (MOT-76) later** | New core ticket MOT-99; ADR-051 amendment, OpenAPI and features in their own spec PR |
 | D7 | Clean up and organise the tickets | New MOT-98 (Practice Shell) and MOT-99; MOT-64/66/67/71/82 updated; "Blocked" label on every slice MOT-63 blocks |
+
+pt-BR findings from D5: "Qualquer instrumento" doesn't fit a third of the SegmentedControl on
+Compact, so the segment reads "Qualquer" there (full label from Medium up); This week captions run
+to two lines and every tile grows with them; Day streak is "Dias seguidos" everywhere (Practice
+Shell wording). Your progress now shows four This week tiles in a 2×2 grid on Compact and in one
+row from Medium up (Skills up, D6.1).
 
 Song charts carry no instrument (the chord catalog is guitar-only, ADR-045), so the Songs count
 isn't per instrument until MOT-76 decides it (song-chart.md D19).
