@@ -69,5 +69,5 @@ straight to the next thing to do.
 
 ## Spec changes this needs
 
-- **D5:** `ExpandedContent.duration_ms` is ignored for article nodes. Deprecate it in OpenAPI, and
-  stop asking for it in authoring (MOT-61).
+- **D5:** `ExpandedContent.duration_ms` is ignored for article nodes. Deprecated and optional in
+  core-domain 0.34.0 (MOT-97); authoring stops asking for it in MOT-95.

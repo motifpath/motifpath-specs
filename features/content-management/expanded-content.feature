@@ -42,6 +42,14 @@ Feature: Manage expanded content
     When "bob" adds an image to "chord-theory-explained" with trigger_at_paragraph 3 and duration_ms 8000
     Then the expanded content item is created and assigned a stable identifier
 
+  # An article item stays under its paragraph, so duration_ms is deprecated and optional (MOT-97).
+  @wip
+  Scenario: A teacher adds an image to an article without a display duration
+    Given "bob" is authenticated as a teacher
+    And an article content node "chord-theory-explained" exists in the system
+    When "bob" submits a create expanded content request with trigger_at_paragraph 3 and duration_ms omitted
+    Then the expanded content item is created and assigned a stable identifier
+
   Scenario: A teacher adds a GIF to an article at the first paragraph
     Given "bob" is authenticated as a teacher
     And an article content node "chord-theory-explained" exists in the system
@@ -292,13 +300,6 @@ Feature: Manage expanded content
     When "bob" submits a create expanded content request with trigger_at_paragraph 0
     Then the request is rejected as invalid
     And the rejection identifies "trigger_at_paragraph" as the source of the error
-
-  Scenario: Adding expanded content to an article node without duration_ms is rejected
-    Given "bob" is authenticated as a teacher
-    And an article content node "chord-theory-explained" exists in the system
-    When "bob" submits a create expanded content request with trigger_at_paragraph 3 and duration_ms omitted
-    Then the request is rejected as invalid
-    And the rejection identifies "duration_ms" as the source of the error
 
   # ── Not found ──────────────────────────────────────────────────────────────
 
