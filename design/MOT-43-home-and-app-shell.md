@@ -13,7 +13,7 @@ code and Storybook are the source of truth (ADR-049 §8).
 |---|---|
 | Bottom navigation | Option A: Home · Practice · My path · Learning · Discover. Rail on Medium, sidebar on Expanded. See `patterns/navigation.md`. |
 | Home | H3, revised: Today's practice → Your path card → This week tiles → Your skills. Details on demand in Your progress. |
-| This week tiles | Minutes (+ change vs the week before) · Day streak (+ best) · Skills up. Streak shown kindly (ADR-051). |
+| This week tiles | Minutes (+ change vs the week before) · Day streak (+ best) · Songs (in your repertoire, + this week). Streak shown kindly (ADR-051). **Revised 2026-10-09 (MOT-73 D17):** Songs replaces Skills up, which repeated Your skills; Your progress lists the songs (`patterns/song-chart.md`). Needs an ADR-051 amendment (MOT-76). |
 | Your skills / Your progress scope | Per instrument. No "All" choice: levels don't add up meaningfully across instruments. Your progress offers the student's instruments plus "Any instrument". |
 | Typeface | **Manrope** (already the web face in tokens.json). |
 | Rejected | App Shell options B ("Me" tab) and C (today's five as they are); Home H1 (too little) and H2 (too dense). Kept in Figma's *Archive* page. |

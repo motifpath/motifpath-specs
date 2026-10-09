@@ -1,8 +1,9 @@
 # Pattern: song chart
 
 **Source:** ADR-049 §1, §4 and §6 · ADR-050 §3–§4 (song charts, as amended) · MOT-73 (Figma "Song
-charts", rows 1–6; decisions D1–D13, approved 2026-10-09, D2 revised by the PO) · reuses MOT-55
-(chord card, song chart practice) and MOT-61 (authoring)
+charts", rows 1–7, and "Home — exploration"; decisions D1–D19, approved 2026-10-09, D2 revised by the
+PO) · MOT-76 (songs in challenges, Your songs) · reuses MOT-55 (chord card, song chart practice) and
+MOT-61 (authoring)
 
 ## When
 
@@ -11,7 +12,9 @@ Use it whenever a song chart is read, shown in content or authored:
 - the **reader** (a chart opened from a link, from a lesson card, or as an admin preview);
 - the **SongChartCard** wherever content shows a chart (lesson articles and video cues);
 - **admin authoring** in Teach (list, editor, ChordPro, rights, publish and withdraw);
-- the **teacher picker** that embeds a published chart in a lesson.
+- the **teacher picker** that embeds a published chart in a lesson;
+- **songs in a challenge**, the way a teacher gives a song as practice;
+- **Your songs**, the student's played songs as a sign of growth on Home and in Your progress.
 
 Song chart *practice* (a song as a practice item, MOT-76) runs in the Practice Shell
 (`session.md`, `self-rating.md`) and shares the chart, the chord card and the metronome with the
@@ -111,6 +114,38 @@ Admins only, in Teach under Admin → Song charts, following `authoring.md`.
 - The inserted chart shows as the SongChartCard; selected, it offers Replace and Remove.
 - A whole chart is embedded, never a section. The exercise prompt editor never offers Song chart.
 
+### Songs in a challenge (row 7, D14–D16)
+
+A song chart never sits in an exercise prompt. A teacher gives a song as practice by adding it to a
+lesson's challenge, next to the exercises.
+
+- **Editor:** the challenge (a full-screen layer on Compact, today's dialog on Expanded) lists its
+  items with **Add exercise** and **Add song**. Add song opens the song chart picker (published charts
+  only; one already in the challenge shows "Added"). A song row is tinted and says "self-rated, not in
+  the pass mark".
+- **Order (D14):** songs come after the exercises; "Shuffle the exercises" shuffles only the
+  exercises.
+- **The run:** the song plays in the Practice Shell as in song practice (chart, chord card,
+  metronome), "I played it", then SelfRating.
+- **Pass mark (D15):** counts the exercises only. A song is done once it is rated, whatever the
+  rating, and never fails the challenge; a challenge of only songs is passed when every song is rated.
+  The result shows the song with its rating; the song then becomes the student's practice item.
+- **Withdrawn later (D16):** the chart drops out of the run; the editor shows it with a warning and
+  Remove, and the challenge can still be saved.
+
+### Your songs: growth on Home (D17–D19)
+
+- **Statuses:** Learning → In your repertoire (Clean on two separate days) → Review due (its
+  keep-alive review is due). `SongProgressRow` shows a song with its last rating, when, and its status.
+- **What adds a song (D18):** "I played it" in the reader adds the song as Learning and makes it a
+  practice item; self-ratings in practice and challenges move it on.
+- **Home (D17):** in This week, the **Songs** tile replaces Skills up: songs in your repertoire,
+  "+1 this week". Tapping it opens Your progress.
+- **Your progress:** a Your songs list grouped Review due · Learning · In your repertoire; a row opens
+  the reader.
+- **Per instrument (D19):** like Your skills — Home shows Today's practice instrument; Your progress
+  follows its instrument switch, and Any instrument lists every song once.
+
 ## Do not
 
 - Open a chord in a dialog or a sheet, or block scrolling while the chord card is open.
@@ -119,6 +154,7 @@ Admins only, in Teach under Admin → Song charts, following `authoring.md`.
 - Show a chart's draft, or a withdrawn chart, to learners or in the teacher picker.
 - Publish while a chord or the rights block it, or hide why Publish is disabled.
 - Use licensed lyrics in designs, stories or tests.
+- Put a song chart in an exercise prompt, or let a song's rating count toward a challenge's pass mark.
 
 ## Spec changes this needs
 
@@ -129,4 +165,9 @@ Admins only, in Teach under Admin → Song charts, following `authoring.md`.
   tempo, default 80, remembered per song on the device, nothing sent).
 - **D8:** in `features/web/song-chart-authoring.feature`, "Publishing a draft that isn't ready lists
   every reason" becomes: the status lists every reason and Publish waits until there are none.
-- No core or OpenAPI change beyond D1.
+- **Songs in a challenge (MOT-76):** ADR-019 amendment (a challenge item is an exercise or a song
+  chart, `song:<chart id>`); ADR-046 song item kind; scenarios for adding a song, the run, the pass
+  mark and a withdrawn chart.
+- **Your songs (MOT-76):** ADR-051 amendment (Songs replaces Skills up); `PracticeOverview` gains a
+  songs summary per instrument and Your progress a song list; `features/web/home.feature`; core
+  consumes `song_chart.completed` to add a song (D18).
