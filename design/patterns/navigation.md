@@ -44,6 +44,9 @@ student can go.
   `discover.md`).
 - **A lesson** is a pushed page (back arrow to My path): on Compact it hides the bottom bar so the
   lesson gets the height; the rail and the sidebar stay on Medium and Expanded (see `lesson.md`).
+- **Before sign-in** there is no App Shell: the landing and the sign-in bridges have their own
+  layout, and a student who has never started anything gets the first run on Home (see
+  `landing-and-first-run.md`).
 - **Back** closes the topmost layer (menu, sheet, dialog) before it leaves the destination.
 - Labels are short nouns that fit one line in pt-BR on a 360 px screen: Início, Praticar, Trilha,
   Aprender, Explorar.

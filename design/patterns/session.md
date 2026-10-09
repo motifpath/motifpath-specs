@@ -38,6 +38,8 @@ like the same product.
   the setup with the focus already chosen.
 - **Nothing to practise:** when the chosen instrument has nothing to play, the way out is the
   primary action, never a secondary button under an error: **Choose what to practise** (D2, D20).
+  A student who has never started a course or path gets **Find where to start** instead, which
+  opens the first run on Home (`landing-and-first-run.md`, MOT-59 D9).
 - **Today's plan:** before the first item, the session lists what it holds, in order: each
   play-along and exercise by its name, with why it was picked, and the fretboard cells grouped by
   drill with how many there are ("Name the note · 8 notes"). Its primary action is **Let's go**; ×
