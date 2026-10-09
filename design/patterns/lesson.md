@@ -40,6 +40,8 @@ straight to the next thing to do.
     "Practise this"), which also opens the next step (D6).
 - **Diagrams in a lesson** follow `diagrams.md` (scroll and overview strip for large ones) and
   `chord-card.md` (Box | Neck, voicings named by position).
+- **Song charts in a lesson** show as the `SongChartCard`; tapping it opens the reader as a layer
+  over the lesson, and a video pauses and resumes at the same moment (`song-chart.md`).
 - **After the S7 challenge** the Practice Shell summary says "Step N done" and shows the next step's
   card. "Back to My path" is the quiet way out.
 - **Review:** a done step never gates. There is no completion action, only "Practise again"

@@ -32,7 +32,8 @@ song.
   - Medium: floats in a corner of the side margin.
   - Expanded: docked in a side pane next to the chart. It opens on the first chord tap and shows the
     last chord tapped; × collapses the pane and the chart re-centres. Same component, only the
-    placement changes.
+    placement changes. In the song reader the pane also holds the metronome and the chords in this
+    song, above the card (`song-chart.md`).
 - A popover anchored at the tapped chord suits the chord sheet better than playing: it covers the
   next lines and must close before reading on.
 

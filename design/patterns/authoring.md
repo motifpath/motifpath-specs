@@ -27,7 +27,7 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   line on what Teach is for, and one `MenuRow` per section; each section is a pushed page with
   ← Teach. On Expanded a **Teach sidebar** lists the sections, then Back to learning and Account.
 - **Sections, in composition order (D3):** Courses · Paths · Lessons · Exercises · Diagrams; for
-  admins an Admin group: Knowledge map · Song charts. "Content" is renamed **Lessons**, the word
+  admins an Admin group: Knowledge map · Song charts (`song-chart.md`). "Content" is renamed **Lessons**, the word
   learners see.
 
 ### Lists (D4, D24, D25–D28)
@@ -109,7 +109,8 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   today's toolbar.
 - **Compact:** a `PromptToolbar` docked above the keyboard (Undo · Redo | Aa · Bold · Italic · List |
   context chip | + · hide keyboard) and three sheets: **Format** (style, marks, text and background
-  colour, alignment, lists), **Insert** (link, table, image, diagram, song chart) and **Table** (today's
+  colour, alignment, lists), **Insert** (link, table, image, diagram; song chart in article lessons only, never in an exercise
+  prompt — `song-chart.md`) and **Table** (today's
   table icons as `IconButton`s: add/delete column and row, header row/column/cell, merge, split, cell
   border, cell colour, delete table; long-press shows the name). The context chip is Table inside a
   table and Edit on an embedded diagram or song chart.
