@@ -6,8 +6,8 @@ account menu decided in MOT-60 (D1–D4); Learning decided in MOT-57
 ## When
 
 Every learner screen outside a practice run: the App Shell. A practice run uses the Practice Shell
-instead, with no global navigation (see the session pattern). Authoring screens keep their own app
-bar and are desktop-first.
+instead, with no global navigation (see the session pattern). Authoring is Teach, a separate mode
+with its own shell and no learner navigation (`authoring.md`).
 
 ## Why
 
@@ -33,6 +33,8 @@ student can go.
     rail, or the "Account" row at the foot of the sidebar (`overlays.md`).
   - "Teach" is in the menu on Compact and Medium; on Expanded it sits in the sidebar under a divider,
     apart from the learner destinations, and the menu drops it.
+  - Inside Teach the same sheet or menu shows **"Back to learning"** in place of "Teach"; on Expanded
+    it sits at the foot of the Teach sidebar. It lands on Home (`authoring.md`, MOT-61 D1).
   - Language opens a list in the same sheet or menu (back arrow); a choice applies at once and
     returns. It changes the app only, not the lesson content's language.
   - Appearance and language apply at once, with no Save.

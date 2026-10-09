@@ -17,8 +17,12 @@ hit. A full neck doesn't fit a phone at that size, and shrinking it makes every 
 
 - **Shared components:** `Fretboard` (Frets = the window drawn: 5 for shapes, a 7-place region
   for drills, 12 for a full neck; Strings = 4, 6 or 7; Layout = horizontal or vertical), `FretMarker` (Note · Root ·
-  Sounding · Asked · Right · Wrong), `ChordBox` with `ChordDot` and `ChordBarre`. No screen draws its
-  own board.
+  Sounding · Asked · Right · Wrong), `ChordBox` with `ChordDot` and `ChordBarre`, `Keyboard`, and for
+  wide boards and stacks `BoardViewport` (scrolls at readable size, edge fade), `OverviewStrip`,
+  `DiagramPlayer` and `DiagramLegend` (promoted from frames in MOT-61). No screen draws its own board.
+- **Same components and rules in authoring** (MOT-61 D23): the diagram picker, stimulus and
+  option editors and sound settings use these components and the rules below (`authoring.md`).
+  Thumbnails in lists and pickers are fitted, because nothing is tapped there.
 - **Markers keep tap size:** at least 28 px drawn and a 44 px hit area, at every size class. The
   sounding note is the dashed yellow ring of the reviewed PB-71 spike.
 - **Fretboard drills** (find the note, name the note; P3, MOT-80): every place the student can tap
