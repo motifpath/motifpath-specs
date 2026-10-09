@@ -40,7 +40,8 @@ student can go.
 - **Practice** opens the session setup directly, never a page in between.
 - **Learning** lists every course and standalone path the student has started (in progress,
   finished, left); tapping a row continues it in My path (see `learning.md`).
-- **Discover** joins the course and path catalogs behind a Courses | Paths segmented control.
+- **Discover** joins the course and path catalogs behind a Courses | Paths segmented control (see
+  `discover.md`).
 - **A lesson** is a pushed page (back arrow to My path): on Compact it hides the bottom bar so the
   lesson gets the height; the rail and the sidebar stay on Medium and Expanded (see `lesson.md`).
 - **Back** closes the topmost layer (menu, sheet, dialog) before it leaves the destination.

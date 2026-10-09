@@ -59,7 +59,7 @@ course by its picture before reading its title.
 - **Enrolled:** a progress row ("Part 2 of 4") and one primary action, "Continue part 2", which opens
   My path on this course (switching first if needed).
 - **Not enrolled, or left before:** "Start course"; a left course adds "You left this course before.
-  Starting again begins at part 1." The catalog side belongs to Discover (MOT-58).
+  Starting again begins at part 1." The catalog side belongs to Discover (`discover.md`).
 - **Outline (D4):** one `PartRow` per part: Done (check), Current (highlighted, number, "7 of 14
   lessons done" from the active StudentPath), Upcoming (muted). The current part opens unfolded with
   its lesson titles and "Open in My path"; the others unfold to titles only. Lessons open from My
