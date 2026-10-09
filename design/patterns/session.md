@@ -54,7 +54,8 @@ like the same product.
   short, and their title names the change.
 - **Summary:** what the run did — minutes, instrument, items — then each item with its result
   ("up to 76 BPM · Clean", "6 of 8 right", "Not quite"), and the This week tiles of ADR-051. The
-  primary action is **Done** (back to Home); **Practise again** is tertiary (D5).
+  primary action is **Done** (back to Home); **Practise again** is tertiary (D5). After the
+  student's first finished session, an `InstallCard` sits under the results (`install.md`).
 - **S7 challenge run:** the same shell, not the App Bar. "How to answer" is an in-place disclosure,
   not a modal; "Ask my teacher" is a tertiary link under the options (D6). After Finish, the review
   lists each exercise with the student's answer and the right one (D7).

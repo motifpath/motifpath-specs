@@ -26,8 +26,9 @@ student can go.
   - Expanded (≥ 840 px): a sidebar with icon and label rows.
 - **Account and settings** sit behind the avatar (MOT-60, D1–D4):
   - Content, at every size: who is signed in (name, and the role for teachers and admins) ·
-    Appearance (Auto | Light | Dark; Auto follows the device and is the default) · Language › ·
-    Teach (teachers and admins only) · Sign out.
+    Appearance (Auto | Light | Dark; Auto follows the device and is the default) · Install the app ›
+    (only while not installed and installable, `install.md`) · Language › · Teach (teachers and
+    admins only) · Sign out.
   - Compact: a bottom sheet. Medium and Expanded: a menu anchored to the avatar — at the foot of the
     rail, or the "Account" row at the foot of the sidebar (`overlays.md`).
   - "Teach" is in the menu on Compact and Medium; on Expanded it sits in the sidebar under a divider,

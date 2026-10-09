@@ -47,4 +47,5 @@ way forward, in the same place and the same shape, the student never hits a dead
 - Leave a state without a way forward, except Offline (which recovers by itself).
 - Show an error code or a raw server message.
 
-Out of scope: offline banners, the cache and sync (MOT-62).
+Out of scope: offline banners, the cache and sync — out of the MVP, after the store apps (MOT-89).
+The installed app (`install.md`) shows these same states.
