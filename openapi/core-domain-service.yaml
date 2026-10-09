@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.33.0
+  version: 0.34.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -1218,9 +1218,10 @@ paths:
         - **video**: `trigger_at_seconds` is required. `hide_at_seconds` must be
           provided and must be greater than `trigger_at_seconds`. `trigger_at_paragraph`
           and `duration_ms` must be absent.
-        - **article**: `trigger_at_paragraph` is required (1-based index). `duration_ms`
-          must be provided (minimum 1 ms). `trigger_at_seconds` and `hide_at_seconds`
-          must be absent.
+        - **article**: `trigger_at_paragraph` is required (1-based index). The item
+          stays under its paragraph, so `duration_ms` is deprecated: it is optional,
+          clients ignore it, and when present it must be at least 1.
+          `trigger_at_seconds` and `hide_at_seconds` must be absent.
 
         These timing rules apply the same way regardless of content_type.
 
@@ -1270,7 +1271,6 @@ paths:
                   content_type: gif
                   media_url: "https://cdn.example.com/animations/finger-placement.gif"
                   trigger_at_paragraph: 3
-                  duration_ms: 8000
                   caption: "Correct finger placement for the first chord"
       responses:
         "201":
@@ -10408,7 +10408,8 @@ components:
         Payload for attaching an expositive item to a content node. The
         trigger and hide fields used depend on the parent content node type:
         video nodes use trigger_at_seconds + hide_at_seconds; article nodes use
-        trigger_at_paragraph + duration_ms. Mixing fields across groups is invalid.
+        trigger_at_paragraph (and the deprecated, optional duration_ms). Mixing
+        fields across groups is invalid.
         These timing fields apply identically regardless of content_type —
         timing is a property of when the item appears, independent of what
         it contains.
@@ -10476,9 +10477,11 @@ components:
         duration_ms:
           type: integer
           minimum: 1
+          deprecated: true
           description: |
-            Article nodes only. How long to display this item in milliseconds
-            after it is triggered. Must be absent for video nodes.
+            Deprecated and optional: an article item stays under its paragraph,
+            and clients ignore this value. Article nodes only; must be absent
+            for video nodes.
         caption:
           type: string
           description: Optional caption displayed alongside the item.
@@ -10551,7 +10554,10 @@ components:
         duration_ms:
           type: integer
           minimum: 1
-          description: Article nodes only. Display duration in milliseconds.
+          deprecated: true
+          description: |
+            Deprecated: an article item stays under its paragraph, and clients
+            ignore this value. Present only on items created with it.
         caption:
           type: string
           description: Optional caption displayed alongside the item.
@@ -10630,7 +10636,10 @@ components:
         duration_ms:
           type: integer
           minimum: 1
-          description: Article nodes only. Must be absent for video nodes.
+          deprecated: true
+          description: |
+            Deprecated and optional: clients ignore it. Article nodes only;
+            must be absent for video nodes.
         caption:
           type: string
           description: Optional caption displayed alongside the item.
