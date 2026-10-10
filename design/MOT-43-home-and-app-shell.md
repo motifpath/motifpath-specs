@@ -79,5 +79,6 @@ Each new component gets a Storybook story (motifpath-web#100 enforces one per sh
 
 - The home (H3, revised) and Your progress, as above.
 - ADR-051's definitions: minutes count every session (even left early); the streak ends at yesterday
-  until today is over; skills up count once per instrument.
+  until today is over; skills up count once per instrument (revised 2026-10-09: once per skill,
+  ADR-051 amendment).
 - A lower week's minutes still show the change, in a neutral colour (`features/web/home.feature`).
