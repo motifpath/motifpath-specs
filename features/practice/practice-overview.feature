@@ -29,7 +29,6 @@ Feature: Show the student's practice overview across instruments
     Then the "guitar" card shows 2 practice days and the next step to strengthen "notes-on-low-strings"
     And the "electric-bass" card shows 1 practice day
 
-  @wip
   Scenario: The last 7 days list which days were practised and which were learning days, today last
     Given today is Wednesday for "alice"
     And "alice" finished a session with "guitar" in hand on Friday and with "electric-bass" in hand on Monday
@@ -46,7 +45,6 @@ Feature: Show the student's practice overview across instruments
     When "alice" reads their practice overview
     Then the overview shows 1 practice day in the last 7
 
-  @wip
   Scenario: Two instruments practised on the same day mark that day once
     Given "alice" finished a session with "guitar" in hand and another with "electric-bass" in hand on Monday
     When "alice" reads their practice overview
@@ -75,7 +73,6 @@ Feature: Show the student's practice overview across instruments
     When "alice" reads their practice overview in time zone "America/Sao_Paulo"
     Then that completion counts on Monday
 
-  @wip
   Scenario: The listed days follow the student's time zone
     Given "alice" completed a content node at 23:30 on Monday in "America/Sao_Paulo", which is Tuesday in UTC
     When "alice" reads their practice overview in time zone "America/Sao_Paulo"
