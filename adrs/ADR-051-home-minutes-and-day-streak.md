@@ -5,7 +5,7 @@
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
 **Task:** MOT-43
 **Amends:** ADR-046 (the "counts, never streaks" decision for the home)
-**Amended:** 2026-10-09 — Songs replaces Skills up on the home (see the end)
+**Amended:** 2026-10-09 — Songs replaces Skills up on the home; Skills up counts each skill once (see the end)
 
 ---
 
@@ -153,3 +153,30 @@ tile becomes **Songs**.
   is across instruments, like the streak. Per-instrument songs are MOT-76's decision.
 - "Played" is the student's own claim, not graded. That is the point of a growth signal, and it is
   why repertoire will later replace it.
+
+## Amendment (2026-10-09) — Skills up counts each skill once
+
+**Task:** MOT-65 · **Decided by:** Gilson Yamada (PO)
+
+Decision 3 counted skills up "once per instrument", over the student's instruments only. Reviewing
+the implementation showed two effects nobody wanted: a skill whose items suit every instrument (most
+theory skills) counted once for each instrument the student plays, and a student enrolled only in a
+path for every instrument, who has no instrument cards, always saw 0.
+
+**Decision:** Skills up this week is the number of **distinct** skills with at least one improved
+measure this week, on any of the student's instruments or on the items that suit every instrument.
+A skill that improved on several instruments counts once. Concepts still don't count.
+
+**Rationale:**
+
+- **Over once per instrument:** "3 skills up" should mean three things the student got better at.
+  Counting a theory skill twice because the student also plays bass inflates the number without
+  any more improvement.
+- **Over leaving theory-only students at 0:** their skills do improve, and Your progress is where
+  they'd look for it.
+
+**Consequences:**
+
+- Improving the same skill on guitar and on bass in one week is one skill up, not two.
+- Core reads the progress of the items that suit every instrument as well as each instrument's.
+

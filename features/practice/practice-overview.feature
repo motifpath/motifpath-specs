@@ -140,11 +140,25 @@ Feature: Show the student's practice overview across instruments
     Then the overview shows a day streak of 2
 
   @wip
-  Scenario: Skills up counts each improved skill once per instrument
+  Scenario: Skills up counts each improved skill once
     Given "alice"'s accuracy and fluency on "notes-on-low-strings" on guitar both improved this week
     And "alice"'s best clean tempo on "root-fifth-groove" on electric-bass improved this week
     When "alice" reads their practice overview
     Then the overview shows 2 skills up in the last 7 days
+
+  @wip
+  Scenario: A skill that improved on two instruments is one skill up
+    Given "alice"'s accuracy on "reading-rhythm" on guitar improved this week
+    And "alice"'s accuracy on "reading-rhythm" on electric-bass improved this week
+    When "alice" reads their practice overview
+    Then the overview shows 1 skill up in the last 7 days
+
+  @wip
+  Scenario: A student without instrument cards still counts their skills up
+    Given student "bruno" is enrolled only in a music-theory path for every instrument
+    And "bruno"'s accuracy on "reading-rhythm", which has items for every instrument, improved this week
+    When "bruno" reads their practice overview
+    Then the overview shows 1 skill up in the last 7 days
 
   @wip
   Scenario: A concept that improved is not a skill up

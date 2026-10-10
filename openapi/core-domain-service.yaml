@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.34.0
+  version: 0.35.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -12054,9 +12054,11 @@ components:
           type: integer
           minimum: 0
           description: |
-            How many skills, counted once per instrument, have at least one improved measure
-            in that instrument's progress this week (accuracy, fluency or best clean tempo
-            higher now than 7 days ago). Concepts are not counted.
+            How many distinct skills have at least one improved measure this week (accuracy,
+            fluency or best clean tempo higher now than 7 days ago), on any of the student's
+            instruments or on the items that suit every instrument. A skill that improved on
+            several instruments counts once, and a student with no instrument cards still
+            counts theirs. Concepts are not counted.
         songs_played_total:
           type: integer
           minimum: 0
