@@ -17,6 +17,20 @@
 # summary (getPracticeSummary) of today's practice instrument for Your skills; the student path for
 # Your path. Nothing on the home is summed across instruments except This week.
 #
+# Order on Your progress, top to bottom (revised 2026-10-10, MOT-67):
+#   1. This week — four tiles across instruments: minutes, day streak, songs and skills up.
+#   2. Learning days — the last 7 days with the days a content node was completed, across
+#      instruments.
+#   3. The instrument choice: the student's instruments and "Any instrument".
+#   4. For the chosen instrument: practice days, Your skills, and Moved this week.
+# What is summed across instruments sits above the choice, so changing instrument never seems to
+# leave numbers behind. Day rows show the last 7 days with today last and marked, and say only
+# which days something happened. They are never a streak and never mark a day as missed.
+#
+# Data on Your progress: the practice overview (getPracticeOverview) above the choice; the
+# practice summary (getPracticeSummary) of the chosen instrument below it, or the any-instrument
+# summary for "Any instrument".
+#
 # These scenarios are verified by motifpath-web's component tests and manual browser checks, not by
 # the core-domain BDD suite.
 
@@ -80,6 +94,28 @@ Feature: The home and Your progress
     When "alice" chooses "electric-bass"
     Then Your progress shows "electric-bass"'s practice days, skills and what moved this week
 
+  Scenario: This week and learning days on Your progress stay put when the instrument changes
+    Given "alice" is on Your progress for "guitar"
+    When "alice" chooses "electric-bass"
+    Then This week and learning days still show the same numbers, above the instrument choice
+
+  Scenario: Day rows show the last 7 days with today last and marked
+    Given today is Wednesday for "alice"
+    And "alice" practised guitar on Thursday, Saturday and today
+    When "alice" opens Your progress on "guitar"
+    Then the practice days row shows the days Thursday to Wednesday, with today marked
+    And Thursday, Saturday and Wednesday are filled and the row says 3 of 7
+
+  Scenario: Moved this week shows each improved skill from where it started
+    Given "alice"'s accuracy on "major-triads" on guitar went from 62% to 85% this week
+    When "alice" opens Your progress on "guitar"
+    Then Moved this week shows "major-triads", accuracy 62% → 85%
+
+  Scenario: Any instrument shows the skills that suit every instrument
+    Given "alice" is on Your progress for "guitar"
+    When "alice" chooses "Any instrument"
+    Then Your progress shows the practice days, skills and what moved this week of the skills that suit every instrument
+
   Scenario: Back from Your progress returns to the home
     Given "alice" opened Your progress from the home
     When "alice" goes back
@@ -102,6 +138,21 @@ Feature: The home and Your progress
     Given "alice" practised 20 minutes this week and 45 minutes the week before
     When "alice" opens the home
     Then the minutes tile shows 20 and the change in a neutral colour
+
+  Scenario: A day without practice is never shown as missed
+    Given "alice" practised on Monday and not on Tuesday
+    When "alice" opens Your progress on "guitar"
+    Then Tuesday is shown unfilled, in the same colours as any other day not yet practised
+    And Your progress never calls the practice days a streak
+
+  Scenario: A week where nothing moved says so kindly
+    Given none of "alice"'s skills on guitar improved this week
+    When "alice" opens Your progress on "guitar"
+    Then Moved this week says nothing moved yet and invites "alice" to practise
+
+  Scenario: Your progress opened without an instrument opens on the student's first
+    When "alice" opens Your progress without choosing an instrument
+    Then Your progress opens on "guitar"
 
   Scenario: Your progress offers only the student's own instruments and "Any instrument"
     When "alice" opens Your progress
@@ -143,3 +194,9 @@ Feature: The home and Your progress
     When "alice" opens the home
     Then Your skills says it couldn't load and offers a retry
     And today's practice, Your path and This week still show
+
+  Scenario: A summary that fails to load on Your progress keeps This week and learning days
+    Given "alice"'s practice summary for "guitar" fails to load
+    When "alice" opens Your progress on "guitar"
+    Then practice days, Your skills and Moved this week say they couldn't load and offer a retry
+    And This week and learning days still show
