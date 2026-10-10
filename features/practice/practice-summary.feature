@@ -13,7 +13,6 @@ Feature: Show the student's practice summary on the home
     When "alice" reads their practice summary for "guitar"
     Then the summary shows 4 practice days in the last 7
 
-  @wip
   Scenario: The last 7 days list which days were practised, today last
     Given today is Wednesday for "alice"
     And "alice" finished sessions with "guitar" in hand on Thursday, Saturday and today
@@ -53,7 +52,6 @@ Feature: Show the student's practice summary on the home
     When "alice" reads their practice summary for "guitar"
     Then the summary shows 0 practice days in the last 7
 
-  @wip
   Scenario: A day with only a session left early is listed as not practised
     Given "alice"'s only session yesterday ended early
     When "alice" reads their practice summary for "guitar"
