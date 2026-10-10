@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.35.0
+  version: 0.36.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -11914,6 +11914,18 @@ components:
             practice event for the session's planned minutes plus 15) with the summarised
             instrument in hand. A session on another instrument counts on that instrument's
             summary, not this one. Never a streak: a missed day is never a reset.
+        last_7_days:
+          type: array
+          minItems: 7
+          maxItems: 7
+          items:
+            $ref: '#/components/schemas/PracticeDay'
+          description: |
+            The same last 7 calendar days, one entry each, oldest first and today last, in
+            the given time zone, so a day row can show which days they were. practised
+            follows practice_days_last_7's rule, so as many days are practised as
+            practice_days_last_7 counts. Never a streak: a day only says whether it
+            happened, never that one was missed.
         progress_this_week:
           type: array
           items:
@@ -11940,6 +11952,7 @@ components:
         - instrument_id
         - student_instrument_ids
         - practice_days_last_7
+        - last_7_days
         - progress_this_week
         - next_steps
         - next_steps_total
@@ -12073,6 +12086,18 @@ components:
             How many of the songs counted in songs_played_total were first marked as played on
             the last 7 calendar days, today included, in the given time zone. Never more than
             songs_played_total.
+        last_7_days:
+          type: array
+          minItems: 7
+          maxItems: 7
+          items:
+            $ref: '#/components/schemas/ActivityDay'
+          description: |
+            The last 7 calendar days, one entry each, oldest first and today last, in the
+            given time zone, so a day row can show which days they were. practised and
+            learned follow practice_days_last_7's and learning_days_last_7's rules, so the
+            days marked match those counts. Never a streak: a day only says whether it
+            happened, never that one was missed.
         instruments:
           type: array
           items:
@@ -12090,7 +12115,48 @@ components:
         - skills_up_last_7
         - songs_played_total
         - songs_played_last_7
+        - last_7_days
         - instruments
+
+    PracticeDay:
+      type: object
+      description: One calendar day of an instrument's last 7, and whether the student practised it.
+      properties:
+        date:
+          type: string
+          format: date
+          description: The calendar day, in the time zone asked for.
+        practised:
+          type: boolean
+          description: |
+            Whether the student finished a practice session with the summarised instrument
+            in hand on this day, by the rule practice_days_last_7 counts.
+      required:
+        - date
+        - practised
+
+    ActivityDay:
+      type: object
+      description: One calendar day of the student's last 7, across instruments.
+      properties:
+        date:
+          type: string
+          format: date
+          description: The calendar day, in the time zone asked for.
+        practised:
+          type: boolean
+          description: |
+            Whether the student finished a practice session on this day, on any instrument
+            or without one, by the rule practice_days_last_7 counts.
+        learned:
+          type: boolean
+          description: |
+            Whether the student completed at least one content node on this day, by the
+            rule learning_days_last_7 counts.
+      required:
+        - date
+        - practised
+        - learned
 
     PracticeInstrumentCard:
       type: object

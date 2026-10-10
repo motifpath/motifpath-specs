@@ -29,12 +29,29 @@ Feature: Show the student's practice overview across instruments
     Then the "guitar" card shows 2 practice days and the next step to strengthen "notes-on-low-strings"
     And the "electric-bass" card shows 1 practice day
 
+  @wip
+  Scenario: The last 7 days list which days were practised and which were learning days, today last
+    Given today is Wednesday for "alice"
+    And "alice" finished a session with "guitar" in hand on Friday and with "electric-bass" in hand on Monday
+    And "alice" completed a content node on Monday and today
+    When "alice" reads their practice overview
+    Then the overview lists 7 days from Thursday to Wednesday
+    And Friday and Monday are practised and the other 5 days are not
+    And Monday and Wednesday are learning days and the other 5 days are not
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   Scenario: Two instruments practised on the same day count as one practice day
     Given "alice" finished a session with "guitar" in hand and another with "electric-bass" in hand on Monday
     When "alice" reads their practice overview
     Then the overview shows 1 practice day in the last 7
+
+  @wip
+  Scenario: Two instruments practised on the same day mark that day once
+    Given "alice" finished a session with "guitar" in hand and another with "electric-bass" in hand on Monday
+    When "alice" reads their practice overview
+    Then Monday is practised in the overview's last 7 days
+    And 1 of the overview's last 7 days is practised
 
   Scenario: A session left early is not a practice day on the overview either
     Given "alice"'s only session yesterday, with "guitar" in hand, ended early
@@ -57,6 +74,13 @@ Feature: Show the student's practice overview across instruments
     Given "alice" completed a content node at 23:30 on Monday in "America/Sao_Paulo", which is Tuesday in UTC
     When "alice" reads their practice overview in time zone "America/Sao_Paulo"
     Then that completion counts on Monday
+
+  @wip
+  Scenario: The listed days follow the student's time zone
+    Given "alice" completed a content node at 23:30 on Monday in "America/Sao_Paulo", which is Tuesday in UTC
+    When "alice" reads their practice overview in time zone "America/Sao_Paulo"
+    Then Monday is a learning day in the overview's last 7 days
+    And Tuesday is not a learning day in the overview's last 7 days
 
   # ── Minutes, day streak and skills up ──────────────────────────────────────
   # Effort, consistency and improvement for the home's "This week" tiles. All three come from the

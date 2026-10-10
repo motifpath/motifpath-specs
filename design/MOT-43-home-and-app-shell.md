@@ -15,6 +15,8 @@ code and Storybook are the source of truth (ADR-049 §8).
 | Home | H3, revised: Today's practice → Your path card → This week tiles → Your skills. Details on demand in Your progress. |
 | This week tiles | Minutes (+ change vs the week before) · Day streak (+ best) · Songs (in your repertoire, + this week). Streak shown kindly (ADR-051). **Revised 2026-10-09 (MOT-73 D17):** Songs replaces Skills up, which repeated Your skills; Your progress lists the songs (`patterns/song-chart.md`). **Decided 2026-10-09 (MOT-63 D6):** Songs counts songs played (`song_chart.completed`, `songs_played_total` / `songs_played_last_7`, ADR-051 amendment, MOT-99) and becomes songs in your repertoire with MOT-76. Skills up stays and shows on Your progress. |
 | Your skills / Your progress scope | Per instrument. No "All" choice: levels don't add up meaningfully across instruments. Your progress offers the student's instruments plus "Any instrument". |
+| Your progress layout | **Decided 2026-10-10 (MOT-67):** what is summed across instruments (This week tiles, learning days) sits **above** the instrument choice. What follows the instrument (practice days, Your skills, Moved this week) sits below it. The Figma frames put everything under the choice. Read that way, the tiles would stay the same on a switch and look broken. |
+| Day rows | **Decided 2026-10-10 (MOT-67, MOT-101):** day rows show the last 7 days by weekday, with today last and marked, from real per-day data (`last_7_days`), not marks that stand for no day. Still never a streak: a day says only whether something happened. |
 | Typeface | **Manrope** (already the web face in tokens.json). |
 | Rejected | App Shell options B ("Me" tab) and C (today's five as they are); Home H1 (too little) and H2 (too dense). Kept in Figma's *Archive* page. |
 
@@ -33,8 +35,10 @@ code and Storybook are the source of truth (ADR-049 §8).
 
 **Your progress** (pushed page, back returns to the home)
 
+- This week tiles (minutes, day streak, songs, skills up) and learning days (`WeekDots`) from the
+  overview, across instruments.
 - `SegmentedControl` of the student's instruments + "Any instrument".
-- This week tiles (minutes, day streak, songs, skills up), practice days and learning days (`WeekDots`), Your skills, Moved this week
+- For the chosen instrument: practice days (`WeekDots`), Your skills, and Moved this week
   (`SkillProgressRow` from `progress_this_week`).
 
 ## API changes (`openapi/core-domain-service.yaml` 0.29.0)
@@ -43,6 +47,10 @@ code and Storybook are the source of truth (ADR-049 §8).
 `day_streak_current`, `day_streak_best` and `skills_up_last_7`. Scenarios:
 `features/practice/practice-overview.feature`, tagged `@wip` until core implements them.
 No new endpoint and no new event.
+
+**0.36.0 (MOT-101):** `PracticeSummary.last_7_days` (`PracticeDay`: date, practised) and
+`PracticeOverview.last_7_days` (`ActivityDay`: date, practised, learned) for Your progress's day
+rows. Additive; the counts stay. Scenarios tagged `@wip` until core implements them.
 
 ## Components
 
@@ -53,7 +61,7 @@ No new endpoint and no new event.
 | `MetricTile` | No | New |
 | `LevelBar` | No (levels exist on the fretboard map) | New, uses the level colour tokens |
 | `PathCard` | `FocusCard` / `StepRow` | New; replaces FocusCard on the home |
-| `WeekDots` | `DayMarks` | Reuse DayMarks |
+| `WeekDots` | `DayMarks` (counts only) | New: weekday letters and today's ring from `last_7_days` (0.36.0). DayMarks stays for counts. |
 | `SkillProgressRow` | Inside `PracticeSummaryPanel` | Extract |
 | `SegmentedControl` | No | New; also used by Discover |
 | `Chip` | Inline badge classes | New |
