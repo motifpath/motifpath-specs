@@ -43,7 +43,6 @@ Feature: Manage expanded content
     Then the expanded content item is created and assigned a stable identifier
 
   # An article item stays under its paragraph, so duration_ms is deprecated and optional (MOT-97).
-  @wip
   Scenario: A teacher adds an image to an article without a display duration
     Given "bob" is authenticated as a teacher
     And an article content node "chord-theory-explained" exists in the system
