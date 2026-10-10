@@ -47,10 +47,12 @@ without scrolling, and show where the student is in the path without a wall of f
   |---|---|
   | Compact | Bottom bar; one column. |
   | Medium | Rail; one 560 px column. |
-  | Expanded | Sidebar; the steps in a 600 px list, with a 320 px side column holding the progress card and the next step's card (D14). |
+  | Expanded | Sidebar; the same 560 px column as Medium (D14, revised 2026-10-10). |
 
 ## Do not
 
+- Split My path into a list and a side column on a wide screen: the one column already leads with
+  the progress and the next step (D14, revised 2026-10-10).
 - Write "Complete the previous step" on every locked row. The lock icon says it, and a tap explains.
 - Show a language lock as an error, or leave the student with no way through it.
 - Put a second primary button on the screen.
