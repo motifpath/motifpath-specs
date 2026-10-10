@@ -28,6 +28,10 @@ straight to the next thing to do.
   - Cues (`ExpandedContent`: a diagram, an image, rich text or a song chart card) show in place under
     the video while they're active. On a phone in landscape and in full screen, they sit beside the
     video.
+  - The screen fits the video lesson: the video at the top, the title block and the actions at the
+    foot, and the cue between them taking the height that is left, scrolling when it needs more. A
+    cue coming and going never moves the title or "Practise this". (On a phone in landscape the
+    page scrolls, since the video already fills the height.)
   - When the video ends, the action bar offers the hand-off:
     - With a challenge: "Practise this", which starts the S7 run in the Practice Shell.
     - Without one, the step is done when the video ends (D2). The screen shows "Step done", the next
