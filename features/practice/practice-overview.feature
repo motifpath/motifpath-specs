@@ -62,105 +62,89 @@ Feature: Show the student's practice overview across instruments
   # Effort, consistency and improvement for the home's "This week" tiles. All three come from the
   # activity already kept: session starts, answers and ends, and the daily item snapshots.
 
-  @wip
   Scenario: Minutes practised add up every session this week
     Given "alice" practised from 18:00 to 18:12 on Monday and from 19:00 to 19:20 on Wednesday
     When "alice" reads their practice overview
     Then the overview shows 32 minutes practised in the last 7 days
 
-  @wip
   Scenario: Minutes practised the week before are shown for comparison
     Given "alice" practised 20 minutes 9 days ago and 15 minutes 12 days ago
     When "alice" reads their practice overview
     Then the overview shows 35 minutes practised in the previous 7 days
 
-  @wip
   Scenario: A session left early still counts its minutes
     Given "alice" started a session at 18:00 yesterday, answered until 18:06 and left early
     When "alice" reads their practice overview
     Then the overview shows 6 minutes practised in the last 7 days
     And the overview shows 0 practice days in the last 7
 
-  @wip
   Scenario: An abandoned session counts up to its last answer
     Given "alice" started a 10-minute session at 18:00 yesterday and sent nothing for it after an answer at 18:04
     When "alice" reads their practice overview
     Then the overview shows 4 minutes practised in the last 7 days
 
-  @wip
   Scenario: Minutes round down to whole minutes
     Given "alice" practised for 7 minutes and 50 seconds yesterday
     When "alice" reads their practice overview
     Then the overview shows 7 minutes practised in the last 7 days
 
-  @wip
   Scenario: The day streak counts consecutive practice days up to today
     Given "alice" finished a session on each of the last 3 days, today included
     When "alice" reads their practice overview
     Then the overview shows a day streak of 3
 
-  @wip
   Scenario: Today without practice yet doesn't break the streak
     Given "alice" finished a session on each of the 4 days before today
     And "alice" has not practised today
     When "alice" reads their practice overview
     Then the overview shows a day streak of 4
 
-  @wip
   Scenario: A missed day ends the current streak and keeps the best one
     Given "alice" finished a session on 9 consecutive days, missed the next day, and has finished a session on each of the 2 days since, today included
     When "alice" reads their practice overview
     Then the overview shows a day streak of 2
     And the overview shows a best day streak of 9
 
-  @wip
   Scenario: Neither today nor yesterday practised means no current streak
     Given "alice" last finished a session 2 days ago
     When "alice" reads their practice overview
     Then the overview shows a day streak of 0
 
-  @wip
   Scenario: A day left early is not a streak day
     Given "alice" finished a session 2 days ago and today, and their only session yesterday ended early
     When "alice" reads their practice overview
     Then the overview shows a day streak of 1
 
-  @wip
   Scenario: Two instruments on the same day are one streak day
     Given "alice" finished a session with "guitar" in hand and another with "electric-bass" in hand today
     And "alice" finished no session before today
     When "alice" reads their practice overview
     Then the overview shows a day streak of 1
 
-  @wip
   Scenario: The streak follows the student's time zone
     Given "alice" finished a session at 23:30 yesterday in "America/Sao_Paulo", which is today in UTC
     And "alice" finished a session today
     When "alice" reads their practice overview in time zone "America/Sao_Paulo"
     Then the overview shows a day streak of 2
 
-  @wip
   Scenario: Skills up counts each improved skill once
     Given "alice"'s accuracy and fluency on "notes-on-low-strings" on guitar both improved this week
     And "alice"'s best clean tempo on "root-fifth-groove" on electric-bass improved this week
     When "alice" reads their practice overview
     Then the overview shows 2 skills up in the last 7 days
 
-  @wip
   Scenario: A skill that improved on two instruments is one skill up
     Given "alice"'s accuracy on "reading-rhythm" on guitar improved this week
     And "alice"'s accuracy on "reading-rhythm" on electric-bass improved this week
     When "alice" reads their practice overview
     Then the overview shows 1 skill up in the last 7 days
 
-  @wip
   Scenario: A student without instrument cards still counts their skills up
     Given student "bruno" is enrolled only in a music-theory path for every instrument
     And "bruno"'s accuracy on "reading-rhythm", which has items for every instrument, improved this week
     When "bruno" reads their practice overview
     Then the overview shows 1 skill up in the last 7 days
 
-  @wip
   Scenario: A concept that improved is not a skill up
     Given "alice"'s accuracy on the concept "intervals" improved this week
     And no skill of "alice" improved this week
@@ -200,7 +184,6 @@ Feature: Show the student's practice overview across instruments
     When "alice" reads their practice overview
     Then the overview shows 0 songs played
 
-  @wip
   Scenario: A student who has never practised starts at zero
     Given student "bruno" has never practised
     When "bruno" reads their practice overview
