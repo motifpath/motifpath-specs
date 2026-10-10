@@ -58,10 +58,13 @@ straight to the next thing to do.
   |---|---|
   | Compact | One column; video at full width. |
   | Medium | Rail; one column (video 620 px, text 560 px). |
-  | Expanded | Sidebar; the video or text at 640 px beside a 304 px aside. The aside holds the cue on top and the section's steps below; when a video ends, the next step's card moves to the top of the aside (D14). |
+  | Expanded | Sidebar; the same one column as Medium (video 620 px, text 560 px), cues under the video (D14, revised 2026-10-10). |
 
 ## Do not
 
+- Put a side column beside the lesson on a wide screen: it shrinks the cue to a sliver and leaves
+  most of the screen's width empty. The one column keeps the cue as wide as the video (D14,
+  revised 2026-10-10 after the first build).
 - Show a cue as a pop-up that disappears while the student reads.
 - Put a disabled "Mark as done" button on screen until the end.
 - Send the student back to the path list after finishing a step when the next step is one tap away.
