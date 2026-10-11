@@ -1,7 +1,7 @@
 # ADR-053: Authoring List Sort, Any-Of Classification Filters and Sub-Skill Matching
 
-**Status:** Proposed
-**Date:** 2026-10-11
+**Status:** Accepted
+**Date:** 2026-10-11 (Proposed) · 2026-10-11 (Accepted, in review of specs#280)
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
 **Task:** MOT-93 (found while designing MOT-61, decision D29)
 
@@ -123,4 +123,4 @@ MotifPath will extend the ADR-031 list contract, leaving its paging rules unchan
 
 ---
 
-*This ADR was proposed on 2026-10-11. To revise, create a new ADR with Status: Supersedes ADR-053.*
+*This ADR was decided on 2026-10-11. To revise, create a new ADR with Status: Supersedes ADR-053.*
