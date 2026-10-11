@@ -166,6 +166,40 @@ Feature: Manage expanded content
       | in direction "shuffled"   |
       | playback "Not On It"      |
 
+  # ── Diagram content — view ────────────────────────────────────────────────────
+
+  Scenario: A diagram is shown on the fretboard unless its author chose otherwise
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" adds diagram "minor-pentatonic-guitar" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165
+    Then the item's diagram is shown as "fretboard"
+
+  Scenario: A teacher shows a chord voicing as a chord box
+    Given the chord catalog has a voicing "d-open" on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" adds the diagram of voicing "d-open" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165, shown as "chord_box"
+    Then the expanded content item is created and assigned a stable identifier
+    And the item's diagram is shown as "chord_box"
+
+  Scenario: Only a chord voicing can be shown as a chord box
+    Given a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" adds diagram "minor-pentatonic-guitar" to "intro-to-triads" with trigger_at_seconds 150 and hide_at_seconds 165, shown as "chord_box"
+    Then the request is rejected as invalid
+    And the rejection identifies "diagram_ref" as the source of the error
+
+  Scenario: A diagram stack can't be shown as a chord box
+    Given the chord catalog has a voicing "d-open" on instrument "guitar"
+    And a diagram "minor-pentatonic-guitar" exists on instrument "guitar"
+    And "bob" is authenticated as a teacher
+    And a video content node "intro-to-triads" exists in the system
+    When "bob" adds a stack of the diagram of voicing "d-open", shown as "chord_box", and diagram "minor-pentatonic-guitar" to "intro-to-triads"
+    Then the request is rejected as invalid
+    And the rejection identifies "diagram_stack_ref" as the source of the error
+
   # ── Diagram content — validation failures ─────────────────────────────────────
 
   Scenario: Adding a diagram stack from two different instruments is rejected
