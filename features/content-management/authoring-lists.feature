@@ -1,4 +1,3 @@
-@wip
 Feature: Find items in the authoring lists at volume
   As a teacher or an admin with thousands of diagrams and hundreds of lessons and exercises
   I want every authoring list sorted by what changed last, filtered by a skill area including its
@@ -6,7 +5,6 @@ Feature: Find items in the authoring lists at volume
   So that I find the item I need instead of building it again
 
   # ADR-053 (extends ADR-031) · MOT-93 · design/patterns/authoring.md (D25–D28)
-  # Remove @wip per scenario as motifpath-core implements it.
 
   Background:
     Given the Core Domain Service is operational and ready to accept requests
