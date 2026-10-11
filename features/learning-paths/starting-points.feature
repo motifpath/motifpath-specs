@@ -11,7 +11,6 @@
 # maps to — never_played → beginner; plays_a_bit → early intermediate or intermediate; plays_well →
 # advanced or expert — each ordered by title, at most five in all.
 
-@wip
 Feature: Curate where a new student should start through the app's settings
   As the MotifPath team
   I want to choose the paths and courses a new student sees first, in order, without a deploy
@@ -83,7 +82,7 @@ Feature: Curate where a new student should start through the app's settings
 
   Scenario: A list is only for its own instrument, experience and language
     Given "starting_points" has a list for "electric-guitar", "never_played", "en" with course "eg-basics"
-    When "carla" asks where to start on "electric-guitar", "never_played", "pt-BR"
+    When "carla" asks where to start on "electric-guitar", "never_played", "pt_BR"
     Then the source is "catalog"
 
   Scenario: A curated entry may be at another level than the experience
