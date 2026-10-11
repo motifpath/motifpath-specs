@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.37.0
+  version: 0.38.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -107,16 +107,56 @@ paths:
         Returns content nodes from the library, for browsing and picking one
         to edit, use as a remediation target, or add to a learning path —
         not a student-facing catalog.
-        Results are paginated (ADR-031): ordered by title, then id and
-        returned in a {items, total, limit, offset} envelope. An offset
-        past the end returns an empty items array, not an error.
-        Only teachers and admins may list content nodes.
+        Results are paginated (ADR-031) in a {items, total, limit, offset}
+        envelope, in the order sort asks for (by title, then id, unless
+        sort is updated). An offset past the end returns an empty items
+        array, not an error.
+        Only teachers and admins may list content nodes; both see every
+        author's nodes. Every filter below is optional and they combine
+        with AND; skill_ids and concept_ids are any-of within themselves.
       tags:
         - Content
       parameters:
         - $ref: '#/components/parameters/SearchText'
         - $ref: '#/components/parameters/Limit'
         - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/AuthoringSort'
+        - $ref: '#/components/parameters/SkillIds'
+        - $ref: '#/components/parameters/ConceptIds'
+        - name: created_by
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: |
+            Restricts the results to content nodes created by this user.
+            GET /content-nodes/creators lists the creators to offer.
+        - name: language
+          in: query
+          required: false
+          schema:
+            type: string
+          description: |
+            Restricts the results to content nodes available in this
+            language (a Language.code other than "any"): those that list
+            it among their languages. A language-agnostic node (languages
+            "any") never matches.
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - draft
+              - published
+              - unpublished_changes
+          description: |
+            Restricts the results by publishing status. draft: never
+            published (no latest_published_version). published: published
+            and not edited since its latest version. unpublished_changes:
+            published, then edited after its latest version was published
+            (has_unpublished_changes).
         - name: content_type
           in: query
           required: false
@@ -126,20 +166,6 @@ paths:
               - video
               - article
           description: When given, only content nodes of this type are returned.
-        - name: skill_id
-          in: query
-          required: false
-          schema:
-            type: string
-            format: uuid
-          description: When given, only content nodes with this exact skill id among their linked skills are returned. Matches that node only, not its ancestors or descendants.
-        - name: concept_id
-          in: query
-          required: false
-          schema:
-            type: string
-            format: uuid
-          description: When given, only content nodes with this exact concept id among their linked concepts are returned. Matches that node only, not its ancestors or descendants.
         - name: difficulty_level
           in: query
           required: false
@@ -169,7 +195,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedContentNodes'
         "400":
-          description: limit or offset is out of range.
+          description: limit, offset, sort, status or a skill or concept id is out of range.
           content:
             application/json:
               schema:
@@ -255,6 +281,65 @@ paths:
           description: |
             The authenticated user does not have permission to create content.
             Only teachers and admins may create content nodes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /content-nodes/creators:
+    get:
+      operationId: listContentNodeCreators
+      summary: List the creators of the content nodes in the library
+      description: |
+        Returns every distinct user who created at least one content node,
+        so a picker can offer a complete creator filter (the created_by
+        parameter of GET /content-nodes) without paging. Only teachers and
+        admins may list content node creators, as with the library itself.
+
+        The list is unpaginated: it is bounded by the number of teachers
+        and admins, not by the number of content nodes. Results are always
+        ordered by display_name, alphabetically as a person reads names —
+        ignoring case and accents, so "Álvaro" sorts with the A's — then
+        by user_id; an empty array means no creator matches.
+        Each creator carries item_count, the number of items in this list's
+        section by them that the caller can see, whatever other filters the
+        section's list is given.
+      tags:
+        - Content
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+          description: >-
+            Restricts the results to creators whose display_name contains
+            this text, ignoring case and accents ("jose" matches "José").
+      responses:
+        "200":
+          description: The creators of the content nodes in the library, possibly empty.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreatorRef'
+        "400":
+          description: q is out of range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The caller is a student.
           content:
             application/json:
               schema:
@@ -691,9 +776,10 @@ paths:
       description: |
         Returns exercises from the reusable pool, for browsing and picking one
         to edit in an authoring tool.
-        Results are paginated (ADR-031): ordered by id and
-        returned in a {items, total, limit, offset} envelope. An offset
-        past the end returns an empty items array, not an error.
+        Results are paginated (ADR-031) in a {items, total, limit, offset}
+        envelope, in the order sort asks for (by title, then id, unless
+        sort is updated). An offset past the end returns an empty items
+        array, not an error.
         Only teachers and admins may list exercises; the pool is an
         authoring surface, not a student-facing catalog. Every teacher sees
         the whole pool, whoever created each exercise.
@@ -704,24 +790,9 @@ paths:
         - $ref: '#/components/parameters/SearchText'
         - $ref: '#/components/parameters/Limit'
         - $ref: '#/components/parameters/Offset'
-        - name: skill_id
-          in: query
-          required: false
-          schema:
-            type: string
-            format: uuid
-          description: |
-            When given, only exercises linked to this exact skill id are
-            returned.
-        - name: concept_id
-          in: query
-          required: false
-          schema:
-            type: string
-            format: uuid
-          description: |
-            When given, only exercises linked to this exact concept id are
-            returned.
+        - $ref: '#/components/parameters/AuthoringSort'
+        - $ref: '#/components/parameters/SkillIds'
+        - $ref: '#/components/parameters/ConceptIds'
         - name: language
           in: query
           required: false
@@ -777,8 +848,8 @@ paths:
                 $ref: '#/components/schemas/PagedExercises'
         "400":
           description: |
-            limit or offset is out of range, or an instrument_id is not a
-            valid uuid.
+            limit, offset or sort is out of range, or an instrument_id,
+            skill id or concept id is not a valid uuid.
           content:
             application/json:
               schema:
@@ -1520,6 +1591,9 @@ paths:
         ordered by display_name, alphabetically as a person reads names —
         ignoring case and accents, so "Álvaro" sorts with the A's — then
         by user_id; an empty array means no creator matches.
+        Each creator carries item_count, the number of items in this list's
+        section by them that the caller can see, whatever other filters the
+        section's list is given.
       tags:
         - Content
       parameters:
@@ -1541,7 +1615,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserRef'
+                  $ref: '#/components/schemas/CreatorRef'
         "400":
           description: q is out of range.
           content:
@@ -2385,11 +2459,13 @@ paths:
         creators to offer.
 
         Results are paginated in a {items, total, limit, offset} envelope,
-        ordered by the name the caller sees — the diagram's name in the
-        caller's locale, else its English name, else its name in the
-        alphabetically first language it has — then by id; an offset past
-        the end returns an empty items array. Every filter below is
-        optional and they combine with AND.
+        in the order sort asks for. By default they are ordered by the name
+        the caller sees — the diagram's name in the caller's locale, else
+        its English name, else its name in the alphabetically first
+        language it has — then by id; sort=updated orders by the most
+        recent change first, then id. An offset past the end returns an
+        empty items array. Every filter below is optional and they combine
+        with AND; skill_ids and concept_ids are any-of within themselves.
 
         Chord voicings from the chord catalog are left out unless purpose
         asks for them, so they don't crowd the diagrams authors browse;
@@ -2458,20 +2534,9 @@ paths:
             type: string
             format: uuid
           description: When given, only diagrams authored against this instrument are returned.
-        - name: skill_id
-          in: query
-          required: false
-          schema:
-            type: string
-            format: uuid
-          description: When given, only diagrams with this exact skill id among their linked skills are returned.
-        - name: concept_id
-          in: query
-          required: false
-          schema:
-            type: string
-            format: uuid
-          description: When given, only diagrams with this exact concept id among their linked concepts are returned.
+        - $ref: '#/components/parameters/AuthoringSort'
+        - $ref: '#/components/parameters/SkillIds'
+        - $ref: '#/components/parameters/ConceptIds'
         - name: purpose
           in: query
           required: false
@@ -2494,7 +2559,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedDiagrams'
         "400":
-          description: limit, offset, kind, language, name, root_note or purpose is out of range.
+          description: limit, offset, kind, language, name, root_note, purpose or sort is out of range, or a skill or concept id is not a valid uuid.
           content:
             application/json:
               schema:
@@ -2631,6 +2696,9 @@ paths:
         ordered by display_name, alphabetically as a person reads names —
         ignoring case and accents, so "Álvaro" sorts with the A's — then
         by user_id; an empty array means no creator matches.
+        Each creator carries item_count, the number of items in this list's
+        section by them that the caller can see, whatever other filters the
+        section's list is given.
       tags:
         - Content
       parameters:
@@ -2652,7 +2720,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserRef'
+                  $ref: '#/components/schemas/CreatorRef'
         "400":
           description: q is out of range.
           content:
@@ -3528,6 +3596,9 @@ paths:
         never matches it. A path matches skill_ids when any of its content
         nodes is classified with any of the given skills, and, if
         concept_ids is also given, also with any of the given concepts.
+        A skill or concept id also matches every skill or concept below
+        it in the knowledge map's tree, so choosing an area finds what is
+        classified with any of its sub-skills or sub-concepts.
         language matches a path's own language; a path with no language
         recorded never matches it. status matches a path's publishing
         status.
@@ -3580,7 +3651,7 @@ paths:
               format: uuid
           description: >-
             Restricts the results to learning paths with a content node
-            classified with at least one of these skills.
+            classified with at least one of these skills, or a skill below one of them.
         - name: concept_ids
           in: query
           required: false
@@ -3593,19 +3664,8 @@ paths:
               format: uuid
           description: >-
             Restricts the results to learning paths with a content node
-            classified with at least one of these concepts.
-        - name: sort
-          in: query
-          required: false
-          schema:
-            type: string
-            enum:
-              - title
-              - updated
-            default: title
-          description: >-
-            title orders by title, then id. updated orders by updated_at,
-            most recent first, then id.
+            classified with at least one of these concepts, or a concept below one of them.
+        - $ref: '#/components/parameters/AuthoringSort'
         - name: instrument_id
           in: query
           required: false
@@ -3756,6 +3816,9 @@ paths:
         ordered by display_name, alphabetically as a person reads names —
         ignoring case and accents, so "Álvaro" sorts with the A's — then
         by user_id; an empty array means no creator matches.
+        Each creator carries item_count, the number of items in this list's
+        section by them that the caller can see, whatever other filters the
+        section's list is given.
       tags:
         - Learning Paths
       parameters:
@@ -3777,7 +3840,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserRef'
+                  $ref: '#/components/schemas/CreatorRef'
         "400":
           description: q is empty or longer than 200 characters.
           content:
@@ -4128,6 +4191,9 @@ paths:
         version's checkpoints' learning path templates contains a
         content node classified with any of the given skills, and, if
         both parameters are given, also with any of the given concepts.
+        A skill or concept id also matches every skill or concept below
+        it in the knowledge map's tree, so choosing an area finds what is
+        classified with any of its sub-skills or sub-concepts.
       tags:
         - Catalog
       parameters:
@@ -4169,7 +4235,7 @@ paths:
               format: uuid
           description: >-
             Restricts the results to courses classified with at least
-            one of these skills.
+            one of these skills, or a skill below one of them.
         - name: concept_ids
           in: query
           required: false
@@ -4182,7 +4248,7 @@ paths:
               format: uuid
           description: >-
             Restricts the results to courses classified with at least
-            one of these concepts.
+            one of these concepts, or a concept below one of them.
         - name: language
           in: query
           required: false
@@ -4237,6 +4303,9 @@ paths:
         ordered by display_name, alphabetically as a person reads names —
         ignoring case and accents, so "Álvaro" sorts with the A's — then
         by user_id; an empty array means no creator matches.
+        Each creator carries item_count, the number of items in this list's
+        section by them that the caller can see, whatever other filters the
+        section's list is given.
       tags:
         - Catalog
       parameters:
@@ -4258,7 +4327,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserRef'
+                  $ref: '#/components/schemas/CreatorRef'
         "401":
           description: Missing or invalid Bearer token.
           content:
@@ -4286,6 +4355,9 @@ paths:
         parameter). A path matches when any of its content nodes is
         classified with any of the given skills, and, if both parameters
         are given, also with any of the given concepts.
+        A skill or concept id also matches every skill or concept below
+        it in the knowledge map's tree, so choosing an area finds what is
+        classified with any of its sub-skills or sub-concepts.
       tags:
         - Catalog
       parameters:
@@ -4327,7 +4399,7 @@ paths:
               format: uuid
           description: >-
             Restricts the results to paths with a content node classified
-            with at least one of these skills.
+            with at least one of these skills, or a skill below one of them.
         - name: concept_ids
           in: query
           required: false
@@ -4340,7 +4412,7 @@ paths:
               format: uuid
           description: >-
             Restricts the results to paths with a content node classified
-            with at least one of these concepts.
+            with at least one of these concepts, or a concept below one of them.
         - name: language
           in: query
           required: false
@@ -4441,6 +4513,9 @@ paths:
         ordered by display_name, alphabetically as a person reads names —
         ignoring case and accents, so "Álvaro" sorts with the A's — then
         by user_id; an empty array means no creator matches.
+        Each creator carries item_count, the number of items in this list's
+        section by them that the caller can see, whatever other filters the
+        section's list is given.
       tags:
         - Catalog
       parameters:
@@ -4462,7 +4537,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserRef'
+                  $ref: '#/components/schemas/CreatorRef'
         "400":
           description: q is empty or longer than 200 characters.
           content:
@@ -4701,9 +4776,11 @@ paths:
         /courses/{course_id} for that). Passing status narrows the list
         to that status; otherwise every status is returned, each
         annotated with whether its live draft has unpublished changes.
-        Every filter is evaluated against the live draft. Results are
-        ordered by title, then id. To browse the published catalog as a
-        learner, whatever your role, use GET /catalog/courses.
+        Every filter is evaluated against the live draft. Results are in
+        the order sort asks for (by title, then id, unless sort is updated
+        — the most recent change to the course or its live draft first).
+        To browse the published catalog as a learner, whatever your role,
+        use GET /catalog/courses.
 
         Results are paginated in a {items, total, limit,
         offset} envelope; an offset past the end returns an empty items
@@ -4721,12 +4798,16 @@ paths:
         checkpoints' learning path templates contains a content node
         classified with any of the given skills, and, if both parameters
         are given, also with any of the given concepts.
+        A skill or concept id also matches every skill or concept below
+        it in the knowledge map's tree, so choosing an area finds what is
+        classified with any of its sub-skills or sub-concepts.
       tags:
         - Courses
       parameters:
         - $ref: '#/components/parameters/SearchText'
         - $ref: '#/components/parameters/Limit'
         - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/AuthoringSort'
         - name: levels
           in: query
           required: false
@@ -4762,7 +4843,7 @@ paths:
               format: uuid
           description: >-
             Restricts the results to courses classified with at least
-            one of these skills.
+            one of these skills, or a skill below one of them.
         - name: concept_ids
           in: query
           required: false
@@ -4775,7 +4856,7 @@ paths:
               format: uuid
           description: >-
             Restricts the results to courses classified with at least
-            one of these concepts.
+            one of these concepts, or a concept below one of them.
         - name: status
           in: query
           required: false
@@ -4811,7 +4892,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedCourseCatalog'
         "400":
-          description: limit or offset is out of range.
+          description: limit, offset, sort or status is out of range.
           content:
             application/json:
               schema:
@@ -4917,6 +4998,9 @@ paths:
         ordered by display_name, alphabetically as a person reads names —
         ignoring case and accents, so "Álvaro" sorts with the A's — then
         by user_id; an empty array means no creator matches.
+        Each creator carries item_count, the number of items in this list's
+        section by them that the caller can see, whatever other filters the
+        section's list is given.
       tags:
         - Courses
       parameters:
@@ -4938,7 +5022,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserRef'
+                  $ref: '#/components/schemas/CreatorRef'
         "401":
           description: Missing or invalid Bearer token.
           content:
@@ -6151,6 +6235,51 @@ components:
         Case-insensitive substring match against the item's title (and
         summary, where it has one).
 
+    AuthoringSort:
+      name: sort
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - title
+          - updated
+        default: title
+      description: >-
+        title orders by title (for diagrams, the name the caller reads),
+        then id. updated orders by updated_at, most recent change first,
+        then id.
+    SkillIds:
+      name: skill_ids
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+      description: >-
+        Restricts the results to items classified with at least one of
+        these skills, or a skill below one of them in the skill tree.
+        Repeat the parameter for several skills.
+    ConceptIds:
+      name: concept_ids
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+      description: >-
+        Restricts the results to items classified with at least one of
+        these concepts, or a concept below one of them in the concept
+        tree. Repeat the parameter for several concepts.
+
     SongChartId:
       name: song_chart_id
       in: path
@@ -6478,6 +6607,21 @@ components:
           type: string
           format: date-time
           description: Timestamp at which the content node was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: >-
+            Timestamp of the last change to the content node; equal to
+            created_at until the first change. GET lists sort by it with
+            sort=updated.
+        has_unpublished_changes:
+          type: boolean
+          description: >-
+            True when the content node differs from its latest published
+            version in anything a version records (title, classification,
+            media_url or rich_content, languages, instruments or
+            thumbnail), or nothing has been published yet. Publishing makes
+            it false.
         latest_published_version:
           type: [integer, "null"]
           description: >-
@@ -6501,6 +6645,8 @@ components:
         - classification
         - languages
         - created_at
+        - updated_at
+        - has_unpublished_changes
         - instrument_ids
 
     ContentNodeVersion:
@@ -7416,7 +7562,15 @@ components:
           type: string
           format: date-time
           description: Timestamp at which the diagram was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: >-
+            Timestamp of the last change to the diagram; equal to
+            created_at until the first change. GET lists sort by it with
+            sort=updated.
       required:
+        - updated_at
         - diagram_id
         - instrument_id
         - instrument_ids
@@ -10084,6 +10238,14 @@ components:
             been published yet. Present only
             in the authoring list, GET /courses; GET /catalog/courses
             never returns it.
+        updated_at:
+          type: string
+          format: date-time
+          description: >-
+            Timestamp of the last change to the course: its details, its
+            live draft, publishing or retiring. GET /courses sorts by it
+            with sort=updated. Present only in the authoring list, GET
+            /courses; GET /catalog/courses never returns it.
         instrument_ids:
           $ref: '#/components/schemas/InstrumentIds'
         thumbnail_url:
@@ -11788,8 +11950,16 @@ components:
           type: string
           format: date-time
           description: Timestamp at which the exercise was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: >-
+            Timestamp of the last change to the exercise; equal to
+            created_at until the first change. GET lists sort by it with
+            sort=updated.
       required:
         - instrument_ids
+        - updated_at
         - exercise_id
         - title
         - prompt
@@ -12899,6 +13069,26 @@ components:
       required:
         - user_id
         - display_name
+
+    CreatorRef:
+      type: object
+      description: |
+        An author offered by a creator filter: a UserRef plus how many
+        items of the list's section they created that the caller can see.
+      allOf:
+        - $ref: '#/components/schemas/UserRef'
+        - type: object
+          properties:
+            item_count:
+              type: integer
+              minimum: 1
+              description: >-
+                Number of items in the section created by this user that
+                the caller can see, whatever other filters the section's
+                list is given. At least 1, since only creators of a visible
+                item are listed.
+          required:
+            - item_count
 
     UserProfile:
       type: object
