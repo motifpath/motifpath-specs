@@ -78,8 +78,10 @@ All of them keep the landing's layout, so the visitor never sees a blank page or
   - **Show me where to start** (Primary).
   - The answers are filters only and are never stored; the catalog language is the app's language.
 - **Where to start (D8):** "Where to start", the answers with **Change**, a count ("1 path · 2
-  courses"), then `CatalogCard` rows: paths first (a guided order), then courses, at most 5, from
-  the catalog endpoints with level, instrument and language filters. The eyebrow names the kind
+  courses"), then `CatalogCard` rows: the **starting points** for the answers and the app's
+  language (ADR-052) — at most 5, in the order the team chose for that instrument, experience and
+  language; when the team chose none, core answers from the catalog (paths, then courses, at the
+  experience's levels). The web shows them as they come. The eyebrow names the kind
   ("Path · Beginner · English"). Tap opens the Discover detail, whose back arrow says "Where to
   start"; Start follows Discover D11 (current, My path on lesson 1, toast with Undo), and the first
   lesson ends in practice. About 7 taps from the landing to the first lesson.

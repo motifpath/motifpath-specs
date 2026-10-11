@@ -190,12 +190,11 @@ Feature: The home and Your progress
   # until a course or path is started. "Never started" means the student holds no course enrolment
   # and no standalone path at all, active or not.
   #
-  # The answers are catalog filters only, with the app's language as the catalog language:
-  #   Never played     = beginner
-  #   I can play a bit = early intermediate or intermediate
-  #   I play well    = advanced or expert
-  # Where to start lists paths first (a guided order), then courses, at most 5 in all. Tapping one
-  # opens its detail, whose Start follows Discover (current, My path on lesson 1, toast with Undo).
+  # The answers are never stored. With the app's language, they ask core for the starting points
+  # (ADR-052): the paths and courses the team picked for that instrument, experience and language,
+  # in the team's order, at most 5 — or, when the team picked none, the catalog's paths then courses
+  # at the experience's levels. The web shows them as they come. Tapping one opens its detail, whose
+  # Start follows Discover (current, My path on lesson 1, toast with Undo).
   # Pattern: design/patterns/landing-and-first-run.md.
 
   Scenario: A student who has never started anything sees the first run
@@ -212,20 +211,18 @@ Feature: The home and Your progress
     And "How much have you played it?" has "Never played" chosen
     And "Show me where to start" waits until an instrument is chosen
 
-  Scenario: Where to start lists paths first, then courses, for the answers
+  Scenario: Where to start asks for the starting points of the answers
     Given student "carla" has never started a course or a path
     And "carla"'s app language is English
-    And for beginners on electric guitar in English the catalog has 1 path and 2 courses
     When "carla" chooses electric guitar and "Never played" and "Show me where to start"
-    Then Where to start shows "1 path · 2 courses"
-    And the path comes first, then the 2 courses
-    And each says its kind, level and language, like "Path · Beginner · English"
+    Then the starting points are asked for electric guitar, never played, in English
 
-  Scenario: Where to start shows at most 5
-    Given student "carla" has never started a course or a path
-    And for beginners on electric guitar the catalog has 3 paths and 4 courses
+  Scenario: Where to start shows the starting points in their order
+    Given the starting points for electric guitar, never played, in English are course "Electric guitar basics", then path "Electric guitar from zero"
     When "carla" asks where to start on electric guitar as "Never played"
-    Then Where to start shows the 3 paths and the first 2 courses
+    Then Where to start shows "1 path · 1 course"
+    And course "Electric guitar basics" comes first, then path "Electric guitar from zero"
+    And each says its kind, level and language, like "Path · Beginner · English"
 
   Scenario: The answers are never stored
     Given "carla" asked where to start on electric guitar as "Never played"
@@ -261,7 +258,7 @@ Feature: The home and Your progress
     Then the home shows the first run
 
   Scenario: Nothing at the chosen level shows the instrument's other levels
-    Given for beginners on electric bass the catalog has nothing
+    Given there are no starting points for electric bass, never played, in "carla"'s language
     And for electric bass at other levels the catalog has 1 course
     When "carla" asks where to start on electric bass as "Never played"
     Then Where to start says "Nothing for beginners on electric bass yet. These are the closest:"
@@ -274,7 +271,7 @@ Feature: The home and Your progress
     And Change is still offered
 
   Scenario: Where to start loading slowly shows skeleton rows
-    Given the catalog takes 2 seconds to answer
+    Given the starting points take 2 seconds to load
     When "carla" asks where to start on electric guitar as "Never played"
     Then after 300 ms Where to start shows skeleton rows
 
@@ -282,12 +279,12 @@ Feature: The home and Your progress
     Given student "carla" has never started a course or a path
     And "carla"'s app language is Portuguese (Brazil)
     When "carla" asks where to start on electric guitar as "Never played"
-    Then the catalog is asked for paths and courses in Portuguese (Brazil)
+    Then the starting points are asked for in Portuguese (Brazil)
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
   Scenario: Where to start that fails to load offers a retry in place
-    Given the catalog fails to answer
+    Given the starting points fail to load
     When "carla" asks where to start on electric guitar as "Never played"
     Then Where to start says it couldn't load and offers Try again
     And Change is still offered
