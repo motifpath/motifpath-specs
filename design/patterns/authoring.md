@@ -124,7 +124,16 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   step 1 choose — Diagrams | Chords, search, filters, thumbnails; step 2 set how it shows — labels
   (intervals, notes, custom, none), positions shown, playback (offered, which, tempo, sound,
   direction, loop), and for a stimulus a tool: a tap *marks it correct* or *hides or shows it*.
-  A full-screen layer on Compact, a 1040 px two-pane dialog on Expanded (choose left, set right).
+  The same two steps at every size (MOT-95, row 14): a full-screen layer on Compact, a 1040 px
+  dialog on Expanded; tapping a result opens its settings, "Change diagram" or "Change chord" goes
+  back with the pick marked, and Cancel / Insert sit at the foot of the settings.
+- **Finding a chord:** a Root selector and "Or type a chord" on one row, the Quality toggles below
+  (one at a time; Major · m · 7 · m7 · maj7 · sus2 · sus4 · dim · aug). A typed symbol is read in any
+  case. Each voicing is named by its chord and where it sits ("Am · 5fr"). In the settings a chord
+  shows as its chord box (Box | Neck), never the bare fretboard.
+- **Finding a diagram:** the search by name, then Root, Author and Type (All · Templates · Custom),
+  shown inline — no filters sheet — with a live count and Clear filters once one is set.
+- **The search and filters stay put;** only the results scroll.
 - **Taps work on a phone (D17):** marking correct and hiding/showing positions are taps, on the board
   at touch size (48 px places). Only placing and moving positions in the Diagrams library waits for a
   larger screen.
