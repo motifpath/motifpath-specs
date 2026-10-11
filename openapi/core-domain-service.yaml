@@ -4513,6 +4513,9 @@ paths:
         ordered by display_name, alphabetically as a person reads names —
         ignoring case and accents, so "Álvaro" sorts with the A's — then
         by user_id; an empty array means no creator matches.
+        Each creator carries item_count, the number of items in this list's
+        section by them that the caller can see, whatever other filters the
+        section's list is given.
       tags:
         - Catalog
       parameters:
@@ -4534,7 +4537,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserRef'
+                  $ref: '#/components/schemas/CreatorRef'
         "400":
           description: q is empty or longer than 200 characters.
           content:
