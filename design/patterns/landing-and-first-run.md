@@ -68,15 +68,20 @@ All of them keep the landing's layout, so the visitor never sees a blank page or
   (a brand-new student's This week would be all zeros). The bottom bar shows Home.
 - **Two questions (D7):** "Welcome, <first name>", "Two quick questions and we'll show you where to
   start.", then one card:
-  - "What do you play?" — a `ChoiceChip` for every catalog instrument (acoustic guitar, electric
-    guitar, electric bass today); none preselected, and the button waits for one.
-  - "How much do you play?" — New to it · I can play a bit · I play well (= Beginner · Intermediate
-    · Advanced); New to it preselected.
+  - "What do you want to play?" — a `ChoiceChip` for every catalog instrument (acoustic guitar,
+    electric guitar, electric bass today); none preselected, and the button waits for one. It asks
+    what they want to play, not what they play, because many new students have never played
+    anything (revised 2026-10-11, MOT-88).
+  - "How much have you played it?" — Never played · I can play a bit · I play well (= Beginner ·
+    Intermediate · Advanced); Never played preselected. pt-BR: "O que você quer tocar?" · "Quanto
+    você já tocou?" — Nunca toquei · Toco um pouco · Toco bem.
   - **Show me where to start** (Primary).
   - The answers are filters only and are never stored; the catalog language is the app's language.
 - **Where to start (D8):** "Where to start", the answers with **Change**, a count ("1 path · 2
-  courses"), then `CatalogCard` rows: paths first (a guided order), then courses, at most 5, from
-  the catalog endpoints with level, instrument and language filters. The eyebrow names the kind
+  courses"), then `CatalogCard` rows: the **starting points** for the answers and the app's
+  language (ADR-052) — as many as the team chose for that instrument, experience and language, in
+  their order; when the team chose none, core answers from the catalog (paths, then courses, at the
+  experience's levels, at most 5). The web shows them as they come. The eyebrow names the kind
   ("Path · Beginner · English"). Tap opens the Discover detail, whose back arrow says "Where to
   start"; Start follows Discover D11 (current, My path on lesson 1, toast with Undo), and the first
   lesson ends in practice. About 7 taps from the landing to the first lesson.
