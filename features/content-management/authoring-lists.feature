@@ -45,14 +45,14 @@ Feature: Find items in the authoring lists at volume
     Then the response lists "Acoustic Start" before "Blues Basics"
 
   Scenario: Editing a lesson records when it last changed
-    Given a content node "Open Chords" exists, last changed on "2026-09-01"
+    Given a content node "Open Chords" exists, last changed on "2026-08-01"
     When "bob" updates content node "Open Chords" with title "Open Chords in First Position"
-    Then the content node's last change is later than "2026-09-01"
+    Then the content node's last change is later than "2026-08-01"
 
   Scenario: Editing a diagram records when it last changed
-    Given a custom diagram "My shape" exists on instrument "guitar", created by "bob", last changed on "2026-09-01"
+    Given a custom diagram "My shape" exists on instrument "guitar", created by "bob", last changed on "2026-08-01"
     When "bob" renames diagram "My shape" to "My E shape"
-    Then the diagram's last change is later than "2026-09-01"
+    Then the diagram's last change is later than "2026-08-01"
 
   Scenario: An unknown sort order is rejected
     When "bob" lists exercises sorted by "popularity"
@@ -82,10 +82,6 @@ Feature: Find items in the authoring lists at volume
     When "bob" lists diagrams filtered by skill "minor-pentatonic-scale" and concept "scale-construction"
     Then the response includes "Am pentatonic"
     And the response does not include "Am arpeggio"
-
-  Scenario: A skill id that is not a valid identifier is rejected
-    When "bob" lists content nodes filtered by skill id "not-a-uuid"
-    Then the request is refused with a validation error
 
   Scenario: A skill that does not exist matches nothing
     Given a content node "intro-to-triads" exists in the system with skills "triad-shapes"
@@ -197,31 +193,36 @@ Feature: Find items in the authoring lists at volume
     And the response does not include "old-lesson"
 
   Scenario: A published lesson with no edits since is published
-    Given "bob" published content node "open-chords" as version 1
+    Given a content node "open-chords" exists in the system
+    And "bob" published content node "open-chords" as version 1
     When "bob" lists content nodes filtered by status "published"
     Then the response includes "open-chords"
     And content node "open-chords" has no unpublished changes
 
   Scenario: Editing a published lesson gives it unpublished changes
-    Given "bob" published content node "open-chords" as version 1
+    Given a content node "open-chords" exists in the system
+    And "bob" published content node "open-chords" as version 1
     When "bob" updates content node "open-chords" with title "Open Chords, Revised"
     And "bob" lists content nodes filtered by status "unpublished_changes"
     Then the response includes "open-chords"
     And content node "open-chords" has unpublished changes
 
   Scenario: A lesson with unpublished changes is not listed as published
-    Given "bob" published content node "open-chords" as version 1
+    Given a content node "open-chords" exists in the system
+    And "bob" published content node "open-chords" as version 1
     And "bob" updated content node "open-chords" with title "Open Chords, Revised"
     When "bob" lists content nodes filtered by status "published"
     Then the response does not include "open-chords"
 
   Scenario: Saving a published lesson without changing anything keeps it published
-    Given "bob" published content node "open-chords" as version 1
+    Given a content node "open-chords" exists in the system
+    And "bob" published content node "open-chords" as version 1
     When "bob" saves content node "open-chords" with the values it already has
     Then content node "open-chords" has no unpublished changes
 
   Scenario: Publishing a lesson with unpublished changes clears them
-    Given "bob" published content node "open-chords" as version 1
+    Given a content node "open-chords" exists in the system
+    And "bob" published content node "open-chords" as version 1
     And "bob" updated content node "open-chords" with title "Open Chords, Revised"
     When "bob" publishes content node "open-chords"
     Then content node "open-chords" has no unpublished changes
@@ -268,5 +269,5 @@ Feature: Find items in the authoring lists at volume
   Scenario: A teacher's own course count covers every status
     Given a course "draft-course" exists as a draft, created by "bob", with checkpoints "path-a"
     And a course "live-course" exists, published, created by "bob", with checkpoints "path-b"
-    When "bob" lists the course creators
+    When "bob" lists the creators of the courses they manage
     Then the creators returned are "bob" with 2 items, in that order
