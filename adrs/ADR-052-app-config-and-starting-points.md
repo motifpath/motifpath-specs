@@ -1,7 +1,7 @@
 # ADR-052: A Key/JSON App Config with a Generic Admin API, First Used for Starting Points
 
-**Status:** Proposed
-**Date:** 2026-10-11
+**Status:** Accepted
+**Date:** 2026-10-11 (Proposed) · 2026-10-11 (Accepted, in review of specs#275)
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
 **Task:** MOT-88
 
@@ -143,4 +143,4 @@ change would need a deploy. Rejected.
 
 ---
 
-*This ADR was proposed on 2026-10-11. To revise, create a new ADR with Status: Supersedes ADR-052.*
+*This ADR was decided on 2026-10-11. To revise, create a new ADR with Status: Supersedes ADR-052.*
