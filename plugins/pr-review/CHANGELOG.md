@@ -1,5 +1,13 @@
 # PR Review — Changelog
 
+## [1.11.0] — 2026-10-11
+
+### Changed
+- `HEURISTICS.md` item 7 (absence and transitional state) now also asks whether a state marking
+  something in progress (playing, loading, connected) clears on every way it can end — failure,
+  an outside interruption, its screen or item moving on — not just normal completion. From the
+  review of motifpath-web#123, where a sound option stayed "playing" after its clip failed.
+
 ## [1.10.1] — 2026-10-07
 
 ### Changed
