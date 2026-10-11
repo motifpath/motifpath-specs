@@ -9061,7 +9061,6 @@ components:
           enum:
             - fretboard
             - chord_box
-          default: fretboard
           description: |
             How this usage shows the diagram, set by its author: on the
             fretboard, or as a chord box (strings upright, finger numbers,
