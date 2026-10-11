@@ -548,8 +548,9 @@ SongChartChordViewedEvent:
     - $ref: '#/TrackingEventBase'
     - type: object
       description: |
-        Emitted when a student taps a chord in a song chart and its voicing sheet opens.
-        Switching voicings or playbacks inside the open sheet emits nothing more.
+        Emitted when a student taps a chord in a song chart and its chord card opens: a chord
+        over the lyrics, or a chord in the song's chord strip. Switching voicings, views or
+        playbacks inside the open card emits nothing more.
       properties:
         event_type:
           type: string
@@ -557,11 +558,22 @@ SongChartChordViewedEvent:
             - song_chart.chord_viewed
         song_chart_context:
           $ref: '#/SongChartContext'
+        source:
+          type: string
+          enum:
+            - lyrics
+            - strip
+          description: |
+            Where the student tapped the chord: over the lyrics, or in the "Chords in this
+            song" strip under the chart's header.
         anchor_id:
           type: string
           minLength: 1
           maxLength: 64
-          description: The anchorId of the chord the student tapped.
+          description: |
+            The anchorId of the chord the student tapped. Required when source is lyrics;
+            absent when source is strip, since a strip chord stands for every anchor of
+            that chord.
         chord_definition_id:
           type: string
           format: uuid
@@ -573,7 +585,7 @@ SongChartChordViewedEvent:
       required:
         - event_type
         - song_chart_context
-        - anchor_id
+        - source
         - chord_definition_id
         - chord_voicing_id
 

@@ -8,8 +8,8 @@
 #
 # ChordPro is read by the server; the editor loads what it describes and nothing is saved until
 # the author saves. Chord symbols are read in the editor the same way the server reads them
-# (golden/chord-symbols), and the catalog is asked for each chord's voicings. The screens are
-# functional only until their design pass (MOT-73).
+# (golden/chord-symbols), and the catalog is asked for each chord's voicings. The screens follow
+# design/patterns/song-chart.md (MOT-73, built in MOT-96) inside Teach (authoring.md).
 
 @web
 Feature: Author song charts
@@ -142,11 +142,11 @@ Feature: Author song charts
 
     Scenario: A symbol that isn't a chord is marked as it is written
       When "ana" writes the chord "H7" on a word
-      Then the chord "H7" is marked as not a chord, which blocks publishing
+      Then the chord "H7" is marked as not a chord, with the reason under its line, which blocks publishing
 
     Scenario: A chord the catalog doesn't have is marked
       When "ana" writes the chord "C#7" on a word
-      Then the chord "C#7" is marked as not in the chord catalog, which blocks publishing
+      Then the chord "C#7" is marked as not in the chord catalog, with the reason under its line, which blocks publishing
 
     Scenario: A no-chord marking is not marked
       When "ana" writes the chord "N.C." on a word
@@ -189,11 +189,25 @@ Feature: Author song charts
       When "ana" publishes "Amazing Grace"
       Then the changes are saved and then published
 
-    Scenario: Publishing a draft that isn't ready lists every reason
-      Given the draft of "Ciranda, Cirandinha" has the chord "H7" and its rights aren't confirmed
-      When "ana" publishes "Ciranda, Cirandinha"
-      Then publishing is refused, saying the rights aren't confirmed and listing the chord "H7"
+    Scenario: The status lists every reason the draft can't be published, and Publish waits
+      Given the draft of "Ciranda, Cirandinha" has the chord "H7" on line 2 of the verse and its rights aren't confirmed
+      When "ana" opens "Ciranda, Cirandinha" in the editor
+      Then the status lists that the rights aren't confirmed and that "H7" in the verse, line 2, isn't a chord
+      And Publish is disabled
       And "Ciranda, Cirandinha" is still a draft
+
+    Scenario: A chord problem is listed in the status as soon as it is written
+      Given "ana" opens "Ciranda, Cirandinha" in the editor with its rights confirmed
+      When "ana" writes the chord "C#7" on a word in line 1 of the verse
+      Then the status lists that "C#7" in the verse, line 1, isn't in the chord catalog
+      And Publish is disabled
+
+    Scenario: Publish is enabled once the last reason is fixed
+      Given the draft of "Ciranda, Cirandinha" has the chord "H7" and its rights are confirmed
+      And "ana" opens "Ciranda, Cirandinha" in the editor
+      When "ana" changes "H7" to "D"
+      Then the status lists no reasons
+      And Publish is enabled
 
     Scenario: A withdrawn chart can be published again
       When "ana" publishes "Oh! Susanna"
