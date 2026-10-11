@@ -49,6 +49,9 @@ hit. A full neck doesn't fit a phone at that size, and shrinking it makes every 
   it a chord. The student switches a chord box in place with **Box | Neck**, for that showing only;
   the next one opens as a box again. A thumbnail, or a chord whose cells are the answers, stays on
   the fretboard, since a box takes no taps.
+- **Chord box window:** a voicing with an open string starts at the nut — frets 1 to 4 at least,
+  never hidden above its fingers — and has no fret label; one without starts at its lowest fretted
+  fret, labelled ("3fr"). Either way it shows at least 4 frets, more when its fingers reach further.
 - **Audio from a diagram** (D14, proposal in MOT-74): a listening exercise may play a diagram instead
   of an uploaded clip. The board stays hidden until the answer; then "What you heard" reveals it.
 - **Keyboard diagrams** (D13): post-v1 (MOT-34). Drawn as a `Keyboard` component that scrolls like a
