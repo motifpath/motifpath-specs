@@ -99,6 +99,19 @@ Feature: Read a song chart and look up its chords
       Given "alice" has opened the card for "G" on the voicing that starts at the 3rd fret
       Then the chord box is labelled "3fr"
 
+    Scenario: A voicing with open strings starts at the nut, however high its fingers sit
+      Given "alice" has opened the card for "A" on its open voicing, fingered at the 2nd fret
+      Then the chord box starts at the nut and shows frets 1 to 4
+      And it is labelled with no fret
+
+    Scenario: A chord box always shows at least four frets
+      Given "alice" has opened the card for "G" on the voicing that starts at the 3rd fret
+      Then the chord box shows 4 frets, from the 3rd to the 6th
+
+    Scenario: A voicing that spans more than four frets shows them all
+      Given "alice" has opened the card for "C" on a voicing with open strings that reaches the 5th fret
+      Then the chord box starts at the nut and shows frets 1 to 5
+
     Scenario: The card switches to the voicing on the neck
       Given "alice" has opened the card for "G"
       When "alice" chooses "Neck"
