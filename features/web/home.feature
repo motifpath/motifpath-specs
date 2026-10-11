@@ -192,8 +192,8 @@ Feature: The home and Your progress
   #
   # The answers are never stored. With the app's language, they ask core for the starting points
   # (ADR-052): the paths and courses the team picked for that instrument, experience and language,
-  # in the team's order, at most 5 — or, when the team picked none, the catalog's paths then courses
-  # at the experience's levels. The web shows them as they come. Tapping one opens its detail, whose
+  # in the team's order, as many as the team chose — or, when the team picked none, the catalog's
+  # paths then courses at the experience's levels, at most 5. The web shows them as they come. Tapping one opens its detail, whose
   # Start follows Discover (current, My path on lesson 1, toast with Undo).
   # Pattern: design/patterns/landing-and-first-run.md.
 
