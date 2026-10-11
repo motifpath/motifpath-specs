@@ -43,9 +43,12 @@ hit. A full neck doesn't fit a phone at that size, and shrinking it makes every 
   it shows only when a diagram still doesn't fit. In landscape on a phone, a 12-fret neck shows whole.
 - **Diagram stack:** two diagrams on one board, each in its own hue, named in a legend (never colour
   alone).
-- **Chords** (D15): the author sets the default view per usage — chord box or fretboard — and the
-  student switches in place with **Box | Neck**, remembered as their preference. Same diagram data
-  either way.
+- **Chords** (D15): the author sets each usage's view — chord box or fretboard
+  (`DiagramRef.view`) — since the diagram's data can't tell which a usage needs. A chord box is
+  offered only for a chord voicing (its catalog fingering draws the box) and never for a stack. On
+  a chord box the student switches in place with **Box | Neck**; the choice isn't remembered, so
+  every showing opens in the author's view. Same diagram data either way. A play-along has no
+  author usage (the composer picks general diagrams) and always uses the fretboard.
 - **Audio from a diagram** (D14, proposal in MOT-74): a listening exercise may play a diagram instead
   of an uploaded clip. The board stays hidden until the answer; then "What you heard" reveals it.
 - **Keyboard diagrams** (D13): post-v1 (MOT-34). Drawn as a `Keyboard` component that scrolls like a
