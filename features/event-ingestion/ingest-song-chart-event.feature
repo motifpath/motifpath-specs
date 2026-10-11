@@ -3,6 +3,9 @@
 # The song chart reader emits song_chart.opened, song_chart.chord_viewed and
 # song_chart.completed, so the song-first hypothesis is checked against real use. When the
 # reader emits each one is client behaviour, in features/web/song-chart-reader.feature.
+#
+# A chord is viewed from the lyrics, where the event names the anchor tapped, or from the
+# song's chord strip, where no single anchor was tapped (MOT-96).
 
 Feature: Ingest song chart reading events
   As the MotifPath platform
@@ -16,15 +19,22 @@ Feature: Ingest song chart reading events
   # ── Happy path ─────────────────────────────────────────────────────────────
 
   Scenario: A song_chart.opened event is accepted
-    When "alice" submits a song_chart.opened event for revision 2 of song chart "asa-branca"
+    When "alice" submits a song_chart.opened event for revision 2 of song chart "amazing-grace"
     Then the event is accepted and stored in the event log
 
-  Scenario: A song_chart.chord_viewed event is accepted
-    When "alice" submits a song_chart.chord_viewed event for anchor "a3" of revision 2 of song chart "asa-branca", resolving to chord "G" and opening on voicing "g-open"
+  @wip
+  Scenario: A song_chart.chord_viewed event from the lyrics is accepted
+    When "alice" submits a song_chart.chord_viewed event from the lyrics for anchor "a3" of revision 2 of song chart "amazing-grace", resolving to chord "G" and opening on voicing "g-open"
     Then the event is accepted and stored in the event log
+
+  @wip
+  Scenario: A song_chart.chord_viewed event from the chord strip is accepted without an anchor
+    When "alice" submits a song_chart.chord_viewed event from the strip of revision 2 of song chart "amazing-grace", resolving to chord "G" and opening on voicing "g-open"
+    Then the event is accepted and stored in the event log
+    And the stored event has the source "strip" and no anchor
 
   Scenario: A song_chart.completed event is accepted
-    When "alice" submits a song_chart.completed event for revision 2 of song chart "asa-branca"
+    When "alice" submits a song_chart.completed event for revision 2 of song chart "amazing-grace"
     Then the event is accepted and stored in the event log
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
@@ -49,6 +59,24 @@ Feature: Ingest song chart reading events
     When "alice" submits a song_chart.chord_viewed event with the voicing omitted
     Then the submission is rejected as invalid
     And the rejection identifies "chord_voicing_id" as the source of the error
+
+  @wip
+  Scenario: A song_chart.chord_viewed event without its source is rejected
+    When "alice" submits a song_chart.chord_viewed event with the source omitted
+    Then the submission is rejected as invalid
+    And the rejection identifies "source" as the source of the error
+
+  @wip
+  Scenario: A song_chart.chord_viewed event with an unknown source is rejected
+    When "alice" submits a song_chart.chord_viewed event with the source "sidebar"
+    Then the submission is rejected as invalid
+    And the rejection identifies "source" as the source of the error
+
+  @wip
+  Scenario: A song_chart.chord_viewed event from the lyrics without its anchor is rejected
+    When "alice" submits a song_chart.chord_viewed event from the lyrics with the anchor omitted
+    Then the submission is rejected as invalid
+    And the rejection identifies "anchor_id" as the source of the error
 
   Scenario: A song_chart.completed event without a song chart context is rejected
     When "alice" submits a song_chart.completed event with the song chart context omitted
