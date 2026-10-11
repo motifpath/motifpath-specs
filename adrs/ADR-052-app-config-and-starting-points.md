@@ -1,4 +1,4 @@
-# ADR-052: A Key/JSON App Config Table, First Used for Curated Starting Points
+# ADR-052: A Key/JSON App Config with a Generic Admin API, First Used for Starting Points
 
 **Status:** Proposed
 **Date:** 2026-10-11
@@ -11,108 +11,128 @@
 
 The first run on Home (MOT-59 D6–D9, `design/patterns/landing-and-first-run.md`) asks a new student
 two questions — what they want to play and how much they have played it — and then shows **Where to
-start**: at most five paths and courses. The first spec answered it from the catalog: the published
+start**: the paths and courses to begin with. The first spec answered it from the catalog: published
 paths, then courses, filtered by instrument, level and language. The catalog orders results by title,
-so when more than five match, the five shown are simply the first in alphabetical order.
+so which items a student saw first was simply alphabetical.
 
-That is not good enough even for the alpha. The alpha already needs several paths and courses per
-instrument and level, and which five a brand-new student sees — and in which order — is the most
+That is not good enough even for the alpha. The alpha already has several paths and courses per
+instrument and level, and which ones a brand-new student sees — and in which order — is the most
 important editorial choice in the product: it decides their first lesson. Nothing in the content
 model says "start here", and a catalog author's level tag says who a path suits, not whether it is a
 good first step.
 
-The team (the concierge, see ADR-017's premise) needs to choose those five, per instrument, level and
-language, and change them without a deploy. It does not need a screen for it yet. MotifPath also has
-no place for this kind of editorial or operational setting: everything persistent today is a domain
-entity with its own table. More settings of the same shape are likely (a featured song, a concierge
-message, limits tuned during the alpha), and a new table for each would be heavy for what is a small
-JSON value read on a few screens.
+The team (the concierge, see ADR-017's premise) needs to choose those items, per instrument,
+experience and language, and change them without a deploy. It does not need a screen for it yet.
+MotifPath also has no place for this kind of editorial or operational setting: everything persistent
+today is a domain entity with its own table. More settings of the same shape are likely (a featured
+song, a concierge message, limits tuned during the alpha), and a table and an admin endpoint for each
+would be heavy for what is a small JSON value the team edits now and then.
 
 ## Decision
 
-**1. A generic config table.** core-domain gets an `app_config` table: `key` (text, primary key),
-`value` (JSON), `updated_at`, `updated_by` (the user who last wrote it). It holds editorial and
-operational settings that the team changes at runtime — never secrets, never per-user data, never
-anything a domain entity should own.
+**1. A config table.** core-domain gets an `app_config` table: `key` (text, primary key), `value`
+(JSON), `updated_at`, `updated_by` (the user who last wrote it). It holds editorial and operational
+settings the team changes at runtime — never secrets, never per-user data, never anything a domain
+entity should own.
 
-**2. Every key is typed in code.** A key is not free-form. Each use case registers a key prefix and a
-Go type for its value, with validation that runs on every write; a value that fails validation is
-refused. Reads decode into that type. The JSON column is storage, not a contract.
+**2. A registry of keys, each with a validator.** A key exists only if core-domain registers it in
+code, with a schema for its value and a validator that runs on every write: first the value's
+structure (required fields, types, enums, counts), then the rules that need data (for example, that
+an id names a published path). A value that fails is refused with every problem listed; nothing is
+stored. Reads decode into the key's Go type. The schema of each key is also published in the OpenAPI
+spec, so whoever writes a value can check it before sending.
 
-**3. No generic config API.** Clients never read or write `app_config` by key. Each use case exposes
-its own typed endpoints in the OpenAPI spec, with its own role rules. The table is an implementation
-detail of core-domain.
+**3. A generic admin API.** Admins read and write any registered key through one API:
+`GET /admin/config` lists the registered keys with when and by whom each was last changed;
+`GET /admin/config/{key}` returns a key's value; `PUT /admin/config/{key}` replaces it after
+validation. An unregistered key is not found. Only admins may call it. There is no screen yet; the
+team calls it with curl or a make target, from a JSON file kept per environment.
 
-**4. First use: curated starting points.** The key `starting_points/{instrument_id}/{experience}/{language}`
-holds an ordered list of at most five entries, each `{kind: path | course, id}`. `experience` is the
-first-run answer (`never_played`, `plays_a_bit`, `plays_well`), not a catalog level; `language` is a
-Language code.
+**4. Typed reads for everyone else.** Clients other than the admin API never read `app_config` by key.
+Each use case exposes its own typed endpoint, with its own role rules, that turns the stored value into
+what that screen needs.
 
-- **Write:** `PUT /admin/starting-points/{instrument_id}/{experience}/{language}` replaces the list
-  and `DELETE` on the same path removes it. Admins only. A write is refused unless every entry names
-  a published path or course, the list has no duplicates, and it has at most five entries. There is
-  no screen; the team calls the endpoint (curl or a make target).
-- **Read:** `GET /catalog/starting-points?instrument_id=&experience=&language=` returns the entries
-  as catalog entries, in the configured order, skipping any that are no longer published. With no
-  entry configured, or none left after skipping, it falls back to the catalog: published paths, then
-  courses, for that instrument and language at the levels the experience maps to — `never_played` =
-  beginner; `plays_a_bit` = early intermediate or intermediate; `plays_well` = advanced or expert —
-  at most five. The response says which source answered (`curated` or `catalog`).
+**5. First key: `starting_points`.** Its value is one document holding every list:
 
-The web's own fallbacks (the instrument's other levels, nothing for the instrument) stay in the web
-and keep using the catalog endpoints.
+- `lists`: an array; each list has `instrument_id`, `experience` (`never_played`, `plays_a_bit`,
+  `plays_well` — the first-run answer, not a catalog level) and `language` (a Language code), all
+  required, and `items`: at least one entry, each `{kind: path | course, id}`, in the order shown. The
+  team decides how many; there is no upper limit.
+- The validator refuses: a missing field; an unknown experience or language; an instrument that does
+  not exist; two lists for the same instrument, experience and language; an empty `items`; a repeated
+  entry within a list; an entry that does not name a published path or course.
+- The typed read is `GET /catalog/starting-points?instrument_id=&experience=&language=`. It returns the
+  matching list's entries as catalog entries, in order, skipping any that is no longer published
+  (`source: curated`). With no matching list, or none of its entries still published, it answers from
+  the catalog (`source: catalog`): published paths, then courses, for that instrument and language at
+  the levels the experience maps to — `never_played` = beginner; `plays_a_bit` = early intermediate or
+  intermediate; `plays_well` = advanced or expert — each by title, at most five in all.
+
+The web's own fallbacks (the instrument's other levels, nothing for the instrument) stay in the web and
+keep using the catalog endpoints.
 
 ## Rationale
 
-**Why curated, not ranked.** Sorting by title is arbitrary; ranking by popularity needs enrolment
-data the alpha does not have; a recommender is far beyond the MVP (ADR-049 keeps the first run
-simple). A short, hand-picked list per instrument, experience and language is what a concierge team
-can actually maintain and reason about.
+**Why curated, not ranked.** Sorting by title is arbitrary; ranking by popularity needs enrolment data
+the alpha does not have; a recommender is far beyond the MVP (ADR-049 keeps the first run simple). A
+hand-picked list per instrument, experience and language is what a concierge team can actually
+maintain and reason about.
 
 **Why a generic table rather than a `starting_points` table.** A dedicated table would give foreign
 keys and column types for free. It was rejected because this is the first of several small settings
-of the same shape, and a table, migration and repository per setting costs more than the setting is
-worth. Typing each key in code (decision 2) recovers most of what the dedicated table would give:
-the value is validated on write and decoded into a type on read.
+of the same shape, and a table, migration, repository and admin endpoints per setting cost more than
+the setting is worth. The per-key validator (decision 2) recovers most of what a dedicated table would
+give: a value is checked on write and decoded into a type on read.
+
+**Why a generic admin API rather than admin endpoints per key.** The team edits these values as
+documents, often from a file per environment; one GET/PUT pair for every key means a new setting needs
+a validator, not new endpoints, and the admin always has one way to see what is set and who set it.
+The safety that typed endpoints would give comes from the registry: only registered keys exist, and
+every write is validated.
+
+**Why typed reads rather than letting clients read keys.** A generic read would hand clients untyped
+JSON, push id resolution and retired-content handling into every client, and make the stored shape a
+public contract the web depends on. A typed read keeps that in core, lets the catalog fallback live in
+one place, and leaves the stored shape free to change.
+
+**Why one document for all starting points rather than a key per list.** The team edits the lists
+together and keeps them in one file per environment; one document is read and written in one call,
+and the validator can check that no two lists overlap. A key per list would scatter one setting across
+many keys whose names repeat the fields inside them.
 
 **Why not a "start here" flag on paths and courses.** It can't express order, can't differ per
-experience level or language, and needs authoring UI to set. Rejected.
+experience or language, and needs authoring UI to set. Rejected.
 
-**Why not a JSON file in a repo or an environment variable.** Path and course IDs are created when
+**Why not a JSON file in a repo or an environment variable.** Path and course ids are created when
 content is authored in each environment, so one file can't hold them for every environment, and every
 change would need a deploy. Rejected.
-
-**Why an admin endpoint rather than SQL or a migration.** The endpoint validates that each ID is a
-published path or course; raw SQL validates nothing, and a migration can't know IDs authored after it
-was written. The endpoint also records who changed it.
-
-**Why typed endpoints rather than `GET /config/{key}`.** A generic read would hand the web untyped
-JSON, push ID resolution and retired-content handling into every client, and make the config table a
-public contract. A typed read keeps that in core and lets the fallback live in one place.
 
 ## Consequences
 
 ### Positive
-- The team decides the five starting points per instrument, experience and language, in order, and
-  changes them at runtime without a deploy.
-- A retired or unpublished entry never reaches a student: it is skipped on read, and refused on write.
+- The team decides the starting points per instrument, experience and language — which and how many,
+  in order — and changes them at runtime without a deploy.
+- A new editorial or operational setting needs a registered key, its schema and validator, and a typed
+  read where a screen needs one — no table, no admin endpoints.
+- A retired or unpublished entry never reaches a student: it is refused on write and skipped on read.
 - A missing configuration still works: the catalog fallback answers.
-- The next editorial or operational setting needs a key type and its endpoints, not a new table.
 
 ### Negative / Trade-offs
-- No foreign keys: an entry can point at a path or course that is later retired or deleted. Reads
-  must keep skipping such entries, and nothing tells the team that a list has become short.
-- A generic table invites misuse — settings that should be domain entities, or a growing pile of
-  untyped keys. Decisions 2 and 3 are the guard; a reviewer must hold the line on them.
-- Without a screen, setting the lists needs an admin token and an HTTP call; the team must keep the
-  lists' source somewhere (a JSON file per environment) to set them again.
-- Until production exists, the dev databases are dropped and reseeded from empty; configured lists
-  are lost with them and must be set again.
+- No foreign keys: an entry can point at a path or course that is later retired or deleted. Reads must
+  keep skipping such entries, and nothing tells the team that a list has become short.
+- A generic table and API invite misuse — settings that should be domain entities, or keys registered
+  with a weak validator. Decisions 1 and 2 are the guard; a reviewer must hold the line on them.
+- Writing `starting_points` replaces every list at once: two admins editing at the same time can
+  overwrite each other's change. Acceptable while the team is small; a version check can be added to
+  the PUT later.
+- Without a screen, changing a value needs an admin token and an HTTP call.
+- Until production exists, the dev databases are dropped and reseeded from empty; configured values
+  are lost with them and must be set again from the team's files.
 
 ### Neutral
-- The experience → level mapping moves from the web into core, where the fallback runs.
-- The first-run spec's Where to start scenarios now read from the starting points, and say which
-  source answered only where it changes behaviour.
+- The experience → level mapping moves from the web into core, where the catalog fallback runs.
+- The OpenAPI spec documents each key's value schema; the admin API's body is that schema, chosen by
+  the key.
 
 ## Related ADRs
 
