@@ -22,12 +22,10 @@ Feature: Ingest song chart reading events
     When "alice" submits a song_chart.opened event for revision 2 of song chart "amazing-grace"
     Then the event is accepted and stored in the event log
 
-  @wip
   Scenario: A song_chart.chord_viewed event from the lyrics is accepted
     When "alice" submits a song_chart.chord_viewed event from the lyrics for anchor "a3" of revision 2 of song chart "amazing-grace", resolving to chord "G" and opening on voicing "g-open"
     Then the event is accepted and stored in the event log
 
-  @wip
   Scenario: A song_chart.chord_viewed event from the chord strip is accepted without an anchor
     When "alice" submits a song_chart.chord_viewed event from the strip of revision 2 of song chart "amazing-grace", resolving to chord "G" and opening on voicing "g-open"
     Then the event is accepted and stored in the event log
@@ -60,19 +58,16 @@ Feature: Ingest song chart reading events
     Then the submission is rejected as invalid
     And the rejection identifies "chord_voicing_id" as the source of the error
 
-  @wip
   Scenario: A song_chart.chord_viewed event without its source is rejected
     When "alice" submits a song_chart.chord_viewed event with the source omitted
     Then the submission is rejected as invalid
     And the rejection identifies "source" as the source of the error
 
-  @wip
   Scenario: A song_chart.chord_viewed event with an unknown source is rejected
     When "alice" submits a song_chart.chord_viewed event with the source "sidebar"
     Then the submission is rejected as invalid
     And the rejection identifies "source" as the source of the error
 
-  @wip
   Scenario: A song_chart.chord_viewed event from the lyrics without its anchor is rejected
     When "alice" submits a song_chart.chord_viewed event from the lyrics with the anchor omitted
     Then the submission is rejected as invalid
