@@ -170,18 +170,133 @@ Feature: The home and Your progress
     Then the home has no path card
     And the home invites "bruno" to find a path
 
-  Scenario: A student with no instruments sees This week and no Your skills
-    Given student "bruno" is enrolled in nothing for any instrument
+  Scenario: A student who has left everything they started sees This week and no Your skills
+    Given student "bruno" abandoned every course and archived every path they started
     When "bruno" opens the home
     Then the home shows This week
     And the home has no Your skills block
+    And the home is not the first run
 
   Scenario: The home reads in pt-BR without truncating its labels
     Given "alice"'s language is Portuguese (Brazil)
     When "alice" opens the home on a phone
     Then every tile label and the path card's step are shown in full
 
+  # ── First run (MOT-59 D6–D9, implemented by MOT-88) ──────────────────────────
+  #
+  # A student's instruments come only from what they have started (ADR-046), so a student who has
+  # never started a course or a path has nothing to practise. For them the home is the first run:
+  # two questions, then Where to start. There is no "seen" flag and no stored answer — it shows
+  # until a course or path is started. "Never started" means the student holds no course enrolment
+  # and no standalone path at all, active or not.
+  #
+  # The answers are catalog filters only, with the app's language as the catalog language:
+  #   New to it      = beginner
+  #   I can play a bit = early intermediate or intermediate
+  #   I play well    = advanced or expert
+  # Where to start lists paths first (a guided order), then courses, at most 5 in all. Tapping one
+  # opens its detail, whose Start follows Discover (current, My path on lesson 1, toast with Undo).
+  # Pattern: design/patterns/landing-and-first-run.md.
+
+  Scenario: A student who has never started anything sees the first run
+    Given student "carla" has never started a course or a path
+    When "carla" opens the home
+    Then the home says "Welcome, Carla" and asks "What do you play?" and "How much do you play?"
+    And the home has no today's practice, no path card, no This week and no Your skills
+
+  Scenario: The instrument question offers every catalog instrument, none chosen
+    Given student "carla" has never started a course or a path
+    And the catalog's instruments are acoustic guitar, electric guitar and electric bass
+    When "carla" opens the home
+    Then "What do you play?" offers acoustic guitar, electric guitar and electric bass, none chosen
+    And "How much do you play?" has "New to it" chosen
+    And "Show me where to start" waits until an instrument is chosen
+
+  Scenario: Where to start lists paths first, then courses, for the answers
+    Given student "carla" has never started a course or a path
+    And "carla"'s app language is English
+    And for beginners on electric guitar in English the catalog has 1 path and 2 courses
+    When "carla" chooses electric guitar and "New to it" and "Show me where to start"
+    Then Where to start shows "1 path · 2 courses"
+    And the path comes first, then the 2 courses
+    And each says its kind, level and language, like "Path · Beginner · English"
+
+  Scenario: Where to start shows at most 5
+    Given student "carla" has never started a course or a path
+    And for beginners on electric guitar the catalog has 3 paths and 4 courses
+    When "carla" asks where to start on electric guitar as "New to it"
+    Then Where to start shows the 3 paths and the first 2 courses
+
+  Scenario: The answers are never stored
+    Given "carla" asked where to start on electric guitar as "New to it"
+    When "carla" opens the home again later without having started anything
+    Then the home asks the two questions again with nothing chosen but "New to it"
+
+  Scenario: Change goes back to the questions with the answers kept
+    Given "carla" is on Where to start for electric guitar, "New to it"
+    When "carla" chooses Change
+    Then the two questions show with electric guitar and "New to it" chosen
+
+  Scenario: Tapping a result opens its detail, which leads back to Where to start
+    Given "carla" is on Where to start for electric guitar, "New to it"
+    When "carla" taps the path "Electric guitar from zero"
+    Then the detail of "Electric guitar from zero" shows
+    And going back shows Where to start with the same results
+
+  Scenario: Starting a path from Where to start ends the first run
+    Given "carla" is on the detail of the path "Electric guitar from zero" from Where to start
+    When "carla" starts the path
+    Then "Electric guitar from zero" is "carla"'s current path
+    And the next time "carla" opens the home it shows today's practice and the path card
+
+  Scenario: The WhatsApp concierge is a quiet link under the questions and the results
+    Given student "carla" has never started a course or a path
+    When "carla" opens the home
+    Then "Not sure? Ask us on WhatsApp" and "Browse everything in Discover" show under the questions
+
+  Scenario: Find where to start on the Practice tab opens the first run
+    Given student "carla" has never started a course or a path
+    And "carla" opened the Practice tab and there is nothing to practise
+    When "carla" chooses "Find where to start"
+    Then the home shows the first run
+
+  Scenario: Nothing at the chosen level shows the instrument's other levels
+    Given for beginners on electric bass the catalog has nothing
+    And for electric bass at other levels the catalog has 1 course
+    When "carla" asks where to start on electric bass as "New to it"
+    Then Where to start says "Nothing for beginners on electric bass yet. These are the closest:"
+    And it shows the electric bass course
+
+  Scenario: Nothing for the instrument offers WhatsApp and Change
+    Given the catalog has nothing on electric bass in "carla"'s language
+    When "carla" asks where to start on electric bass as "New to it"
+    Then Where to start says "No electric bass courses yet" and offers "Ask us on WhatsApp"
+    And Change is still offered
+
+  Scenario: Where to start loading slowly shows skeleton rows
+    Given the catalog takes 2 seconds to answer
+    When "carla" asks where to start on electric guitar as "New to it"
+    Then after 300 ms Where to start shows skeleton rows
+
+  Scenario: The first run reads in pt-BR
+    Given student "carla" has never started a course or a path
+    And "carla"'s app language is Portuguese (Brazil)
+    When "carla" asks where to start on electric guitar as "New to it"
+    Then the catalog is asked for paths and courses in Portuguese (Brazil)
+
   # ── Failure cases ──────────────────────────────────────────────────────────
+
+  Scenario: Where to start that fails to load offers a retry in place
+    Given the catalog fails to answer
+    When "carla" asks where to start on electric guitar as "New to it"
+    Then Where to start says it couldn't load and offers Try again
+    And Change is still offered
+
+  Scenario: The home that can't tell whether anything was started offers a retry
+    Given "carla"'s course enrolments fail to load
+    When "carla" opens the home
+    Then the home says it couldn't load and offers a retry
+    And the home shows neither the first run nor This week
 
   Scenario: An overview that fails to load offers a retry and keeps the rest of the home
     Given "alice"'s practice overview fails to load
