@@ -56,8 +56,10 @@ MotifPath will extend the ADR-031 list contract, leaving its paging rules unchan
    Picking a leaf behaves exactly as before.
 4. **Lessons get the other sections' filters.** `GET /content-nodes` gains `created_by`, `language`
    (matches any of the node's languages; never "any") and `status`: `draft` (never published),
-   `published` (published, no edit since) or `unpublished_changes` (published, edited since). A
-   content node gains `has_unpublished_changes`, the name courses already use. A new
+   `published` (the node matches its latest version) or `unpublished_changes` (published, and now
+   differs from its latest version). A content node gains `has_unpublished_changes` with the
+   meaning courses already give it: true when the node differs from its latest published version
+   in anything a version records, or nothing is published yet. A new
    `GET /content-nodes/creators` lists the authors of lessons, like the other sections.
 5. **Creator lists carry counts.** Every `…/creators` endpoint returns, for each author, `item_count`:
    how many items of that section by that author the caller can see, ignoring every other filter.
@@ -79,9 +81,10 @@ MotifPath will extend the ADR-031 list contract, leaving its paging rules unchan
   only — it saves nothing and leaves the same parameter meaning two things.
 - **A per-item `updated_at`, not "updated" derived from versions or events.** Content nodes and
   courses have published versions, but exercises and diagrams do not, and a draft edit is not a
-  version. One timestamp per item is the simplest thing every list can sort by, and it also answers
-  "unpublished changes" for lessons (edited after the latest version was published) without
-  comparing snapshots field by field.
+  version. One timestamp per item is the simplest thing every list can sort by.
+- **"Unpublished changes" compares content, as for courses, not timestamps.** "Edited after the
+  latest version was published" would be cheaper, but it flags a lesson saved twice with the same
+  values, and it would give the same field name two meanings across courses and lessons.
 - **`unpublished_changes` as a third status value (E4 = A).** A two-value status would hide exactly
   the lessons a teacher most needs to find: published ones with edits learners don't see yet.
 - **Counts on creators (E6 = A).** The picker is bounded by the number of authors, and the count is
@@ -102,8 +105,8 @@ MotifPath will extend the ADR-031 list contract, leaving its paging rules unchan
   data is regenerated, so no live back-fill), and every write path must move it.
 - Subtree matching needs a recursive lookup of the `part_of` tree per filtered request; the tree is
   small (hundreds of nodes), so it is cheap, but it adds a query.
-- `has_unpublished_changes` turns true on any edit after publishing, even one that changes nothing a
-  learner sees (for example an edit saved twice with the same values).
+- Every save of a published content node must compare it with its latest version (or keep a flag
+  that publishing clears), as course drafts already do.
 - A course whose classification comes from its checkpoints' paths does not move its `updated_at` when
   one of those paths is edited; it moves only when the course itself changes.
 
