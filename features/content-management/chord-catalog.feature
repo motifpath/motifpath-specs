@@ -126,21 +126,16 @@ Feature: Find chords in the chord catalog
 
   Scenario: A voicing's diagram, read on its own, carries its fingering
     Given "alice" is authenticated as a student
-    When "alice" retrieves the diagram of the voicing "d-open"
+    When "alice" retrieves the diagram of voicing "d-open"
     Then the diagram's purpose is "chord_voicing"
-    And it carries the voicing "d-open" with its fingering and fret window
+    And the diagram carries voicing "d-open", with its fingering and fret window
 
-  Scenario: A general diagram carries no voicing
+  Scenario: A copy saved from a voicing's diagram is general and carries no voicing
     Given "bob" is authenticated as a teacher
-    And "bob" has created a diagram
-    When "bob" retrieves that diagram
-    Then it carries no voicing
-
-  Scenario: A copy saved from a voicing's diagram carries no voicing
-    Given "bob" is authenticated as a teacher
-    And "bob" has saved a copy of the diagram of the voicing "d-open"
-    When "bob" retrieves that diagram
-    Then it carries no voicing
+    And "bob" saves a copy of the diagram of voicing "d-open" named "My D"
+    When "bob" retrieves the new diagram
+    Then the diagram's purpose is "general"
+    And the diagram carries no voicing
 
   # ── Failures ─────────────────────────────────────────────────────────────────
 
