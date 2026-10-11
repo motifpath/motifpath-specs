@@ -4483,12 +4483,13 @@ paths:
       description: |
         The paths and courses a student who has never started anything
         should see first, for the instrument they want to play, how much
-        they have played it, and their language — at most five, in order.
+        they have played it, and their language, in order.
 
-        When the team has configured a list for this instrument,
-        experience and language, the result is that list in its
-        configured order, skipping any entry that is no longer published
-        (source "curated"). When no list is configured, or none of its
+        When the starting_points setting (PUT /admin/config/{key}) has a
+        list for this instrument, experience and language, the result is
+        that list's entries in their order, as many as the team chose,
+        skipping any entry that is no longer published (source
+        "curated"). When no list is configured, or none of its
         entries is still published, the result comes from the catalog
         instead (source "catalog"): published paths, then published
         courses, for this instrument and language at the levels the
@@ -4545,58 +4546,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
 
-  /admin/starting-points/{instrument_id}/{experience}/{language}:
-    parameters:
-      - name: instrument_id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-        description: The instrument this list is for.
-      - name: experience
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/StartingPointExperience'
-        description: How much a student has played the instrument.
-      - name: language
-        in: path
-        required: true
-        schema:
-          type: string
-        description: The language this list is for, as a Language.code other than "any".
-    put:
-      operationId: setStartingPoints
-      summary: Set where a new student should start
+  /admin/config:
+    get:
+      operationId: listAppConfig
+      summary: List the app's settings
       description: |
-        Replaces the list GET /catalog/starting-points returns for this
-        instrument, experience and language with the given entries, in
-        the given order. Every entry must name a published path or
-        course, no entry may repeat, and there are at most five. The
-        entries are not required to match the instrument, level or
-        language — the team may point at any published path or course.
-        Only admins may set a list; the user who set it is recorded.
+        Returns every setting key the service knows, with when and by
+        whom each was last changed — set or not. Settings are editorial
+        and operational values the team changes at runtime; each key's
+        value has its own schema (see AppConfigValue). Only admins may
+        list them.
       tags:
-        - Catalog
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SetStartingPointsRequest'
+        - Admin
       responses:
         "200":
-          description: The list as it is now stored.
+          description: Every known setting key, ordered by key.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SetStartingPointsRequest'
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppConfigSummary'
         "400":
-          description: >-
-            The request failed validation: a path parameter is invalid,
-            there are more than five entries, an entry repeats, or an entry
-            does not name a published path or course.
+          description: The request is malformed.
           content:
             application/json:
               schema:
@@ -4608,32 +4580,93 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "403":
-          description: The authenticated user does not have permission to set starting points. Only admins may.
+          description: The authenticated user does not have permission to read settings. Only admins may.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /admin/config/{key}:
+    parameters:
+      - name: key
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-z][a-z0-9_]*$'
+        description: >-
+          The setting's key, one of those GET /admin/config lists (today:
+          starting_points).
+    get:
+      operationId: getAppConfig
+      summary: Get one of the app's settings
+      description: |
+        Returns a setting's current value, with when and by whom it was
+        last changed. A known key that was never set returns no value.
+        Only admins may read settings.
+      tags:
+        - Admin
+      responses:
+        "200":
+          description: The setting.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppConfigEntry'
+        "400":
+          description: The key is not a well-formed key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user does not have permission to read settings. Only admins may.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForbiddenError'
         "404":
-          description: No instrument exists with the given instrument_id.
+          description: The service knows no setting with this key.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
-    delete:
-      operationId: clearStartingPoints
-      summary: Clear where a new student should start
+    put:
+      operationId: setAppConfig
+      summary: Replace one of the app's settings
       description: |
-        Removes the list for this instrument, experience and language, so
-        GET /catalog/starting-points answers from the catalog again.
-        Clearing a list that does not exist succeeds. Only admins may
-        clear a list.
+        Replaces a setting's whole value. The body must match the schema
+        of this key's value (see AppConfigValue: starting_points takes a
+        StartingPointsConfig) and pass that key's checks, which may look
+        at other data — for starting_points, that every entry names a
+        published path or course. A value that fails is refused with
+        every problem listed, and nothing is stored. Records the caller
+        as the last to change it. Only admins may change settings.
       tags:
-        - Catalog
+        - Admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppConfigValue'
       responses:
-        "204":
-          description: The list is gone.
+        "200":
+          description: The setting as it is now stored.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppConfigEntry'
         "400":
-          description: A path parameter is invalid.
+          description: >-
+            The value does not match this key's schema or fails its
+            checks; every problem is listed with the field it is about.
           content:
             application/json:
               schema:
@@ -4645,11 +4678,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
         "403":
-          description: The authenticated user does not have permission to clear starting points. Only admins may.
+          description: The authenticated user does not have permission to change settings. Only admins may.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: The service knows no setting with this key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
 
   /courses:
     get:
@@ -10302,18 +10341,95 @@ components:
         - kind
         - id
 
-    SetStartingPointsRequest:
+    AppConfigSummary:
       type: object
-      description: An ordered list of where a new student should start.
+      description: One of the app's settings, without its value.
       properties:
+        key:
+          type: string
+          description: The setting's key.
+        is_set:
+          type: boolean
+          description: Whether the setting has ever been given a value.
+        updated_at:
+          type: string
+          format: date-time
+          description: When the setting was last changed. Absent when it was never set.
+        updated_by:
+          $ref: '#/components/schemas/UserRef'
+      required:
+        - key
+        - is_set
+
+    AppConfigEntry:
+      type: object
+      description: One of the app's settings with its value.
+      properties:
+        key:
+          type: string
+          description: The setting's key.
+        value:
+          $ref: '#/components/schemas/AppConfigValue'
+        updated_at:
+          type: string
+          format: date-time
+          description: When the setting was last changed. Absent when it was never set.
+        updated_by:
+          $ref: '#/components/schemas/UserRef'
+      required:
+        - key
+
+    AppConfigValue:
+      description: >-
+        A setting's value. Its schema depends on the key — starting_points
+        takes a StartingPointsConfig. Absent from an AppConfigEntry whose
+        setting was never set.
+      oneOf:
+        - $ref: '#/components/schemas/StartingPointsConfig'
+
+    StartingPointsConfig:
+      type: object
+      description: >-
+        The value of the starting_points setting: the paths and courses a
+        student who has never started anything sees first, one list per
+        instrument, experience and language.
+      properties:
+        lists:
+          type: array
+          items:
+            $ref: '#/components/schemas/StartingPointsList'
+          description: >-
+            Every list. No two lists may share the same instrument_id,
+            experience and language.
+      required:
+        - lists
+
+    StartingPointsList:
+      type: object
+      description: The starting points for one instrument, experience and language, in order.
+      properties:
+        instrument_id:
+          type: string
+          format: uuid
+          description: The instrument this list is for. It must exist.
+        experience:
+          $ref: '#/components/schemas/StartingPointExperience'
+        language:
+          type: string
+          description: The language this list is for, as a Language.code other than "any".
         items:
           type: array
-          maxItems: 5
+          minItems: 1
           uniqueItems: true
           items:
             $ref: '#/components/schemas/StartingPointRef'
-          description: The entries, first shown first. An empty list is allowed and shows nothing curated.
+          description: >-
+            The entries, first shown first; as many as the team chooses.
+            Each must name a published path or course.
       required:
+        - instrument_id
+        - experience
+        - language
         - items
 
     StartingPoint:
@@ -10351,10 +10467,11 @@ components:
             published.
         items:
           type: array
-          maxItems: 5
           items:
             $ref: '#/components/schemas/StartingPoint'
-          description: The paths and courses, first shown first.
+          description: >-
+            The paths and courses, first shown first: as many as the
+            curated list holds, or at most five from the catalog.
       required:
         - source
         - items
