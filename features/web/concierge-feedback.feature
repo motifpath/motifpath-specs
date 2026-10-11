@@ -41,9 +41,11 @@ Feature: Send to your teacher
 
   # ── Where the button appears ─────────────────────────────────────────────────
   #
-  # The button is a floating WhatsApp icon, named "Send to your teacher" for assistive
-  # technology. It carries no visible text of its own. It starts in the bottom-right corner, and
-  # the student can drag it elsewhere when it covers something.
+  # On the lesson screen, the button is a floating WhatsApp icon, named "Send to your teacher" for
+  # assistive technology. It carries no visible text of its own. It starts in the bottom-right
+  # corner, and the student can drag it elsewhere when it covers something. The practice screen
+  # runs in the Practice Shell, which keeps its run free of floating controls: there, it is a
+  # tertiary "Send to your teacher" link under the options.
 
   Rule: The button appears on every unlocked lesson and on its practice
 
@@ -52,14 +54,14 @@ Feature: Send to your teacher
       Then the student sees a floating WhatsApp icon named "Send to your teacher"
       And it stays in the bottom-right corner while the student scrolls
 
-    Scenario: The practice screen offers the button while an exercise is shown
+    Scenario: The practice screen offers a link under the options while an exercise is shown
       When the student is on exercise 2 of the practice for "Shuffle in E"
-      Then the student sees a floating WhatsApp icon named "Send to your teacher"
+      Then the student sees a "Send to your teacher" link with the WhatsApp icon under the options
+      And no floating WhatsApp icon is shown
 
-    Scenario: The button never covers the practice's Next control
+    Scenario: The practice link never sits in the bar holding the "Next" control
       When the student is on exercise 2 of the practice for "Shuffle in E"
-      Then the floating WhatsApp icon sits above the bar holding the "Next" control
-      And the student cannot drag it below that bar
+      Then the bar holding the "Next" control has no "Send to your teacher" link
 
     Scenario Outline: No button when there is no lesson to talk about
       When the lesson screen for "Shuffle in E" is in the "<state>" state

@@ -143,8 +143,8 @@ Feature: Work through a lesson's challenge in the Practice Shell
     Given "alice" is in a run on a screen 1280 px wide
     When "alice" is on <an exercise answered on its stimulus>
     Then the stimulus is in a pane on the left
-    And the item header, prompt, feedback and help are in a 400 px pane on the right
-    And the action bar stays at the bottom
+    And the item header, prompt and help are in a 400 px pane on the right
+    And the action bar, with the feedback, stays at the bottom
 
     Examples:
       | an exercise answered on its stimulus                  |
