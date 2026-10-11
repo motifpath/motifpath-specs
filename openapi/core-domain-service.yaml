@@ -7103,7 +7103,21 @@ components:
             chord_voicing exactly when the chord catalog installed it as a
             voicing, and a diagram created through createDiagram, including
             a copy saved from a chord_voicing diagram, is general. A
-            diagram's purpose doesn't change how it renders or plays.
+            diagram's purpose doesn't change how it plays. Only a
+            chord_voicing diagram carries chord data (chord_voicing), and
+            a diagram with chord data is shown as a chord box by default.
+        chord_voicing:
+          readOnly: true
+          allOf:
+            - $ref: '#/components/schemas/ChordVoicing'
+          description: |
+            The catalog voicing this diagram is the fingering of: its
+            chord data (fingers, muted strings, fret window). A diagram
+            that carries it is shown as a chord box by default, drawn from
+            it without a search of the chord catalog. Present exactly when
+            purpose is chord_voicing, on GET /diagrams/{diagram_id}; absent
+            from list responses and from every general diagram, a copy
+            saved from a chord_voicing diagram included.
         created_by:
           $ref: '#/components/schemas/UserRef'
         root_note:

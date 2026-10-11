@@ -122,6 +122,21 @@ Feature: Find chords in the chord catalog
     When "bob" retrieves a chord with an ID that does not exist
     Then the request is refused with a not-found error
 
+  # ── A voicing's diagram ──────────────────────────────────────────────────────
+
+  Scenario: A voicing's diagram, read on its own, carries its fingering
+    Given "alice" is authenticated as a student
+    When "alice" retrieves the diagram of voicing "d-open"
+    Then the diagram's purpose is "chord_voicing"
+    And the diagram carries voicing "d-open", with its fingering and fret window
+
+  Scenario: A copy saved from a voicing's diagram is general and carries no voicing
+    Given "bob" is authenticated as a teacher
+    And "bob" saves a copy of the diagram of voicing "d-open" named "My D"
+    When "bob" retrieves the new diagram
+    Then the diagram's purpose is "general"
+    And the diagram carries no voicing
+
   # ── Failures ─────────────────────────────────────────────────────────────────
 
   Scenario: A chord symbol longer than 32 characters is rejected
