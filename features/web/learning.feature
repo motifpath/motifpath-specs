@@ -1,0 +1,271 @@
+# Learning (MOT-57 design, implemented in MOT-83).
+#
+# Everything the student has started — course enrolments and standalone paths — in one list, the
+# learner view of a course, and the screen shown when a course is finished. The pattern is
+# design/patterns/learning.md; the Figma page is "Learning" (rows 1–5). Switching, abandoning and
+# archiving, and why the current item cannot be left while another is in progress, are in
+# features/learning-paths/current-path-lifecycle.feature.
+#
+# These scenarios are verified by motifpath-web's component tests and by manual browser checks,
+# not by any service's BDD suite.
+
+@web
+Feature: See everything I started and pick up where I left off
+  As a student with more than one course or path
+  I want them all in one list, with one tap to continue
+  So that I come back to what I started instead of losing track of it
+
+  Background:
+    Given "alice" is signed in as a student
+
+  # ── The list ──────────────────────────────────────────────────────────────
+
+  Scenario: Courses and paths are listed together, grouped by where the student is
+    Given "alice" is enrolled in the courses "Guitar foundations" and "Reading rhythm"
+    And "alice" has the standalone path "Open chords"
+    And "alice" finished the course "First songs"
+    And "alice" left the course "Blues basics"
+    When "alice" opens Learning
+    Then "In progress" lists "Guitar foundations", "Reading rhythm" and "Open chords"
+    And "Finished" lists "First songs"
+    And "Left" lists "Blues basics"
+
+  Scenario: The current item comes first, then the most recently started
+    Given "alice" started "Guitar foundations", then "Open chords", then "Reading rhythm"
+    And "Guitar foundations" is her current course
+    When "alice" opens Learning
+    Then "In progress" lists "Guitar foundations", "Reading rhythm", "Open chords", in that order
+
+  Scenario: The left group is folded
+    Given "alice" left the courses "Blues basics" and "Slide guitar"
+    When "alice" opens Learning
+    Then the "Left" group shows as one row reading "Left · 2"
+    And its rows are hidden until "alice" taps it
+
+  Scenario: The current item is marked on its row
+    Given "Guitar foundations" is "alice"'s current course
+    When "alice" opens Learning
+    Then the "Guitar foundations" row has a "Current" badge on its thumbnail and an accent border
+
+  Scenario: A course row counts parts
+    Given "alice" is on part 2 of the 4 parts of "Guitar foundations"
+    When "alice" opens Learning
+    Then the "Guitar foundations" row reads "Course · Part 2 of 4" above its title
+    And its progress bar reads "1 of 4 parts"
+
+  Scenario: A path row counts lessons
+    Given "alice" has completed 5 of the 9 lessons of the standalone path "Open chords"
+    When "alice" opens Learning
+    Then the "Open chords" row reads "Path" above its title
+    And its progress bar reads "5 of 9 lessons"
+
+  Scenario: A path assigned by a teacher names the teacher
+    Given the teacher "Ana" assigned "alice" the standalone path "Open chords"
+    When "alice" opens Learning
+    Then the "Open chords" row reads "Path · Assigned by Ana" above its title
+
+  Scenario: A row shows no level, author or button
+    When "alice" opens Learning
+    Then no row shows a level, an author or a button
+
+  Scenario: A row without a thumbnail shows its kind's icon instead
+    Given the course "Reading rhythm" has no thumbnail
+    When "alice" opens Learning
+    Then the "Reading rhythm" row shows the course icon on a tinted tile of the thumbnail's size
+
+  # ── Tapping a row ─────────────────────────────────────────────────────────
+
+  Scenario: Tapping the current item opens My path
+    Given "Guitar foundations" is "alice"'s current course
+    When "alice" taps the "Guitar foundations" row
+    Then My path opens on "Guitar foundations"
+    And no toast is shown
+
+  Scenario: Tapping another item in progress makes it current and opens My path
+    Given "Guitar foundations" is "alice"'s current course
+    And "alice" is enrolled in "Reading rhythm"
+    When "alice" taps the "Reading rhythm" row
+    Then "Reading rhythm" becomes "alice"'s current course
+    And My path opens on "Reading rhythm"
+    And a toast says "Now on Reading rhythm" with "Undo"
+
+  Scenario: Undo switches back
+    Given "alice" tapped "Reading rhythm" while "Guitar foundations" was her current course
+    When "alice" taps "Undo" on the "Now on Reading rhythm" toast
+    Then "Guitar foundations" is "alice"'s current course again
+
+  Scenario: Tapping a finished item opens its detail
+    Given "alice" finished the course "First songs"
+    When "alice" taps the "First songs" row
+    Then the course detail of "First songs" opens
+
+  Scenario: Tapping a left course opens its detail to start again
+    Given "alice" left the course "Blues basics"
+    When "alice" taps the "Blues basics" row
+    Then the course detail of "Blues basics" opens with "Start course"
+
+  Scenario: A failed switch keeps the current item
+    Given "Guitar foundations" is "alice"'s current course
+    And switching to "Reading rhythm" fails
+    When "alice" taps the "Reading rhythm" row
+    Then an error toast is shown
+    And "Guitar foundations" is still "alice"'s current course
+    And Learning stays open
+
+  # ── The ⋯ menu and leaving ────────────────────────────────────────────────
+
+  Scenario: The ⋯ menu of a course offers its details and leaving it
+    When "alice" taps ⋯ on the "Reading rhythm" row
+    Then a menu offers "Course details" and "Leave course"
+
+  Scenario: The ⋯ menu of a standalone path offers removing it
+    When "alice" taps ⋯ on the "Open chords" row
+    Then a menu offers "Path details" and "Remove from Learning"
+
+  Scenario: Leaving always asks first
+    When "alice" chooses "Leave course" for "Reading rhythm"
+    Then a confirm asks "Leave Reading rhythm?"
+    And it says she loses her place, starting again begins at part 1, and her practice and skill levels stay
+    And "Reading rhythm" is still in progress
+
+  Scenario: Confirming leaves the course
+    Given "Guitar foundations" is "alice"'s current course
+    When "alice" confirms leaving "Reading rhythm"
+    Then "Reading rhythm" moves to "Left"
+    And "Guitar foundations" is still "alice"'s current course
+    And no Undo is offered
+
+  Scenario: Leaving the current item names the item that becomes current
+    Given "Guitar foundations" is "alice"'s current course
+    And "Reading rhythm" is the next item in progress
+    When "alice" chooses "Leave course" for "Guitar foundations"
+    Then the confirm says she will continue with "Reading rhythm"
+
+  Scenario: Leaving the current item while another is in progress moves on to the next one first
+    Given "Guitar foundations" is "alice"'s current course
+    And "Reading rhythm" is the next item in progress
+    When "alice" confirms leaving "Guitar foundations"
+    Then "Reading rhythm" becomes "alice"'s current course
+    And "Guitar foundations" moves to "Left"
+
+  Scenario: Leaving the only item in progress leaves nothing current
+    Given "Guitar foundations" is the only thing "alice" has in progress
+    When "alice" confirms leaving "Guitar foundations"
+    Then "Guitar foundations" moves to "Left"
+    And "alice" has no current course or path
+
+  Scenario: A leave that fails after the switch says so
+    Given "Guitar foundations" is "alice"'s current course and "Reading rhythm" is the next in progress
+    And leaving "Guitar foundations" fails after the switch to "Reading rhythm"
+    When "alice" confirms leaving "Guitar foundations"
+    Then "Reading rhythm" is "alice"'s current course
+    And "Guitar foundations" is still in progress
+    And an error toast says she is now on "Reading rhythm" but "Guitar foundations" was not left
+
+  # ── States ────────────────────────────────────────────────────────────────
+
+  Scenario: Nothing started yet
+    Given "alice" has no course enrolment and no standalone path
+    When "alice" opens Learning
+    Then it says "Nothing here yet" with "Explore courses and paths", which opens Discover
+
+  Scenario: Everything finished
+    Given every course and path "alice" has is finished or left
+    When "alice" opens Learning
+    Then a "Nothing in progress" card with "Find your next course" shows above "Finished"
+
+  Scenario: Learning fails to load
+    Given "alice"'s courses and paths fail to load
+    When "alice" opens Learning
+    Then a notice in place of the list offers "Try again"
+    And the navigation stays
+
+  # ── Course detail (learner view) ──────────────────────────────────────────
+
+  Scenario: A course opened from Learning goes back to Learning
+    When "alice" opens the course detail of "Reading rhythm" from Learning
+    Then its back arrow reads "Learning"
+    And Learning is the highlighted destination
+
+  Scenario: The detail of an enrolled course offers to continue its part
+    Given "alice" is on part 2 of the 4 parts of "Guitar foundations"
+    When "alice" opens the course detail of "Guitar foundations"
+    Then it shows "Part 2 of 4" and one primary action, "Continue part 2"
+
+  Scenario: Continue part makes the course current and opens My path
+    Given "Reading rhythm" is "alice"'s current course
+    When "alice" taps "Continue part 2" on the course detail of "Guitar foundations"
+    Then "Guitar foundations" becomes "alice"'s current course
+    And My path opens on "Guitar foundations"
+
+  Scenario: The outline marks each part done, current or upcoming
+    Given "alice" is on part 2 of the 4 parts of "Guitar foundations"
+    When "alice" opens the course detail of "Guitar foundations"
+    Then part 1 is marked done, part 2 is highlighted as current, and parts 3 and 4 are muted
+
+  Scenario: The current part opens unfolded with its lessons
+    Given "alice" is on part 2 of "Guitar foundations"
+    When "alice" opens the course detail of "Guitar foundations"
+    Then part 2 shows its lesson titles and "Open in My path"
+    And the other parts show their titles only until tapped
+
+  Scenario: The current part counts its lessons when the course is current
+    Given "Guitar foundations" is "alice"'s current course
+    And "alice" has completed 7 of the 14 lessons of part 2
+    When "alice" opens the course detail of "Guitar foundations"
+    Then part 2 reads "7 of 14 lessons done"
+
+  Scenario: The current part shows no lesson count when the course is not current
+    Given "alice" is enrolled in "Guitar foundations", which is not her current course
+    When "alice" opens the course detail of "Guitar foundations"
+    Then part 2 is highlighted as current without a lesson count
+
+  Scenario: A left course offers to start again from part 1
+    Given "alice" left the course "Blues basics"
+    When "alice" opens the course detail of "Blues basics"
+    Then it offers "Start course"
+    And it says "You left this course before. Starting again begins at part 1."
+
+  Scenario: A finished course offers practice, not lessons
+    Given "alice" finished the course "First songs"
+    When "alice" opens the course detail of "First songs"
+    Then it shows a "Finished" chip and every part done
+    And it offers "Practise what you learned", which opens the practice setup
+
+  Scenario: Leave this course sits at the end of the detail
+    Given "alice" is enrolled in "Reading rhythm"
+    When "alice" opens the course detail of "Reading rhythm"
+    Then "Leave this course" is the last thing on the page, in the danger colour
+    And tapping it asks first, as from the ⋯ menu
+
+  # ── Course completed ──────────────────────────────────────────────────────
+
+  Scenario: Finishing a course celebrates it
+    Given "alice" has just finished the last lesson of "Guitar foundations", 4 parts and 44 lessons
+    When the course completed screen opens
+    Then it says "You finished Guitar foundations" and "4 parts · 44 lessons"
+    And it shows no completion date
+
+  Scenario: Another item in progress is the way on
+    Given "alice" has just finished "Guitar foundations"
+    And "Reading rhythm" is in progress
+    When the course completed screen opens
+    Then the primary action is "Continue Reading rhythm"
+    And "Find your next course" is the quiet action
+
+  Scenario: Continue on the completed screen makes that item current
+    Given "alice" has just finished "Guitar foundations" and "Reading rhythm" is in progress
+    When "alice" taps "Continue Reading rhythm"
+    Then "Reading rhythm" becomes "alice"'s current course
+    And My path opens on "Reading rhythm"
+
+  Scenario: With nothing else in progress, the way on is a new course
+    Given "alice" has just finished "Guitar foundations" and has nothing else in progress
+    When the course completed screen opens
+    Then the primary action is "Find your next course", which opens Discover on courses
+    And "Practise what you learned" is the quiet action
+
+  Scenario: A course not finished is not celebrated
+    Given "alice" is still on part 2 of "Guitar foundations"
+    When "alice" opens the course completed screen of "Guitar foundations"
+    Then it says the course was not found among her finished courses
