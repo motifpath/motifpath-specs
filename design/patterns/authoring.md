@@ -38,7 +38,7 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   courses, paths, lessons and exercises, in one column at every size (max 880 px on Expanded).
   **Diagrams** are a grid of `DiagramTile` thumbnails — a diagram is recognised by its shape: two per
   row on Compact; wider, as many boards of at least 168 px as the list's width holds (three at
-  1280 px beside the panel, four at 1440) (D24, Figma row 18).
+  1024 px, five at 1280) (D24, Figma row 18).
 - **Status words (D5):** Draft · Published · v N · Unpublished changes · Retired. Exercises and
   diagrams have no publish state; diagrams show a Template badge.
 - **Count:** the API's `PageMeta.total` for the current filters ("46 of 1,284 diagrams").
@@ -52,17 +52,17 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   | Paths, courses | status · level · instrument · language · skill · concept · author |
 
   On Compact they open as a **full-screen layer** (too many groups for a sheet) whose button shows
-  the live total ("Show 46 diagrams"); on Medium, and on Expanded below 1200 px, the same fields
-  open as a **dialog** from a Filters button beside the search. From **1200 px** they are a
-  **320 px side panel** that applies at once (the Discover pattern), and the list takes the rest of
-  the width (Figma row 18). Below 1200 px a panel would squeeze the list to one or two columns.
-  Every size shows the same fields, one tap per choice; never selectors that hide what is chosen.
+  the live total ("Show 46 diagrams"); on Medium and Expanded the same fields open as a **dialog**
+  from a Filters button beside the search, with the same live total, and the list always takes the
+  full width (Figma row 18). There is no side panel: beside the Teach sidebar it left the list too
+  little room. Every size shows the same fields, one tap per choice; never selectors that hide what
+  is chosen.
   Status (courses, paths, lessons) is the status chips, not a filter. **Root note** takes one note:
   a selector with Any, as in the diagram picker (row 14).
 - **Skill and concept picker (D26, row 17):** teachers keep the tree picker (students don't —
   `discover.md`): search by name or area, scoped to the filtered instrument with "All instruments",
   Recent first. It takes **several**: tapping a skill or an area chooses it (✓), and an area brings
-  its sub-skills; "N skills ›" opens an area (a path on Compact, inline on Expanded). The chosen
+  its sub-skills; "N skills ›" opens an area, with a path back up. The chosen
   ones show as removable chips, and the filter row sums them up ("2 skills"). Items matching any
   of them show.
 - **Author:** Me first, then a search over the section's `…/creators?q=` endpoint, each author with
@@ -184,7 +184,7 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 |---|---|---|---|
 | Compact | Teach home hub; pushed pages with ← Teach. | One column; diagrams 2 per row; filters as a full-screen layer. | `EditorAppBar`; one column, status first; heavy parts read-only; pickers as full-screen layers. |
 | Medium | Same as Compact, in a centred 560 px column. | Same; filters as a dialog. | Same, with heavy editing unlocked; stimulus images and boards break out to 720 px. |
-| Expanded | Teach sidebar. | Rows at most 880 px; diagrams fill the width (168 px+ each); filters as a 320 px side panel from 1200 px, a dialog below it. | Two columns: the form, and a 320 px sticky column (status, preview, thumbnail, where used); pickers as two-pane dialogs. |
+| Expanded | Teach sidebar. | Rows at most 880 px; diagrams fill the width (168 px+ each); filters as a dialog. | Two columns: the form, and a 320 px sticky column (status, preview, thumbnail, where used); pickers as two-pane dialogs. |
 
 ## Do not
 
@@ -198,7 +198,7 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 
 ## Spec changes this needs
 
-- **Figma row 18 (2026-10-12):** the side panel from 1200 px only, at 320 px, replacing the
+- **Figma row 18 (2026-10-12):** no side panel; the Filters dialog from Medium up, replacing the
   Expanded part of 13g and 17e.
 - **MOT-93 (done 2026-10-12, ADR-053):** `sort=title|updated` on every authoring list; several
   `skill_ids` / `concept_ids`, matching an area's sub-skills; author, language and status filters
