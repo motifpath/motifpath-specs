@@ -287,7 +287,7 @@ exercises remain deferred to PB-43, unaffected by this amendment.
 
 ## Amendment (2026-10-12) — a sound can be a diagram's playback (MOT-74)
 
-**Status:** Proposed
+**Status:** Accepted (2026-10-12, by Gilson)
 
 Every sound in a listening exercise is an uploaded file today: `Exercise.audio_url` for the
 `audio_recognition` stimulus, `Option.audio_url` for each `audio_selection` option. A teacher who
