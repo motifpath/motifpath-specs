@@ -37,7 +37,7 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 - **Rows:** `AuthoringRow` (thumbnail or kind icon, title, one meta line, a status chip, chevron) for
   courses, paths, lessons and exercises, in one column at every size (max 880 px on Expanded).
   **Diagrams** are a grid of `DiagramTile` thumbnails — a diagram is recognised by its shape: two per
-  row on Compact; wider, as many boards of at least 180 px as the list's width holds (three at
+  row on Compact; wider, as many boards of at least 168 px as the list's width holds (three at
   1280 px beside the panel, four at 1440) (D24, Figma row 18).
 - **Status words (D5):** Draft · Published · v N · Unpublished changes · Retired. Exercises and
   diagrams have no publish state; diagrams show a Template badge.
@@ -184,7 +184,7 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 |---|---|---|---|
 | Compact | Teach home hub; pushed pages with ← Teach. | One column; diagrams 2 per row; filters as a full-screen layer. | `EditorAppBar`; one column, status first; heavy parts read-only; pickers as full-screen layers. |
 | Medium | Same as Compact, in a centred 560 px column. | Same; filters as a dialog. | Same, with heavy editing unlocked; stimulus images and boards break out to 720 px. |
-| Expanded | Teach sidebar. | Rows at most 880 px; diagrams fill the width (180 px+ each); filters as a 320 px side panel from 1200 px, a dialog below it. | Two columns: the form, and a 320 px sticky column (status, preview, thumbnail, where used); pickers as two-pane dialogs. |
+| Expanded | Teach sidebar. | Rows at most 880 px; diagrams fill the width (168 px+ each); filters as a 320 px side panel from 1200 px, a dialog below it. | Two columns: the form, and a 320 px sticky column (status, preview, thumbnail, where used); pickers as two-pane dialogs. |
 
 ## Do not
 
