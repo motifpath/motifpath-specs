@@ -39,7 +39,6 @@ Feature: Student self-enrollment in courses
     And the enrollment's active checkpoint becomes checkpoint 2
 
   # MOT-36 (ADR-055): advancing reads the enrollment's pinned version, never a newer one.
-  @wip
   Scenario: Advancing follows the pinned course version, even after a newer one is published
     Given "alice" is authenticated as a student
     And "alice" is enrolled in "fingerstyle-journey" with checkpoint 1 active
