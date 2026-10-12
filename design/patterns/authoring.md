@@ -137,7 +137,8 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 - **One picker** wherever a diagram goes (prompt embed, stimulus, image-choice option, sound):
   step 1 choose — Diagrams | Chords, search, filters, thumbnails; step 2 set how it shows — labels
   (intervals, notes, custom, none), positions shown, playback (offered, which, tempo, sound,
-  direction, loop), and for a stimulus a tool: a tap *marks it correct* or *hides or shows it*.
+  direction, loop), and for a stimulus a tool: a tap *marks it correct* or *hides or shows it*, on the fretboard or on
+  a chord's box alike (row 16).
   The same two steps at every size (MOT-95, row 14): a full-screen layer on Compact, a 1040 px
   dialog on Expanded; tapping a result opens its settings, "Change diagram" or "Change chord" goes
   back with the pick marked, and Cancel / Insert sit at the foot of the settings.
