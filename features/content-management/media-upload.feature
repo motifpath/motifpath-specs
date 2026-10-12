@@ -32,7 +32,6 @@ Feature: Request a presigned media upload URL
     Then a presigned upload URL is returned
     And the response includes the object's read URL and an expiry time
 
-  @wip
   Scenario: A teacher requests an upload URL for a lesson's video
     Given "bob" is authenticated as a teacher
     When "bob" requests a media upload URL for purpose "lesson_video" with content type "video", file name "open-chords-lesson.mp4" and file size 980 MB
@@ -40,13 +39,11 @@ Feature: Request a presigned media upload URL
     And the response includes the object's read URL and an expiry time
     And the upload URL only accepts a file of exactly 980 MB
 
-  @wip
   Scenario: A video of exactly 1 GB is accepted
     Given "bob" is authenticated as a teacher
     When "bob" requests a media upload URL for purpose "lesson_video" with content type "video", file name "long-lesson.mp4" and file size 1024 MB
     Then a presigned upload URL is returned
 
-  @wip
   Scenario: The .mp4 extension is matched in any case
     Given "bob" is authenticated as a teacher
     When "bob" requests a media upload URL for purpose "lesson_video" with content type "video", file name "OPEN-CHORDS.MP4" and file size 300 MB
@@ -54,21 +51,18 @@ Feature: Request a presigned media upload URL
 
   # ── Validation failures ────────────────────────────────────────────────────
 
-  @wip
   Scenario: A video over 1 GB is rejected before anything is uploaded
     Given "bob" is authenticated as a teacher
     When "bob" requests a media upload URL for purpose "lesson_video" with content type "video", file name "long-lesson.mp4" and file size 1025 MB
     Then the request is rejected as invalid
     And the rejection identifies "file_size" as the source of the error
 
-  @wip
   Scenario: A video without a declared file size is rejected
     Given "bob" is authenticated as a teacher
     When "bob" requests a media upload URL for purpose "lesson_video" with content type "video", file name "open-chords-lesson.mp4" and no file size
     Then the request is rejected as invalid
     And the rejection identifies "file_size" as the source of the error
 
-  @wip
   Scenario Outline: A video that is not an MP4 is rejected
     Given "bob" is authenticated as a teacher
     When "bob" requests a media upload URL for purpose "lesson_video" with content type "video", file name "<file_name>" and file size 300 MB
@@ -81,21 +75,18 @@ Feature: Request a presigned media upload URL
       | lesson.webm      |
       | lesson.mp4.zip   |
 
-  @wip
   Scenario: A video for any purpose other than lesson_video is rejected
     Given "bob" is authenticated as a teacher
     When "bob" requests a media upload URL for purpose "library_asset" with content type "video", file name "open-chords-lesson.mp4" and file size 300 MB
     Then the request is rejected as invalid
     And the rejection identifies "content_type" as the source of the error
 
-  @wip
   Scenario: A lesson_video upload that is not a video is rejected
     Given "bob" is authenticated as a teacher
     When "bob" requests a media upload URL for purpose "lesson_video" with content type "image" and file name "poster.png"
     Then the request is rejected as invalid
     And the rejection identifies "content_type" as the source of the error
 
-  @wip
   Scenario: Requesting a lesson_video upload URL with an exercise_id is rejected
     Given "bob" is authenticated as a teacher
     And an exercise "triad-exercise-01" exists
