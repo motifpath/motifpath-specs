@@ -16,19 +16,16 @@ Feature: Listening exercises that play a diagram
 
   # ── Happy path — audio_recognition ───────────────────────────────────────────
 
-  @wip
   Scenario: A teacher creates an audio_recognition exercise that plays a diagram
     When "bob" creates an audio_recognition exercise titled "Major or minor?" with options "Major, Minor" and "Minor" correct, sounding diagram "a-minor-chord" playing playback "Strum"
     Then the exercise is created and assigned a stable identifier
     And the exercise's sound is diagram "a-minor-chord" playing playback "Strum"
     And the exercise has no audio_url
 
-  @wip
   Scenario: A diagram sound keeps its tempo, voice and direction
     When "bob" creates an audio_recognition exercise titled "Major or minor?" with options "Major, Minor" and "Minor" correct, sounding diagram "a-minor-chord" playing playback "Arpeggio" at 60 BPM, reversed
     Then the exercise's sound is diagram "a-minor-chord" playing playback "Arpeggio" at 60 BPM, reversed
 
-  @wip
   Scenario: A teacher switches an exercise's sound from an uploaded clip to a diagram
     Given "bob" has an audio_recognition exercise "Major or minor?" whose sound is an uploaded clip
     When "bob" updates the exercise's sound to diagram "a-minor-chord" playing playback "Strum", with no audio_url
@@ -37,7 +34,6 @@ Feature: Listening exercises that play a diagram
 
   # ── Happy path — audio_selection ─────────────────────────────────────────────
 
-  @wip
   Scenario: A teacher creates an audio_selection exercise whose options play diagrams
     When "bob" creates an audio_selection exercise titled "Which one is minor?" with options:
       | label   | sound                    | correct |
@@ -47,7 +43,6 @@ Feature: Listening exercises that play a diagram
     And option "Sound 2" sounds diagram "a-minor-chord" playing playback "Strum"
     And option "Sound 2" is marked correct
 
-  @wip
   Scenario: An audio_selection exercise may mix uploaded clips and diagram sounds
     When "bob" creates an audio_selection exercise titled "Which one is minor?" with options:
       | label   | sound                    | correct |
@@ -59,19 +54,16 @@ Feature: Listening exercises that play a diagram
 
   # ── Validation failures ──────────────────────────────────────────────────────
 
-  @wip
   Scenario: An audio_recognition exercise with both an uploaded clip and a diagram sound is rejected
     When "bob" creates an audio_recognition exercise titled "Major or minor?" with options "Major, Minor" and "Minor" correct, an uploaded clip and diagram "a-minor-chord" playing playback "Strum"
     Then the request is rejected as invalid
     And the rejection identifies "diagram_ref" as the source of the error
 
-  @wip
   Scenario: An audio_recognition exercise with no sound is rejected
     When "bob" creates an audio_recognition exercise titled "Major or minor?" with options "Major, Minor" and "Minor" correct, and no sound
     Then the request is rejected as invalid
     And the rejection identifies "audio_url" as the source of the error
 
-  @wip
   Scenario: An audio_selection option with both an uploaded clip and a diagram sound is rejected
     When "bob" creates an audio_selection exercise titled "Which one is minor?" with options:
       | label   | sound                                   | correct |
@@ -80,7 +72,6 @@ Feature: Listening exercises that play a diagram
     Then the request is rejected as invalid
     And the rejection identifies "options" as the source of the error
 
-  @wip
   Scenario Outline: A diagram sound that can't play exactly once is rejected
     Given a diagram "silent-shape" exists on instrument "guitar" with no playbacks
     When "bob" creates an audio_recognition exercise titled "Major or minor?" with options "Major, Minor" and "Minor" correct, sounding <sound>
@@ -97,7 +88,6 @@ Feature: Listening exercises that play a diagram
 
   # ── A playback in use as a sound can't be removed ────────────────────────────
 
-  @wip
   Scenario: Removing a playback an exercise plays as its sound is refused
     Given an audio_recognition exercise "Major or minor?" sounds diagram "a-minor-chord" playing playback "Strum"
     When the playback "Strum" is removed from diagram "a-minor-chord"
@@ -105,27 +95,23 @@ Feature: Listening exercises that play a diagram
     And the error names playback "Strum" and the exercise "Major or minor?"
     And diagram "a-minor-chord" still has playbacks "Strum, Arpeggio"
 
-  @wip
   Scenario: Removing a playback an audio_selection option plays is refused
     Given an audio_selection exercise "Which one is minor?" has an option that sounds diagram "a-minor-chord" playing playback "Arpeggio"
     When the playback "Arpeggio" is removed from diagram "a-minor-chord"
     Then the request is refused with a conflict error
     And the error names playback "Arpeggio" and the exercise "Which one is minor?"
 
-  @wip
   Scenario: A playback in use as a sound can still be changed
     Given an audio_recognition exercise "Major or minor?" sounds diagram "a-minor-chord" playing playback "Strum"
     When the playback "Strum" of diagram "a-minor-chord" is changed to 80 BPM
     Then playback "Strum" is at 80 BPM in "4/4"
     And the exercise's sound is diagram "a-minor-chord" playing playback "Strum"
 
-  @wip
   Scenario: A playback no exercise plays can be removed
     Given an audio_recognition exercise "Major or minor?" sounds diagram "a-minor-chord" playing playback "Strum"
     When the playback "Arpeggio" is removed from diagram "a-minor-chord"
     Then diagram "a-minor-chord" has playbacks "Strum"
 
-  @wip
   Scenario: Changing the default playback doesn't change an exercise's sound
     Given an audio_recognition exercise "Major or minor?" sounds diagram "a-minor-chord" playing playback "Strum"
     When the default playback of diagram "a-minor-chord" is changed to "Arpeggio"
