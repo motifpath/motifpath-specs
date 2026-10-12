@@ -609,8 +609,9 @@ paths:
         rules-based recommendation engine, plus an optional, purely informational
         time threshold.
 
-        A subject is mandatory — exactly one of subject_skill_id/subject_concept_id,
-        referencing one of the parent content node's linked skill_ids/concept_ids.
+        A subject is mandatory — at least one of subject_skill_id/subject_concept_id
+        (both may be set), each referencing one of the parent content node's linked
+        skill_ids/concept_ids.
         Without it, right/wrong outcomes on exercises are analytically meaningless
         and gap detection cannot function. Remediation targets are configured per
         exercise, not on the challenge — see Exercise.remediation_targets.
@@ -11381,15 +11382,15 @@ components:
     CreateChallengeRequest:
       type: object
       description: |
-        Payload for creating a challenge within a content node. Exactly one
-        of subject_skill_id or subject_concept_id must be set.
+        Payload for creating a challenge within a content node. At least one
+        of subject_skill_id or subject_concept_id must be set; both may be set.
       properties:
         subject_skill_id:
           type: string
           format: uuid
           description: |
             The skill-kind KnowledgeNode this challenge assesses. Must be one of the parent
-            content node's linked skill_ids. Exactly one of
+            content node's linked skill_ids. At least one of
             subject_skill_id/subject_concept_id must be set — the subject is
             the minimum required for gap detection, a challenge without one
             produces analytically meaningless outcomes.
@@ -11398,7 +11399,7 @@ components:
           format: uuid
           description: |
             The concept-kind KnowledgeNode this challenge assesses. Must be one of the parent
-            content node's linked concept_ids. Exactly one of
+            content node's linked concept_ids. At least one of
             subject_skill_id/subject_concept_id must be set.
         pass_threshold:
           type: integer
@@ -11458,11 +11459,11 @@ components:
         subject_skill_id:
           type: string
           format: uuid
-          description: The skill-kind KnowledgeNode this challenge assesses. Exactly one of subject_skill_id/subject_concept_id is set.
+          description: The skill-kind KnowledgeNode this challenge assesses. At least one of subject_skill_id/subject_concept_id is set; both may be.
         subject_concept_id:
           type: string
           format: uuid
-          description: The concept-kind KnowledgeNode this challenge assesses. Exactly one of subject_skill_id/subject_concept_id is set.
+          description: The concept-kind KnowledgeNode this challenge assesses. At least one of subject_skill_id/subject_concept_id is set; both may be.
         pass_threshold:
           type: integer
           minimum: 1
@@ -11506,8 +11507,8 @@ components:
         configuration. Linked exercises are not part of this payload — they
         are changed via POST/DELETE
         /challenges/{challenge_id}/exercises/{exercise_id}, not by resending
-        them here. Exactly one of subject_skill_id or subject_concept_id
-        must be set.
+        them here. At least one of subject_skill_id or subject_concept_id
+        must be set; both may be set.
       properties:
         subject_skill_id:
           type: string

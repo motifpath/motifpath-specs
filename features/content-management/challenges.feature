@@ -58,6 +58,14 @@ Feature: Manage challenges
     When "bob" creates a challenge for "intro-to-triads" with subject skill "triad-shapes", pass threshold 70, shuffled exercises, and shuffled options
     Then the challenge is created with exercise shuffling and option shuffling both enabled
 
+  @wip
+  Scenario: A teacher creates a challenge that assesses both a skill and a concept
+    Given "bob" is authenticated as a teacher
+    When "bob" creates a challenge for "intro-to-triads" with subject skill "triad-shapes", subject concept "chord-theory", and pass threshold 70
+    Then the challenge is created and assigned a stable identifier
+    And the challenge's subject skill is "triad-shapes"
+    And the challenge's subject concept is "chord-theory"
+
   Scenario: A teacher creates a challenge without specifying shuffling
     Given "bob" is authenticated as a teacher
     When "bob" creates a challenge for "intro-to-triads" with subject skill "triad-shapes" and pass threshold 70
@@ -93,11 +101,21 @@ Feature: Manage challenges
     Then the challenge's subject skill is "triad-shapes-revised"
     And the challenge's pass threshold is 85
 
+  @wip
   Scenario: A teacher switches a challenge's subject from a skill to a concept
     Given a challenge "triad-challenge" exists for content node "intro-to-triads"
     And "bob" is authenticated as a teacher
     When "bob" updates challenge "triad-challenge" with subject concept "chord-theory" and pass threshold 70
     Then the challenge's subject concept is "chord-theory"
+    And the challenge has no subject skill
+
+  @wip
+  Scenario: A teacher adds a subject concept to a challenge that assesses a skill
+    Given a challenge "triad-challenge" exists for content node "intro-to-triads"
+    And "bob" is authenticated as a teacher
+    When "bob" updates challenge "triad-challenge" with subject skill "triad-shapes", subject concept "chord-theory", and pass threshold 70
+    Then the challenge's subject skill is "triad-shapes"
+    And the challenge's subject concept is "chord-theory"
 
   Scenario: A teacher sets an explicit time threshold on an existing challenge
     Given a challenge "triad-challenge" exists for content node "intro-to-triads"
@@ -136,13 +154,6 @@ Feature: Manage challenges
     Then the request is rejected as invalid
     And the rejection identifies "subject_skill_id" as the source of the error
 
-  Scenario: Updating a challenge with both a subject skill and a subject concept is rejected
-    Given a challenge "triad-challenge" exists for content node "intro-to-triads"
-    And "bob" is authenticated as a teacher
-    When "bob" submits an update challenge request for "triad-challenge" with both subject_skill_id and subject_concept_id set
-    Then the request is rejected as invalid
-    And the rejection identifies "subject_concept_id" as the source of the error
-
   Scenario: Updating a challenge's subject to a skill not linked to its content node is rejected
     Given a challenge "triad-challenge" exists for content node "intro-to-triads"
     And "bob" is authenticated as a teacher
@@ -165,9 +176,10 @@ Feature: Manage challenges
     Then the request is rejected as invalid
     And the rejection identifies "subject_skill_id" as the source of the error
 
-  Scenario: Creating a challenge with both a subject skill and a subject concept is rejected
+  @wip
+  Scenario: Creating a challenge whose subject concept is not linked to its content node is rejected, even with a linked subject skill
     Given "bob" is authenticated as a teacher
-    When "bob" submits a create challenge request with both subject_skill_id and subject_concept_id set
+    When "bob" creates a challenge for "intro-to-triads" with subject skill "triad-shapes", subject concept "an-unrelated-concept", and pass threshold 70
     Then the request is rejected as invalid
     And the rejection identifies "subject_concept_id" as the source of the error
 
