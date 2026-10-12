@@ -113,9 +113,9 @@ Feature: Fretboard presentation
       Then every open-string marker and its label is fully visible
       And an open-string marker's touch target does not overlap a fret-1 marker's target
 
-  # ── Instrument materials ─────────────────────────────────────────────────────
+  # ── The board ────────────────────────────────────────────────────────────────
 
-  Rule: The board looks like a real fretboard without changing what it means
+  Rule: The board reads like a fretboard without changing what it means
 
     Scenario: Only an open-position board displays a nut
       Given a diagram whose window starts at fret 0
@@ -156,21 +156,27 @@ Feature: Fretboard presentation
       When the student views a diagram on that instrument
       Then every string is drawn at the same thickness
 
-    Scenario: The board uses wood, metal fret and string materials in both themes
+    Scenario: The board is drawn flat in the theme's colours
       Given a diagram
       When the student views it in the light theme and in the dark theme
-      Then the board has a wood surface, metallic frets and visible strings in each theme
-      And markers, labels and fret numbers keep sufficient contrast against the board
+      Then the board is a flat surface with no wood, grain or metal in either theme
+      And its fret lines and inlays are drawn in the border colour
+      And its strings and fret numbers are drawn in a muted ink
 
-    Scenario: The board remains complete without its decorative texture
-      Given the board's decorative wood grain is unavailable
+    Scenario: The nut stands out from the frets
+      Given a diagram whose window starts at fret 0
       When the student views the diagram
-      Then the plain board still shows frets, strings, inlays, markers, labels, regions and answer targets
+      Then the nut is drawn in the ink colour, twice as thick as a fret line
+
+    Scenario: Markers stay readable on the board in both themes
+      Given a diagram with root, note and custom-coloured markers
+      When the student views it in the light theme and in the dark theme
+      Then markers, labels and fret numbers keep sufficient contrast against the board
 
     Scenario: Several diagrams on one page keep their own appearance
       Given a page showing three diagrams with different regions and marker colors
       When the student views the page
-      Then each diagram renders with its own colors and board materials
+      Then each diagram renders with its own regions and marker colors
 
   # ── Markers ──────────────────────────────────────────────────────────────────
 
