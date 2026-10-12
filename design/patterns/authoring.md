@@ -137,6 +137,9 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   table icons as `IconButton`s: add/delete column and row, header row/column/cell, merge, split, cell
   border, cell colour, delete table; long-press shows the name). The context chip is Table inside a
   table and Edit on an embedded diagram or song chart.
+- **Link** opens a short sheet (a dialog from Medium up) with the address, Apply, and Remove link
+  when the selection already has one — never a browser prompt (Figma row 7g). **Table** inserts
+  3 × 3 cells with a header row at every size (7c).
 - **Merging cells (D15 = B):** drag across cells to select several, then Merge — the same model as
   desktop; Split works on a merged cell.
 - **Medium, Expanded:** today's one-row toolbar, with the table row while the cursor is in a table.
