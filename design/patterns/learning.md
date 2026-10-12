@@ -66,7 +66,7 @@ publishes changes, the student can choose to take them (ADR-055).
 - **Where it starts (U2):**
   - "Update to the latest version" is the **first** item in the row's ⋯ menu.
   - On the course detail, a quiet card under Continue says "A newer version is available", with a
-    secondary "Update course" button.
+    secondary "Update course" button. A held path's detail has the same card, with "Update path".
   - Both open the same confirm.
 - **The confirm (U4, U6):**
   - It is a sheet on Compact and a centred dialog from Medium, with Not now on the left and Update

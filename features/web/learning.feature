@@ -303,6 +303,18 @@ Feature: See everything I started and pick up where I left off
     Then a card under "Continue part 2" reads "A newer version is available"
     And its "Update course" button opens the update confirm
 
+  Scenario: A held path's detail offers the same update
+    Given a newer version of the standalone path "Fingerstyle warm-ups" is available to "alice"
+    When "alice" opens the detail of "Fingerstyle warm-ups" from Learning
+    Then a card under "Continue" reads "A newer version is available"
+    And its "Update path" button opens the update confirm
+
+  Scenario: A path's detail opened from Learning leads back to Learning
+    Given "alice" has the standalone path "Open chords"
+    When "alice" opens the detail of "Open chords" from Learning
+    Then Learning stays highlighted in the navigation
+    And the way back reads "Back to Learning" and returns to Learning
+
   Scenario: The update always confirms first, with the same text
     Given a newer version of "Guitar foundations" is available to "alice"
     When "alice" chooses "Update to the latest version" on the "Guitar foundations" row
