@@ -197,8 +197,12 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 - **MOT-93 (done 2026-10-12, ADR-053):** `sort=title|updated` on every authoring list; several
   `skill_ids` / `concept_ids`, matching an area's sub-skills; author, language and status filters
   on `/content-nodes`; `item_count` on `…/creators`. The screens: `features/web/authoring-lists.feature`.
-- **MOT-74 / MOT-75:** sounds from a diagram playback or a catalog voicing (ADR-019 / ADR-041
-  amendments); chord-box options and stimuli.
+- **MOT-74 (specified 2026-10-12, ADR-019 / ADR-041 amendments):** a sound is an `audio_url` or a
+  `diagram_ref` naming a playback, never looping; a playback in use can't be removed. The rules:
+  `features/content-management/exercise-sounds.feature`; the screens:
+  `features/web/listening-from-a-diagram.feature`.
+- **MOT-75:** sounds from a catalog voicing (a voicing is a diagram, so the MOT-74 source); chord-box
+  options and stimuli.
 - **MOT-19 / ADR-054:** `lesson_video` uploads (MP4, at most 1 GB, declared `file_size`) on
   `POST /media/upload-url`.
 - **D3:** "Content" → "Lessons" is a UI label change only (routes and API keep `content-nodes`).

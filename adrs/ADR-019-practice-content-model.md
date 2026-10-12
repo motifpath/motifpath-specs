@@ -285,6 +285,56 @@ is introduced.
 skill tags, and option-selection checking model apply identically to this type. Rhythmic
 exercises remain deferred to PB-43, unaffected by this amendment.
 
+## Amendment (2026-10-12) — a sound can be a diagram's playback (MOT-74)
+
+**Status:** Proposed
+
+Every sound in a listening exercise is an uploaded file today: `Exercise.audio_url` for the
+`audio_recognition` stimulus, `Option.audio_url` for each `audio_selection` option. A teacher who
+wants "is this chord major or minor?" has to record, export and upload a clip per chord, even
+though the platform can already sound that chord: ADR-041 and ADR-050 give a diagram named
+playbacks (a strum, an arpeggio, a fingerstyle pattern) played by a sampled voice at any tempo.
+An uploaded clip also says nothing about what made it. After answering, the student can't see
+the shape they just heard.
+
+Alternatives considered:
+
+1. **Keep uploads only.** Rejected: every chord-quality or interval exercise costs a recording
+   and S3 bytes, although the sound already exists as a diagram.
+2. **A new `sound` object** (`{ audio_url } | { diagram_ref }`) on the exercise and on each
+   option. Rejected: it is a second way to say `audio_url` and renames a field existing audio
+   exercises already use, for no gain over the per-type pattern below.
+3. **Reuse `diagram_ref`, read by `exercise_type`.** Accepted. `image_recognition` already reads
+   `Exercise.diagram_ref` as its stimulus, and `image_choice` reads `Option.diagram_ref` as its
+   thumbnail. The listening types read the same field as their sound.
+
+**Decision:** a listening exercise's sound is exactly one of an uploaded clip or a diagram
+playback.
+
+- `audio_recognition`: the stimulus is `Exercise.audio_url` **or** `Exercise.diagram_ref`, never
+  both and never neither.
+- `audio_selection`: each option's sound is `Option.audio_url` **or** `Option.diagram_ref`. Options
+  may mix the two.
+- A `diagram_ref` used as a sound must play: its diagram has at least one playback, and its
+  `playback` names one explicitly (`playback_id` is required here, never "the default"), so a
+  later change of the diagram's default never changes the exercise's sound. `loop` must be
+  false (the student replays instead). `tempo_bpm`, `voice_id` and `direction` work as in any
+  usage.
+- A playback that any exercise uses as a sound can't be removed from its diagram. Its steps,
+  tempo and name can still change. This is the guard ADR-041 amends into diagram updates.
+- The student never sees the diagram before committing the answer, because the shape would give
+  the answer away. Afterwards, "What you heard" shows the diagram with its name, and replaying it
+  lights its positions. In an S7 challenge, that reveal waits for the review at the end, like
+  every other piece of feedback there. For `audio_selection`, each option reveals its own
+  diagram. Labels stay neutral ("Sound 1") until then.
+- For timed answers, the sound's length (`audio_ms`) is computed from the playback
+  at the usage's tempo, not read from media metadata. Slowing the playback down is a student
+  choice and, like a replay, is not taken off the latency.
+- Grading is unchanged: options are still graded by their own `is_correct`.
+
+No checking model, type or endpoint is added. A catalog chord voicing is a diagram (ADR-050), so
+"listen to the chord" from the chord catalog (MOT-75) is the same source.
+
 ## Related ADRs
 
 - **ADR-015** — Challenge belongs to the path node; this ADR narrows ADR-015's implicit
@@ -310,6 +360,9 @@ exercises remain deferred to PB-43, unaffected by this amendment.
 - **PB-52**: `openapi/core-domain-service.yaml`'s `Option` schema and `exercise_type` enum need
   an `audio_url` field and the `audio_selection` value added to match this amendment, before
   `motifpath-core`/`motifpath-web` implementation begins.
+- **MOT-74** (2026-10-12 amendment): `motifpath-core` validates the one-sound rule and the
+  playback-in-use guard; `motifpath-web` adds the Upload audio | From a diagram sound picker
+  (MOT-95) and the hidden-board play and "What you heard" reveal (MOT-98).
 
 ---
 
