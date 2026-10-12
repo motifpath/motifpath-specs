@@ -15,9 +15,11 @@ hit. A full neck doesn't fit a phone at that size, and shrinking it makes every 
 
 ## How
 
-- **Shared components:** `Fretboard` (Frets = the window drawn: 5 for shapes, a 7-place region
+- **Shared components:** `Fretboard` (flat, in the theme's colours — border fret lines and inlays,
+  an ink nut, muted strings; no wood or metal. Frets = the window drawn: 5 for shapes, a 7-place region
   for drills, 12 for a full neck; Strings = 4, 6 or 7; Layout = horizontal or vertical), `FretMarker` (Note · Root ·
-  Sounding · Asked · Right · Wrong), `ChordBox` with `ChordDot` and `ChordBarre`, `Keyboard`, and for
+  Sounding · Asked · Right · Wrong), `ChordBox` with `ChordDot` (Default · Root · Sounding ·
+  Asked · Right · Wrong · Missed, and for the author Correct · Hidden correct · Hidden) and `ChordBarre`, `Keyboard`, and for
   wide boards and stacks `BoardViewport` (scrolls at readable size, edge fade), `OverviewStrip`,
   `DiagramPlayer` and `DiagramLegend` (promoted from frames in MOT-61). No screen draws its own board.
 - **Same components and rules in authoring** (MOT-61 D23): the diagram picker, stimulus and
@@ -47,8 +49,13 @@ hit. A full neck doesn't fit a phone at that size, and shrinking it makes every 
   chord voicing's (`Diagram.chord_voicing`) — is shown as a chord box; every other diagram
   (scales, arpeggios, drills, play-alongs) on the fretboard. No flag: the chord data is what makes
   it a chord. The student switches a chord box in place with **Box | Neck**, for that showing only;
-  the next one opens as a box again. A thumbnail, or a chord whose cells are the answers, stays on
-  the fretboard, since a box takes no taps.
+  the next one opens as a box again. A chord stays a box wherever it shows (MOT-95, Authoring row
+  16): a thumbnail or image-choice option is its box, without Box | Neck, and a chord whose notes
+  are answers is answered on the box. The box then takes taps: every cell, the open strings above
+  the nut included, is a 48 px place; a pick is a dashed ring, and Check grades picks right or wrong
+  with a right cell not picked shown as a dashed success ring. The author marks answers and hides
+  notes on the box with the same tool as on the fretboard (`ChordDot` Correct · Hidden correct ·
+  Hidden).
 - **Chord box window:** a voicing with an open string starts at the nut — frets 1 to 4 at least,
   never hidden above its fingers — and has no fret label; one without starts at its lowest fretted
   fret, labelled ("3fr"). Either way it shows at least 4 frets, more when its fingers reach further.
