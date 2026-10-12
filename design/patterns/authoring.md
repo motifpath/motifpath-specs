@@ -75,7 +75,7 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   never a silently disabled button. A teacher sees "An admin publishes courses" instead of a button
   for courses and paths; teachers publish lessons themselves.
 - **Save blockers (D20):** Save stays tappable; with something missing it lists what (no correct
-  option, no skill or concept, a playback tempo outside 40–300), each item jumping to its field.
+  option, no skill or concept, a playback tempo outside 20–300), each item jumping to its field.
 - **Reordering (D8):** `OrderedRow` — drag by the handle on every size, and ⋮ → Move up · Move down ·
   Rename here · Open · Remove, the way to reorder on a phone, with a keyboard or a screen reader.
   Lists in time order (video pop-ups) don't drag.

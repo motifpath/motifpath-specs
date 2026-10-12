@@ -171,14 +171,14 @@ Feature: Edit and publish authored content
       Given "bob" is editing an exercise that has <missing>
       When "bob" taps Save
       Then nothing is saved
-      And a list "Can't save yet" names "<item>"
+      And a list "Before you can save:" names "<item>"
 
       Examples:
         | missing                                    | item                               |
         | no correct option                          | Mark at least one option correct   |
         | no skill                                   | Add a skill                        |
         | no concept                                 | Add a concept                      |
-        | a stimulus playback at 20 BPM              | Set a tempo between 40 and 300 BPM |
+        | a stimulus playback at 10 BPM              | Pick a tempo from 20 to 300 BPM    |
 
     Scenario: Every missing item is listed at once
       Given "bob" is editing an exercise with no correct option and no skill
@@ -186,12 +186,12 @@ Feature: Edit and publish authored content
       Then the list names "Mark at least one option correct" and "Add a skill"
 
     Scenario: An item in the list jumps to its field
-      Given the list "Can't save yet" names "Add a skill"
+      Given the list "Before you can save:" names "Add a skill"
       When "bob" taps "Add a skill"
       Then the Skills field is scrolled into view and has the focus
 
     Scenario: The list goes once nothing is missing
-      Given the list "Can't save yet" names only "Add a skill"
+      Given the list "Before you can save:" names only "Add a skill"
       When "bob" adds the skill "Strumming"
       Then the list is gone
 
@@ -238,13 +238,14 @@ Feature: Edit and publish authored content
 
     Scenario: A new exercise asks for its type first
       When "bob" starts a new exercise
-      Then they are asked to choose one of five types, each saying what the student does:
-        | type              | what the student does                                      |
-        | Image recognition | Taps the right place on an image or a diagram              |
-        | Text response     | Picks the right answer among text options                  |
-        | Image choice      | Picks the right image, diagram or chord                    |
-        | Audio recognition | Listens to a sound and picks what it is                    |
-        | Audio selection   | Picks the sound that matches                               |
+      Then "What will the student do?" offers five types, each saying what the student does:
+        | type              | what the student does                            |
+        | Image recognition | Taps the right place on an image or a diagram.   |
+        | Image choice      | Picks the right image, diagram or chord box.     |
+        | Text response     | Picks the right answer from text options.        |
+        | Audio recognition | Hears one sound and picks what it is.            |
+        | Audio selection   | Hears the options and picks the right sound.     |
+      And it says "The type can't be changed after the first save."
 
     Scenario: Choosing a type opens the editor for that type
       Given "bob" is choosing the type of a new exercise
