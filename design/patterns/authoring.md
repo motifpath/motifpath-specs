@@ -116,7 +116,7 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 | Image choice | — | Images, diagrams or chord boxes (D22), two per row; check = correct |
 | Text response | — | Text options, Mark correct (one or more) |
 | Audio recognition | A `SoundSource` | Text options |
-| Audio selection | — | Each option = label + `SoundSource` + Mark correct |
+| Audio selection | — | Each option = label + `SoundSource` + Mark correct, one per row at every size (a sound row needs the editor column's width) |
 
 - **Sound sources (D18; MOT-74, MOT-75):** every sound picks Upload audio · From a diagram · From the
   chord catalog. "From a diagram" lists only diagrams with a playback; settings are playback, tempo,
