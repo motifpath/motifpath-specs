@@ -1,8 +1,8 @@
 # Pattern: authoring (Teach)
 
 **Source:** ADR-049 §6 (authoring is desktop-first, with minimal responsiveness) · MOT-61 (Figma
-"Authoring", rows 1–13; decisions D1–D29, decided 2026-10-09: all A except D15 = B) · API gaps in
-MOT-93 · the chord-progression idea in MOT-94
+"Authoring", rows 1–13; decisions D1–D29, decided 2026-10-09: all A except D15 = B) · Figma row 17
+(lists after MOT-93, approved 2026-10-12) · MOT-93 (the API for lists at volume, ADR-053) · the chord-progression idea in MOT-94
 
 ## When
 
@@ -47,18 +47,23 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   |---|---|
   | Diagrams | instrument · kind (all, templates, custom) · shows (diagrams, chord voicings, both) · root note · language · skill · concept · author |
   | Exercises | type · instrument · language · skill · concept · author |
-  | Lessons | type (video, article) · level · instrument · skill · concept |
+  | Lessons | type (video, article) · level · instrument · language · skill · concept · author |
   | Paths, courses | status · level · instrument · language · skill · concept · author |
 
   On Compact they open as a **full-screen layer** (too many groups for a sheet) whose button shows
   the live total ("Show 46 diagrams"). On Expanded they are a **280 px side panel** that applies at
   once (the Discover pattern).
-- **Skill and concept picker (D26):** teachers keep the tree picker (students don't — `discover.md`):
-  search by name or area, scoped to the filtered instrument with "All instruments", Recent first,
-  areas drill in with a path on Compact and expand inline on Expanded.
-- **Author:** Me first, then a search over the section's `…/creators?q=` endpoint; Anyone clears it.
-- **Sort:** Name A–Z, and Recently changed where the API supports it (paths today; MOT-93 adds the
-  rest).
+  Status (courses, paths, lessons) is the status chips, not a filter. **Root note** takes one note:
+  a selector with Any, as in the diagram picker (row 14).
+- **Skill and concept picker (D26, row 17):** teachers keep the tree picker (students don't —
+  `discover.md`): search by name or area, scoped to the filtered instrument with "All instruments",
+  Recent first. It takes **several**: tapping a skill or an area chooses it (✓), and an area brings
+  its sub-skills; "N skills ›" opens an area (a path on Compact, inline on Expanded). The chosen
+  ones show as removable chips, and the filter row sums them up ("2 skills"). Items matching any
+  of them show.
+- **Author:** Me first, then a search over the section's `…/creators?q=` endpoint, each author with
+  how many items they have in the section; Anyone clears it.
+- **Sort:** Name A–Z or Recently changed, on every list.
 - **Remembered (D27):** search, filters and sort live in the URL and are remembered per section on
   this device; coming back from an editor restores them and the scroll position.
 - **Long lists (D28):** 20 at a time; the next page loads when the end comes into view; a failed page
@@ -189,9 +194,9 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 
 ## Spec changes this needs
 
-- **MOT-93 (High):** `sort=title|updated` on every authoring list; several `skill_ids` /
-  `concept_ids` on diagrams, exercises and lessons, matching an area's sub-skills; author, language
-  and status filters on `/content-nodes`; optional counts on `…/creators`.
+- **MOT-93 (done 2026-10-12, ADR-053):** `sort=title|updated` on every authoring list; several
+  `skill_ids` / `concept_ids`, matching an area's sub-skills; author, language and status filters
+  on `/content-nodes`; `item_count` on `…/creators`. The screens: `features/web/authoring-lists.feature`.
 - **MOT-74 / MOT-75:** sounds from a diagram playback or a catalog voicing (ADR-019 / ADR-041
   amendments); chord-box options and stimuli.
 - **MOT-19 / ADR-054:** `lesson_video` uploads (MP4, at most 1 GB, declared `file_size`) on
