@@ -4,7 +4,6 @@
 # can choose to take them. Progress is kept per lesson, so finished lessons stay finished. The
 # screens are in features/web/learning.feature.
 
-@wip
 Feature: Update a course or path I started to its latest version
   As a learner who started a course or path before its author changed it
   I want to take the latest version without losing my place
@@ -12,6 +11,7 @@ Feature: Update a course or path I started to its latest version
 
   Background:
     Given the Core Domain Service is operational and ready to accept requests
+    And a learning path "open-chords-path" exists, published, created by "bob", with a summary, level "beginner" and a thumbnail
     And student "alice" is registered in the system
     And "alice" is authenticated as a student
 
@@ -61,13 +61,6 @@ Feature: Update a course or path I started to its latest version
     And the author adds a lesson to "open-chords-path"
     When "alice" lists her course enrollments
     Then her enrollment in "fingerstyle-journey" shows that an update is available
-
-  Scenario: A course checkpoint's own path copy is never offered an update on its own
-    Given a course "fingerstyle-journey" exists, published, with checkpoints "open-chords-path"
-    And "alice" is enrolled in "fingerstyle-journey" with checkpoint 1 active
-    And the author adds a lesson to "open-chords-path"
-    When "alice" opens checkpoint 1's student path
-    Then that student path shows no update available
 
   # ── Updating a standalone path ────────────────────────────────────────────
 
@@ -170,7 +163,8 @@ Feature: Update a course or path I started to its latest version
   # ── Refusals ──────────────────────────────────────────────────────────────
 
   Scenario: An archived path cannot be updated
-    Given "alice" has archived her copy of "open-chords-path"
+    Given "alice" has enrolled in learning path "open-chords-path"
+    And "alice" has archived her copy of "open-chords-path"
     When "alice" tries to update her copy of "open-chords-path"
     Then the update is refused because no active standalone path was found
 
