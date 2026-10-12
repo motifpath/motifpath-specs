@@ -118,9 +118,9 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 | Audio recognition | A `SoundSource` | Text options |
 | Audio selection | — | Each option = label + `SoundSource` + Mark correct, one per row at every size (a sound row needs the editor column's width) |
 
-- **Sound sources (D18; MOT-74, MOT-75):** every sound picks Upload audio · From a diagram · From the
-  chord catalog. "From a diagram" lists only diagrams with a playback; settings are playback, tempo,
-  sound and direction (no loop: the student replays), with ▶ Hear it and the length, which becomes
+- **Sound sources (D18; MOT-74, MOT-75):** every sound picks Upload audio · From a diagram. "From a
+  diagram" lists only diagrams with a playback, with a chord's catalog voicings a tab away; settings
+  are playback, tempo, sound and direction (no loop: the student replays), with ▶ Hear it and the length, which becomes
   `audio_ms`. Students hear it with the board hidden, then "What you heard" reveals it
   (`diagrams.md`).
 - **Neutral labels (D19):** audio-selection labels default to "Sound 1, 2, 3…", stay editable, and
@@ -130,7 +130,7 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 
 - The prompt and the article use the real **TipTap** editor on every size, with every command of
   today's toolbar.
-- **Compact:** a `PromptToolbar` docked above the keyboard (Undo · Redo | Aa · Bold · Italic · List |
+- **Compact:** a `PromptDockedBar` docked above the keyboard (Undo · Redo | Aa · Bold · Italic · List |
   context chip | + · hide keyboard) and three sheets: **Format** (style, marks, text and background
   colour, alignment, lists), **Insert** (link, table, image, diagram; song chart in article lessons only, never in an exercise
   prompt — `song-chart.md`) and **Table** (today's
