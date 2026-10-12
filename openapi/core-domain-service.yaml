@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.40.0
+  version: 0.41.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -2565,6 +2565,17 @@ paths:
             Restricts the results to diagrams of this purpose (see
             Diagram.purpose). Omitted, it is general, so chord voicings are
             listed only when asked for; any lists both.
+        - name: playable
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: |
+            true lists only diagrams with at least one playback, the ones a
+            listening exercise can play as its sound; the total counts only
+            those. Omitted or false lists diagrams whether they have
+            playbacks or not.
       responses:
         "200":
           description: One page of the diagrams visible to the caller, possibly empty.
