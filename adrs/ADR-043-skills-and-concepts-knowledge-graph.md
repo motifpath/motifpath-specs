@@ -181,8 +181,8 @@ KnowledgeEdge {
 ### Content links are unchanged in shape
 
 Content nodes, exercises and diagrams keep their `skill_ids` and `concept_ids` arrays, now holding
-`KnowledgeNode` ids of the matching kind. A challenge keeps `subject_skill_id` or
-`subject_concept_id`. Generated drill templates (PB-22) link the same way. Content never becomes a
+`KnowledgeNode` ids of the matching kind. A challenge keeps `subject_skill_id` and/or
+`subject_concept_id` (at least one, per the ADR-026 amendment of 2026-10-12). Generated drill templates (PB-22) link the same way. Content never becomes a
 graph node, and songs and repertoire stay content.
 
 ### API

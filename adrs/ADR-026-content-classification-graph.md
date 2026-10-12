@@ -3,6 +3,8 @@
 **Status:** Accepted
 **Date:** 2026-09-19
 **Deciders:** Gilson (Product Owner)
+**Amended:** 2026-10-12 (MOT-20, Proposed) — a challenge's subject can be a skill, a concept, or
+both (see the amendment at the end).
 
 ---
 
@@ -232,6 +234,43 @@ rather than guessed at.
   tree nodes is a new interaction ADR-018 hasn't covered before (a tree browser, not a freeform
   tag input like the existing `SkillTagsInput`) — its own component/interaction decisions are
   this ADR's implementation work, not decided here.
+
+## Amendment (2026-10-12) — a challenge can assess a skill and a concept (MOT-20)
+
+**Status:** Proposed
+
+"Exactly one" in *Challenge's subject references a Skill or Concept by ID* becomes "at least
+one": a challenge sets `subject_skill_id`, `subject_concept_id`, or both. A teacher reported the
+old rule as a bug while authoring (picking a concept cleared the skill already picked). A
+challenge on "alternate picking over the major scale" assesses a skill and a concept at once,
+and two challenges are not a workaround, because a content node has one challenge.
+
+- **Neither is still rejected.** A challenge with no subject has nothing to remediate. The error
+  stays on `subject_skill_id`.
+- **Each id is checked on its own.** A set `subject_skill_id` must be in the parent node's
+  `classification.skill_ids`, and a set `subject_concept_id` in its `concept_ids`. Each failure
+  is reported under its own field.
+- **A failed challenge flags both subjects as gaps.** The remediation rule above becomes: any
+  `ContentNode` linked to the challenge's skill **or** its concept, excluding nodes the student
+  has completed. Nodes linked to both come first, then the rest; inside each group, ordered by
+  `difficulty_level` ascending. The match is still exact-node. With one subject set, the rule is
+  the same as before. PB-8g (MOT-7) builds the query; no code reads the subject for
+  recommendations yet, so nothing else changes.
+- **Authoring shows both.** The challenge summary shows the skill name, then the concept name.
+
+Alternatives rejected:
+
+- **An explicit Skill | Concept toggle**, which keeps "exactly one" but makes it visible. It is
+  cheaper, but it keeps the limit the teacher hit.
+- **Recommend only content linked to both.** It is the most precise match, but it often finds
+  nothing, since few nodes carry both ids. A failed student would then get fewer suggestions
+  than a single-subject challenge gives.
+- **Recommend either, ordered by difficulty only.** It is simpler, but it puts a beginner node
+  that covers just the concept ahead of a node that covers exactly what was assessed.
+
+Backward compatible: clients that send one id keep working, and stored challenges already hold
+one. Other "exactly one" rules in the spec (for example an exercise sound's clip or `diagram_ref`)
+are out of scope.
 
 ---
 
