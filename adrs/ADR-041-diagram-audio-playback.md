@@ -7,6 +7,8 @@
 (see the `sequence_index` bullet under Decision).
 **Amended by:** ADR-050 (2026-10-06) — a diagram has a list of named playbacks instead of one
 `sequence`; `tempo_bpm` and `time_signature` move onto each playback, and a `DiagramRef` chooses one.
+**Amended:** 2026-10-12 (MOT-74, Proposed) — a playback can be a listening exercise's sound, and a
+playback in that use can't be removed (see the amendment at the end).
 **Partially supersedes:** ADR-028's `DiagramPosition.sequence_index` and `diagram_ref.playback`
 (`direction`, `step_ms`), and the ADR-027/ADR-028 note that sends audio-synced highlighting to
 Canvas. Everything else in ADR-028 stands.
@@ -380,6 +382,38 @@ inside a stack keeps the schema unchanged and leaves the choice open.
   control with tempo slider, the sequence editor, and the credits page.
 - Confirm sample provenance and attribution before production; check Bluetooth latency reporting.
 - Delete the spike branch `spike/PB-70/diagram-audio` and its worktree once this ADR is accepted.
+
+## Amendment (2026-10-12) — a playback as an exercise's sound (MOT-74)
+
+**Status:** Proposed
+
+The ADR-019 amendment of the same date lets an `audio_recognition` stimulus or an
+`audio_selection` option be a diagram's playback instead of an uploaded clip. For playback, it
+means:
+
+- **A sound plays a named playback, once.** Its `diagram_ref.playback.playback_id` is required,
+  and `loop` is false. Elsewhere, a ref with no `playback_id` follows the diagram's default; a
+  sound doesn't, so changing the default never changes a published exercise.
+- **The board is hidden, not the sound.** Before the answer, the Practice Shell plays the
+  playback with no board at all: a Listen button with the playback's name and tempo, and the
+  tempo slider. This goes further than `layers.hidden_position_ids`, which hides positions on a
+  drawn board. After the answer, "What you heard" draws the board and replays it with the
+  audio-clock highlighting decided here.
+- **A playback in use can't be removed.** `updateDiagram` refuses a playback list that drops a
+  playback any exercise uses as a sound, and says which exercises use it. Changing its steps,
+  tempo, time signature or names is still allowed, since the sound stays valid. This is narrower
+  than the rule for other usages (ADR-050), which keep a removed `playback_id` and fall back to
+  the default. That fallback is harmless in a lesson, but it would silently change an exercise's
+  answer. Diagrams can't be deleted, so no other guard is needed. Catalog voicings are not
+  edited through `updateDiagram`, and the catalog build keeps the standard playbacks every
+  voicing has, so the guard never blocks it.
+- **The length is known exactly.** A sound's `audio_ms` is the sum of its steps' durations at
+  the usage's tempo (rests included; the last note's ringing tail is not). It comes from the
+  timeline, not from `<audio>` metadata (the iPhone `audio_ms` bug, MOT-69).
+
+Alternative rejected: degrade gracefully, letting the playback go and treating the exercise
+as a sound that failed to load (Skip, `not_answered`). It needs no cross-aggregate check, but a
+teacher tidying a diagram would break exercises they can't see from the diagram editor.
 
 ---
 
