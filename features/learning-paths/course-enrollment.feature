@@ -38,6 +38,16 @@ Feature: Student self-enrollment in courses
     Then checkpoint 2's student path is created
     And the enrollment's active checkpoint becomes checkpoint 2
 
+  # MOT-36 (ADR-055): advancing reads the enrollment's pinned version, never a newer one.
+  @wip
+  Scenario: Advancing follows the pinned course version, even after a newer one is published
+    Given "alice" is authenticated as a student
+    And "alice" is enrolled in "fingerstyle-journey" with checkpoint 1 active
+    And an admin publishes a new version of "fingerstyle-journey" with checkpoints "open-chords-path", "warm-up-path", "strumming-path"
+    When "alice" completes every item in checkpoint 1's student path
+    Then a student path for "strumming-path" is created as checkpoint 2
+    And the enrollment is still pinned to the version she enrolled in
+
   Scenario: Completing the last checkpoint completes the course and clears the current pointer
     Given "alice" is authenticated as a student
     And "alice" is enrolled in "fingerstyle-journey" with checkpoint 2 active as her current path
