@@ -3,7 +3,7 @@
 **Status:** Accepted
 **Date:** 2026-09-30
 **Deciders:** Gilson (Product Owner)
-**Amended by:** ADR-055 (2026-10-12, proposed) — a learner can update a standalone copy in place instead of archiving it and enrolling again.
+**Amended by:** ADR-055 (2026-10-12) — a learner can update a standalone copy in place instead of archiving it and enrolling again.
 **Revised:** 2026-09-30, in spec review. Staff may assign only published paths, a course may
 publish only with published paths, and a learner never holds two active standalone copies of one
 path. Later that day, in web review: a teacher works only with their own paths in the authoring

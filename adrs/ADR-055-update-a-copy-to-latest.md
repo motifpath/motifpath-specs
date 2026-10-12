@@ -1,7 +1,7 @@
 # ADR-055: Updating a Learner's Copy to the Latest Published Course or Path
 
-**Status:** Proposed
-**Date:** 2026-10-12
+**Status:** Accepted
+**Date:** 2026-10-12 (Proposed) · 2026-10-12 (Accepted, in review of specs#299)
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
 **Task:** MOT-36 (PB-81). Design: Figma "Learning", row 6, decisions U1–U8, approved 2026-10-12.
 
@@ -172,5 +172,5 @@ depends on it. There is no node-level update.
 
 ---
 
-*This ADR was proposed on 2026-10-12. To revise it, create a new ADR with the status
+*This ADR was decided on 2026-10-12. To revise it, create a new ADR with the status
 "Supersedes ADR-055".*
