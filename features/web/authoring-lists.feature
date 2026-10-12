@@ -96,7 +96,7 @@ Feature: Find an item in the authoring lists
       When "bob" chooses the root note "Any"
       Then the Diagrams filters have no root note
 
-  Rule: Filters open as a layer on Compact, a dialog on Medium and a side panel on Expanded
+  Rule: Filters open as a layer on a phone, a dialog up to 1199 px and a side panel from 1200 px
 
     Scenario: On Compact the filters are a full-screen layer with the live total
       Given "bob" is on a phone
@@ -115,11 +115,18 @@ Feature: Find an item in the authoring lists
       When "bob" closes the layer
       Then the list's filters are unchanged
 
-    Scenario: On Expanded the filters are a side panel that applies at once
-      Given "bob" is on a computer
+    Scenario: On a wide screen the filters are a side panel that applies at once
+      Given "bob" is on a computer 1280 px wide
       When "bob" opens the Diagrams list
       Then the filters are a panel beside the list
       And choosing "Custom" narrows the list at once
+
+    Scenario: Below 1200 px the filters open as a dialog, leaving the list the width
+      Given "bob" is on a computer 1024 px wide
+      When "bob" opens the Diagrams list
+      Then there is no filter panel, and a Filters button beside the search shows how many filters are applied
+      When "bob" taps Filters
+      Then the same filters open as a dialog, with the live total on its button
 
   Rule: Applied filters show as removable chips with Clear all
 
