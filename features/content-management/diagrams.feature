@@ -723,7 +723,6 @@ Feature: Manage prebuilt diagrams
     Then the response includes "minor-pentatonic-guitar"
     And the response does not include "minor-pentatonic-piano"
 
-  @wip
   Scenario: A teacher lists only the diagrams that can play, for a listening exercise's sound
     Given a basic diagram "a-minor-triad" exists on instrument "guitar" with a playback "Strum down"
     And a basic diagram "silent-shape" exists on instrument "guitar" with no playbacks
@@ -733,7 +732,6 @@ Feature: Manage prebuilt diagrams
     And the response does not include "silent-shape"
     And the response reports a total of 1
 
-  @wip
   Scenario: Diagrams are listed whether they can play or not unless asked
     Given a basic diagram "a-minor-triad" exists on instrument "guitar" with a playback "Strum down"
     And a basic diagram "silent-shape" exists on instrument "guitar" with no playbacks
@@ -742,7 +740,6 @@ Feature: Manage prebuilt diagrams
     Then the response includes "a-minor-triad"
     And the response includes "silent-shape"
 
-  @wip
   Scenario: Only diagrams that can play combines with the other filters
     Given a basic diagram "a-minor-triad" exists on instrument "guitar" with root note "A" and a playback "Strum down"
     And a basic diagram "e-minor-triad" exists on instrument "guitar" with root note "E" and a playback "Strum down"
