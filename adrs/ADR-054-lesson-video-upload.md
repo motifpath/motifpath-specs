@@ -1,7 +1,7 @@
 # ADR-054: Lesson Video Upload — One Presigned PUT of an MP4, Capped at 1 GB
 
-**Status:** Proposed
-**Date:** 2026-10-11
+**Status:** Accepted
+**Date:** 2026-10-11 (Proposed) · 2026-10-11 (Accepted, in review of specs#284)
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
 **Task:** MOT-19 (PB-59; found while finishing PB-40's video lessons)
 
