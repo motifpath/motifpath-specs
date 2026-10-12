@@ -178,7 +178,7 @@ Feature: Edit and publish authored content
         | no correct option                          | Mark at least one option correct   |
         | no skill                                   | Add a skill                        |
         | no concept                                 | Add a concept                      |
-        | a stimulus playback at 20 BPM              | Pick a tempo from 40 to 300 BPM    |
+        | a stimulus playback at 10 BPM              | Pick a tempo from 20 to 300 BPM    |
 
     Scenario: Every missing item is listed at once
       Given "bob" is editing an exercise with no correct option and no skill
