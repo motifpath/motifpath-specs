@@ -7,7 +7,7 @@
 (see the `sequence_index` bullet under Decision).
 **Amended by:** ADR-050 (2026-10-06) — a diagram has a list of named playbacks instead of one
 `sequence`; `tempo_bpm` and `time_signature` move onto each playback, and a `DiagramRef` chooses one.
-**Amended:** 2026-10-12 (MOT-74, Proposed) — a playback can be a listening exercise's sound, and a
+**Amended:** 2026-10-12 (MOT-74, Accepted) — a playback can be a listening exercise's sound, and a
 playback in that use can't be removed (see the amendment at the end).
 **Partially supersedes:** ADR-028's `DiagramPosition.sequence_index` and `diagram_ref.playback`
 (`direction`, `step_ms`), and the ADR-027/ADR-028 note that sends audio-synced highlighting to
@@ -385,7 +385,7 @@ inside a stack keeps the schema unchanged and leaves the choice open.
 
 ## Amendment (2026-10-12) — a playback as an exercise's sound (MOT-74)
 
-**Status:** Proposed
+**Status:** Accepted (2026-10-12, by Gilson)
 
 The ADR-019 amendment of the same date lets an `audio_recognition` stimulus or an
 `audio_selection` option be a diagram's playback instead of an uploaded clip. For playback, it
