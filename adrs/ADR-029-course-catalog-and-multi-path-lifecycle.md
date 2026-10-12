@@ -4,6 +4,7 @@
 **Date:** 2026-09-21
 **Deciders:** Gilson Yamada (solo engineering at MVP)
 **Amended by:** ADR-037 (2026-09-25) — every user can self-enroll; the learner catalog moves to `GET /catalog/courses` and `GET /catalog/creators`, and `GET /courses` becomes authoring-only.
+**Amended by:** ADR-055 (2026-10-12) — an enrollment's pinned version changes only when the learner updates, and checkpoint advance reads the pinned version; the node version on a copy is an audit trail.
 
 ---
 

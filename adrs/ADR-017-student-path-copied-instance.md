@@ -4,6 +4,7 @@
 **Date:** 2026-09-08
 **Deciders:** Gilson Yamada (solo engineering at MVP)
 **Amended by:** ADR-037 (2026-09-25) — learner state is no longer restricted to users with role student; every user can learn.
+**Amended by:** ADR-055 (2026-10-12) — a learner can update a copy from its template on request.
 
 ---
 

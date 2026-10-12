@@ -1,7 +1,8 @@
 # Pattern: Learning (my courses, course detail, course completed)
 
 **Source:** ADR-049 §1 and §5 · ADR-017 (the student's copied path) · MOT-57 (Figma "Learning",
-rows 1–5; decisions D1–D10, D2 revised after a benchmark)
+rows 1–5; decisions D1–D10, D2 revised after a benchmark) · MOT-36 (row 6, decisions U1–U8;
+ADR-055)
 
 ## When
 
@@ -50,6 +51,44 @@ course by its picture before reading its title.
   Finished group.
 - **States:** skeleton rows while loading (after 300 ms); a load error is an `InlineNotice` with
   "Try again" in place, and the shell stays (`states.md`).
+
+### Updating to the latest version (MOT-36)
+
+A course or path the student started keeps the content it had when they started it. When the author
+publishes changes, the student can choose to take them (ADR-055).
+
+- **When it is offered (U3):** only for an item **In progress** that is behind its published course or
+  path (`update_available`). Finished and Left items are never offered it. Starting a left item again
+  already gets the latest version.
+- **The row (U1):** `LearningCard` with **New version** on: a refresh icon before the eyebrow, with
+  the accessible name "New version available". The eyebrow, the progress and the tap behaviour
+  stay the same.
+- **Where it starts (U2):**
+  - "Update to the latest version" is the **first** item in the row's ⋯ menu.
+  - On the course detail, a quiet card under Continue says "A newer version is available", with a
+    secondary "Update course" button.
+  - Both open the same confirm.
+- **The confirm (U4, U6):**
+  - It is a sheet on Compact and a centred dialog from Medium, with Not now on the left and Update
+    on the right.
+  - The title is "Update Guitar foundations?". The text is always the same: you get the latest parts,
+    lessons and picture; lessons you finished stay finished; if the lesson you are on was removed,
+    you continue at the next one you haven't finished; this can't be undone.
+  - It has no list of changes, because counts would mislead.
+  - The primary ("Update course" or "Update path") is not destructive, because nothing done is lost.
+  - There is no Undo.
+- **States:**
+  - While updating, the primary is busy and Not now is disabled.
+  - On success, the sheet closes and a success toast says "Guitar foundations is up to date", with no
+    action. The row loses the icon and shows the new picture and title.
+  - On failure, the sheet stays open with an error `InlineNotice` (nothing changed) and the primary
+    becomes "Try again".
+- **Your place (U5):**
+  - Finished lessons stay finished.
+  - In a course, the student stays on their part if it still exists; otherwise they continue at the
+    first part they haven't finished.
+  - In a path, they continue at the first unfinished lesson, as My path always does.
+  - Updating never changes which item is current.
 
 ### Course detail (learner view)
 
@@ -104,10 +143,14 @@ course by its picture before reading its title.
   (D3). Adding it is an OpenAPI change first.
 - Show the level or author on the rows, or a lesson length anywhere.
 - Undo a leave: it is irreversible today, so it confirms.
+- Count or list what changed in an update, or offer the update on a finished or left item.
 - Add concept pages to Learning (D10). "Practise this" lives on Your skills, Your progress, the
   practice setup picker and the lesson end (MOT-77).
 
 ## Spec changes this needs
+
+- **MOT-36 (update a copy):** `update_available` on the learner's course enrollments and standalone
+  paths, and an update action for each (ADR-055). Spec-first.
 
 - None for D1–D7 and D9: the data exists (`CourseEnrollment`, `CourseDetail`, `StudentPath`).
 - **D8 (rating):** MOT-27 — an endpoint to save a 1–5 course rating per enrolment (spec-first).

@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.41.0
+  version: 0.42.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -5581,10 +5581,10 @@ paths:
         anywhere show as completed in the copy. If the caller already
         holds a non-archived standalone StudentPath copied from this path
         (there is never more than one), that copy is made current and
-        returned (200) instead of creating a second one. To take a newer
-        version of the path, the caller archives that copy first: an
-        archived copy is not reused, so enrolling again creates a fresh
-        copy. Any user may enroll,
+        returned (200) instead of creating a second one. To take the
+        path's latest content, the caller updates that copy in place, or
+        archives it first: an archived copy is not reused, so enrolling
+        again creates a fresh copy. Any user may enroll,
         whatever their role.
       tags:
         - Learning Paths
@@ -5766,6 +5766,67 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConflictError'
 
+  /students/me/course-enrollments/{course_enrollment_id}/update:
+    post:
+      operationId: updateCourseEnrollmentToLatest
+      summary: Update a course enrollment to the course's latest published content
+      description: |
+        Moves an active enrollment to the course's latest published
+        version, at the learner's explicit request. The enrollment is
+        re-pinned to that version, and its title, summary, level,
+        thumbnail and checkpoint count are read from it. Lesson progress
+        is kept per content node, so finished lessons stay finished.
+
+        The active checkpoint: if its learning path is still a checkpoint
+        of the latest version, the learner stays on it at its new
+        position, and its student path is updated to the learning path's
+        current lessons and presentation, keeping its id. Otherwise that
+        student path is archived and the active checkpoint becomes the
+        first checkpoint of the latest version whose lessons the learner
+        has not all completed, copied as on a normal advance. If every
+        checkpoint is already completed, the enrollment completes.
+        Checkpoints before the active one count as passed.
+
+        The update cannot be undone. It never changes which course or
+        path is current. Updating an enrollment with no update available
+        changes nothing and returns it as it is.
+      tags:
+        - Courses
+      parameters:
+        - name: course_enrollment_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the enrollment to update.
+      responses:
+        "200":
+          description: The enrollment after the update.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseEnrollment'
+        "400":
+          description: The course_enrollment_id is not a valid UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: |
+            No active enrollment with this ID exists for the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /students/me/paths/{student_path_id}/archive:
     post:
       operationId: archiveStandaloneStudentPath
@@ -5816,6 +5877,70 @@ paths:
             have nothing else eligible to become current. Switch to
             another course or path first via PUT
             /students/me/current-path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+
+  /students/me/paths/{student_path_id}/update:
+    post:
+      operationId: updateStandalonePathToLatest
+      summary: Update a standalone student path to its template's latest content
+      description: |
+        Replaces a standalone StudentPath's items with its learning path's
+        current items, at the learner's explicit request. Each item
+        resolves to its content node's latest published version, as on
+        any copy. The title, summary, level and thumbnail are refreshed
+        from the learning path. The path keeps its id, its assigner, and
+        whether it is current. Lesson progress is kept per content node,
+        so finished lessons stay finished, and the next lesson is the
+        first one not yet completed.
+
+        The update cannot be undone. Updating a path with no update
+        available changes nothing and returns it as it is.
+      tags:
+        - Learning Paths
+      parameters:
+        - name: student_path_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the standalone StudentPath to update.
+      responses:
+        "200":
+          description: The StudentPath after the update.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentPath'
+        "400":
+          description: The student_path_id is not a valid UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: |
+            No non-archived standalone StudentPath with this ID exists for
+            the caller. A StudentPath that belongs to a course enrollment is
+            also refused here with this status; update its enrollment
+            instead.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: |
+            The path cannot be updated: every lesson is already completed,
+            or its learning path is no longer published.
           content:
             application/json:
               schema:
@@ -9823,7 +9948,8 @@ components:
         A student's own copy of a learning path template's items. Created by
         copying a LearningPath at assign time; independently editable
         afterwards and never affected by later changes to the template it
-        was copied from.
+        was copied from, unless the student explicitly updates it to the
+        template's latest content.
       properties:
         student_path_id:
           type: string
@@ -9900,6 +10026,15 @@ components:
           description: >-
             Number of this path's items whose content node the student has
             completed, here or in any other path.
+        update_available:
+          type: boolean
+          description: >-
+            True when this standalone path can be updated to its template's
+            latest published content: it is not archived, not finished, its
+            template is still published, and the template's lessons (their
+            order and section labels), title, summary, level or thumbnail
+            differ from this copy. Always false for a path that belongs to a
+            course enrollment; the enrollment is updated instead.
       required:
         - student_path_id
         - student
@@ -9909,6 +10044,7 @@ components:
         - assigned_at
         - lesson_count
         - completed_count
+        - update_available
 
     StudentPathItem:
       type: object
@@ -10954,6 +11090,14 @@ components:
           type: string
           format: date-time
           description: Timestamp at which the student enrolled.
+        update_available:
+          type: boolean
+          description: >-
+            True when this active enrollment can be updated to the course's
+            latest published content: a newer published course version
+            exists, or the active checkpoint's student path differs from its
+            learning path's current lessons, title, summary, level or
+            thumbnail. Always false for a completed or abandoned enrollment.
       required:
         - course_enrollment_id
         - student
@@ -10968,6 +11112,7 @@ components:
         - active_checkpoint_student_path_id
         - active_checkpoint_position
         - enrolled_at
+        - update_available
 
     SetCurrentPathRequest:
       type: object

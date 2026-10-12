@@ -2,9 +2,10 @@
 #
 # Everything the student has started — course enrolments and standalone paths — in one list, the
 # learner view of a course, and the screen shown when a course is finished. The pattern is
-# design/patterns/learning.md; the Figma page is "Learning" (rows 1–5). Switching, abandoning and
-# archiving, and why the current item cannot be left while another is in progress, are in
-# features/learning-paths/current-path-lifecycle.feature.
+# design/patterns/learning.md; the Figma page is "Learning" (rows 1–5, and row 6 for updating a
+# copy, MOT-36). Switching, abandoning and archiving, and why the current item cannot be left while
+# another is in progress, are in features/learning-paths/current-path-lifecycle.feature. What an
+# update does to a copy is in features/learning-paths/update-a-copy.feature.
 #
 # These scenarios are verified by motifpath-web's component tests and by manual browser checks,
 # not by any service's BDD suite.
@@ -269,3 +270,79 @@ Feature: See everything I started and pick up where I left off
     Given "alice" is still on part 2 of "Guitar foundations"
     When "alice" opens the course completed screen of "Guitar foundations"
     Then it says the course was not found among her finished courses
+
+  # ── Updating to the latest version (MOT-36, ADR-055) ─────────────────────
+
+  Scenario: A row that is behind shows a new-version icon
+    Given "alice" is on part 2 of the 4 parts of "Guitar foundations"
+    And a newer version of "Guitar foundations" is available to her
+    When "alice" opens Learning
+    Then the "Guitar foundations" row shows a refresh icon before "Course · Part 2 of 4", named "New version available"
+    And its progress bar still reads "1 of 4 parts"
+
+  Scenario: The row menu offers the update first, only while one is available
+    Given a newer version of "Guitar foundations" is available to "alice"
+    When "alice" opens the ⋯ menu of the "Guitar foundations" row
+    Then the first item is "Update to the latest version"
+    And "Course details" and "Leave course" follow
+
+  Scenario: A row that is up to date has no update in its menu
+    Given "Guitar foundations" is up to date for "alice"
+    When "alice" opens the ⋯ menu of the "Guitar foundations" row
+    Then there is no "Update to the latest version" item
+
+  Scenario: Finished and left items are never offered the update
+    Given "alice" finished the course "First songs" and left the course "Blues basics"
+    When "alice" opens Learning
+    Then neither row shows the new-version icon
+    And neither row's ⋯ menu offers "Update to the latest version"
+
+  Scenario: The course detail offers the same update under Continue
+    Given a newer version of "Guitar foundations" is available to "alice"
+    When "alice" opens the course detail of "Guitar foundations"
+    Then a card under "Continue part 2" reads "A newer version is available"
+    And its "Update course" button opens the update confirm
+
+  Scenario: The update always confirms first, with the same text
+    Given a newer version of "Guitar foundations" is available to "alice"
+    When "alice" chooses "Update to the latest version" on the "Guitar foundations" row
+    Then a confirm titled "Update Guitar foundations?" opens
+    And it says finished lessons stay finished, a removed current lesson moves her to the next unfinished one, and the update can't be undone
+    And its actions are "Update course" and "Not now"
+
+  Scenario: Not now leaves the course as it was
+    Given the update confirm for "Guitar foundations" is open
+    When "alice" taps "Not now"
+    Then the confirm closes
+    And the "Guitar foundations" row still shows the new-version icon
+
+  Scenario: While updating, the confirm stays and shows progress
+    Given the update confirm for "Guitar foundations" is open
+    When "alice" taps "Update course"
+    Then "Update course" shows it is busy and "Not now" is disabled until the update finishes
+
+  Scenario: A successful update closes the confirm and refreshes the row
+    Given the update confirm for "Guitar foundations" is open
+    And the latest version of "Guitar foundations" has a new picture
+    When "alice" taps "Update course" and the update succeeds
+    Then the confirm closes
+    And a success toast reads "Guitar foundations is up to date", with no Undo
+    And the "Guitar foundations" row shows the new picture and no new-version icon
+
+  Scenario: A failed update keeps the confirm open and changes nothing
+    Given the update confirm for "Guitar foundations" is open
+    When "alice" taps "Update course" and the update fails
+    Then the confirm stays open with an error notice saying nothing changed
+    And its primary action reads "Try again"
+    And the "Guitar foundations" row still shows the new-version icon
+
+  Scenario: Updating a path uses the path's wording
+    Given a newer version of the standalone path "Fingerstyle warm-ups" is available to "alice"
+    When "alice" chooses "Update to the latest version" on the "Fingerstyle warm-ups" row
+    Then a confirm titled "Update Fingerstyle warm-ups?" opens with the action "Update path"
+
+  Scenario: Updating does not switch the current item
+    Given "Reading rhythm" is "alice"'s current course
+    And a newer version of "Guitar foundations" is available to her
+    When "alice" updates "Guitar foundations"
+    Then "Reading rhythm" is still her current course
