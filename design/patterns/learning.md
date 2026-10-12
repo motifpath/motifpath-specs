@@ -26,7 +26,7 @@ course by its picture before reading its title.
 - **Order:** the current item first, then by most recently started (`enrolled_at`; there is no
   last-activity time).
 - **Rows (`LearningCard`):** a compact row with no button (D2, revised):
-  - a 16:9 thumbnail at 96 × 54 (`thumbnail_url`, cover); without one, the course or path icon on a
+  - a 16:9 thumbnail at 96 × 54 (`thumbnail_url`, whole picture, letterboxed — never cropped); without one, the course or path icon on a
     tinted tile in the same box;
   - an eyebrow with the kind and where the student is: "Course · Part 2 of 4", "Path · Assigned by
     Ana", "Course · Finished";
