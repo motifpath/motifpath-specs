@@ -69,6 +69,10 @@ course by its picture before reading its title.
   foundations?" — you lose your place; starting again begins at part 1; your practice and skill
   levels stay. Sheet on Compact (destructive on top), alert dialog from Medium (safe left,
   destructive right).
+- **Leaving the current item (MOT-83):** the current course or path cannot be left while another
+  is in progress, so the app first makes the next item in progress (top of the order) current, then
+  leaves. The confirm names it: "You'll continue with Reading rhythm." Leaving the only item in
+  progress leaves nothing current.
 - **Finished (D9):** a "Finished" chip, every part done, and "Practise what you learned" as a
   secondary button; no lesson review for now.
 
