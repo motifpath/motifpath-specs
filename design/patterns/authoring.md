@@ -85,6 +85,20 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   in a full-screen layer with a Preview bar (accent fill, ×). It grades but records nothing; nothing
   can be started for real.
 
+### Lesson video (MOT-19, ADR-054)
+
+- The Video field of a video lesson is a `VideoSource` card above the link field, which reads
+  "Or paste a link". Either one sets the lesson's video (Figma "Authoring", row 15).
+- **Upload:** tapping the card picks a file. Only an MP4 (H.264) of up to 1 GB is accepted; anything
+  else is refused on the card before a byte is sent (Refused), with the iPhone hint (Camera ›
+  Formats › Most Compatible).
+- **Uploading:** name, "490 of 980 MB · 50%", a `ProgressBar` and × to cancel; the link field hides.
+  Save waits for the upload, and leaving asks first.
+- **Uploaded:** the card stands for the video; ⋮ = Play · Replace · Use a link instead · Remove.
+- **Failed:** the card turns danger with "Upload stopped. Check your connection and try again." and
+  ↻, which restarts the upload from the beginning; the link field is back.
+- The lesson's thumbnail is also the poster before the video plays; nothing is taken from the video.
+
 ### Exercise types
 
 | Type | Stimulus | Options |
@@ -179,5 +193,7 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   and status filters on `/content-nodes`; optional counts on `…/creators`.
 - **MOT-74 / MOT-75:** sounds from a diagram playback or a catalog voicing (ADR-019 / ADR-041
   amendments); chord-box options and stimuli.
+- **MOT-19 / ADR-054:** `lesson_video` uploads (MP4, at most 1 GB, declared `file_size`) on
+  `POST /media/upload-url`.
 - **D3:** "Content" → "Lessons" is a UI label change only (routes and API keep `content-nodes`).
 - **MOT-94 (discovery):** chord progressions by bars — not designed here.
