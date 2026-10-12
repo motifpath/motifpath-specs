@@ -1,7 +1,7 @@
 # Pattern: Discover (course and path catalog, filters, path detail)
 
 **Source:** ADR-049 §1 and §5 · ADR-029 (course catalog) · MOT-58 (Figma "Discover", rows 1–5;
-decisions D1–D11, D5 revised twice)
+decisions D1–D11, D5 revised twice) · MOT-87 (Expanded filters as a dialog)
 
 ## When
 
@@ -59,9 +59,10 @@ stay short.
 - **Compact:** a bottom sheet (`overlays.md`): the chip groups, the Teacher row, then "Clear all"
   (Tertiary) and "Show 2 courses" (Primary), whose count updates as filters change. The Teacher list
   replaces the sheet's content and gets a back arrow — never a sheet on a sheet.
-- **Medium:** the same content in a 480 px dialog; actions bottom-right, primary last.
-- **Expanded:** a 260 px filter panel to the left of the results that applies at once (no Show
-  button), with "Clear all" in its header. The Teacher list is a menu anchored to the Teacher row.
+- **Medium and Expanded:** the same content in a 480 px dialog; actions bottom-right, primary last.
+  The Teacher list replaces the dialog's content, as in the sheet. (Expanded first had a 260 px
+  side panel that applied at once; on 2026-10-12 it moved to the dialog so every size class reuses
+  the phone's fields and the grid keeps its width, as in Teach.)
 
 ### Path detail (D10)
 
@@ -79,7 +80,8 @@ stay short.
 
 - "Start course" / "Start path" enrols, makes it the current item and opens My path on lesson 1,
   with a toast "Now on Blues shuffle" and **Undo**. Undo switches back to the item that was current;
-  the new one stays in Learning (`overlays.md`: reversible, so no confirm).
+  the new one stays in Learning (`overlays.md`: reversible, so no confirm). When nothing was
+  current before, there is nothing to switch back to, so the toast has no Undo.
 - Enrolling in a path always makes it current. Enrolling in a course only does that when nothing is
   current, so the web also sets the current path (`PUT /students/me/current-path`) after enrolling
   in a course.
@@ -90,7 +92,7 @@ stay short.
 |---|---|---|---|
 | Compact | Bottom bar; one column of rows. | Bottom sheet; Teacher list replaces its content. | One column. |
 | Medium | Rail; one 560 px column of rows (two columns would squeeze the titles). | 480 px dialog. | The Compact order in the 560 px column. |
-| Expanded | Sidebar; segmented control and search on top; filter panel (260 px) beside a 3-column grid of `CatalogCard` Layout=Tile (Discover is a shelf to browse; Learning stays a list). | Side panel, applies at once; Teacher as an anchored menu. | A 600 px outline pane and a 320 px side card that stays in view: thumbnail, size, "Start path". |
+| Expanded | Sidebar; segmented control, search and filter button on top; a 3-column grid of `CatalogCard` Layout=Tile (Discover is a shelf to browse; Learning stays a list). | 480 px dialog, as on Medium. | A 600 px outline pane and a 320 px side card that stays in view: thumbnail, size, "Start path". |
 
 ## Do not
 
