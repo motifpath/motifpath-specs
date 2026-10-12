@@ -3,7 +3,7 @@
 **Status:** Accepted
 **Date:** 2026-09-19
 **Deciders:** Gilson (Product Owner)
-**Amended:** 2026-10-12 (MOT-20, Proposed) — a challenge's subject can be a skill, a concept, or
+**Amended:** 2026-10-12 (MOT-20, Accepted) — a challenge's subject can be a skill, a concept, or
 both (see the amendment at the end).
 
 ---
@@ -237,7 +237,7 @@ rather than guessed at.
 
 ## Amendment (2026-10-12) — a challenge can assess a skill and a concept (MOT-20)
 
-**Status:** Proposed
+**Status:** Accepted
 
 "Exactly one" in *Challenge's subject references a Skill or Concept by ID* becomes "at least
 one": a challenge sets `subject_skill_id`, `subject_concept_id`, or both. A teacher reported the

@@ -58,7 +58,6 @@ Feature: Manage challenges
     When "bob" creates a challenge for "intro-to-triads" with subject skill "triad-shapes", pass threshold 70, shuffled exercises, and shuffled options
     Then the challenge is created with exercise shuffling and option shuffling both enabled
 
-  @wip
   Scenario: A teacher creates a challenge that assesses both a skill and a concept
     Given "bob" is authenticated as a teacher
     When "bob" creates a challenge for "intro-to-triads" with subject skill "triad-shapes", subject concept "chord-theory", and pass threshold 70
@@ -101,7 +100,6 @@ Feature: Manage challenges
     Then the challenge's subject skill is "triad-shapes-revised"
     And the challenge's pass threshold is 85
 
-  @wip
   Scenario: A teacher switches a challenge's subject from a skill to a concept
     Given a challenge "triad-challenge" exists for content node "intro-to-triads"
     And "bob" is authenticated as a teacher
@@ -109,7 +107,6 @@ Feature: Manage challenges
     Then the challenge's subject concept is "chord-theory"
     And the challenge has no subject skill
 
-  @wip
   Scenario: A teacher adds a subject concept to a challenge that assesses a skill
     Given a challenge "triad-challenge" exists for content node "intro-to-triads"
     And "bob" is authenticated as a teacher
@@ -176,7 +173,6 @@ Feature: Manage challenges
     Then the request is rejected as invalid
     And the rejection identifies "subject_skill_id" as the source of the error
 
-  @wip
   Scenario: Creating a challenge whose subject concept is not linked to its content node is rejected, even with a linked subject skill
     Given "bob" is authenticated as a teacher
     When "bob" creates a challenge for "intro-to-triads" with subject skill "triad-shapes", subject concept "an-unrelated-concept", and pass threshold 70
