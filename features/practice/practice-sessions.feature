@@ -55,6 +55,14 @@ Feature: Keep a record of practice sessions and learning activity
     When "alice" answers a challenge exercise of the content node "open-chords"
     Then no practice session gains an answer
 
+  # ── Review of a finished course or path (MOT-106) ─────────────────────────
+
+  @wip
+  Scenario: A lesson reviewed after it was completed stays completed
+    Given "alice" completed "intro-to-chords" yesterday
+    When "alice"'s lesson.started for "intro-to-chords", marked as review, arrives
+    Then "intro-to-chords" is still completed for "alice"
+
   # ── Failure cases ──────────────────────────────────────────────────────────
 
   Scenario: The same practice.session_ended delivered twice counts once
