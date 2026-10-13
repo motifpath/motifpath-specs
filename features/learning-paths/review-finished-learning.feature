@@ -4,7 +4,9 @@
 # reads never change the current course or path, an enrolment or any status. Progress stays put
 # because a completed node stays completed whatever arrives for it later (ADR-011). Events sent
 # during review carry a review marker for analytics. Accepting it is in
-# features/event-ingestion/ingest-tracking-event.feature. What the student sees is in
+# features/event-ingestion/ingest-tracking-event.feature; what the worker does with review events
+# is in features/practice/practice-sessions.feature and features/practice/knowledge-state.feature.
+# What the student sees is in
 # features/web/learning.feature and features/web/lesson-review.feature.
 
 @wip
@@ -98,16 +100,3 @@ Feature: Read a finished course or path again
     Given "alice" is authenticated as a student
     When "alice" reads the student path "not-a-uuid"
     Then the request is rejected as invalid
-
-  # ── Progress during review ─────────────────────────────────────────────────
-
-  Scenario: A lesson reviewed in a finished course keeps its status
-    Given "alice" has completed course "fingerstyle-journey"
-    When "alice"'s lesson.started for the first item of "open-chords-path", marked as review, is processed
-    Then that item's status for "alice" is still "completed"
-    And the enrollment status is still "completed"
-
-  Scenario: A challenge answered in review counts as practice evidence
-    Given "alice" has completed course "fingerstyle-journey"
-    When "alice" answers an exercise of a challenge in "open-chords-path", marked as review
-    Then the answer is graded and counted in "alice"'s practice evidence like any other
