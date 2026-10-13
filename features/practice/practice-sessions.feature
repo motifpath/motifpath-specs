@@ -57,7 +57,6 @@ Feature: Keep a record of practice sessions and learning activity
 
   # ── Review of a finished course or path (MOT-106) ─────────────────────────
 
-  @wip
   Scenario: A lesson reviewed after it was completed stays completed
     Given "alice" completed "intro-to-chords" yesterday
     When "alice"'s lesson.started for "intro-to-chords", marked as review, arrives

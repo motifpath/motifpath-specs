@@ -9,7 +9,6 @@
 # What the student sees is in
 # features/web/learning.feature and features/web/lesson-review.feature.
 
-@wip
 Feature: Read a finished course or path again
   As a student who finished a course or a standalone path
   I want to read its parts and lessons again without moving my progress
