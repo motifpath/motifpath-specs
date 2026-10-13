@@ -31,7 +31,8 @@ hit. A full neck doesn't fit a phone at that size, and shrinking it makes every 
   is **48 px wide, the open string included** (its zone left of the nut too). A drill **never
   scrolls sideways**: each drill is asked inside one **fret window** of five frets, plus the open
   string when it starts at the nut (frets 0–5, 6 × 48 px = 288 px), chosen by the **composer** with
-  the drill (where its due cells are) and named in the question ("frets 0–5"). Compact draws only
+  the drill (where its due cells are, and every other session where its new cells are) and named in
+  the question ("frets 0–5"). Compact draws only
   the window. Medium and Expanded may draw more of the neck, but the places outside the window are
   dimmed and can't be tapped, so the item is the same on every screen (ADR-046, 2026-10-13).
   Phone evidence: on today's fitted board (≈27 px frets, 26 px open-string zone) 6 of 16 taps were
