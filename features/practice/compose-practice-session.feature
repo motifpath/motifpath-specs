@@ -149,6 +149,63 @@ Feature: Compose a practice session
     When "alice" composes a 5-minute session with no instrument in hand
     Then every fretboard cell in the session is estimated at 8 seconds
 
+  # ── Fret windows ───────────────────────────────────────────────────────────
+  # A fretboard drill never scrolls sideways: each drill of each layout is asked inside one window
+  # of five frets the composer picks, plus the open string when it starts at the nut (frets 0–5).
+  # The window holds the most of the drill's due cells, then weak, then new, nearest the nut on a
+  # tie. Cells are frets 0 to 11, so the windows are 0–5, 2–6, 3–7 and so on up to 7–11.
+
+  @wip
+  Scenario: Every cell of a drill comes from one window of five frets
+    Given "alice" has nothing due or weak, and 40 new fretboard cells on guitar
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then every "guitar" find_the_note cell in the session carries the same fret window
+    And every "guitar" name_the_note cell in the session carries the same fret window
+    And every fretboard cell's fret is inside its window
+
+  @wip
+  Scenario: A window at the nut includes the open string
+    Given "alice" has nothing due or weak, and 40 new fretboard cells on guitar
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" name_the_note cells carry the fret window 0 to 5
+
+  @wip
+  Scenario: The window holds the most due cells, nearest the nut on a tie
+    Given "alice" has 6 "guitar" cells due at frets 7 to 9, to be asked as name_the_note
+    And 2 "guitar" cells due at frets 1 and 2, to be asked as name_the_note
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" name_the_note cells carry the fret window 5 to 9
+
+  @wip
+  Scenario: With nothing due, the window holds the most weak cells
+    Given "alice" has nothing due on guitar
+    And 5 weak "guitar" cells at frets 8 to 10 to be asked as find_the_note, and new cells at every fret
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" find_the_note cells carry the fret window 6 to 10
+
+  @wip
+  Scenario: A due cell outside the drill's window waits for another session
+    Given "alice" has 6 "guitar" cells due at frets 7 to 9 and 1 due at fret 0, all to be asked as name_the_note
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the session has no "guitar" name_the_note cell at fret 0
+    And the "guitar" cell at fret 0 is still due afterwards
+
+  @wip
+  Scenario: Each drill has its own window
+    Given "alice" has 6 "guitar" cells due at frets 8 to 10 to be asked as name_the_note
+    And 6 "guitar" cells due at frets 1 to 3 to be asked as find_the_note
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" name_the_note cells carry the fret window 6 to 10
+    And the "guitar" find_the_note cells carry the fret window 0 to 5
+
+  @wip
+  Scenario: In a session mixing layouts, each layout's drill has its own window
+    Given "alice" has 6 "guitar" cells due at frets 7 to 9 to be asked as name_the_note
+    And 6 "electric-bass" cells due at frets 1 to 3 to be asked as name_the_note
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" name_the_note cells carry the fret window 5 to 9
+    And the "electric-bass" name_the_note cells carry the fret window 0 to 5
+
   Scenario: A session in the head picks diagram shapes of the student's instruments
     Given "alice" has new shapes of skill "map-fretboard-caged" on guitar
     When "alice" composes a 10-minute session with no instrument in hand

@@ -28,6 +28,50 @@ Feature: Answer a practice item the way it can be graded honestly
     When "alice" taps "C"
     Then the practice.item_answered response names the note "C" with the choices "B", "F", "C" and "C#"
 
+  # ── Fretboard drills in a fret window ──────────────────────────────────────
+  # The plan gives each fretboard cell its drill's window: five frets, plus the open string when
+  # it starts at the nut. Sizes are CSS pixels; a phone is a 390 px wide viewport.
+
+  @web
+  Scenario: On a phone a drill draws only its window and never scrolls sideways
+    Given "alice" is asked to find the note of the guitar cell on string 6 at fret 5, in the fret window 3 to 7
+    When the drill is shown on a phone
+    Then the board shows frets 3 to 7 and no other fret
+    And the board doesn't scroll sideways
+
+  @web
+  Scenario: Every place in a window at the nut is at least 48 px wide, the open string included
+    Given "alice" is asked to find the note of the guitar cell on string 6 at fret 0, in the fret window 0 to 5
+    When the drill is shown on a phone
+    Then the open-string place and frets 1 to 5 are each at least 48 px wide
+    And the board shows a nut, with the open-string place left of it
+
+  @web
+  Scenario: A tap on the open string is answered as the open string, not fret 1
+    Given "alice" is asked to find the note of the guitar cell on string 6 at fret 0, in the fret window 0 to 5
+    When "alice" taps the open-string place on string 6
+    Then the practice.item_answered response names string 6, fret 0
+
+  @web
+  Scenario: The question names the window
+    Given "alice" is asked to find the note "C" on string 5, in the fret window 0 to 5
+    When the drill is shown
+    Then the question names frets 0 to 5
+
+  @web
+  Scenario: On a wider screen the places outside the window are dimmed and can't be tapped
+    Given "alice" is asked to find the note of the guitar cell on string 6 at fret 8, in the fret window 6 to 10
+    When the drill is shown on a 1024 px wide screen
+    Then frets 6 to 10 can be tapped
+    And the other frets are dimmed and can't be tapped
+
+  @web
+  Scenario: Name the note draws its cell in the window too
+    Given "alice" is asked to name the note of the guitar cell on string 4 at fret 9, in the fret window 7 to 11
+    When the drill is shown on a phone
+    Then the board shows frets 7 to 11 with the cell on string 4 at fret 9 marked
+    And the board doesn't scroll sideways
+
   # ── Sound options commit with Check ────────────────────────────────────────
 
   @web
