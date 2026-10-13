@@ -575,6 +575,29 @@ FretboardDrill:
     How a fretboard cell is asked. name_the_note = the cell is shown and the student names
     its note; find_the_note = the note and string are named and the student taps the cell.
 
+FretWindow:
+  type: object
+  description: |
+    The frets a fretboard drill is asked within, so its board is drawn at full tap size without
+    scrolling sideways. Five frets, plus the open string when the window starts at the nut: a
+    from_fret of 0 covers the open string and frets 1 to 5; any other from_fret covers it and the
+    next four frets, such as 3 to 7. Only the window's places can be tapped, and the question
+    names it. Every cell of the same drill and layout in a plan carries the same window, and the
+    cell's fret is always inside it.
+  properties:
+    from_fret:
+      type: integer
+      enum: [0, 2, 3, 4, 5, 6, 7]
+      description: |
+        The window's lowest fret; 0 means it starts at the open string and ends at fret 5.
+        Otherwise it ends at from_fret + 4, at most fret 11. Never 1, since a window at the nut
+        always includes the open string.
+  additionalProperties: false
+  required:
+    - from_fret
+  example:
+    from_fret: 3
+
 DiagramShapeDrill:
   type: string
   enum:
