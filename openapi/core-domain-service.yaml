@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.43.0
+  version: 0.43.1
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -5826,10 +5826,13 @@ paths:
       summary: List the parts of one of the authenticated student's course enrollments
       description: |
         Returns the StudentPath of every part the caller has reached in
-        this enrollment, ordered by course_checkpoint_position, each with
-        the progress state of its items. For a completed enrollment that
-        is every part of the course version the student took, never a
-        newer one. Item statuses follow the same rules as
+        this enrollment, in the order of the course version the enrollment
+        is pinned to — the version the student enrolled in, or the one they
+        last updated to — each with the progress state of its items and
+        that version's course_checkpoint_position. Parts the pinned version
+        no longer has, and copies archived by an update, are left out. For
+        a completed enrollment that is every part of the pinned version,
+        never a newer one. Item statuses follow the same rules as
         GET /students/me/path. Used to open the lessons of a finished
         course for review.
 
