@@ -1,0 +1,448 @@
+{
+  "schema_version": 1,
+  "revision": "MOT-115-r2",
+  "status": "proposed",
+  "prepared_on": "2026-10-13",
+  "approval": {
+    "approver": null,
+    "approved_on": null,
+    "reviewed_revision": null
+  },
+  "namespace": "monetization",
+  "scope": "Activation of new commercial capabilities; existing rights, progress, protection and financial obligations are independent of activation flags.",
+  "owner_assignment": "Accountable owner roles are proposed; named assignees are required before rollout.",
+  "environments": [
+    "local",
+    "test",
+    "staging",
+    "production"
+  ],
+  "targeting": {
+    "default_enabled": false,
+    "default_cohorts": [],
+    "subject": "server-resolved MotifPath user UUID; teacher UUID for seller/license operations",
+    "rule": "Explicit environment and subject allowlist; never trust a caller-supplied cohort or client flag. Automation uses authenticated integration identity and correlated obligation, not a user cohort."
+  },
+  "flags": [
+    {
+      "name": "monetization.content_ownership",
+      "deliverables": [
+        "MOT-118"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain",
+      "accountable_owner_role": "Content provenance steward",
+      "named_owner": null,
+      "requires_for_new_actions": [],
+      "off_behavior": "Stop new commercial ownership classification; retain existing ownership and provenance history."
+    },
+    {
+      "name": "monetization.content_versions",
+      "deliverables": [
+        "MOT-119"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain",
+      "accountable_owner_role": "Content version steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.content_ownership"
+      ],
+      "off_behavior": "Stop new commercial snapshots; keep all referenced published versions readable under existing grants."
+    },
+    {
+      "name": "monetization.strapi_rights",
+      "deliverables": [
+        "MOT-120"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain + Strapi",
+      "accountable_owner_role": "CMS integration steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.content_ownership"
+      ],
+      "off_behavior": "Stop CMS-driven commercial publication; continue authenticated ingestion/reconciliation of existing references without trusting CMS as rights authority."
+    },
+    {
+      "name": "monetization.commercial_validation",
+      "deliverables": [
+        "MOT-121"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain",
+      "accountable_owner_role": "Commercial publication steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.content_versions",
+        "monetization.strapi_rights",
+        "monetization.premium_embedding_license"
+      ],
+      "off_behavior": "Stop new paid publication and commercial updates; retain existing license enforcement and purchased-content delivery."
+    },
+    {
+      "name": "monetization.entitlement_resolution",
+      "deliverables": [
+        "MOT-122"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain",
+      "accountable_owner_role": "Access policy steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.content_ownership",
+        "monetization.content_versions"
+      ],
+      "off_behavior": "Stop activation on additional surfaces; keep access resolution active for any already commercialized resource."
+    },
+    {
+      "name": "monetization.access_grants",
+      "deliverables": [
+        "MOT-123"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain",
+      "accountable_owner_role": "Grant lifecycle steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.entitlement_resolution"
+      ],
+      "off_behavior": "Stop new discretionary grants; continue existing-grant resolution and idempotent fulfillment/adjustments for already-authorized transactions."
+    },
+    {
+      "name": "monetization.progress_retention",
+      "deliverables": [
+        "MOT-124"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain + aggregation-worker",
+      "accountable_owner_role": "Learning continuity steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.access_grants"
+      ],
+      "off_behavior": "Hide new commercial recovery UX; retain all progress and history and allow existing learning continuity. Retention is unconditional."
+    },
+    {
+      "name": "monetization.authorization_enforcement",
+      "deliverables": [
+        "MOT-125"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain + protected media",
+      "accountable_owner_role": "Protected resource steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.entitlement_resolution",
+        "monetization.access_grants",
+        "monetization.progress_retention"
+      ],
+      "off_behavior": "Stop activation on additional surfaces; never bypass authorization or make existing protected resources free."
+    },
+    {
+      "name": "monetization.plus_catalog",
+      "deliverables": [
+        "MOT-127"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain + Vue",
+      "accountable_owner_role": "Plus catalog steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.strapi_rights",
+        "monetization.authorization_enforcement"
+      ],
+      "off_behavior": "Hide new Plus sales surfaces; keep purchased/subscribed content and account status available according to existing rights."
+    },
+    {
+      "name": "monetization.plus_webhooks",
+      "deliverables": [
+        "MOT-128"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain",
+      "accountable_owner_role": "Payment integration steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.access_grants",
+        "monetization.authorization_enforcement"
+      ],
+      "off_behavior": "Stop onboarding new provider integrations; continue verified callbacks, durable receipt, fulfillment and reconciliation for all existing payment obligations."
+    },
+    {
+      "name": "monetization.plus_billing",
+      "deliverables": [
+        "MOT-129"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain + Vue",
+      "accountable_owner_role": "Billing lifecycle steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.plus_webhooks"
+      ],
+      "off_behavior": "Hide new acquisition-related billing UI; preserve existing subscription status, cancellation and required billing support."
+    },
+    {
+      "name": "monetization.plus_checkout",
+      "deliverables": [
+        "MOT-127",
+        "MOT-128"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain + Vue",
+      "accountable_owner_role": "Checkout steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.plus_catalog",
+        "monetization.plus_webhooks",
+        "monetization.plus_billing"
+      ],
+      "off_behavior": "Reject new Plus checkout sessions; fulfill authorized in-flight sessions and process their verified outcomes."
+    },
+    {
+      "name": "monetization.teacher_paid_paths",
+      "deliverables": [
+        "MOT-131"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain + Vue",
+      "accountable_owner_role": "Teacher commerce steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.commercial_validation",
+        "monetization.authorization_enforcement"
+      ],
+      "off_behavior": "Hide new paid offers/publication; keep free creation tools and previously purchased paths available."
+    },
+    {
+      "name": "monetization.path_purchase",
+      "deliverables": [
+        "MOT-131"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain + Vue",
+      "accountable_owner_role": "Purchase fulfillment steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.teacher_paid_paths",
+        "monetization.plus_webhooks",
+        "monetization.teacher_settlement"
+      ],
+      "off_behavior": "Reject new path checkout sessions; fulfill authorized in-flight purchases and retain permanent grants."
+    },
+    {
+      "name": "monetization.premium_embedding_license",
+      "deliverables": [
+        "MOT-132"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain + Vue",
+      "accountable_owner_role": "Commercial license steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.content_versions",
+        "monetization.authorization_enforcement"
+      ],
+      "off_behavior": "Stop new license acquisition/issuance; retain license history and enforce approved terms for existing licensed content without inventing revocation rules."
+    },
+    {
+      "name": "monetization.teacher_settlement",
+      "deliverables": [
+        "MOT-133"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain",
+      "accountable_owner_role": "Financial operations steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.plus_webhooks",
+        "monetization.premium_embedding_license"
+      ],
+      "off_behavior": "Stop onboarding new sellers/settlement programs; continue accounting, refunds, chargebacks, reconciliation and existing settlement obligations under approved policy."
+    },
+    {
+      "name": "monetization.private_beta",
+      "deliverables": [
+        "MOT-137"
+      ],
+      "default_enabled": false,
+      "environment_cohorts": {
+        "local": [],
+        "test": [],
+        "staging": [],
+        "production": []
+      },
+      "evaluation_authority": "core-domain + Vue",
+      "accountable_owner_role": "Release steward",
+      "named_owner": null,
+      "requires_for_new_actions": [
+        "monetization.plus_checkout",
+        "monetization.path_purchase"
+      ],
+      "off_behavior": "Stop admitting new commercial participants/actions; honor existing grants and service existing billing/payment obligations for removed cohorts."
+    }
+  ],
+  "validation_deliverables": {
+    "MOT-134": [
+      "content_ownership",
+      "content_versions",
+      "strapi_rights",
+      "commercial_validation",
+      "entitlement_resolution",
+      "access_grants",
+      "progress_retention",
+      "authorization_enforcement",
+      "plus_catalog",
+      "plus_webhooks",
+      "plus_billing",
+      "plus_checkout",
+      "teacher_paid_paths",
+      "path_purchase",
+      "premium_embedding_license",
+      "teacher_settlement",
+      "private_beta"
+    ],
+    "MOT-135": [
+      "content_ownership",
+      "content_versions",
+      "strapi_rights",
+      "commercial_validation",
+      "entitlement_resolution",
+      "access_grants",
+      "progress_retention",
+      "authorization_enforcement",
+      "plus_catalog",
+      "plus_webhooks",
+      "plus_billing",
+      "plus_checkout",
+      "teacher_paid_paths",
+      "path_purchase",
+      "premium_embedding_license",
+      "teacher_settlement",
+      "private_beta"
+    ],
+    "MOT-136": [
+      "plus_webhooks",
+      "access_grants",
+      "strapi_rights",
+      "premium_embedding_license",
+      "teacher_settlement",
+      "private_beta"
+    ],
+    "MOT-137": [
+      "private_beta"
+    ]
+  },
+  "planning_gates": {
+    "MOT-114": "Architecture audit evidence",
+    "MOT-115": "Registry approval",
+    "MOT-116": "Commercial Figma approval",
+    "MOT-117": "Business/OpenAPI/event/Gherkin contract approval",
+    "MOT-126": "Plus UX refinement approval",
+    "MOT-130": "Teacher commerce UX refinement approval"
+  },
+  "mandatory_commercial_controls": {
+    "traceability": "Durable attributable audit evidence for all direct and indirect commercial operations, including free-to-paid changes, correlated through asynchronous effects.",
+    "idempotency": "Durable logical-operation deduplication and business-transition uniqueness across retries, concurrency, provider events and recovery.",
+    "flag_independent": true,
+    "contract_owner_ticket": "MOT-117",
+    "review_requirement": "Exact audit schema, coupling/recovery, key scope, retention and behavior scenarios must be approved before implementation."
+  }
+}

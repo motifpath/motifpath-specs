@@ -22,3 +22,7 @@ node_modules/
 # Implementation plans (ADR-022): local-only, never committed or PR'd.
 # Historical plans already tracked before ADR-022 are unaffected by this rule.
 /plans/*.md
+
+# MOT-115 registry review artifacts are explicitly shared, per PO instruction.
+!/plans/MOT-115-feature-flags.md
+!/plans/MOT-114-architecture-audit.md
