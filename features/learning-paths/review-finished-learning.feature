@@ -43,16 +43,16 @@ Feature: Read a finished course or path again
   Scenario: After an update, only the parts of the version updated to are listed
     Given "alice" is authenticated as a student
     And "alice" is enrolled in "fingerstyle-journey" with checkpoint 2 active
-    And a newer version of "fingerstyle-journey" replaces "strumming-path" with "fingerpicking-path"
-    And "alice" updates her "fingerstyle-journey" enrollment to the latest version
+    And an admin publishes a new version of "fingerstyle-journey" with checkpoints "open-chords-path", "fingerpicking-path"
+    And "alice" updates her enrollment in "fingerstyle-journey"
     When "alice" lists the parts of her "fingerstyle-journey" enrollment
     Then the response holds only "open-chords-path" and "fingerpicking-path"
 
   Scenario: After an update that reorders the parts, they follow the new order
     Given "alice" is authenticated as a student
     And "alice" is enrolled in "fingerstyle-journey" with checkpoint 2 active
-    And a newer version of "fingerstyle-journey" puts "strumming-path" before "open-chords-path"
-    And "alice" updates her "fingerstyle-journey" enrollment to the latest version
+    And an admin publishes a new version of "fingerstyle-journey" with checkpoints "strumming-path", "open-chords-path"
+    And "alice" updates her enrollment in "fingerstyle-journey"
     When "alice" lists the parts of her "fingerstyle-journey" enrollment
     Then the response holds the student paths of "strumming-path" and "open-chords-path", in that order
 
