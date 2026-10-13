@@ -5,7 +5,8 @@
 # the way back and the way on stay inside that course or path. The reads behind it are in
 # features/learning-paths/review-finished-learning.feature. The lesson screen itself is
 # features/web/lesson.feature. Opening a completed step of the current path is a different review,
-# covered there. Design: the "Learning" Figma page, once the review proposal is approved.
+# covered there. Design: design/patterns/learning.md and the "Learning" Figma page, row 7
+# (decisions R1–R6, approved 2026-10-13).
 #
 # These scenarios are verified by motifpath-web's component tests and by manual browser checks,
 # not by any service's BDD suite.
@@ -34,24 +35,35 @@ Feature: Review a lesson of a finished course or path
 
   Scenario: The title block names the part, not a step of My path
     When "alice" opens lesson 2 of part 1, a video, from the course detail of "First songs"
-    Then the title block shows "Part 1 · Lesson 2 of 6 · Video"
+    Then the title block shows "Part 1 · Lesson 2 of 6 · Video · Done"
 
   Scenario: The way on is the next lesson of the course
     Given "alice" is reviewing lesson 2 of part 1 of "First songs"
     When the lesson ends
-    Then the screen offers the next lesson's card for lesson 3 of part 1
-    And there is no "Next step on My path"
+    Then the screen offers the next lesson's card, "Up next · Part 1 · Lesson 3 of 6", with "Back to First songs"
+    And there is no "Step done" and no "Back to My path"
 
   Scenario: The last lesson of a part leads to the first lesson of the next part
     Given "alice" is reviewing lesson 6 of part 1 of "First songs"
     When the lesson ends
     Then the screen offers the next lesson's card for lesson 1 of part 2
 
-  Scenario: The last lesson of the course leads back to the course
+  Scenario: The last lesson of the course leads to Learning
     Given "alice" is reviewing lesson 6 of part 3 of "First songs"
     When the lesson ends
-    Then the screen offers "Back to First songs" and no next lesson
+    Then the screen says "That was the last lesson of First songs." with "Go to Learning" and no next lesson
     And the course completed screen does not open
+
+  Scenario: The end of a review does not leave the lesson by itself
+    Given "alice" is reviewing lesson 6 of part 3 of "First songs"
+    When the lesson ends
+    Then the lesson stays open until "alice" taps "Go to Learning"
+
+  Scenario: The last lesson of a finished path leads to Learning
+    Given "alice" finished the standalone path "Open chords", 9 lessons
+    And "alice" is reviewing lesson 9 of "Open chords"
+    When the lesson ends
+    Then the screen says "That was the last lesson of Open chords." with "Go to Learning"
 
   Scenario: A lesson of a finished standalone path goes back to its path detail
     Given "alice" finished the standalone path "Open chords"
