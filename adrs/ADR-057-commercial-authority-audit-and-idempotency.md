@@ -76,7 +76,8 @@ of replacing history.
 Committed commercial state and its audit evidence must be durably coupled. An audit failure
 cannot silently commit an untraceable state change. External provider calls cannot be covered
 by a local atomic transaction; durable operation state and reconciliation must preserve the
-causal chain across that boundary. Exact coupling, recovery and tamper-evidence mechanisms,+retention and access permissions require approved MOT-117 contracts.
+causal chain across that boundary. Exact coupling, recovery and tamper-evidence mechanisms,
+retention and access permissions require approved MOT-117 contracts.
 
 ### Idempotent business effects
 
