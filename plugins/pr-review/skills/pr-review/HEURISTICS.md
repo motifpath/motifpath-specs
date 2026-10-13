@@ -45,13 +45,18 @@ plus the five always-on items.
    *Smell:* reusing something built for dozens of items on a path that sees thousands.
 4. **Second-order effect / invariant.** Does the change alter a guarantee other code assumes —
    including by adding rows of a new kind to a table or collection that other code reads through a
-   broad filter (by type, owner, classification), so every existing reader now picks them up? —
-   *Smell:* "just optimized," "just swapped a parameter," "just installed more reference data,"
-   with no map of who depends on it; a new discriminator column whose default only the new code
-   path filters on. In `motifpath-core` this is explicitly the monorepo boundary: does a change
+   broad filter (by type, owner, classification), so every existing reader now picks them up? And
+   the other direction: does new code rely on a guarantee that another flow breaks — "one live
+   child per parent and position," "rows under this key are current" — when an update, archive or
+   re-versioning elsewhere leaves superseded rows under the same key? — *Smell:* "just optimized,"
+   "just swapped a parameter," "just installed more reference data," with no map of who depends on
+   it; a new discriminator column whose default only the new code path filters on; a new read
+   that selects children by their parent's id with no filter for the ones a lifecycle elsewhere
+   archived or replaced. In `motifpath-core` this is explicitly the monorepo boundary: does a change
    quietly make `core-domain` and `event-ingestion` depend on each other? (From core#95: chord
    voicings installed as basic diagrams with playback entered the knowledge rollup and session
-   composer, which select basic playable diagrams by skill.)
+   composer, which select basic playable diagrams by skill. From core#132: a course's parts listed
+   by enrolment id included the copy an update had archived, beside the new copy at its position.)
 
 23. **A pointer into a collection that someone else can change.** Does state that points at an item
     (a selection, cursor, focus, "current" item, pagination offset) hold its *position*, while

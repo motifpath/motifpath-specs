@@ -1,5 +1,15 @@
 # PR Review — Changelog
 
+## [1.12.0] — 2026-10-13
+
+### Changed
+- `HEURISTICS.md` item 4 (second-order effect / invariant) now also asks the other direction: does
+  new code rely on a guarantee another flow breaks, such as a read by parent id that picks up the
+  children an update archived or replaced? From the review of motifpath-core#132, where a course's
+  parts included the copy a course update had archived.
+- `profiles/motifpath-core.md`: both services' API stubs are now on oapi-codegen v2.8.0, the
+  version `mise.toml` pins; the norm no longer describes the two services on different versions.
+
 ## [1.11.0] — 2026-10-11
 
 ### Changed
