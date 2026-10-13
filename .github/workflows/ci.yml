@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main, feat/MOT-107/monetization-mvp]
+    branches: [main]
 
 jobs:
   validate-openapi:
