@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.42.0
+  version: 0.43.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -5627,6 +5627,59 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+  /students/me/student-paths/{student_path_id}:
+    get:
+      operationId: getMyStudentPath
+      summary: Get one of the authenticated student's paths with progress
+      description: |
+        Returns one StudentPath the caller holds, a standalone path or a
+        part of a course enrollment, current or not, active, archived or
+        finished, with the progress state of each item. Item statuses
+        follow the same rules as GET /students/me/path. Used to open the
+        lessons of a finished course or standalone path for review.
+
+        Read-only: it never changes the caller's current course or path,
+        any enrollment, or any item's status, and course_completed is
+        always false.
+      tags:
+        - Learning Paths
+      parameters:
+        - name: student_path_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the StudentPath to read.
+      responses:
+        "200":
+          description: The StudentPath with per-item progress state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentPathView'
+        "400":
+          description: student_path_id is not a valid UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: |
+            The caller holds no StudentPath with this ID. Another
+            student's path is reported the same way, so its existence is
+            not revealed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /students/me/course-enrollments:
     get:
       operationId: listMyCourseEnrollments
@@ -5766,6 +5819,63 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConflictError'
+
+  /students/me/course-enrollments/{course_enrollment_id}/parts:
+    get:
+      operationId: listMyCourseEnrollmentParts
+      summary: List the parts of one of the authenticated student's course enrollments
+      description: |
+        Returns the StudentPath of every part the caller has reached in
+        this enrollment, ordered by course_checkpoint_position, each with
+        the progress state of its items. For a completed enrollment that
+        is every part of the course version the student took, never a
+        newer one. Item statuses follow the same rules as
+        GET /students/me/path. Used to open the lessons of a finished
+        course for review.
+
+        Read-only: it never changes the caller's current course or path,
+        the enrollment, or any item's status, and course_completed is
+        always false on every part.
+      tags:
+        - Courses
+      parameters:
+        - name: course_enrollment_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the enrollment whose parts to list.
+      responses:
+        "200":
+          description: The enrollment's parts, in course order.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StudentPathView'
+        "400":
+          description: course_enrollment_id is not a valid UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: |
+            The caller has no enrollment with this ID, in any status.
+            Another student's enrollment is reported the same way, so its
+            existence is not revealed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
 
   /students/me/course-enrollments/{course_enrollment_id}/update:
     post:
@@ -10130,27 +10240,29 @@ components:
     StudentPathView:
       type: object
       description: |
-        The student's current learning path with per-item progress state.
-        Returned by GET /students/me/path and used by the SPA to render
-        the main learning screen.
+        A student's learning path with per-item progress state. Returned
+        for the current path by GET /students/me/path, which the SPA uses
+        to render the main learning screen, and for any path the student
+        holds by GET /students/me/student-paths/{student_path_id} and
+        GET /students/me/course-enrollments/{course_enrollment_id}/parts.
       properties:
         student_path_id:
           type: string
           format: uuid
-          description: The current StudentPath's ID.
+          description: The StudentPath's ID.
         source_template_id:
           type: string
           format: uuid
           description: The learning path this StudentPath was copied from.
         title:
           type: string
-          description: Title of the current StudentPath.
+          description: Title of the StudentPath.
         course_enrollment_id:
           type: [string, "null"]
           format: uuid
           description: >-
             The CourseEnrollment this is a checkpoint of, or null when
-            the caller's current path is a standalone path. Set together
+            the path is a standalone path. Set together
             with course_checkpoint_position.
         course_checkpoint_position:
           type: [integer, "null"]
