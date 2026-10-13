@@ -1,6 +1,6 @@
 # ADR-057: Commercial authority, durable audit and idempotent operations
 
-**Status:** Proposed
+**Status:** Accepted — approved by Gilson Yamada on 2026-10-13 in review of specs PR #315
 **Date:** 2026-10-13
 **Deciders:** Gilson Yamada (Product Owner and engineering lead)
 **Task:** [MOT-117](https://linear.app/motif-path/issue/MOT-117/m0-finalize-architecture-and-api-contracts), under MOT-107 / MOT-108
@@ -169,4 +169,4 @@ this ADR. Initial proposed scenarios are in [specs PR #311](https://github.com/m
 
 ---
 
-*Proposed on 2026-10-13; acceptance requires review. Once accepted, revise through a superseding ADR.*
+*Accepted on 2026-10-13. To revise, create a superseding ADR.*
