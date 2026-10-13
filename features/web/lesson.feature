@@ -100,6 +100,8 @@ Feature: Take a lesson and move on to the next step
 
   # ── Review ────────────────────────────────────────────────────────────────
 
+  # A lesson of a finished course or path, opened from its detail, is features/web/lesson-review.feature.
+
   Scenario: A done step opens as a review that never gates
     Given "alice" has completed step 3, which has a challenge
     When "alice" opens step 3

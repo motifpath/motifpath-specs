@@ -5,7 +5,8 @@
 # design/patterns/learning.md; the Figma page is "Learning" (rows 1–5, and row 6 for updating a
 # copy, MOT-36). Switching, abandoning and archiving, and why the current item cannot be left while
 # another is in progress, are in features/learning-paths/current-path-lifecycle.feature. What an
-# update does to a copy is in features/learning-paths/update-a-copy.feature.
+# update does to a copy is in features/learning-paths/update-a-copy.feature. Opening a lesson of a
+# finished course or path for review (MOT-106) is in features/web/lesson-review.feature.
 #
 # These scenarios are verified by motifpath-web's component tests and by manual browser checks,
 # not by any service's BDD suite.
@@ -227,11 +228,55 @@ Feature: See everything I started and pick up where I left off
     Then it offers "Start course"
     And it says "You left this course before. Starting again begins at part 1."
 
-  Scenario: A finished course offers practice, not lessons
+  Scenario: A finished course shows every part done and offers practice
     Given "alice" finished the course "First songs"
     When "alice" opens the course detail of "First songs"
     Then it shows a "Finished" chip and every part done
     And it offers "Practise what you learned", which opens the practice setup
+
+  # ── Reviewing a finished course or path (MOT-106) ─────────────────────────
+
+  Scenario: Every part of a finished course unfolds to lessons that open for review
+    Given "alice" finished the course "First songs", 3 parts
+    When "alice" taps part 2 on the course detail of "First songs"
+    Then part 2 unfolds to its lessons, each one a row that opens it
+    And there is no "Open in My path"
+
+  Scenario: A finished course shows the lessons of the version the student took
+    Given "alice" finished version 1 of "First songs"
+    And version 2 of "First songs" adds a lesson to part 1
+    When "alice" unfolds part 1 on the course detail of "First songs"
+    Then it lists the lessons of version 1
+
+  Scenario: Opening a lesson of a finished course changes nothing
+    Given "alice" finished the course "First songs"
+    And "Reading rhythm" is "alice"'s current course
+    When "alice" opens lesson 1 of part 1 from the course detail of "First songs"
+    Then the lesson opens for review
+    And "Reading rhythm" is still "alice"'s current course
+    And Learning still lists "First songs" under "Finished"
+
+  Scenario: Tapping a finished standalone path opens its detail
+    Given "alice" finished the standalone path "Open chords"
+    When "alice" taps the "Open chords" row
+    Then the path detail of "Open chords" opens, with a "Finished" chip
+
+  Scenario: A finished standalone path lists its lessons to open for review
+    Given "alice" finished the standalone path "Open chords", 9 lessons
+    When "alice" opens the path detail of "Open chords" from Learning
+    Then it lists the 9 lessons under their section labels, each done and each a row that opens it
+
+  Scenario: The lessons of a course in progress still open from My path
+    Given "alice" is on part 2 of "Guitar foundations"
+    When "alice" opens the course detail of "Guitar foundations"
+    Then part 1's lessons are titles only, and do not open
+
+  Scenario: Lessons that fail to load on a finished course offer Try again in place
+    Given "alice" finished the course "First songs"
+    And the lessons of "First songs" fail to load
+    When "alice" opens the course detail of "First songs"
+    Then the outline shows a notice with "Try again" in place of the parts
+    And "Practise what you learned" is still offered
 
   Scenario: Leave this course sits at the end of the detail
     Given "alice" is enrolled in "Reading rhythm"
