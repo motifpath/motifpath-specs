@@ -165,5 +165,5 @@ Proposed, unimplemented scenarios are in [commercial controls](../features/monet
 
 ## Epic delivery workflow
 
-Per Gilson's instruction on 2026-10-13, monetization task branches start from `codex/feat/MOT-107/monetization-mvp` and target that epic integration branch. The epic is merged into the repository's base only when a deliverable version is ready and approved: `main` for motifpath-specs; use the applicable repository's integration base for implementation repositories. MOT-115 work is on `codex/spec/MOT-115/commercial-rollout-controls`. Task integration does not constitute product/design approval or permission to implement before M0 gates pass.
+Per Gilson's instruction on 2026-10-13, monetization task branches start from `feat/MOT-107/monetization-mvp` and target that epic integration branch. The epic is merged into the repository's base only when a deliverable version is ready and approved: `main` for motifpath-specs; use the applicable repository's integration base for implementation repositories. MOT-115 work is on `featu/MOT-107/monetization-mvp/MOT-115/commercial-rollout-controls`. Task integration does not constitute product/design approval or permission to implement before M0 gates pass.
 
