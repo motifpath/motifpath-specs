@@ -143,7 +143,9 @@ included, is at least 48 px wide:
   window** the composer picks: five frets, plus the open string when the window starts at the nut
   (frets 0–5). All the drill's cells in the session come from its window;
 - the composer picks the window holding the most of the drill's due cells, then weak, then new,
-  the one nearest the nut on a tie. Cells outside it wait for another session;
+  the one nearest the nut on a tie. Every other session in the head, a drill with new cells takes
+  the window holding the most new cells instead, so the whole neck is reached, not only the frets
+  where cells are already due. Cells outside the window wait for another session;
 - the window limits the item on **every screen size**: the question names it ("frets 0–5"), and
   only its places can be tapped. A phone draws only the window; a wider screen may draw more of the
   neck, with the rest dimmed;
@@ -400,12 +402,14 @@ One piece of evidence per observation, the only stored learning state:
   Each cell pick is asked the way (drill) with the fewer right answers on that cell, name the
   note on a tie. A session may mix layouts; each question then names its instrument.
 - **One fret window per drill** (amended 2026-10-13): for each layout, each fretboard drill takes
-  its cells from one window of five frets, `from_fret` to `to_fret`: frets 0–5 at the nut (the open
+  its cells from one window of five frets, starting at `from_fret`: frets 0–5 at the nut (the open
   string and frets 1–5), otherwise any five frets up to 11, such as 3–7. The composer first decides
   each candidate cell's drill (as above), then picks the drill's window: the most due cells, then
-  the most weak, then the most new, then the one nearest the nut. The drill's picks (due, weak, new,
-  review ahead, stretch) come only from cells inside it; the mix, the cap of 10 and the
-  interleaving apply as before. Every cell of the same drill and layout in a plan carries the same
+  the most weak, then the most new, then the one nearest the nut. On a **new-cell turn**, when the
+  student has started an odd number of sessions in the head so far and the drill has new cells,
+  it picks the window with the most new cells instead, nearest the nut on a tie. The drill's picks
+  (due, weak, new, review ahead, stretch) come only from cells inside it; the mix, the cap of 10
+  and the interleaving apply as before. Every cell of the same drill and layout in a plan carries the same
   window. The window limits the item on every screen size: the question names it, only its places
   can be tapped, and a phone draws nothing else.
 - **Never empty, or no plan** (amended 2026-10-06): a plan has at least one item. A student with
@@ -600,6 +604,13 @@ shown from evidence (tempo history, speed per string, levels).
 - **A window that moves to the due cells, over fixed low and high regions.** Fixed regions (frets
   0–6 and 6–12) were proposed first; Gilson chose a window that follows where the drill's due cells
   are, kept to five frets so it fits at 48 px.
+- **New-cell turns every other session, over due cells alone or the open position first**
+  (decided 2026-10-13). New cells are always asked as name the note, and after a first session the
+  window at the nut holds most of the due cells, so a window that follows due cells alone would keep
+  a beginner on frets 0–5 for weeks and never reach the upper frets of a skill that covers the whole
+  string. Counting the sessions already started keeps the composer stateless: it already reads past
+  sessions to pick the felt questions. Rotating windows by the last one used was rejected because it
+  needs that window stored per student, drill and layout.
 - **One window per drill, over one per layout or per item** (Gilson's choice). Each drill follows its
   own due cells, and a drill's board never moves between its questions.
 - **The window on every screen size, over phones only.** The same item then has the same answer
@@ -648,7 +659,9 @@ shown from evidence (tempo history, speed per string, levels).
   is right 1 time in 5 or 6. Find the note has no guess correction, so its accuracy reads a little
   higher than before, and its fluent time may also be lax until MOT-53 calibrates it.
 - **Due cells outside the window wait.** A drill's due cells in another part of the neck stay due
-  until a session picks their window, which can be a session or two later.
+  until a session picks their window, which can be a session or two later. On a new-cell turn the
+  window may hold few due cells, so the drill's share of due items can come up short; the time passes
+  on as any short share does.
 
 ### Neutral
 
