@@ -27,7 +27,6 @@ Feature: Derive a student's knowledge of an item from evidence
     When "alice" answers the cell correctly 5 times, each in 1900 milliseconds
     Then "alice"'s level for the cell is "fluent"
 
-  @wip
   Scenario: Answers given while reviewing a finished course count like any other
     When "alice" answers the cell correctly 3 times on 3 different days, each marked as review
     Then "alice"'s level for the cell is "accurate"
