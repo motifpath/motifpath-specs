@@ -2,7 +2,7 @@
 
 **Source:** ADR-049 §1 and §5 · ADR-017 (the student's copied path) · MOT-57 (Figma "Learning",
 rows 1–5; decisions D1–D10, D2 revised after a benchmark) · MOT-36 (row 6, decisions U1–U8;
-ADR-055)
+ADR-055) · MOT-106 (row 7, decisions R1–R6, approved 2026-10-13, R4 revised)
 
 ## When
 
@@ -113,7 +113,39 @@ publishes changes, the student can choose to take them (ADR-055).
   leaves. The confirm names it: "You'll continue with Reading rhythm." Leaving the only item in
   progress leaves nothing current.
 - **Finished (D9):** a "Finished" chip, every part done, and "Practise what you learned" as a
-  secondary button; no lesson review for now.
+  secondary button.
+- **Reviewing a finished course (MOT-106, R1):** every part folds; tapping one unfolds all its
+  lessons as `StepRow` (Done) rows, indented under the part, and each opens the lesson for review.
+  No "… N more" and no "Open in My path". The parts and lessons are the version the student took
+  (`listMyCourseEnrollmentParts`). A course still in progress keeps its outline as titles only.
+- **A finished standalone path (R2):** a learner path detail shaped like the finished course:
+  chips, progress ("9 of 9 lessons"), "Practise what you learned", then "Lessons" under their
+  `SectionHeader`s, each a `StepRow` (Done) that opens for review (`getMyStudentPath`).
+- **States (R6):** lessons that fail to load show an `InlineNotice` with "Try again" in the
+  outline's place; "Practise what you learned" stays.
+
+### Reviewing a lesson (MOT-106)
+
+The lesson screen (`lesson.md`), opened from a finished course or path. Nothing is locked, and
+nothing changes the current course or path, an enrolment or a status.
+
+- **Telling it apart (R3):** no banner. The back arrow names the course or path, the meta reads
+  "Part 1 · Lesson 2 of 5 · Video · Done" (a path: "Lesson 4 of 9 · Video · Done"), and there is
+  no completion action, as when reviewing a done step on My path.
+- **The way on (R4, revised):** when a lesson ends, a `NextStepCard` for the next lesson of the
+  course ("Up next · Part 1 · Lesson 3 of 5", into the next part after a part's last lesson), with a
+  quiet "Back to <course>". No "Step done", since nothing completes. After the last lesson of the
+  course or path: "That was the last lesson of <course>." and one primary, "Go to Learning", where
+  the next course or path is. No celebration, and no automatic redirect, so the end can be watched
+  again.
+- **Challenges (R5):** "Practise again" redoes the challenge; finishing it returns to the lesson. Its
+  answers count as practice evidence; a score under the threshold changes nothing.
+- **Tracking:** lesson and exercise events carry the review marker (`content_context.review`,
+  `trigger_context.review`).
+- **Not reachable (R6):** a lesson of a course the student has not finished, opened from a link,
+  says it opens later and offers "Go to My path".
+- **Sizes (R6):** no new layout. Medium and Expanded reuse the course detail and the lesson; the
+  aside lists the part's lessons.
 
 ### Course completed
 
