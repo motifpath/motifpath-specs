@@ -223,11 +223,14 @@ pattern catalog is added.
 ## Follow-up slices
 
 - **C2** (MOT-144): the generated-drill framework in core; cells and shapes move onto it.
-- **C4** (MOT-145): graders and golden cases for the new families.
+- **C4** (MOT-145): graders and golden cases for the new families. *(Amended 2026-10-14, PO:
+  C4 also owns every new family's item key scheme and response type, so all of them are graded
+  alike before any slice starts.)*
 - **C3** (MOT-146): the composer's focus rules, current rung and the subjects list.
 - **C5** (MOT-147) and **D0** (MOT-143): web building blocks and Figma.
-- **P1–P8**: one slice per drill group, each with its item schema, grader, golden cases and
-  default fluent times.
+- **P1–P8**: one slice per drill group, each with its templates, generator and default fluent
+  times, on the item keys and graders C4 specified. *(Amended 2026-10-14: item schemas, graders
+  and golden cases moved to C4.)*
 
 ## Related ADRs
 

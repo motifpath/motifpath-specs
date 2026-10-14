@@ -15,7 +15,7 @@
     "description": { "type": "string", "minLength": 1 },
     "reference": {
       "type": "object",
-      "description": "The reference data the grader reads. Anything an item key points at that is missing here is unknown to the grader.",
+      "description": "The reference data the grader reads. Anything an item key points at that is missing here is unknown to the grader. Keys, numerals, chords and their tones are computed, so they need no reference.",
       "additionalProperties": false,
       "properties": {
         "instruments": {
@@ -94,6 +94,19 @@
               "members": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "type": "string" } }
             }
           }
+        },
+        "progressions": {
+          "type": "object",
+          "description": "Progressions of the progression catalog by key, with their numerals one bar each, in a major key.",
+          "propertyNames": { "pattern": "^[0-9A-Za-z][0-9A-Za-z-]*$" },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["bars"],
+            "properties": {
+              "bars": { "type": "array", "minItems": 1, "items": { "enum": ["I", "ii", "iii", "IV", "V", "vi", "viio", "I7", "IV7", "V7"] } }
+            }
+          }
         }
       }
     },
@@ -128,7 +141,7 @@
                           "latency_ms": { "type": "integer", "minimum": 0 },
                           "audio_ms": { "type": "integer", "minimum": 0 },
                           "answer_key": {
-                            "description": "What a right answer was, kept so a disputed answer can be checked without the reference data of the day: the asked cell and its note (spelled with sharps), with the choices when it was named among them; every option of the exercise as shown, each with whether it was correct; a named shape's family and member; or a found degree's interval and every position of the shape that is it.",
+                            "description": "What a right answer was, kept so a disputed answer can be checked without the reference data of the day: the asked cell and its note (spelled with sharps), with the choices when it was named among them; every option of the exercise as shown, each with whether it was correct; a named shape's family and member; or a found degree's interval and every position of the shape that is it; a generated question's way, its key when the item doesn't fix one, the right answer and the options offered; a guide-tone take's key, tone and every bar with its chord, the tone's note and whether it was hit; or a note found everywhere, its fret window and every place of the note in it.",
                             "oneOf": [
                               {
                                 "type": "object",
@@ -185,6 +198,66 @@
                                   "cells": {
                                     "type": "array",
                                     "minItems": 1,
+                                    "items": {
+                                      "type": "object",
+                                      "additionalProperties": false,
+                                      "required": ["string", "fret"],
+                                      "properties": {
+                                        "string": { "type": "integer", "minimum": 1 },
+                                        "fret": { "type": "integer", "minimum": 0 }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": ["way", "answer", "offered"],
+                                "properties": {
+                                  "way": { "type": "string" },
+                                  "music_key": { "enum": ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"] },
+                                  "answer": { "type": "string" },
+                                  "offered": { "type": "array", "minItems": 2, "items": { "type": "string" } }
+                                }
+                              },
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": ["music_key", "tone", "bars"],
+                                "properties": {
+                                  "music_key": { "enum": ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"] },
+                                  "tone": { "enum": ["3", "7"] },
+                                  "bars": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "items": {
+                                      "type": "object",
+                                      "additionalProperties": false,
+                                      "required": ["chord", "note_name", "hit"],
+                                      "properties": {
+                                        "chord": { "type": "string" },
+                                        "note_name": { "enum": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] },
+                                        "hit": { "type": "boolean" }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": ["note_name", "fret_window", "cells"],
+                                "properties": {
+                                  "note_name": { "enum": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] },
+                                  "fret_window": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": ["from_fret"],
+                                    "properties": { "from_fret": { "type": "integer", "minimum": 0 } }
+                                  },
+                                  "cells": {
+                                    "type": "array",
                                     "items": {
                                       "type": "object",
                                       "additionalProperties": false,
