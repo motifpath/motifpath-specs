@@ -33,6 +33,9 @@ learns one way to answer and can answer with a pedal or a keyboard as well as a 
 - **Several right options (MultipleChoice) say how many** (P2): the prompt ends with "Choose N"
   and the item still commits with **Check**. Committing at the Nth pick was rejected: one mis-tap
   would commit an answer the student can't take back.
+- **Finding every place of a note doesn't say how many** (MOT-143 D34): in a generated drill that
+  asks for every instance on the fretboard, taps toggle and **Check** commits, with no count shown.
+  The count would let the student rule places out (ADR-057 challenge rules).
 - **Up to about five options** show as tiles. More (the focus picker, a long list) become a searchable
   list (ADR-049 §5).
 - **Sound options (AudioOption):** the play button only plays; tapping the rest of the row selects.
