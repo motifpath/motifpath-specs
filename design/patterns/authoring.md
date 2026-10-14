@@ -28,7 +28,7 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   line on what Teach is for, and one `MenuRow` per section; each section is a pushed page with
   ← Teach. On Expanded a **Teach sidebar** lists the sections, then Back to learning and Account.
 - **Sections, in composition order (D3):** Courses · Paths · Lessons · Exercises · Diagrams; for
-  admins an Admin group: Knowledge map · Song charts (`song-chart.md`) · Alpha (below). "Content" is renamed **Lessons**, the word
+  admins an Admin group: Knowledge map · Song charts (`song-chart.md`) · Engagement (below). "Content" is renamed **Lessons**, the word
   learners see.
 
 ### Lists (D4, D24, D25–D28)
@@ -184,7 +184,8 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 
 ### Alpha observation (MOT-8, row 19)
 
-- **What:** an admin-only, read-only section that measures the alpha against PB-8's success metric:
+- **What:** an admin-only, read-only section, labelled **Engagement** (pt-BR "Engajamento"), that
+  measures the alpha against PB-8's success metric:
   3+ finished practice sessions a week, and more than 70% of the first path completed. Nothing on
   it can be changed. Teachers don't see it (row D1).
 - **Overview (19a, 19e):** a week stepper that opens on the running week and can't step past it ·

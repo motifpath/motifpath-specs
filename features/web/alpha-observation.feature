@@ -1,6 +1,8 @@
 # Alpha observation in Teach (MOT-8, PB-8h).
 #
 # An admin-only, read-only section of Teach that shows the alpha against PB-8's success metric.
+# The section is labelled "Engagement" (pt-BR "Engajamento"); "alpha observation" stays the name of
+# the API and of these files.
 # The rules behind every number are in features/core-domain/alpha-observation.feature, and the raw
 # events in features/event-ingestion/read-event-log.feature. Design: design/patterns/authoring.md
 # ("Alpha observation") and the "Authoring" Figma page, row 19 (decisions D1–D9, approved
@@ -22,52 +24,52 @@ Feature: Observe the alpha in Teach
 
   # ── Where it lives ───────────────────────────────────────────────────────
 
-  Scenario: Admins find "Alpha" in Teach's Admin group
+  Scenario: Admins find "Engagement" in Teach's Admin group
     When "ana" opens Teach
-    Then the Admin group lists "Knowledge map", "Song charts" and "Alpha", in that order
+    Then the Admin group lists "Knowledge map", "Song charts" and "Engagement", in that order
 
-  Scenario: Teachers do not see "Alpha"
+  Scenario: Teachers do not see "Engagement"
     Given "tina" is signed in as a teacher
     When "tina" opens Teach
-    Then there is no "Alpha" entry
+    Then there is no "Engagement" entry
 
-  Scenario: A teacher who opens the Alpha address is turned away
+  Scenario: A teacher who opens the Engagement address is turned away
     Given "tina" is signed in as a teacher
-    When "tina" opens the Alpha address directly
+    When "tina" opens the Engagement address directly
     Then "tina" is taken to Teach home
 
-  Scenario: Nothing in Alpha can be changed
-    When "ana" opens Alpha
+  Scenario: Nothing in Engagement can be changed
+    When "ana" opens Engagement
     Then the overview, student and events screens offer no way to edit, add or delete anything
 
   # ── Overview ─────────────────────────────────────────────────────────────
 
   Scenario: The overview opens on the running week
-    When "ana" opens Alpha
+    When "ana" opens Engagement
     Then the week stepper shows "This week · 12–18 Oct"
     And the page says the week is still running
     And the stepper's "next week" control is disabled
 
   Scenario: Stepping back shows an earlier week
-    Given "ana" is on the Alpha overview for the week of 12 Oct
+    Given "ana" is on the Engagement overview for the week of 12 Oct
     When "ana" steps back one week
     Then the overview shows the week of 5–11 Oct, with no "still running" note
 
   Scenario: The four tiles show both targets
-    When "ana" opens Alpha
+    When "ana" opens Engagement
     Then the tiles read "3+ sessions this week", "3+ every week so far", "First path over 70%" and "Median first path"
     And the first three show a count out of 7 and the last a percentage
 
   Scenario: Each student's row shows the week, the weeks so far and the first path
     Given "camila" has 2 counted sessions this week, was at the target in 3 of 3 weeks so far and has completed 11 of 18 nodes of "Guitar foundations"
-    When "ana" opens Alpha
+    When "ana" opens Engagement
     Then "camila"'s row shows "2 sessions" with a "1 to go" chip
     And it shows a bar for each of the 3 weeks so far against a line at 3, captioned "3 of 3 weeks at 3+"
     And it shows "Guitar foundations", a bar filled to 61% with a mark at 70%, and "11 of 18 nodes · 61%"
 
   Scenario Outline: The week chip says how far a student is from 3
     Given "<student>" has <count> counted sessions this week
-    When "ana" opens Alpha
+    When "ana" opens Engagement
     Then "<student>"'s row shows the chip "<chip>"
 
     Examples:
@@ -80,7 +82,7 @@ Feature: Observe the alpha in Teach
 
   Scenario: A quiet student's last activity is shown as a warning
     Given "lucas"'s last activity was 9 days ago
-    When "ana" opens Alpha
+    When "ana" opens Engagement
     Then "lucas"'s row shows "9 days ago" in the danger colour
 
   Scenario: Filter chips narrow the list and keep their counts
@@ -150,16 +152,16 @@ Feature: Observe the alpha in Teach
 
   Scenario: The overview says when the alpha has no students yet
     Given no student has been given a path
-    When "ana" opens Alpha
+    When "ana" opens Engagement
     Then the page says no student is in the alpha yet, in place of the tiles and the list
 
   Scenario: A failed load offers a retry
     Given the alpha observation cannot be loaded
-    When "ana" opens Alpha
+    When "ana" opens Engagement
     Then the page says it could not load the alpha and offers "Try again"
 
   Scenario: The section reads in Portuguese
     Given "ana"'s interface language is Portuguese (Brazil)
-    When "ana" opens Alpha
+    When "ana" opens Engagement
     Then the titles, tiles, chips and column labels are in Portuguese
     And event types stay as their exact names
