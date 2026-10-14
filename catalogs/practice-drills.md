@@ -68,9 +68,11 @@ item of the catalog, every way and every variant.
 
 ## Drill families v2 (planned)
 
-Declared by ADR-057 and built one slice at a time. Each slice adds its templates and fluent
-times to `practice-drills.yaml` (with fixed IDs), its item key scheme, grader and golden cases;
-until then a family installs nothing. Every family has a bass version on the `electric-bass`
+Declared by ADR-057 and built one slice at a time. The item key schemes, response types,
+graders and golden cases of every family are specified together (`PracticeItemKey` and the
+responses in the practice schemas; `golden/practice-graders/`), so each is graded alike from
+the start. Each slice then adds its templates and fluent times to `practice-drills.yaml` (with
+fixed IDs) and its generator; until then a family installs nothing. Every family has a bass version on the `electric-bass`
 layout: chord boxes become chord symbols, or the answer is the chord's root (or chord tone)
 tapped on the bass fretboard, at positions computed from the chord's formula and the tuning.
 
@@ -87,6 +89,27 @@ tapped on the bass fretboard, at positions computed from the chord's formula and
 | `guide_tone` | a progression in a key | `tap_the_third` (target): over the playback, tap the 3rd of each chord as it arrives; the 7th at higher levels | — (not asked among options) | `target-chord-tones`, `voice-lead` (bass: `play-chord-tone-lines`) | P5 |
 | `song_chart` | a song chart built on a progression | none, self-rated (use) | — | `common-progressions` | P6 |
 | `fretboard_note` | a note on a layout | `find_every_instance` (know): tap every place of the note in the fret window | — (not asked among options) | `find-octaves` | P7 |
+
+**Item keys and graders.** A key is part of the item when the fact differs per key (the vi of
+G is not the vi of E♭); a relative skill is one item in every key, and the key is picked each
+time it is asked and sent back with the answer. The same goes for a guide tone's tone and tempo,
+and for a find every instance's fret window.
+
+| Kind | Item key | Picked each time | Response | Grader |
+|---|---|---|---|---|
+| `diatonic_chord` | `diatonic_chord:<key>:<numeral>` | — | `generated_choice` | `generated_choice.v1` |
+| `chord_function` | `chord_function:<key>:<numeral>` | — | `generated_choice` | `generated_choice.v1` |
+| `chart_progression` | `chart_progression:<progression key>` | key | `generated_choice` | `generated_choice.v1` |
+| `heard_chord` | `heard_chord:<numeral>` | key | `generated_choice` | `generated_choice.v1` |
+| `heard_progression` | `heard_progression:<progression key>` | key | `generated_choice` | `generated_choice.v1` |
+| `chord_voicing` | `chord_voicing:<diagram id>` | — | `self_rating`, no measure | `self_rating.v1` |
+| `root_fifth` (bass) | `root_fifth:<layout id>:<chord>` | — | `self_rating`, no measure | `self_rating.v1` |
+| `root_change` (bass) | `root_change:<layout id>:<from chord>:<to chord>` | — | `self_rating` + changes per minute | `self_rating.v1` |
+| `guide_tone` | `guide_tone:<layout id>:<progression key>` | key, tone, tempo | `timed_taps` | `timed_taps.v1` |
+| `fretboard_note` | `fretboard_note:<layout id>:<note>` | fret window | `multi_tap` | `multi_tap.v1` |
+
+The bass versions of the harmony and ear families are the same items: only how an option is
+drawn changes (a chord symbol instead of a chord box). `play_along` keeps its key and grader.
 
 ## Fretboard cells
 
