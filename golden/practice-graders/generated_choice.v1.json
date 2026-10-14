@@ -1,0 +1,860 @@
+{
+  "grader": "generated_choice.v1",
+  "description": "Generated questions asked among options the server planned: a numeral's chord or a chord's numeral in a key, a chord's function, a progression read as a chart, a chord or a progression heard. The response sends back the way it was asked, its key when the item doesn't fix one, and the options as shown. The grader computes the right answer from the key, the numeral or the progression, checks the options, and keeps the right answer and the options in the answer key.",
+  "reference": {
+    "progressions": {
+      "I-V-vi-IV": {
+        "bars": [
+          "I",
+          "V",
+          "vi",
+          "IV"
+        ]
+      },
+      "I-vi-IV-V": {
+        "bars": [
+          "I",
+          "vi",
+          "IV",
+          "V"
+        ]
+      },
+      "vi-IV-I-V": {
+        "bars": [
+          "vi",
+          "IV",
+          "I",
+          "V"
+        ]
+      },
+      "ii-V-I": {
+        "bars": [
+          "ii",
+          "V",
+          "I",
+          "I"
+        ]
+      },
+      "IV-V-I": {
+        "bars": [
+          "IV",
+          "V",
+          "I",
+          "I"
+        ]
+      },
+      "12-bar-blues": {
+        "bars": [
+          "I7",
+          "I7",
+          "I7",
+          "I7",
+          "IV7",
+          "IV7",
+          "I7",
+          "I7",
+          "V7",
+          "IV7",
+          "I7",
+          "V7"
+        ]
+      },
+      "12-bar-blues-quick-change": {
+        "bars": [
+          "I7",
+          "IV7",
+          "I7",
+          "I7",
+          "IV7",
+          "IV7",
+          "I7",
+          "I7",
+          "V7",
+          "IV7",
+          "I7",
+          "V7"
+        ]
+      }
+    }
+  },
+  "cases": [
+    {
+      "name": "numeral to chord: right",
+      "item_key": "diatonic_chord:G:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numeral_to_chord",
+        "options": [
+          "Em",
+          "C",
+          "Am",
+          "Bm"
+        ],
+        "choice": "Em",
+        "latency_ms": 2100
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2100,
+          "answer_key": {
+            "way": "numeral_to_chord",
+            "answer": "Em",
+            "offered": [
+              "Em",
+              "C",
+              "Am",
+              "Bm"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "numeral to chord: wrong",
+      "item_key": "diatonic_chord:G:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numeral_to_chord",
+        "options": [
+          "Em",
+          "C",
+          "Am",
+          "Bm"
+        ],
+        "choice": "C",
+        "latency_ms": 2600
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2600,
+          "answer_key": {
+            "way": "numeral_to_chord",
+            "answer": "Em",
+            "offered": [
+              "Em",
+              "C",
+              "Am",
+              "Bm"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "numeral to chord: a root spelled the other way is the same chord",
+      "item_key": "diatonic_chord:Db:IV",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numeral_to_chord",
+        "options": [
+          "Gb",
+          "Ab",
+          "Ebm",
+          "Bbm"
+        ],
+        "choice": "Gb",
+        "latency_ms": 2400
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2400,
+          "answer_key": {
+            "way": "numeral_to_chord",
+            "answer": "F#",
+            "offered": [
+              "Gb",
+              "Ab",
+              "Ebm",
+              "Bbm"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "numeral to chord: the diminished chord on viio",
+      "item_key": "diatonic_chord:C:viio",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numeral_to_chord",
+        "options": [
+          "Bdim",
+          "G",
+          "Dm",
+          "Em"
+        ],
+        "choice": "Bdim",
+        "latency_ms": 3000
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 3000,
+          "answer_key": {
+            "way": "numeral_to_chord",
+            "answer": "Bdim",
+            "offered": [
+              "Bdim",
+              "G",
+              "Dm",
+              "Em"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "chord to numeral: right",
+      "item_key": "diatonic_chord:D:V",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_to_numeral",
+        "options": [
+          "V",
+          "IV",
+          "ii",
+          "vi"
+        ],
+        "choice": "V",
+        "latency_ms": 1900
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 1900,
+          "answer_key": {
+            "way": "chord_to_numeral",
+            "answer": "V",
+            "offered": [
+              "V",
+              "IV",
+              "ii",
+              "vi"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "chord to numeral: wrong",
+      "item_key": "diatonic_chord:D:V",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_to_numeral",
+        "options": [
+          "V",
+          "IV",
+          "ii",
+          "vi"
+        ],
+        "choice": "IV",
+        "latency_ms": 2200
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2200,
+          "answer_key": {
+            "way": "chord_to_numeral",
+            "answer": "V",
+            "offered": [
+              "V",
+              "IV",
+              "ii",
+              "vi"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "chord to function: right",
+      "item_key": "chord_function:D:V",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_to_function",
+        "options": [
+          "tonic",
+          "subdominant",
+          "dominant"
+        ],
+        "choice": "dominant",
+        "latency_ms": 1700
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 1700,
+          "answer_key": {
+            "way": "chord_to_function",
+            "answer": "dominant",
+            "offered": [
+              "tonic",
+              "subdominant",
+              "dominant"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "chord to function: vi is tonic, not subdominant",
+      "item_key": "chord_function:A:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_to_function",
+        "options": [
+          "tonic",
+          "subdominant",
+          "dominant"
+        ],
+        "choice": "subdominant",
+        "latency_ms": 2300
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2300,
+          "answer_key": {
+            "way": "chord_to_function",
+            "answer": "tonic",
+            "offered": [
+              "tonic",
+              "subdominant",
+              "dominant"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "function to chord: right",
+      "item_key": "chord_function:G:IV",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "function_to_chord",
+        "options": [
+          "C",
+          "D",
+          "Em",
+          "G"
+        ],
+        "choice": "C",
+        "latency_ms": 2800
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2800,
+          "answer_key": {
+            "way": "function_to_chord",
+            "answer": "C",
+            "offered": [
+              "C",
+              "D",
+              "Em",
+              "G"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "function to chord: wrong",
+      "item_key": "chord_function:G:IV",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "function_to_chord",
+        "options": [
+          "C",
+          "D",
+          "Em",
+          "G"
+        ],
+        "choice": "D",
+        "latency_ms": 2500
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2500,
+          "answer_key": {
+            "way": "function_to_chord",
+            "answer": "C",
+            "offered": [
+              "C",
+              "D",
+              "Em",
+              "G"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "chart to numbers: right, in the key it was asked in",
+      "item_key": "chart_progression:I-V-vi-IV",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chart_to_numbers",
+        "music_key": "E",
+        "options": [
+          "I-V-vi-IV",
+          "I-vi-IV-V",
+          "vi-IV-I-V"
+        ],
+        "choice": "I-V-vi-IV",
+        "latency_ms": 4200
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 4200,
+          "answer_key": {
+            "way": "chart_to_numbers",
+            "music_key": "E",
+            "answer": "I-V-vi-IV",
+            "offered": [
+              "I-V-vi-IV",
+              "I-vi-IV-V",
+              "vi-IV-I-V"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "numbers to chart: right",
+      "item_key": "chart_progression:ii-V-I",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numbers_to_chart",
+        "music_key": "Bb",
+        "options": [
+          "Cm F Bb Bb",
+          "Eb F Bb Bb"
+        ],
+        "choice": "Cm F Bb Bb",
+        "latency_ms": 3900
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 3900,
+          "answer_key": {
+            "way": "numbers_to_chart",
+            "music_key": "Bb",
+            "answer": "Cm F Bb Bb",
+            "offered": [
+              "Cm F Bb Bb",
+              "Eb F Bb Bb"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "numbers to chart: the blues taken for its quick change",
+      "item_key": "chart_progression:12-bar-blues",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numbers_to_chart",
+        "music_key": "A",
+        "options": [
+          "A7 A7 A7 A7 D7 D7 A7 A7 E7 D7 A7 E7",
+          "A7 D7 A7 A7 D7 D7 A7 A7 E7 D7 A7 E7"
+        ],
+        "choice": "A7 D7 A7 A7 D7 D7 A7 A7 E7 D7 A7 E7",
+        "latency_ms": 6100
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 6100,
+          "answer_key": {
+            "way": "numbers_to_chart",
+            "music_key": "A",
+            "answer": "A7 A7 A7 A7 D7 D7 A7 A7 E7 D7 A7 E7",
+            "offered": [
+              "A7 A7 A7 A7 D7 D7 A7 A7 E7 D7 A7 E7",
+              "A7 D7 A7 A7 D7 D7 A7 A7 E7 D7 A7 E7"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "cadence then chord: right, with the sound it played",
+      "item_key": "heard_chord:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "cadence_then_chord",
+        "music_key": "C",
+        "options": [
+          "vi",
+          "IV",
+          "ii",
+          "iii"
+        ],
+        "choice": "vi",
+        "latency_ms": 3200,
+        "audio_ms": 2500
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 3200,
+          "audio_ms": 2500,
+          "answer_key": {
+            "way": "cadence_then_chord",
+            "music_key": "C",
+            "answer": "vi",
+            "offered": [
+              "vi",
+              "IV",
+              "ii",
+              "iii"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "progression by number: a confusable progression picked",
+      "item_key": "heard_progression:I-vi-IV-V",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "progression_by_number",
+        "music_key": "G",
+        "options": [
+          "I-vi-IV-V",
+          "I-V-vi-IV"
+        ],
+        "choice": "I-V-vi-IV",
+        "latency_ms": 9400,
+        "audio_ms": 8000
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 9400,
+          "audio_ms": 8000,
+          "answer_key": {
+            "way": "progression_by_number",
+            "music_key": "G",
+            "answer": "I-vi-IV-V",
+            "offered": [
+              "I-vi-IV-V",
+              "I-V-vi-IV"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "rejected: a way of another kind",
+      "item_key": "diatonic_chord:G:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_to_function",
+        "options": [
+          "tonic",
+          "subdominant",
+          "dominant"
+        ],
+        "choice": "tonic",
+        "latency_ms": 1500
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a key sent for an item that has its own",
+      "item_key": "diatonic_chord:G:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numeral_to_chord",
+        "music_key": "G",
+        "options": [
+          "Em",
+          "C",
+          "Am",
+          "Bm"
+        ],
+        "choice": "Em",
+        "latency_ms": 2100
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: no key sent for an item asked in any key",
+      "item_key": "heard_chord:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "cadence_then_chord",
+        "options": [
+          "vi",
+          "IV",
+          "ii",
+          "iii"
+        ],
+        "choice": "vi",
+        "latency_ms": 3200,
+        "audio_ms": 2500
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a progression the catalog doesn't have",
+      "item_key": "chart_progression:I-ii-iii-IV",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chart_to_numbers",
+        "music_key": "C",
+        "options": [
+          "I-V-vi-IV",
+          "I-vi-IV-V"
+        ],
+        "choice": "I-V-vi-IV",
+        "latency_ms": 4000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: the right answer is not among the options",
+      "item_key": "diatonic_chord:G:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numeral_to_chord",
+        "options": [
+          "C",
+          "Am",
+          "Bm",
+          "D"
+        ],
+        "choice": "C",
+        "latency_ms": 2000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
+      }
+    },
+    {
+      "name": "rejected: an option outside the asked key",
+      "item_key": "diatonic_chord:G:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numeral_to_chord",
+        "options": [
+          "Em",
+          "Fm",
+          "C",
+          "D"
+        ],
+        "choice": "Em",
+        "latency_ms": 2000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
+      }
+    },
+    {
+      "name": "rejected: a seventh chord among triads",
+      "item_key": "diatonic_chord:G:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numeral_to_chord",
+        "options": [
+          "Em",
+          "C",
+          "D7",
+          "Am"
+        ],
+        "choice": "Em",
+        "latency_ms": 2000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
+      }
+    },
+    {
+      "name": "rejected: one chord offered twice, spelled two ways",
+      "item_key": "diatonic_chord:G:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numeral_to_chord",
+        "options": [
+          "Em",
+          "C",
+          "F#dim",
+          "Gbdim"
+        ],
+        "choice": "Em",
+        "latency_ms": 2000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
+      }
+    },
+    {
+      "name": "rejected: the pick is not one of the options",
+      "item_key": "diatonic_chord:G:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numeral_to_chord",
+        "options": [
+          "Em",
+          "C",
+          "Am",
+          "Bm"
+        ],
+        "choice": "D",
+        "latency_ms": 2000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
+      }
+    },
+    {
+      "name": "rejected: an option that is not a function",
+      "item_key": "chord_function:D:V",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_to_function",
+        "options": [
+          "tonic",
+          "predominant",
+          "dominant"
+        ],
+        "choice": "dominant",
+        "latency_ms": 1700
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
+      }
+    },
+    {
+      "name": "rejected: another option with the asked function",
+      "item_key": "chord_function:G:IV",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "function_to_chord",
+        "options": [
+          "C",
+          "Am",
+          "D",
+          "G"
+        ],
+        "choice": "C",
+        "latency_ms": 2800
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
+      }
+    },
+    {
+      "name": "rejected: a chart that is no catalog progression in the key",
+      "item_key": "chart_progression:ii-V-I",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numbers_to_chart",
+        "music_key": "Bb",
+        "options": [
+          "Cm F Bb Bb",
+          "Cm F Bb Eb"
+        ],
+        "choice": "Cm F Bb Bb",
+        "latency_ms": 3900
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
+      }
+    },
+    {
+      "name": "rejected: a progression option the catalog doesn't have",
+      "item_key": "heard_progression:I-vi-IV-V",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "progression_by_number",
+        "music_key": "G",
+        "options": [
+          "I-vi-IV-V",
+          "I-ii-iii-IV"
+        ],
+        "choice": "I-vi-IV-V",
+        "latency_ms": 9000,
+        "audio_ms": 8000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
+      }
+    },
+    {
+      "name": "rejected: tapping a note doesn't answer a numeral",
+      "item_key": "diatonic_chord:G:vi",
+      "response": {
+        "response_type": "find_the_note",
+        "string": 1,
+        "fret": 0,
+        "latency_ms": 1000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    }
+  ]
+}

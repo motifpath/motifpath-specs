@@ -23,6 +23,8 @@ Each file holds:
   - `diagrams`: the diagrams that exist. A drill shape also has its layout instrument, its
     family and member, and its positions with their intervals.
   - `shape_families`: each shape family's members, in the order they are offered.
+  - `progressions`: progressions of the progression catalog by key, with their numerals one
+    bar each. Keys, numerals, chords and chord tones are computed, so they have no reference.
 - `cases`: each case is an `item_key`, a raw `response` (as a client sends it in
   `practice.item_answered`) and the `expected` result. The result is either
   `{"result": "graded", "evidence": {...}}` or `{"result": "rejected", "reason": "..."}`.
@@ -33,8 +35,13 @@ Each file holds:
   - `fretboard_cell` → `fretboard_cell.v2` (`fretboard_cell.v1` before 2026-10-08; its file stays
     for the evidence it graded)
   - `exercise` → `exercise_option.v1`
-  - `play_along` and `chord_change` → `self_rating.v1`
+  - `play_along`, `chord_change`, `chord_voicing`, `root_fifth` and `root_change` →
+    `self_rating.v1`
   - `diagram_shape` → `diagram_shape.v1`
+  - `diatonic_chord`, `chord_function`, `chart_progression`, `heard_chord` and
+    `heard_progression` → `generated_choice.v1`
+  - `guide_tone` → `timed_taps.v1`
+  - `fretboard_note` → `multi_tap.v1`
 - **Checks run in this order, and the first failure is the rejection:**
   1. The response type fits the item kind (`response_does_not_fit_item`).
   2. What the key points at exists (`unknown_reference`).
@@ -59,10 +66,26 @@ Each file holds:
   feedback may ignore it.
   For a named diagram shape, its `shape_family` and `shape`. For a degree found on one, the
   asked `interval` and the `cells` (string and fret) of every position of the shape that is
-  that interval, in the diagram's position order.
+  that interval, in the diagram's position order. For a generated question, its `way`, its
+  `music_key` when the item doesn't fix one, the right `answer` and the options `offered` as
+  shown. For a guide-tone take, its `music_key`, `tone` and `bars`. For a note found
+  everywhere, its `note_name`, `fret_window` and `cells`.
   Adding it to `exercise_option.v1`'s cases changes no grading rule.
-- **Self-assessed evidence** is `source`, `rating` and the one measure its kind takes:
-  `tempo_bpm` for a play-along, `changes_per_minute` for a chord change.
+- **Self-assessed evidence** is `source`, `rating` and the measure its kind takes:
+  `tempo_bpm` for a play-along, `changes_per_minute` for a chord change or a root change, none
+  for a chord voicing or a root and fifth.
+
+### Music in the new graders
+
+- **A key** is a major key, spelled as the chord catalog spells roots (C D♭ D E♭ E F F# G A♭ A
+  B♭ B, written `Db`, `Eb`, `Ab`, `Bb`).
+- **The numerals** are I ii iii IV V vi viio (vii°), and their chords are the key's triads:
+  major on I IV V, minor on ii iii vi, diminished on viio. A progression's I7, IV7 and V7 are
+  dominant sevenths.
+- **A chord symbol** is a root, then `m`, `dim`, `7` or nothing. A root may be spelled either
+  way in a response (`F#m` and `Gbm` are one chord); an answer key spells it as the catalog
+  does, even where the key would spell it otherwise (IV of D♭ is kept as `F#`).
+- **Functions:** I iii vi are tonic, ii IV subdominant, V viio dominant.
 
 ### `fretboard_cell.v1`
 
@@ -111,8 +134,72 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
 
 - The rating and its measure are kept as given. A take of zero chord changes is still a
   rating.
-- A play-along needs `tempo_bpm` and takes no `changes_per_minute`. A chord change needs
-  `changes_per_minute` and takes no `tempo_bpm`.
+- A play-along needs `tempo_bpm` and takes no `changes_per_minute`. A chord change and a root
+  change need `changes_per_minute` and take no `tempo_bpm`. A chord voicing and a root and
+  fifth are rated alone: either measure is `response_does_not_fit_item`.
+- A chord voicing's diagram, and a root and fifth's or a root change's layout, must exist
+  (`unknown_reference`).
+
+### `generated_choice.v1`
+
+- **The way must be one of the kind's ways:** `numeral_to_chord` or `chord_to_numeral` for a
+  diatonic chord; `chord_to_function` or `function_to_chord` for a chord function;
+  `chart_to_numbers` or `numbers_to_chart` for a chart progression; `cadence_then_chord` for a
+  heard chord; `progression_by_number` for a heard progression. Any other way is
+  `response_does_not_fit_item`.
+- **`music_key` comes with the kinds asked in any key** (chart progression, heard chord, heard
+  progression), and with no other kind. Missing or extra, it is `response_does_not_fit_item`.
+- A progression the catalog doesn't have, in the item key, is `unknown_reference`.
+- **The right answer:**
+  - `numeral_to_chord`: the key's chord on the numeral.
+  - `chord_to_numeral` and `cadence_then_chord`: the numeral.
+  - `chord_to_function`: the numeral's function.
+  - `function_to_chord`: the key's chord on the numeral.
+  - `chart_to_numbers` and `progression_by_number`: the progression's key.
+  - `numbers_to_chart`: the progression's chords in `music_key`, one per bar, separated by
+    single spaces.
+- **The options are checked** before the pick (`invalid_choices` on any failure):
+  - every option is a possible answer of the way:
+    - a chord of the key, triads only, for `numeral_to_chord` and `function_to_chord`;
+    - a numeral, for `chord_to_numeral` and `cadence_then_chord`;
+    - `tonic`, `subdominant` or `dominant`, for `chord_to_function`;
+    - a progression of the catalog, for `chart_to_numbers` and `progression_by_number`;
+    - the chart of a catalog progression in `music_key`, for `numbers_to_chart`;
+  - no two options are the same answer (`F#dim` and `Gbdim` are one);
+  - the right answer is among them, and so is the pick;
+  - for `function_to_chord`, no other option has the asked function.
+  Whether the distractors are near misses is the planner's rule, checked over the catalog by
+  its own tests, not here.
+- Right when the pick is the right answer.
+- `latency_ms` and `audio_ms` are copied as for every auto-graded answer.
+
+### `timed_taps.v1`
+
+- The layout in the key and the progression must exist (`unknown_reference`). A tap on a
+  string outside the layout's tuning is `invalid_cell`.
+- The progression plays in `music_key` at `tempo_bpm`, four beats to a bar. Bar *i* (from 0)
+  starts at *i* × 240000 / `tempo_bpm` ms, rounded down, and runs to the next bar's start. A
+  tap belongs to the bar it falls in; a tap after the last bar ends is not graded.
+- **The asked tone** of each bar's chord: its third for `3` (minor on ii iii vi viio, major
+  otherwise); its seventh in the key for `7` (major on I and IV, minor on every other numeral
+  and on a dominant seventh).
+- **A bar is hit** when at least one of its taps sounds the asked tone (on the layout's tuning,
+  any octave) and none sounds another note.
+- **Right only when every bar is hit.**
+- **`latency_ms`** is the latest delay, over every bar, from the bar's start to its first right
+  tap; a bar not hit counts its full length.
+- The answer key's `bars` list every bar in order, with its `chord`, the asked tone's
+  `note_name` and `hit`.
+
+### `multi_tap.v1`
+
+- The layout in the key must exist (`unknown_reference`).
+- The window covers `from_fret` to `from_fret` + 4, or the open string to fret 5 when
+  `from_fret` is 0. A tap outside it, or on a string outside the tuning, is `invalid_cell`.
+- **The note's places** are every cell of the window, on every string, that sounds the note in
+  any octave; the answer key lists them by string from 1, then fret from the lowest.
+- **Right only when the cells tapped are exactly those places**, in any order. A place missed
+  or an extra cell is wrong.
 
 ## Using the cases
 

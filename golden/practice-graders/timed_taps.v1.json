@@ -1,0 +1,685 @@
+{
+  "grader": "timed_taps.v1",
+  "description": "Guide tones: a chord tone of each chord of a progression tapped in time with its playback, four beats to a bar, one chord per bar. A bar is hit when a tap within it is on the asked tone and no tap within it is on another note; the take is right only when every bar is hit. The latency is the latest any bar was hit after its downbeat, a missed bar counting its full length.",
+  "reference": {
+    "instruments": {
+      "6ea2d087-ab9c-59dc-9657-8546025414d2": {
+        "name": "Acoustic guitar (standard tuning)",
+        "tuning": [
+          "E2",
+          "A2",
+          "D3",
+          "G3",
+          "B3",
+          "E4"
+        ]
+      },
+      "00000000-0000-4000-8000-0000000000b1": {
+        "name": "Electric bass (standard tuning)",
+        "tuning": [
+          "E1",
+          "A1",
+          "D2",
+          "G2"
+        ]
+      }
+    },
+    "progressions": {
+      "ii-V-I": {
+        "bars": [
+          "ii",
+          "V",
+          "I",
+          "I"
+        ]
+      },
+      "12-bar-blues": {
+        "bars": [
+          "I7",
+          "I7",
+          "I7",
+          "I7",
+          "IV7",
+          "IV7",
+          "I7",
+          "I7",
+          "V7",
+          "IV7",
+          "I7",
+          "V7"
+        ]
+      }
+    }
+  },
+  "cases": [
+    {
+      "name": "every bar hit: the latest hit is the latency",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:ii-V-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 1,
+            "fret": 1
+          },
+          {
+            "at_ms": 2300,
+            "string": 2,
+            "fret": 0
+          },
+          {
+            "at_ms": 4050,
+            "string": 1,
+            "fret": 0
+          },
+          {
+            "at_ms": 6400,
+            "string": 4,
+            "fret": 2
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "Dm",
+                "note_name": "F",
+                "hit": true
+              },
+              {
+                "chord": "G",
+                "note_name": "B",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a tap on a bar's downbeat belongs to that bar",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:ii-V-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 0,
+            "string": 1,
+            "fret": 1
+          },
+          {
+            "at_ms": 2000,
+            "string": 2,
+            "fret": 0
+          },
+          {
+            "at_ms": 4000,
+            "string": 1,
+            "fret": 0
+          },
+          {
+            "at_ms": 6000,
+            "string": 1,
+            "fret": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 0,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "Dm",
+                "note_name": "F",
+                "hit": true
+              },
+              {
+                "chord": "G",
+                "note_name": "B",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a bar with no tap is missed, and counts its full length",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:ii-V-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 1,
+            "fret": 1
+          },
+          {
+            "at_ms": 2300,
+            "string": 2,
+            "fret": 0
+          },
+          {
+            "at_ms": 6400,
+            "string": 4,
+            "fret": 2
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2000,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "Dm",
+                "note_name": "F",
+                "hit": true
+              },
+              {
+                "chord": "G",
+                "note_name": "B",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": false
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a wrong note in a bar misses it, even with the right one",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:ii-V-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 1,
+            "fret": 1
+          },
+          {
+            "at_ms": 2100,
+            "string": 2,
+            "fret": 0
+          },
+          {
+            "at_ms": 2500,
+            "string": 2,
+            "fret": 1
+          },
+          {
+            "at_ms": 4050,
+            "string": 1,
+            "fret": 0
+          },
+          {
+            "at_ms": 6400,
+            "string": 4,
+            "fret": 2
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2000,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "Dm",
+                "note_name": "F",
+                "hit": true
+              },
+              {
+                "chord": "G",
+                "note_name": "B",
+                "hit": false
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "the right note a bar late is the next bar's wrong note",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:ii-V-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 2100,
+            "string": 1,
+            "fret": 1
+          },
+          {
+            "at_ms": 2600,
+            "string": 2,
+            "fret": 0
+          },
+          {
+            "at_ms": 4050,
+            "string": 1,
+            "fret": 0
+          },
+          {
+            "at_ms": 6400,
+            "string": 4,
+            "fret": 2
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2000,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "Dm",
+                "note_name": "F",
+                "hit": false
+              },
+              {
+                "chord": "G",
+                "note_name": "B",
+                "hit": false
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "taps after the last bar are not graded",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:ii-V-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 1,
+            "fret": 1
+          },
+          {
+            "at_ms": 2300,
+            "string": 2,
+            "fret": 0
+          },
+          {
+            "at_ms": 4050,
+            "string": 1,
+            "fret": 0
+          },
+          {
+            "at_ms": 6400,
+            "string": 4,
+            "fret": 2
+          },
+          {
+            "at_ms": 8100,
+            "string": 2,
+            "fret": 1
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "Dm",
+                "note_name": "F",
+                "hit": true
+              },
+              {
+                "chord": "G",
+                "note_name": "B",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "sevenths on bass: the major seventh of I, minor of ii and V",
+      "item_key": "guide_tone:00000000-0000-4000-8000-0000000000b1:ii-V-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "G",
+        "tone": "7",
+        "tempo_bpm": 100,
+        "taps": [
+          {
+            "at_ms": 200,
+            "string": 1,
+            "fret": 0
+          },
+          {
+            "at_ms": 2600,
+            "string": 3,
+            "fret": 3
+          },
+          {
+            "at_ms": 5000,
+            "string": 2,
+            "fret": 4
+          },
+          {
+            "at_ms": 7300,
+            "string": 4,
+            "fret": 2
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 200,
+          "answer_key": {
+            "music_key": "G",
+            "tone": "7",
+            "bars": [
+              {
+                "chord": "Am",
+                "note_name": "G",
+                "hit": true
+              },
+              {
+                "chord": "D",
+                "note_name": "C",
+                "hit": true
+              },
+              {
+                "chord": "G",
+                "note_name": "F#",
+                "hit": true
+              },
+              {
+                "chord": "G",
+                "note_name": "F#",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a take with no taps misses every bar of the blues",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:12-bar-blues",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "A",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": []
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2000,
+          "answer_key": {
+            "music_key": "A",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "A7",
+                "note_name": "C#",
+                "hit": false
+              },
+              {
+                "chord": "A7",
+                "note_name": "C#",
+                "hit": false
+              },
+              {
+                "chord": "A7",
+                "note_name": "C#",
+                "hit": false
+              },
+              {
+                "chord": "A7",
+                "note_name": "C#",
+                "hit": false
+              },
+              {
+                "chord": "D7",
+                "note_name": "F#",
+                "hit": false
+              },
+              {
+                "chord": "D7",
+                "note_name": "F#",
+                "hit": false
+              },
+              {
+                "chord": "A7",
+                "note_name": "C#",
+                "hit": false
+              },
+              {
+                "chord": "A7",
+                "note_name": "C#",
+                "hit": false
+              },
+              {
+                "chord": "E7",
+                "note_name": "G#",
+                "hit": false
+              },
+              {
+                "chord": "D7",
+                "note_name": "F#",
+                "hit": false
+              },
+              {
+                "chord": "A7",
+                "note_name": "C#",
+                "hit": false
+              },
+              {
+                "chord": "E7",
+                "note_name": "G#",
+                "hit": false
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "rejected: a progression the catalog doesn't have",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:I-ii-iii-IV",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 1,
+            "fret": 1
+          }
+        ]
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: a layout that doesn't exist",
+      "item_key": "guide_tone:00000000-0000-4000-8000-0000000000ff:ii-V-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 1,
+            "fret": 1
+          }
+        ]
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: a tap on a string the layout doesn't have",
+      "item_key": "guide_tone:00000000-0000-4000-8000-0000000000b1:ii-V-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 5,
+            "fret": 3
+          }
+        ]
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_cell"
+      }
+    },
+    {
+      "name": "rejected: a single tap doesn't answer a guide tone",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:ii-V-I",
+      "response": {
+        "response_type": "find_the_note",
+        "string": 1,
+        "fret": 1,
+        "latency_ms": 900
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    }
+  ]
+}
