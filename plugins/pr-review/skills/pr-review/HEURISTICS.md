@@ -37,9 +37,14 @@ plus the five always-on items.
    caller or where the output lands.
 2. **Symmetry and precedent.** One path gained a guard/optimization — did its sibling paths get it
    too (e.g. `core-domain`'s read path vs. its write path; `event-ingestion`'s Kafka consumer vs.
-   its HTTP producer)? Does the project already have a solution for this? — *Smell:* a guard
-   present in one direction of a pair and absent in the other; a twin module already solved this
-   and it was ignored here.
+   its HTTP producer)? Does the project already have a solution for this? And when the change adds
+   an extension point (an interface, a registry, a plugin source) so new kinds need no change: do
+   the rules elsewhere that still switch on the concrete kinds read through it too, or would a new
+   kind silently skip them? — *Smell:* a guard present in one direction of a pair and absent in
+   the other; a twin module already solved this and it was ignored here; an extension point proven
+   only by a fake plugging in, never by the fake meeting the caps, ratings and labels the old kinds
+   get. (From core#135: a drill family added through its new source escaped the per-drill cap and
+   its template's rung, because the template key still switched on the two old kinds.)
 3. **Reuse fit.** Does the reused routine return what I need, or does it carry weight (fields,
    ordering, no limit) my caller doesn't use — and does it change the scale it was built for? —
    *Smell:* reusing something built for dozens of items on a path that sees thousands.
