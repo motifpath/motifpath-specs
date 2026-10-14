@@ -54,45 +54,16 @@ Feature: Derive a student's knowledge of an item from evidence
     When "alice" answers the cell wrongly
     Then the cell moves to box 1 and is next due in 1 day
 
-  # ── Guessing among choices ─────────────────────────────────────────────────
-  # A wrong pick among k recorded choices counts -1/(k-1) toward accuracy instead of 0, so
-  # guessing among four averages 0. Accuracy is floored at 0. Name the note only, for now.
+  # ── Picks among choices ────────────────────────────────────────────────────
+  # No guess correction (ADR-057, withdrawing ADR-046's 1/(k-1) rule before it shipped): a wrong
+  # pick among choices counts 0 like any wrong answer. A lucky guess is caught by asking the item
+  # again, the other way or later in the session.
 
   @wip
-  Scenario: Six right picks of seven among four note choices make a cell accurate
-    When "alice" names the cell among four choices, right 6 times and wrong once
-    Then "alice"'s accuracy on the cell is 0.81
-    And "alice"'s level for the cell is "accurate"
-
-  @wip
-  Scenario: Four right picks of five among four note choices are not yet accurate
+  Scenario: A wrong pick among four note choices counts as a plain miss
     When "alice" names the cell among four choices, right 4 times and wrong once
-    Then "alice"'s accuracy on the cell is 0.73
-    And "alice"'s level for the cell is "learning"
-
-  @wip
-  Scenario: Picking no better than chance among four note choices reads as no accuracy
-    When "alice" names the cell among four choices, right once and wrong 5 times
-    Then "alice"'s accuracy on the cell is 0
-    And "alice"'s level for the cell is "learning"
-
-  @wip
-  Scenario: A wrong tap finding the note counts as a plain miss
-    When "alice" finds the cell's note, right 4 times and wrong once
     Then "alice"'s accuracy on the cell is 0.8
     And "alice"'s level for the cell is "accurate"
-
-  @wip
-  Scenario: A note named on the twelve-note keypad counts as a plain miss
-    When "alice" names the cell on the twelve-note keypad, right 4 times and wrong once
-    Then "alice"'s accuracy on the cell is 0.8
-    And "alice"'s level for the cell is "accurate"
-
-  @wip
-  Scenario: A wrong pick among four note choices still sends the cell back to box 1
-    Given the cell is in box 3
-    When "alice" names the cell among four choices wrongly
-    Then the cell moves to box 1 and is next due in 1 day
 
   # ── Self-rated and teacher-reviewed takes ──────────────────────────────────
 
