@@ -1,0 +1,39 @@
+# Monetization behavior contracts — MOT-117
+
+These proposed `@wip` scenarios record PO decisions from 2026-10-13 and 2026-10-14.
+They are not runtime test results or completion of M0. Architectural constraints are in
+[ADR-057](../../adrs/ADR-057-commercial-authority-audit-and-idempotency.md).
+
+| Contract | Behavior |
+|---|---|
+| [Subscription lifecycle](subscription-lifecycle.feature) | Platform-wide/course/path offers, billing periods, renewal, cancellation, grace, switching, retention and independent beta readiness |
+| [Refunds and chargebacks](refunds-and-chargebacks.feature) | First subscription per scope, access-based eligibility start, admin handling, full refunds, retained records and dispute grace |
+| [Teacher commercial rights](teacher-commercial-rights.feature) | Price bounds, permanent per-path licenses, permanent purchases, withdrawal, user-pulled free updates and earnings adjustments |
+
+Amounts and dates in scenarios are examples, not launch prices. Configurability does not
+authorize the browser or editorial metadata to override authoritative prices, rights or ledger
+records. All direct and indirect commercial changes retain ADR-057 audit and idempotency rules.
+No changes to CI, ignore rules or the existing learner update process are part of this slice.
+
+## Unresolved contract boundaries
+
+- Payment provider and supported markets; USD remains conditional on additional cost assessment.
+- Initial prices, discounts, teacher price bounds, commission shares and fee allocations.
+- Provider-supported payout timing and the allocation of partial refunds/chargeback costs.
+- Final dispute outcomes, restoration after successful defense and early dispute resolution.
+- Exact seven-day refund deadline inclusivity and time/calendar conventions.
+- Notice delivery failures, payment retries, recovery during grace, and simultaneous cancellation,
+  switching, renewal or refund requests.
+- Stable entitlement/product/version identifiers and premium dependency/license coverage.
+- Existing `learning-paths/path-publishing.feature` specifies path publish/unpublish, whereas
+  the PO's commercial model says paths expose their latest version without a publishing process.
+  Reconcile that lifecycle separately; this slice adds no path publication workflow and removes none.
+- Withdrawal preserves purchased copies. The exact retained path reference must reconcile the
+  latest-version requirement with [ADR-055](../../adrs/ADR-055-update-a-copy-to-latest.md)'s
+  user-initiated updates. These scenarios preserve its eligibility and progress rules.
+- OpenAPI and commercial event contracts still need definition; neither public endpoint shapes
+  nor provider event schemas are introduced by these feature files.
+
+Gilson owns commercial rollout, financial reconciliation and editorial approvals. Plus is the
+first rollout priority; teacher commerce has independent readiness. Registry approval, the
+commercial Figma approval record and complete approved contracts remain required before code.
