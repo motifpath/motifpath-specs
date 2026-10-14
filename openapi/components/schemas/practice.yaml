@@ -320,6 +320,33 @@ PracticePickReason:
     node the student is ready to start, the skills of their paths first, when nothing else is due
     or past the new share.
 
+PracticeRung:
+  type: string
+  enum:
+    - know
+    - hear
+    - play_clean
+    - play_in_time
+    - move
+    - target
+    - use
+  description: |
+    The rung of the practice ladder an item trains, lowest first. know = recall a fact (a
+    note, a numeral, a shape); hear = recognise it by ear; play_clean = play it cleanly, untimed;
+    play_in_time = play it at a tempo; move = play it in another key or place; target = aim at it
+    while the music moves; use = play it in a piece of music. A drill template has one rung;
+    a play-along and a chord change are play_in_time, a single self-rated chord is play_clean,
+    and a song chart item is use.
+
+PracticeFocusSource:
+  type: string
+  enum:
+    - suggested
+    - chosen
+  description: |
+    Who chose a session's subjects. suggested = the composer picked them for Today's mix;
+    chosen = the student chose the one subject the session holds.
+
 PlannedPracticeItem:
   type: object
   description: One item of a composed practice session, in the order it was offered.
@@ -526,9 +553,9 @@ AnswerKey:
         type: string
         pattern: '^[A-G][#b]?$'
       description: |
-        The notes the student picked from, as shown, when the note was named among choices.
-        A wrong pick among k choices counts against accuracy by 1/(k-1), the chance of
-        guessing being 1/k. Fretboard cells named among choices only.
+        The notes the student picked from, as shown, when the note was named among choices,
+        kept so the grade can be checked. A wrong pick counts like any wrong answer. Fretboard
+        cells named among choices only.
     options:
       type: array
       minItems: 1

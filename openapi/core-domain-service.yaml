@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.44.0
+  version: 0.45.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -6135,6 +6135,19 @@ paths:
         application ending. Any instrument may be named, not only the ones the student is
         enrolled for.
 
+        A session is focused: it practises at most three subjects (knowledge nodes), named in
+        focus_nodes, main first. For Today's mix the composer picks them: a teacher's
+        suggestion, then the nodes with the most due and weak time, then the nodes of new
+        items, then stretch; due items of other nodes come in a review block of at most a
+        fifth of the focus time or 5 items. With focus_node_id, the student chose the subject:
+        only items of that node and its part_of subtree are picked, there is no warm-up, and
+        the application ending is a play-along of the subtree, or none. Any node with
+        material for the session can be chosen; requirements never gate it.
+
+        For each subject, new and stretch items come from its current rung (the lowest rung
+        with material for the session whose items are not yet accurate) and the next one;
+        due, weak and review-ahead items are picked whatever their rung.
+
         Any authenticated user may practise.
       tags:
         - Practice
@@ -6152,7 +6165,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/PracticeSessionPlan'
         "400":
-          description: The request body failed schema validation, such as minutes outside 1–60.
+          description: |
+            The request body failed schema validation, such as minutes outside 1–60 or a
+            focus_node_id that is not a uuid.
           content:
             application/json:
               schema:
@@ -6165,8 +6180,62 @@ paths:
                 $ref: '#/components/schemas/UnauthorizedError'
         "404":
           description: |
-            No instrument exists with the given instrument_id, or nothing connected to what
-            the student is learning can be practised with the instrument chosen.
+            No instrument exists with the given instrument_id, no knowledge node exists with
+            the given focus_node_id, nothing connected to what the student is learning can be
+            practised with the instrument chosen, or the chosen node has nothing to practise
+            with it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /students/me/practice-subjects:
+    get:
+      operationId: listPracticeSubjects
+      summary: List the subjects the authenticated student can choose to practise
+      description: |
+        Every knowledge node with practice material for a session with the given instrument
+        in hand, or in the head, grouped by area, for the student to choose one. A node is
+        listed when it or a node part_of it has at least one item the session could pick: one
+        that suits the instrument and is played in hand, or, in the head, one recalled on the
+        screen for any of the student's instruments. Nodes on the student's paths are listed
+        with the rest, and requirements never hide a node.
+
+        Derived from the catalog and the student's evidence; reading it changes nothing.
+
+        Any authenticated user may read their own subjects.
+      tags:
+        - Practice
+      parameters:
+        - name: instrument_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: |
+            The instrument in hand. Absent means a session in the head.
+      responses:
+        "200":
+          description: The subjects the student can choose, grouped by area.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeSubjectList'
+        "400":
+          description: instrument_id is not a valid uuid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No instrument exists with the given instrument_id.
           content:
             application/json:
               schema:
@@ -12574,6 +12643,15 @@ components:
           minimum: 1
           maximum: 60
           description: How long the student wants to practise, in minutes.
+        focus_node_id:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          description: |
+            The knowledge node the student chose to practise. The session then holds only items
+            of that node and the nodes part_of it, at any depth. Null (or omitted) for Today's
+            mix, whose subjects the composer picks.
       additionalProperties: false
       required:
         - minutes
@@ -12599,6 +12677,19 @@ components:
           minimum: 1
           maximum: 60
           description: The time the session was composed for, in minutes.
+        focus_source:
+          $ref: './components/schemas/practice.yaml#/PracticeFocusSource'
+        focus_nodes:
+          type: array
+          minItems: 1
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/PracticeFocusNode'
+          description: |
+            The session's subjects, main first, shown to the student as what the session works
+            on. Every item practises one of them, except the warm-up and, in Today's mix, the
+            review block: due items of other nodes, at most a fifth of the focus time or 5 items.
+            One node, the chosen one, when focus_source is chosen.
         items:
           type: array
           minItems: 1
@@ -12628,9 +12719,104 @@ components:
         - practice_session_id
         - instrument_id
         - minutes
+        - focus_source
+        - focus_nodes
         - items
         - felt_questions
         - tap_check_due
+
+    PracticeFocusNode:
+      type: object
+      description: One subject of a practice session.
+      properties:
+        node_id:
+          type: string
+          format: uuid
+          description: The knowledge node practised.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+      additionalProperties: false
+      required:
+        - node_id
+        - names
+
+    PracticeSubjectList:
+      type: object
+      description: The subjects a student can choose to practise, for one instrument in hand or in the head.
+      properties:
+        instrument_id:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          description: The instrument in hand, or null for a session in the head.
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/PracticeSubjectGroup'
+          description: One group per area with at least one subject, in catalog order.
+      additionalProperties: false
+      required:
+        - instrument_id
+        - groups
+
+    PracticeSubjectGroup:
+      type: object
+      description: The subjects of one area.
+      properties:
+        area_node_id:
+          type: string
+          format: uuid
+          description: The area, a top-level knowledge node.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+        subjects:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PracticeSubject'
+          description: The area's nodes with material, in catalog order.
+      additionalProperties: false
+      required:
+        - area_node_id
+        - names
+        - subjects
+
+    PracticeSubject:
+      type: object
+      description: One knowledge node the student can choose to practise, with where they stand on it.
+      properties:
+        node_id:
+          type: string
+          format: uuid
+          description: The knowledge node.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+        on_path:
+          type: boolean
+          description: True when the node is a skill of one of the student's paths.
+        item_count:
+          type: integer
+          minimum: 1
+          description: Items of the node and its part_of subtree that the session could pick.
+        level:
+          oneOf:
+            - $ref: './components/schemas/practice.yaml#/KnowledgeLevel'
+            - type: 'null'
+          description: |
+            The highest level at least 80% of those items reach, for the instrument in hand; in
+            the head, the best of the student's instruments. Null for a wide node (one with
+            child nodes), shown through its children.
+        current_rung:
+          $ref: './components/schemas/practice.yaml#/PracticeRung'
+      additionalProperties: false
+      required:
+        - node_id
+        - names
+        - on_path
+        - item_count
+        - level
+        - current_rung
 
     PracticeSessionItem:
       type: object
@@ -12645,6 +12831,8 @@ components:
           $ref: './components/schemas/practice.yaml#/PracticeItemKind'
         reason:
           $ref: './components/schemas/practice.yaml#/PracticePickReason'
+        rung:
+          $ref: './components/schemas/practice.yaml#/PracticeRung'
         node_id:
           type:
             - string
@@ -12799,6 +12987,7 @@ components:
         - item_key
         - kind
         - reason
+        - rung
         - node_id
         - level
         - estimated_seconds
