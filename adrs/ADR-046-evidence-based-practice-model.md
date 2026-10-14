@@ -44,7 +44,8 @@ Also decided:
 **Amended:** 2026-10-05, after the composer review, by Gilson. What the system suggests connects to
 what the student is learning: stretch and "ready to start" next steps reach only path skills, their
 `applies` and `part_of` neighbours, and nodes that build on something the student has met. Practice
-the student chooses for themselves, beyond these, is a later feature.
+the student chooses for themselves, beyond these, is a later feature (decided in ADR-057,
+2026-10-14).
 
 **Amended:** 2026-10-06, planning slice 4, by Gilson. The overview and the instrument tabs are the
 app's **general home**, the first screen every signed-in user sees, whatever their role. **Practice**
@@ -125,7 +126,8 @@ written in MOT-78), by Gilson:
   a twelve-note keypad. The client picks the distractors (one semitone either side, and the note at
   the same fret on an adjacent string), and the response keeps the four choices. A new grader,
   `fretboard_cell.v2`, checks them and keeps them in the answer key;
-- **a wrong pick among k choices costs 1/(k−1)** of accuracy (guess correction), so a lucky guess
+- **a wrong pick among k choices costs 1/(k−1)** of accuracy (guess correction; withdrawn
+  2026-10-14 by ADR-057, never shipped), so a lucky guess
   doesn't make a cell accurate. For now this applies to name-the-note answers that record their
   choices; it is a new version of the mastery rules. Fluency is unchanged, since it is measured by
   response time on right answers;
@@ -150,6 +152,17 @@ included, is at least 48 px wide:
   only its places can be tapped. A phone draws only the window; a wider screen may draw more of the
   neck, with the rest dimmed;
 - the plan carries the window on each cell. Item keys, grading and evidence don't change.
+
+**Amended:** 2026-10-14, by ADR-057 (drill model v2, MOT-142), by Gilson. ADR-057 decides, and this
+ADR defers to it on:
+- **guess correction is withdrawn** before it shipped: a wrong pick among choices counts 0, and a
+  lucky guess is caught by asking the item again. `fretboard_cell.v2` is unchanged;
+- **sessions are focused**: at most three subjects (knowledge nodes), a review block for other due
+  items in Today's mix, and new items from each subject's current rung;
+- **the student may choose a subject** (a session on one node and its `part_of` subtree), which
+  this ADR left as a later feature;
+- **new choice drills carry their options in the plan**; name the note keeps client-picked
+  distractors.
 
 ---
 
@@ -312,7 +325,8 @@ One piece of evidence per observation, the only stored learning state:
 - **One rule set, reduced to three readings.** Each piece of evidence becomes a hit, a miss or a hold,
   plus an accuracy value and a fluency ratio against the item's goal: the timed threshold, the target
   tempo, or the target change count. Ratings map clean → hit, almost → hold, struggled → miss.
-- **A guess among few choices is corrected** (amended 2026-10-08, D9). A right answer's accuracy
+- **A guess among few choices is corrected** (amended 2026-10-08, D9; **withdrawn 2026-10-14 by
+  ADR-057**: a wrong pick counts 0, and a lucky guess is caught by asking again). A right answer's accuracy
   value is 1. A wrong one is 0, or **−1/(k−1)** when the answer key records the k choices the
   student picked from: −⅓ with four choices. A pure guesser then averages 0, and an item's accuracy
   (the weighted average below) is floored at 0. So 0.8 needs about 85% of four-choice picks right,
@@ -573,7 +587,8 @@ shown from evidence (tempo history, speed per string, levels).
   stories. FSRS needs fitted parameters and review data the platform doesn't have yet.
 - **Practice days, over streaks.** Streak resets punish a missed day; the home shows practice without
   penalty.
-- **Guess correction, over more attempts or a streak, for four choices** (decided 2026-10-08). With
+- **Guess correction, over more attempts or a streak, for four choices** (decided 2026-10-08;
+  withdrawn 2026-10-14 by ADR-057, in favour of asking the item again). With
   four choices, a student who knows 75% of a string's notes gets about 81% right and would read as
   `accurate`. Requiring 5+ attempts delays that but doesn't stop it. A rule like "the last four
   right" is easy to say but sits outside the fold's averages. Charging a wrong pick 1/(k−1) takes
@@ -645,7 +660,7 @@ shown from evidence (tempo history, speed per string, levels).
 - **Requirements on empty nodes stay unmet** until content exists, which the map editor has to surface.
 - **Small-sample instability.** Below the calibration gate, thresholds don't move at all, even when the
   benchmark is visibly off.
-- **Guess correction is uneven for now** (2026-10-08). Single-answer exercises (2–5 options) and
+- **Guess correction is uneven for now** (2026-10-08; moot since ADR-057 withdrew it). Single-answer exercises (2–5 options) and
   name the shape (4–5 family members) have the same guess problem but still count a wrong pick as 0,
   so they can read as `accurate` somewhat earlier than name the note. Extending the correction to
   them is a follow-up and another mastery-rules version.
