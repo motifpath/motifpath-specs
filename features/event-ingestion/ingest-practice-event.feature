@@ -24,30 +24,25 @@ Feature: Ingest practice events
     Then the event is accepted and stored in the event log
     And the server returns the submitted event identifier and a receipt timestamp
 
-  @wip
   Scenario: A note named among four choices is accepted with its choices
     When "alice" submits a practice.item_answered event naming the note "C" among "B", "F", "C" and "C#" for the guitar cell on string 5 at fret 3
     Then the event is accepted and stored in the event log
     And the stored and published practice.item_answered event keeps the choices "B", "F", "C" and "C#"
 
-  @wip
   Scenario: An item skipped because its sound failed to load is accepted as not answered
     When "alice" submits a practice.item_answered event skipping exercise "hear-the-fifth" because its sound failed to load
     Then the event is accepted and stored in the event log
     And the stored and published practice.item_answered event is not answered, with the reason "failed_to_load"
 
-  @wip
   Scenario: A generated question's answer is accepted with the options it was asked among
     When "alice" submits a practice.item_answered event picking "Em" among "Em", "C", "Am" and "Bm" for the chord on vi in G
     Then the event is accepted and stored in the event log
 
-  @wip
   Scenario: A guide-tone take with no taps keeps its empty list of taps
     When "alice" submits a practice.item_answered event for a guide-tone take of "ii-V-I" in C at 120 BPM with no taps
     Then the event is accepted and stored in the event log
     And the stored and published practice.item_answered event keeps an empty list of taps
 
-  @wip
   Scenario: Every place of a note tapped in a fret window is accepted
     When "alice" submits a practice.item_answered event tapping string 6 at fret 3, string 4 at fret 5 and string 1 at fret 3 for the note "G" in the window from fret 3
     Then the event is accepted and stored in the event log
@@ -128,13 +123,11 @@ Feature: Ingest practice events
     Then the submission is rejected as invalid
     And the rejection identifies "practice_session_id" as the source of the error
 
-  @wip
   Scenario: A note named among three choices is rejected
     When "alice" submits a practice.item_answered event naming the note "C" among "B", "C" and "C#" for the guitar cell on string 5 at fret 3
     Then the submission is rejected as invalid
     And the rejection identifies "response" as the source of the error
 
-  @wip
   Scenario: A generated question's answer offering a single option is rejected
     When "alice" submits a practice.item_answered event picking "Em" among "Em" for the chord on vi in G
     Then the submission is rejected as invalid
