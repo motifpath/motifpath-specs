@@ -24,14 +24,12 @@ Feature: Read the event log
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: An administrator reads the newest events first
     Given the caller is authenticated and the platform recognises them as an administrator
     When the caller reads the event log, 12 at a time
     Then the 12 most recently received events are returned, newest first
     And the total is 40
 
-  @wip
   Scenario: Each event is returned as it was received, with when it was received
     Given the caller is authenticated and the platform recognises them as an administrator
     And "alice"'s practice.session_ended event "evt-end-001", not left early with 9 items answered, was received at 07:51:12
@@ -39,7 +37,6 @@ Feature: Read the event log
     Then event "evt-end-001" is returned with its event type, student, occurred_at and every field it was submitted with
     And it shows it was received at 07:51:12
 
-  @wip
   Scenario: The next page continues where the last one ended
     Given the caller is authenticated and the platform recognises them as an administrator
     When the caller reads the event log, 12 at a time, from the 13th event
@@ -47,28 +44,24 @@ Feature: Read the event log
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: Filtering by student returns only that student's events
     Given the caller is authenticated and the platform recognises them as an administrator
     When the caller reads the event log for student "bruno"
     Then only "bruno"'s events are returned
     And the total is 10
 
-  @wip
   Scenario: Filtering by type group returns only events of those types
     Given the caller is authenticated and the platform recognises them as an administrator
     And "alice" has practice.session_started, practice.item_answered, practice.session_ended and lesson.started events in the log
     When the caller reads the event log for student "alice" in the type group practice_sessions
     Then only "alice"'s practice.session_started and practice.session_ended events are returned
 
-  @wip
   Scenario: Events received at the same moment keep a stable order
     Given the caller is authenticated and the platform recognises them as an administrator
     And events "evt-a" and "evt-b" were received at the same instant
     When the caller reads the event log twice
     Then "evt-a" and "evt-b" are in the same order both times
 
-  @wip
   Scenario: A student with no events returns an empty page
     Given the caller is authenticated and the platform recognises them as an administrator
     When the caller reads the event log for student "carla", who has no events
@@ -77,20 +70,17 @@ Feature: Read the event log
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A student may not read the event log
     Given the caller is authenticated and the platform recognises them as a student
     When the caller reads the event log
     Then the request is refused for lacking permission
 
-  @wip
   Scenario: Reading is unavailable when the caller's role cannot be established
     Given the caller is authenticated
     And the platform cannot be reached to establish the caller's role
     When the caller reads the event log
     Then the request is refused as temporarily unavailable
 
-  @wip
   Scenario: An unknown type group is rejected
     Given the caller is authenticated and the platform recognises them as an administrator
     When the caller reads the event log in the type group "videos"
