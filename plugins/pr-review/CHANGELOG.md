@@ -1,5 +1,13 @@
 # PR Review — Changelog
 
+## [1.13.0] — 2026-10-14
+
+### Changed
+- `HEURISTICS.md` item 2 (symmetry and precedent) now also asks, when a change adds an extension
+  point so new kinds need no change, whether the rules that still switch on the concrete kinds
+  read through it too. From the review of motifpath-core#135, where a new drill family escaped
+  the per-drill cap and its template's rung.
+
 ## [1.12.0] — 2026-10-13
 
 ### Changed
