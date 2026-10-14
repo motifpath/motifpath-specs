@@ -7,8 +7,25 @@ guarantee.
 
 ## Drill templates
 
-A drill template is a way of asking: what is shown, what the student answers, and whether
-the answer is timed. Thresholds and felt questions are per template, never per item.
+A drill template is a way of asking: what is shown, what the student answers, whether the
+answer is timed, and which rung of the practice ladder it trains (ADR-057). Thresholds and felt
+questions are per template, never per item.
+
+- **The ladder**, in order: `know`, `hear`, `play_clean`, `play_in_time`, `move`, `target`,
+  `use`. Every template names its `rung`. Kinds with no template take a fixed rung:
+
+  | Kind | Rung |
+  |---|---|
+  | play-along | `play_in_time` (its next-key take, `move`) |
+  | chord change | `play_in_time` |
+  | single chord, self-rated | `play_clean` |
+  | song chart item | `use` |
+
+- **Second way.** A generated template that asks among options names its `second_way`: another
+  template of the same item kind that asks the same item another way. The composer asks an item
+  the way with fewer right answers, so a lucky guess meets the other way. A template with no
+  second way of its own instead brings its item back later in the same session, after at least
+  three other items.
 
 - **Fretboard cells** have two templates, one for each way of asking about a cell:
   - `fretboard_cell:name_the_note`: the cell is shown, and the student names its note.
@@ -20,12 +37,56 @@ the answer is timed. Thresholds and felt questions are per template, never per i
   - `diagram_shape:find_the_degree`: the shape is shown with its root marked and its other
     positions unlabelled, and the student taps the asked degree.
 - **Authored exercises** are grouped into families by exercise type, one template each:
-  `exercise:<exercise_type>`. A family's exercises share one threshold, since one exercise
+  `exercise:<exercise_type>`. They are `know`, or `hear` when the student answers what they hear
+  (`audio_recognition`, `audio_selection`). A family's exercises share one threshold, since one exercise
   rarely gathers enough answers to calibrate on its own.
 - **Play-alongs and chord changes** have no template. They are measured in tempo and changes
   per minute, against targets that come from the music.
 - An answer's template comes from its item kind and response type (and, for exercises, the
   exercise's type). Keys never change.
+
+## Challenge rules
+
+Every generated question must test the skill it names (ADR-057). A planned item is valid only
+when:
+
+1. **No marked answer.** Nothing in the stimulus sets the right answer(s) apart: no label, marker
+   shape, colour, highlight, size or position unique to them. What the question gives (the root
+   in find the degree) may be marked, and is never asked.
+2. **Plausible distractors.** Options are near misses a learner confuses, and none can be ruled
+   out without the skill: a numeral question offers only chords of the asked key; a progression
+   question offers its confusable progressions (`progressions.yaml`).
+3. **The answer is never in the wording.** Neither the prompt nor an option's name contains it.
+4. **Asked twice.** A template asked among options has a second way, or brings the item back
+   later in the session.
+5. **Harder as the level rises.** A template may list **variants** by the student's level on
+   the item (more keys, no cadence, a faster tempo). The level picks the variant.
+
+They bind generated drills only: authored exercises are their author's responsibility. A family
+whose generator can produce an invalid item is not installed: its property test runs over every
+item of the catalog, every way and every variant.
+
+## Drill families v2 (planned)
+
+Declared by ADR-057 and built one slice at a time. Each slice adds its templates and fluent
+times to `practice-drills.yaml` (with fixed IDs), its item key scheme, grader and golden cases;
+until then a family installs nothing. Every family has a bass version on the `electric-bass`
+layout: chord boxes become chord symbols, or the answer is the chord's root (or chord tone)
+tapped on the bass fretboard, at positions computed from the chord's formula and the tuning.
+
+| Family (item kind) | One item is | Templates (rung) | Second way | Nodes | Slice |
+|---|---|---|---|---|---|
+| `diatonic_chord` | a numeral in a major key | `numeral_to_chord` (know): "In G, which chord is vi?", pick the chord · `chord_to_numeral` (know): a chord and a key, pick the numeral | each other | `diatonic-chords`, `roman-numerals` | P1 |
+| `chord_function` | a numeral in a major key | `chord_to_function` (know): "In D, A7 is…", pick tonic, subdominant or dominant · `function_to_chord` (know): pick a chord with the asked function | each other | `chord-function` | P1 |
+| `chart_progression` | a progression (`progressions.yaml`) | `chart_to_numbers` (know): four chords in a key, pick the progression · `numbers_to_chart` (know): a progression and a key, pick its chart | each other | `read-chord-charts`, `common-progressions` | P1 |
+| `heard_chord` | a numeral in a major key | `cadence_then_chord` (hear): a cadence sets the key, a chord plays, pick the numeral; no cadence once accurate | comes back | `hear-chord-quality`, `hear-progressions` | P2 |
+| `heard_progression` | a progression | `progression_by_number` (hear): four chords in a random key, pick the progression; confusable progressions offered | comes back | `hear-progressions`, `common-progressions` | P2 |
+| `chord_voicing` | a chord voicing (bass: a chord's root and fifth) | none, self-rated (play_clean) | — | `play-open-chords` (bass: `play-root-fifth-lines`) | P3 |
+| `chord_change` | two chords (bass: their roots) | none, changes per minute (play_in_time) | — | `change-chords` (bass: `play-root-notes`) | P3 |
+| `play_along` | a diagram | next key after a clean take (move) | — | the diagram's nodes, `play-shapes-in-any-key` | P4 |
+| `guide_tone` | a progression in a key | `tap_the_third` (target): over the playback, tap the 3rd of each chord as it arrives; the 7th at higher levels | — (not asked among options) | `target-chord-tones`, `voice-lead` (bass: `play-chord-tone-lines`) | P5 |
+| `song_chart` | a song chart built on a progression | none, self-rated (use) | — | `common-progressions` | P6 |
+| `fretboard_note` | a note on a layout | `find_every_instance` (know): tap every place of the note in the fret window | — (not asked among options) | `find-octaves` | P7 |
 
 ## Fretboard cells
 
@@ -135,6 +196,9 @@ the answer is timed. Thresholds and felt questions are per template, never per i
 - Felt ratings calibrate thresholds and **never** count toward the student's mastery.
 
 ## Acceptance
+
+- Every template names a rung of the ladder, and a `second_way` names another template of the
+  same item kind.
 
 - Installing on an empty database twice gives identical template and threshold IDs.
 - The generated cells for a layout are exactly the strings and frets listed. A string the
