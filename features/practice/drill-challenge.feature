@@ -15,12 +15,10 @@ Feature: Generated drill questions challenge the student
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: No generated question marks its answer
     When every item of every installed drill family is planned, in every way and every variant
     Then no planned question sets a right answer apart from the other places or options by a label, marker shape, colour, highlight or size
 
-  @wip
   Scenario: Find the degree marks only the root it gives
     When the shape "C major — CAGED A, shift 3" is planned as find_the_degree for the 3rd
     Then the root's places are marked as the root
@@ -78,7 +76,6 @@ Feature: Generated drill questions challenge the student
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A template whose second way asks another kind of item fails the installation
     Given a drill template "diatonic_chord:numeral_to_chord" whose second way is "fretboard_cell:find_the_note"
     When the practice drill catalog is installed
