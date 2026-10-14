@@ -24,7 +24,7 @@ plus the five always-on items.
 | carries external content into render/query/exec | 15, 16, 2 |
 | touches configuration, migration, or rollout | 7, 14, 2 |
 | adds a test or CI step that reads another repo or shared data | 7 |
-| is user-facing (motifpath-web) | 12, 18, 14, 23 |
+| is user-facing (motifpath-web) | 12, 18, 14, 23, 5 |
 | runs on a tick (animation frame, timer, poller, scheduled job) | 24, 7 |
 | **always** | **17, 19, 20, 21, 22** |
 
@@ -68,8 +68,12 @@ plus the five always-on items.
 ## Axis B — Real data
 
 5. **Distribution, not example.** What's the real volume and shape of the data in production
-   (generic values repeated in nearly every row, the largest collection, the max allowed limit)? —
-   *Smell:* reasoning anchored to the spec's clean example payload.
+   (generic values repeated in nearly every row, the largest collection, the max allowed limit)?
+   For UI, the same goes for the real range of window widths: does a fixed-width layout still fit
+   at the narrowest width of each size class it's shown in, after persistent chrome (a sidebar,
+   page padding) takes its share? — *Smell:* reasoning anchored to the spec's clean example
+   payload; columns sized against the design's one frame width. (Came from motifpath-web#151: rows
+   built for a 1280 px frame collapsed between 840 and 1010 px, beside the Teach sidebar.)
 6. **Amplification and cost.** 1 event/request → how many operations? Multiply by fan-out **and**
    by the trigger's frequency (e.g. one `exercise.answer_sent` event fanning out to a threshold
    check per node). — *Smell:* a serial loop calling something with N round trips, no limit.

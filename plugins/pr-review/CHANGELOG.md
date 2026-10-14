@@ -1,5 +1,13 @@
 # PR Review — Changelog
 
+## [1.13.0] — 2026-10-14
+
+### Changed
+- `HEURISTICS.md` item 5 (distribution, not example) now also asks, for UI, whether a fixed-width
+  layout still fits at the narrowest width of each size class it's shown in once persistent chrome
+  takes its share, and user-facing changes now activate it. From the review of motifpath-web#151,
+  where student and event rows built for a 1280 px frame collapsed between 840 and 1010 px.
+
 ## [1.12.0] — 2026-10-13
 
 ### Changed
