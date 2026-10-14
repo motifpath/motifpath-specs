@@ -1,8 +1,11 @@
 # ADR-057: Drill model v2: rungs, subjects, challenge rules and focused sessions
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-14
 **Deciders:** Gilson (Product Owner)
+**Accepted:** 2026-10-14, by Gilson, with the refinements listed in specs#318 (current rung,
+plan-level "You chose this", chosen-session leftover time, core-planned options, comeback for
+drills with no second way, families installed per slice, `fretboard_cell.v2` unchanged).
 **Input:** plan "Drill set v2 and focused practice sessions" (MOT-77 anchor, local); the reports
 "Effective Music Drills — Research Benchmark" and "Automatic Drills — How They Work Today";
 PO answers Q1–Q7 of 2026-10-14; MOT-77 decisions D22–D25.
@@ -239,4 +242,4 @@ pattern catalog is added.
 
 ---
 
-*This ADR was proposed on 2026-10-14. To revise, create a new ADR with Status: Supersedes ADR-057.*
+*This ADR was accepted on 2026-10-14. To revise, create a new ADR with Status: Supersedes ADR-057.*
