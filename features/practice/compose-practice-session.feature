@@ -10,6 +10,9 @@ Feature: Compose a practice session
   # stretch, as for a caught-up student. Weak = practised, not due, not yet fluent. Stretch reaches
   # only nodes connected to what the student is learning: path skills, their applies and part_of
   # neighbours, and nodes that build on something the student has met. Every pick carries a reason.
+  # Focus (ADR-057): a session practises at most three subjects (knowledge nodes), main first, and
+  # names them; due items of other nodes come in a review block of at most 20% of the focus time or
+  # 5 items. New and stretch items come from each subject's current rung and the next one.
 
   Background:
     Given student "alice" plays "guitar" and "electric-bass"
@@ -311,6 +314,91 @@ Feature: Compose a practice session
     Given "alice" has nothing due or weak on guitar and new fretboard cells on the E and A strings
     When "alice" composes a 10-minute session with no instrument in hand
     Then no two fretboard cells in a row are on the same string while a cell on another string is left
+
+  # ── Focus: subjects and rungs ──────────────────────────────────────────────
+  # A subject is one knowledge node. Today's mix takes its subjects in this order until it has
+  # three: a teacher's suggestion; the nodes with the most due and weak time; the nodes its new
+  # items come from, path skills first; the stretch nodes. A subject's current rung is the lowest
+  # rung on the ladder (know, hear, play_clean, play_in_time, move, target, use) with material for
+  # the session whose items on that subject are not yet accurate.
+
+  @wip
+  Scenario: Today's mix practises at most three subjects and names them
+    Given "alice" has due and weak items on 6 skills of their path on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then the plan names at most 3 focus nodes
+    And every item other than the warm-up and the review block practises one of them
+
+  @wip
+  Scenario: The main subject is the node with the most due and weak time
+    Given "alice" has 4 minutes of due and weak items on "diatonic-chords" and 2 minutes on "chord-tones" on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then the plan's first focus node is "diatonic-chords"
+
+  @wip
+  Scenario: Due items of other nodes come in a review block of at most 5 items
+    Given "alice" has due items on 6 skills of their path on guitar, 12 of them outside the session's focus nodes
+    When "alice" composes a 30-minute session with "guitar" in hand
+    Then exactly 5 items with the reason due practise none of the plan's focus nodes
+    And they are the most overdue of those 12
+
+  @wip
+  Scenario: The review block never takes more than a fifth of the focus time
+    Given "alice" has due items outside the session's focus nodes, each estimated at 30 seconds
+    When "alice" composes a 5-minute session with "guitar" in hand
+    Then the due items outside the focus nodes take at most a fifth of the focus time
+
+  @wip
+  Scenario: With few nodes due or weak, the nodes of new items complete the subjects
+    Given "alice" has due items only on "chord-tones" on guitar
+    And "alice"'s path skills "diatonic-chords" and "change-chords" have new items on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then the plan's focus nodes are "chord-tones", "diatonic-chords" and "change-chords", in that order
+
+  @wip
+  Scenario: A student new to a subject gets new items from its first two rungs
+    Given "alice" has never practised "diatonic-chords", which has items at the know, hear and play_clean rungs on guitar
+    When "alice" composes a 10-minute session with "guitar" in hand and "diatonic-chords" is a focus node
+    Then every new item of "diatonic-chords" in the session is at the know or hear rung
+
+  @wip
+  Scenario: Once a rung is accurate, new items climb to the next two rungs
+    Given "alice" is accurate on every know item of "diatonic-chords" on guitar
+    And "diatonic-chords" has items at the know, hear and play_clean rungs on guitar
+    When "alice" composes a 10-minute session with "guitar" in hand and "diatonic-chords" is a focus node
+    Then every new item of "diatonic-chords" in the session is at the hear or play_clean rung
+
+  @wip
+  Scenario: Due items are reviewed whatever their rung
+    Given "alice" is accurate on every know and hear item of "diatonic-chords" on guitar
+    And 3 know items of "diatonic-chords" are due
+    When "alice" composes a 10-minute session with "guitar" in hand and "diatonic-chords" is a focus node
+    Then the 3 due know items are in the session with the reason due
+
+  @wip
+  Scenario: Rungs with no material for the session are skipped
+    Given "alice" is accurate on every know item of "diatonic-chords" on guitar
+    And "diatonic-chords" has items at the know, hear and play_clean rungs, and only its know and hear items need no instrument in hand
+    When "alice" composes a 10-minute session with no instrument in hand and "diatonic-chords" is a focus node
+    Then every new item of "diatonic-chords" in the session is at the hear rung
+
+  @wip
+  Scenario: A subject accurate on every rung it has takes new items from its top rung
+    Given "find-notes-top-strings" has items only at the know rung
+    And "alice" is accurate on 80% of its cells on guitar, and 10 of them are new
+    When "alice" composes a 10-minute session with no instrument in hand and "find-notes-top-strings" is a focus node
+    Then the session may include new know items of "find-notes-top-strings"
+
+  @wip
+  Scenario: Every item carries its rung
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then every item in the session carries one of the rungs know, hear, play_clean, play_in_time, move, target or use
+
+  @wip
+  Scenario: Confusable progressions are asked next to each other
+    Given "alice" has new heard progressions "I-V-vi-IV" and "I-vi-IV-V", and other new heard progressions
+    When "alice" composes a 10-minute session with no instrument in hand and "hear-progressions" is a focus node
+    Then "I-V-vi-IV" and "I-vi-IV-V" are asked with no other heard progression between them
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 

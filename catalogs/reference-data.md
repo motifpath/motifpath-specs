@@ -26,6 +26,7 @@ scripts can refer to rows by ID instead of looking them up by name.
   | Drill threshold version | `drill-threshold/<template key>/v<version>` |
   | Fretboard cell range (a skill's strings and frets on a layout) | `fretboard-cells/<skill key>/<layout instrument key>` |
   | Chord definition, template, voicing and voicing diagram | the chord catalog's keys, as `chord-voicings.md` defines |
+  | Progression | `progression/<key>` |
 
 - Voices use their slug as ID (`acoustic-guitar`), which is already fixed.
 - Keys never change, so neither do IDs. Renaming a row changes its names, never its ID.
@@ -49,6 +50,7 @@ after every migration and never create any of these rows.
    generated from it, not stored as rows.
 8. The chord catalog (`chord-voicings.md`): chord definitions, then templates, then each
    voicing's diagram (positions, playbacks, classification) and the voicing itself.
+9. The progression catalog (`progressions.md`).
 
 Until production exists, these migrations are regenerated in place and development databases
 are recreated from empty. From the first production install, they are append-only.
