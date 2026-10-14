@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Event Ingestion Service
-  version: 0.9.0
+  version: 0.10.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -272,6 +272,104 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServiceUnavailableError'
 
+  /admin/events:
+    get:
+      operationId: listLoggedEvents
+      summary: Read the event log
+      description: |
+        Returns tracking events exactly as they were received, newest first,
+        with when each was received. Changes nothing. Ordered by received_at,
+        then by event_id, both descending, so events received at the same
+        instant keep a stable order across pages.
+
+        Authorization: the caller must hold the admin role. The service establishes this by
+        calling the Core Domain Service with the caller's own bearer token and reading the role
+        on the profile it returns — a role claim in the JWT itself is not trusted. A caller
+        whose role is not admin, or who has no registered profile, is refused with 403. If the
+        role cannot be established because the Core Domain Service is unreachable, the request
+        is refused with 503.
+      tags:
+        - Admin
+      parameters:
+        - name: student_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Only this student's events. All students' when absent.
+        - name: type_group
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - practice_sessions
+              - answers
+              - lessons
+              - exercises
+              - song_charts
+          description: |
+            Only events of one group of types. All types when absent.
+            practice_sessions — practice.session_started, practice.session_ended.
+            answers — practice.item_answered, practice.tap_check_completed.
+            lessons — lesson.started, lesson.resumed, lesson.completed.
+            exercises — exercise.started, exercise.progress, exercise.ended.
+            song_charts — song_chart.opened, song_chart.chord_viewed,
+            song_chart.completed.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Maximum number of events to return in this page.
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Number of matching events to skip before this page.
+      responses:
+        "200":
+          description: >-
+            A page of matching events. An offset past the end returns an empty page.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggedEventPage'
+        "400":
+          description: A parameter is malformed or out of range, or type_group is not a known group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: |
+            The caller's role is not admin, or the caller has no registered profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "503":
+          description: |
+            The caller's role could not be established because the Core Domain Service is
+            unreachable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+
   /healthz:
     get:
       operationId: livenessCheck
@@ -467,6 +565,47 @@ components:
           description: |
             Human-readable explanation of why this entry no longer needs automatic retry,
             stored on the entry for audit purposes.
+
+    LoggedEvent:
+      type: object
+      description: A tracking event as it was received, with when it was received.
+      properties:
+        received_at:
+          type: string
+          format: date-time
+          description: When the service received and stored the event.
+        event:
+          $ref: '#/components/schemas/TrackingEvent'
+      required:
+        - received_at
+        - event
+
+    LoggedEventPage:
+      type: object
+      description: One page of the event log.
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LoggedEvent'
+          description: The page's events, newest received first.
+        total:
+          type: integer
+          minimum: 0
+          description: All events matching the request's filters.
+        limit:
+          type: integer
+          minimum: 1
+          description: The page size used.
+        offset:
+          type: integer
+          minimum: 0
+          description: The number of matching events skipped before this page.
+      required:
+        - items
+        - total
+        - limit
+        - offset
 
     HealthStatus:
       $ref: './components/schemas/health.yaml#/HealthStatus'

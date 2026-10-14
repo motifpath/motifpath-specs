@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.45.0
+  version: 0.46.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -4795,6 +4795,110 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+  /admin/alpha-observation:
+    get:
+      operationId: getAlphaObservation
+      summary: Observe the alpha for one week
+      description: |
+        Measures the alpha against its success metric for one week: how many
+        students practised 3 or more times, how many have done so every week so
+        far, and how far each student has got through their first path. Changes
+        nothing. Only admins may observe the alpha.
+
+        The alpha is every user with the student role who has been given at
+        least one path. A week runs Monday 00:00 to Sunday 24:00 in São Paulo
+        time (America/Sao_Paulo). A practice session belongs to the week its
+        start falls in and counts only once it is finished; sessions ended
+        early, abandoned or still in progress never count. A student is at the
+        target in a week with 3 or more counted sessions.
+
+        Students are ordered by fewest counted sessions in the week, then by
+        display name, then by student_id.
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/AlphaWeek'
+      responses:
+        "200":
+          description: The alpha, measured for the week.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlphaObservation'
+        "400":
+          description: >-
+            The week is not a Monday, or it starts after the running week.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user is not an admin. Only admins may observe the alpha.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /admin/alpha-observation/students/{student_id}:
+    get:
+      operationId: getAlphaStudentObservation
+      summary: Observe one student of the alpha
+      description: |
+        One student's measures for a week, as getAlphaObservation reports them,
+        with the practice sessions behind them and their first path node by
+        node. Sessions of every state are listed, so a week below the target
+        can be explained. Changes nothing. Only admins may observe the alpha.
+      tags:
+        - Admin
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The student's user_id.
+        - $ref: '#/components/parameters/AlphaWeek'
+      responses:
+        "200":
+          description: The student, measured for the week.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlphaStudentObservation'
+        "400":
+          description: >-
+            The student_id is not a UUID, or the week is not a Monday or starts
+            after the running week.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user is not an admin. Only admins may observe the alpha.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No student with this user_id is in the alpha.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /courses:
     get:
       operationId: listCourses
@@ -6541,6 +6645,17 @@ components:
         See ADR-007 for the full validation contract.
 
   parameters:
+    AlphaWeek:
+      name: week
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date
+      description: >-
+        The Monday the week starts on, in São Paulo time (e.g. 2026-10-12).
+        Defaults to the running week. A date that is not a Monday, or a week
+        after the running one, is rejected.
     Limit:
       name: limit
       in: query
@@ -10124,6 +10239,357 @@ components:
       required:
         - message
         - missing
+
+    AlphaWeekRange:
+      type: object
+      description: A Monday-to-Sunday week in São Paulo time.
+      properties:
+        week_start:
+          type: string
+          format: date
+          description: The Monday the week starts on.
+        week_end:
+          type: string
+          format: date
+          description: The Sunday the week ends on.
+        running:
+          type: boolean
+          description: True when the week contains the current moment, so it is still running.
+      required:
+        - week_start
+        - week_end
+        - running
+
+    AlphaCohortSummary:
+      type: object
+      description: The alpha as a whole, measured for the requested week.
+      properties:
+        student_count:
+          type: integer
+          minimum: 0
+          description: Number of students in the alpha.
+        at_target_in_week:
+          type: integer
+          minimum: 0
+          description: Students with 3 or more counted sessions in the requested week.
+        at_target_in_previous_week:
+          type: integer
+          minimum: 0
+          description: Students with 3 or more counted sessions in the week before the requested one.
+        at_target_every_week:
+          type: integer
+          minimum: 0
+          description: >-
+            Students at the target in every one of their weeks so far. A student
+            with no week so far is not counted.
+        first_path_over_target:
+          type: integer
+          minimum: 0
+          description: >-
+            Students who have completed strictly more than 70% of their first
+            path's nodes.
+        median_first_path_percent:
+          type: [integer, "null"]
+          minimum: 0
+          maximum: 100
+          description: >-
+            Median of the students' first-path completion, rounded down to a
+            whole percent; with an even number of students, the mean of the two
+            middle values. Null when the alpha has no students.
+      required:
+        - student_count
+        - at_target_in_week
+        - at_target_in_previous_week
+        - at_target_every_week
+        - first_path_over_target
+        - median_first_path_percent
+
+    AlphaWeekCount:
+      type: object
+      description: One finished week of a student's, with its counted sessions.
+      properties:
+        week_start:
+          type: string
+          format: date
+          description: The Monday the week starts on.
+        finished_sessions:
+          type: integer
+          minimum: 0
+          description: Practice sessions started in this week and finished.
+      required:
+        - week_start
+        - finished_sessions
+
+    AlphaFirstPath:
+      type: object
+      description: |
+        The student's first path — the earliest one they were given, kept even
+        if a later path replaced it — and how much of it they have completed.
+      properties:
+        student_path_id:
+          type: string
+          format: uuid
+          description: The student's copy of the path.
+        title:
+          type: string
+          description: The path's title on the student's copy.
+        given_at:
+          type: string
+          format: date-time
+          description: When the student was given this path.
+        completed_nodes:
+          type: integer
+          minimum: 0
+          description: Nodes of this path the student has completed, here or in any other path.
+        total_nodes:
+          type: integer
+          minimum: 0
+          description: All nodes of this path.
+        completed_percent:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: completed_nodes over total_nodes, rounded down to a whole percent.
+        over_target:
+          type: boolean
+          description: >-
+            True when completed_nodes over total_nodes is strictly more than
+            70%, compared exactly rather than on the rounded percent.
+      required:
+        - student_path_id
+        - title
+        - given_at
+        - completed_nodes
+        - total_nodes
+        - completed_percent
+        - over_target
+
+    AlphaStudent:
+      type: object
+      description: One student of the alpha, measured for the requested week.
+      properties:
+        student_id:
+          type: string
+          format: uuid
+          description: The student's user_id.
+        display_name:
+          type: string
+          description: The student's display name.
+        registered_at:
+          type: string
+          format: date-time
+          description: When the student registered.
+        finished_sessions_in_week:
+          type: integer
+          minimum: 0
+          description: Practice sessions started in the requested week and finished.
+        at_target_in_week:
+          type: boolean
+          description: True when finished_sessions_in_week is 3 or more.
+        weeks_so_far:
+          type: array
+          maxItems: 8
+          items:
+            $ref: '#/components/schemas/AlphaWeekCount'
+          description: >-
+            The student's most recent finished weeks, up to 8, oldest first.
+            Weeks so far start at the week the first path was given and end
+            before the running week. Empty when none has finished.
+        weeks_so_far_count:
+          type: integer
+          minimum: 0
+          description: All of the student's weeks so far, including any not listed in weeks_so_far.
+        weeks_at_target_count:
+          type: integer
+          minimum: 0
+          description: Weeks so far in which the student was at the target.
+        at_target_every_week:
+          type: boolean
+          description: >-
+            True when the student has at least one week so far and was at the
+            target in all of them.
+        last_active_at:
+          type: [string, "null"]
+          format: date-time
+          description: >-
+            When the student's most recent event of any type occurred. Null when
+            the student has no event at all.
+        quiet:
+          type: boolean
+          description: >-
+            True when last_active_at is 7 days or more before now, or, for a
+            student with no event at all, when the first path was given 7 days
+            or more before now.
+        first_path:
+          $ref: '#/components/schemas/AlphaFirstPath'
+      required:
+        - student_id
+        - display_name
+        - registered_at
+        - finished_sessions_in_week
+        - at_target_in_week
+        - weeks_so_far
+        - weeks_so_far_count
+        - weeks_at_target_count
+        - at_target_every_week
+        - last_active_at
+        - quiet
+        - first_path
+
+    AlphaObservation:
+      type: object
+      description: The alpha measured for one week.
+      properties:
+        week:
+          $ref: '#/components/schemas/AlphaWeekRange'
+        summary:
+          $ref: '#/components/schemas/AlphaCohortSummary'
+        students:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlphaStudent'
+          description: >-
+            Every student in the alpha, ordered by fewest counted sessions in the
+            week, then by display name, then by student_id.
+      required:
+        - week
+        - summary
+        - students
+
+    AlphaSession:
+      type: object
+      description: One practice session of a student's, in any state.
+      properties:
+        practice_session_id:
+          type: string
+          format: uuid
+          description: The practice session's id.
+        started_at:
+          type: string
+          format: date-time
+          description: When the session started.
+        planned_minutes:
+          type: integer
+          minimum: 1
+          description: The minutes the student planned for the session.
+        ended_at:
+          type: [string, "null"]
+          format: date-time
+          description: >-
+            When the session ended — its end for a finished or ended-early
+            session, its last event for an abandoned one. Null while in progress.
+        state:
+          type: string
+          enum:
+            - finished
+            - ended_early
+            - abandoned
+            - in_progress
+          description: |
+            finished — ended without leaving early; the only state that counts.
+            ended_early — the student left before the end.
+            abandoned — no end arrived and the session has been silent for its
+            planned minutes plus 15.
+            in_progress — still within its planned minutes plus 15.
+        items_answered:
+          type: integer
+          minimum: 0
+          description: Items the student answered in the session.
+      required:
+        - practice_session_id
+        - started_at
+        - planned_minutes
+        - ended_at
+        - state
+        - items_answered
+
+    AlphaSessionWeek:
+      type: object
+      description: One week of a student's practice sessions.
+      properties:
+        week:
+          $ref: '#/components/schemas/AlphaWeekRange'
+        finished_sessions:
+          type: integer
+          minimum: 0
+          description: The week's counted sessions.
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlphaSession'
+          description: Every session started in the week, in any state, newest first.
+      required:
+        - week
+        - finished_sessions
+        - sessions
+
+    AlphaPathNode:
+      type: object
+      description: One node of the student's first path and where the student is with it.
+      properties:
+        position:
+          type: integer
+          minimum: 1
+          description: 1-based position of the node in the path.
+        content_node_id:
+          type: string
+          format: uuid
+          description: The content node at this position.
+        title:
+          type: string
+          description: Title of the content node.
+        status:
+          type: string
+          enum:
+            - completed
+            - in_progress
+            - not_started
+          description: |
+            completed — finished, here or in any other path.
+            in_progress — started but not finished.
+            not_started — not started yet; a node the student cannot open yet is
+            reported as not started too.
+        completed_at:
+          type: [string, "null"]
+          format: date-time
+          description: When the student first completed the node. Null unless completed.
+        started_at:
+          type: [string, "null"]
+          format: date-time
+          description: When the student first started the node. Null when not started.
+      required:
+        - position
+        - content_node_id
+        - title
+        - status
+        - completed_at
+        - started_at
+
+    AlphaStudentObservation:
+      type: object
+      description: One student of the alpha, measured for one week, with what lies behind the measures.
+      properties:
+        week:
+          $ref: '#/components/schemas/AlphaWeekRange'
+        student:
+          $ref: '#/components/schemas/AlphaStudent'
+        session_weeks:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items:
+            $ref: '#/components/schemas/AlphaSessionWeek'
+          description: The requested week, then the week before it.
+        first_path_nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlphaPathNode'
+          description: Every node of the student's first path, in path order.
+      required:
+        - week
+        - student
+        - session_weeks
+        - first_path_nodes
 
     StudentPath:
       type: object

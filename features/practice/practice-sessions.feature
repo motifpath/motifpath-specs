@@ -55,6 +55,22 @@ Feature: Keep a record of practice sessions and learning activity
     When "alice" answers a challenge exercise of the content node "open-chords"
     Then no practice session gains an answer
 
+  # ── Last activity (MOT-8) ─────────────────────────────────────────────────
+  # The alpha observation (features/core-domain/alpha-observation.feature) calls a student quiet
+  # from their last activity: the latest occurred_at of any event of theirs, of any type.
+
+  @wip
+  Scenario: Any event of a student's becomes their last activity
+    Given "alice"'s last activity was a practice.session_ended at 18:11
+    When "alice"'s song_chart.opened, occurred at 21:15, arrives
+    Then "alice"'s last activity is 21:15
+
+  @wip
+  Scenario: An event that arrives late does not move last activity back
+    Given "alice"'s last activity was a lesson.started at 21:15
+    When "alice"'s practice.item_answered, occurred at 18:03, arrives at 21:20
+    Then "alice"'s last activity is still 21:15
+
   # ── Review of a finished course or path (MOT-106) ─────────────────────────
 
   Scenario: A lesson reviewed after it was completed stays completed

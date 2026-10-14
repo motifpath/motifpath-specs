@@ -2,7 +2,8 @@
 
 **Source:** ADR-049 §6 (authoring is desktop-first, with minimal responsiveness) · MOT-61 (Figma
 "Authoring", rows 1–13; decisions D1–D29, decided 2026-10-09: all A except D15 = B) · Figma row 17
-(lists after MOT-93, approved 2026-10-12) · MOT-93 (the API for lists at volume, ADR-053) · the chord-progression idea in MOT-94
+(lists after MOT-93, approved 2026-10-12) · Figma row 19 (alpha observation, MOT-8; decisions D1–D9
+of that row, approved 2026-10-14: all A) · MOT-93 (the API for lists at volume, ADR-053) · the chord-progression idea in MOT-94
 
 ## When
 
@@ -27,7 +28,7 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   line on what Teach is for, and one `MenuRow` per section; each section is a pushed page with
   ← Teach. On Expanded a **Teach sidebar** lists the sections, then Back to learning and Account.
 - **Sections, in composition order (D3):** Courses · Paths · Lessons · Exercises · Diagrams; for
-  admins an Admin group: Knowledge map · Song charts (`song-chart.md`). "Content" is renamed **Lessons**, the word
+  admins an Admin group: Knowledge map · Song charts (`song-chart.md`) · Alpha (below). "Content" is renamed **Lessons**, the word
   learners see.
 
 ### Lists (D4, D24, D25–D28)
@@ -181,6 +182,28 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   the knowledge map (drill-in lists), skills and concepts, publishing, reordering.
 - The limit is by **size class only**: Medium and Expanded, tablets included, get the full editors.
 
+### Alpha observation (MOT-8, row 19)
+
+- **What:** an admin-only, read-only section that measures the alpha against PB-8's success metric:
+  3+ finished practice sessions a week, and more than 70% of the first path completed. Nothing on
+  it can be changed. Teachers don't see it (row D1).
+- **Overview (19a, 19e):** a week stepper that opens on the running week and can't step past it ·
+  four `MetricTile`s (3+ sessions this week · 3+ every week so far · First path over 70% · Median
+  first path) · `ChoiceChip`s All · Below 3 this week · Quiet 7+ days, each with its count, and
+  `SearchField` · one `ObservationRow` per student (Expanded) or `ObservationCard` (Compact), fewest
+  sessions first. The week chip reads None yet · N to go · On target. Weekly bars sit against a
+  dashed line at 3; first-path progress has a mark at 70%. A quiet student's last activity is in
+  the danger colour.
+- **Student (19b, 19f):** the same three measures (`MetricTile`s; `WeekSummary` on Compact) ·
+  sessions grouped by week with a `Chip` per state (Finished · Ended early · Abandoned), saying
+  only finished sessions count · the first path node by node (`PathNodeRow`). On Compact,
+  Sessions · First path · Events are tabs (`SegmentedControl`).
+- **Events (19c):** the raw event log, newest first, 12 at a time with "Load 12 more" · one student
+  chip per student (never "+N more") and type chips for the five groups · event types stay as
+  their exact names in every language.
+- The rules: `features/core-domain/alpha-observation.feature`, `features/event-ingestion/read-event-log.feature`;
+  the screens: `features/web/alpha-observation.feature`.
+
 ### Size classes
 
 | Size class | Shell | Lists | Editors |
@@ -201,6 +224,10 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 
 ## Spec changes this needs
 
+- **MOT-8 (specified 2026-10-14):** `GET /admin/alpha-observation` and `GET
+  /admin/alpha-observation/students/{student_id}` in core-domain; `GET /admin/events` in event
+  ingestion; each student's last activity kept by the aggregation worker
+  (`features/practice/practice-sessions.feature`).
 - **Figma row 18 (2026-10-12):** no side panel; the Filters dialog from Medium up, replacing the
   Expanded part of 13g and 17e.
 - **MOT-93 (done 2026-10-12, ADR-053):** `sort=title|updated` on every authoring list; several
