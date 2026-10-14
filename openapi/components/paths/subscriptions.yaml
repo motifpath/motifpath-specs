@@ -1,0 +1,186 @@
+Offers:
+  get:
+    operationId: listSubscriptionOffers
+    summary: List available offers for one subscription scope
+    description: |
+      Return backend-approved offer revisions for one scope and enabled currency.
+      content_id is required for course/path and forbidden for platform. Unknown content
+      returns 404; a disabled currency or invalid combination returns 400.
+      Acquisition OFF returns no new offers, without hiding existing subscriptions.
+      Scope/currency/period prices are configured independently; client and CMS values
+      never override authoritative monetary terms. This read does not start checkout.
+    tags: [Subscriptions]
+    parameters:
+      - name: scope_kind
+        in: query
+        required: true
+        description: Coverage of the requested subscription offers.
+        schema: {type: string, enum: [platform, course, path]}
+      - name: content_id
+        in: query
+        description: Course or path identity; required only for those content scopes.
+        schema: {type: string, format: uuid}
+      - name: currency
+        in: query
+        required: true
+        description: Explicit enabled currency; no automatic currency conversion is performed.
+        schema: {type: string, pattern: '^[A-Z]{3}$'}
+    responses:
+      '200':
+        description: Available offer revisions for the exact requested scope and currency.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/subscriptions.yaml#/OfferList'}
+      '400': {$ref: '#/InvalidRequest'}
+      '401': {$ref: '#/Unauthenticated'}
+      '404': {$ref: '#/NotFound'}
+      '503': {$ref: '#/Unavailable'}
+
+Subscriptions:
+  get:
+    operationId: listMySubscriptions
+    summary: List the caller's existing subscriptions
+    description: |
+      Return only the authenticated MotifPath user's established subscriptions,
+      including expired subscriptions. No caller-supplied owner is accepted.
+      Acquisition flags and cohort removal do not hide billing state or history.
+      Subscription billing state is not a complete lesson access decision; permanent
+      purchases, completed lessons, refunds and disputes have separate grant rules.
+    tags: [Subscriptions]
+    parameters:
+      - $ref: '../../core-domain-service.yaml#/components/parameters/Limit'
+      - $ref: '../../core-domain-service.yaml#/components/parameters/Offset'
+    responses:
+      '200':
+        description: Caller-owned subscriptions ordered by identifier; an empty page is valid.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/subscriptions.yaml#/SubscriptionPage'}
+      '400': {$ref: '#/InvalidRequest'}
+      '401': {$ref: '#/Unauthenticated'}
+      '503': {$ref: '#/Unavailable'}
+
+CancelRenewal:
+  parameters:
+    - $ref: '#/SubscriptionID'
+  post:
+    operationId: cancelMySubscriptionRenewal
+    summary: Stop the next renewal without truncating paid access
+    description: |
+      Durably record a caller-owned cancellation and its attributable audit evidence.
+      Preserve paid_until, progress and independent grants. Existing cancellation
+      support remains available while acquisition flags are OFF. This is not a refund.
+      Another user's subscription is indistinguishable from a missing one (404).
+      An accepted command may be pending until external billing state is reconciled;
+      200 alone does not claim the provider has already disabled renewal.
+      expected_revision prevents racing a renewal or another lifecycle command.
+      Process same-key retries as described by IdempotencyKey before revision checks.
+      If this subscription already has renewal disabled, record an applied no-op command.
+    tags: [Subscriptions]
+    parameters:
+      - $ref: '#/IdempotencyKey'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '../schemas/subscriptions.yaml#/CancelSubscriptionRequest'}
+    responses:
+      '200': {$ref: '#/CommandReceipt'}
+      '400': {$ref: '#/InvalidRequest'}
+      '401': {$ref: '#/Unauthenticated'}
+      '404': {$ref: '#/NotFound'}
+      '409': {$ref: '#/Conflict'}
+      '503': {$ref: '#/Unavailable'}
+
+ScheduleAnnual:
+  parameters:
+    - $ref: '#/SubscriptionID'
+  post:
+    operationId: scheduleMyAnnualSubscription
+    summary: Schedule monthly-to-annual billing at the next renewal
+    description: |
+      Require a paid, automatically renewing monthly subscription owned by the caller.
+      target_offer_id must be a current eligible annual offer for the identical scope
+      and currency; stale, wrong-scope or wrong-currency offers are refused (409).
+      Do not charge or credit mid-period. Apply annual billing at paid_until, using
+      authoritative terms applicable at that renewal, not caller-provided amounts.
+      Scheduling an offer does not freeze its price against later approved renewal
+      price changes. Annual-to-monthly switching is refused (409).
+      Activation requires server-side action/cohort/prerequisite decisions (403 if OFF).
+      Record one durable operation with audit evidence; do not report external success
+      before reconciliation. A conflicting pending lifecycle command returns 409.
+      Known same-intent retries return their recorded operation before evaluating new
+      acquisition gates or the originally observed revision; rollback cannot lose them.
+      Scope-based first-subscription refund history is unchanged by this operation.
+    tags: [Subscriptions]
+    parameters:
+      - $ref: '#/IdempotencyKey'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '../schemas/subscriptions.yaml#/ScheduleAnnualRequest'}
+    responses:
+      '200': {$ref: '#/CommandReceipt'}
+      '400': {$ref: '#/InvalidRequest'}
+      '401': {$ref: '#/Unauthenticated'}
+      '403': {$ref: '#/Forbidden'}
+      '404': {$ref: '#/NotFound'}
+      '409': {$ref: '#/Conflict'}
+      '503': {$ref: '#/Unavailable'}
+
+SubscriptionID:
+  name: subscription_id
+  in: path
+  required: true
+  description: Subscription owned by the authenticated MotifPath user.
+  schema: {type: string, format: uuid}
+
+IdempotencyKey:
+  name: Idempotency-Key
+  in: header
+  required: true
+  description: |
+    Caller-generated UUID identifying one logical command. Scoped by trusted environment,
+    authenticated user, action and subscription; fingerprint the complete request intent.
+    Same key and intent returns the same operation identity with its current recorded status,
+    without repeating effects, even after a restart or revision change. A conflicting
+    fingerprint returns 409. Concurrent submissions must converge on one operation.
+    Never discard operation identity merely because a transient retry cache expires.
+  schema: {type: string, format: uuid}
+
+CommandReceipt:
+  description: Durable command identity and current outcome, including pending reconciliation.
+  content:
+    application/json:
+      schema: {$ref: '../schemas/subscriptions.yaml#/SubscriptionCommand'}
+InvalidRequest:
+  description: Malformed parameters, missing idempotency identity or invalid request shape.
+  content:
+    application/json:
+      schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ValidationError'}
+Unauthenticated:
+  description: Missing/invalid authentication or unregistered MotifPath identity.
+  content:
+    application/json:
+      schema: {$ref: '../../core-domain-service.yaml#/components/schemas/UnauthorizedError'}
+NotFound:
+  description: Resource does not exist or is not owned by the caller.
+  content:
+    application/json:
+      schema: {$ref: '../../core-domain-service.yaml#/components/schemas/NotFoundError'}
+Forbidden:
+  description: New commercial action is unavailable to this caller under server rollout decisions.
+  content:
+    application/json:
+      schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ForbiddenError'}
+Conflict:
+  description: Stale revision, conflicting idempotency intent, offer mismatch or invalid lifecycle transition.
+  content:
+    application/json:
+      schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ConflictError'}
+Unavailable:
+  description: Required authoritative state, durable audit storage or external billing reconciliation is unavailable; no untraceable effect may be committed.
+  content:
+    application/json:
+      schema: {$ref: '../schemas/subscriptions.yaml#/CommercialUnavailable'}

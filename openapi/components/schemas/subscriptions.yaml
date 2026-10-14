@@ -1,0 +1,196 @@
+SubscriptionScope:
+  type: object
+  additionalProperties: false
+  description: Commercial subscription coverage; unrelated scopes have independent prices and refund history.
+  required: [kind]
+  properties:
+    kind:
+      type: string
+      enum: [platform, course, path]
+      description: Platform-wide coverage or one identified course or path.
+    content_id:
+      type: string
+      format: uuid
+      description: Stable course or path identifier; required for content scopes and forbidden for platform coverage.
+  oneOf:
+    - properties:
+        kind: {const: platform, description: Platform-wide coverage has no content identifier.}
+      not: {required: [content_id]}
+    - properties:
+        kind: {enum: [course, path], description: Content-specific coverage requires its course or path identifier.}
+      required: [content_id]
+
+SubscriptionOffer:
+  type: object
+  additionalProperties: false
+  description: Immutable revision of a backend-approved subscription price; editorial metadata cannot override it.
+  required: [offer_id, scope, billing_period, amount_minor, currency]
+  properties:
+    offer_id:
+      type: string
+      format: uuid
+      description: Identifier of this immutable offer revision; changing its price creates a new revision identifier.
+    scope:
+      $ref: '#/SubscriptionScope'
+      description: Coverage purchased by this offer.
+    billing_period:
+      type: string
+      enum: [monthly, annual]
+      description: Automatically renewing paid period; annual discounts are configured independently by scope.
+    amount_minor:
+      type: integer
+      minimum: 1
+      maximum: 9007199254740991
+      description: Full charge for one period in the currency's minor units, never a floating-point amount.
+    currency:
+      type: string
+      pattern: '^[A-Z]{3}$'
+      description: Enabled ISO 4217 currency. The code shape does not enable a currency or approve USD support.
+
+Subscription:
+  type: object
+  additionalProperties: false
+  description: Caller-owned billing state; this is not a complete access decision or a substitute for independent grants.
+  required: [subscription_id, revision, scope, current_offer, billing_period, billing_status, renewal_enabled, paid_until, first_access_at]
+  properties:
+    subscription_id:
+      type: string
+      format: uuid
+      description: Stable identity of this subscription lifecycle; refund history also persists across rejoining its scope.
+    revision:
+      type: integer
+      minimum: 1
+      description: Increasing state revision used to refuse stale commercial commands.
+    scope:
+      $ref: '#/SubscriptionScope'
+      description: Coverage of this subscription.
+    current_offer:
+      $ref: '#/SubscriptionOffer'
+      description: Immutable price snapshot of the current or most recently paid period, with the same scope and billing period as the subscription.
+    billing_period:
+      type: string
+      enum: [monthly, annual]
+      description: Current billing period; a scheduled change does not replace it before renewal.
+    billing_status:
+      type: string
+      enum: [paid, renewal_grace, expired]
+      description: Paid-period lifecycle only. Refunds, disputes and other grants can independently affect access.
+    renewal_enabled:
+      type: boolean
+      description: Whether another period is scheduled to renew automatically; false does not truncate the paid period.
+    paid_until:
+      type: string
+      format: date-time
+      description: End of access from the paid period before any separate refund, dispute or valid independent grant is considered.
+    first_access_at:
+      type: string
+      format: date-time
+      description: First time paid access became available for this learner and scope; never reset by renewal, rejoining or a billing-period change.
+    renewal_grace_until:
+      type: string
+      format: date-time
+      description: End of the seven-day unpaid-renewal grace period, present only during renewal_grace.
+    scheduled_annual_offer:
+      $ref: '#/SubscriptionOffer'
+      description: Offer revision selected when scheduling annual renewal, not a price guarantee; renewal uses then-applicable authoritative terms. Absent when no change is scheduled.
+  allOf:
+    - if:
+        properties:
+          billing_status: {const: renewal_grace, description: Renewal grace requires an explicit deadline.}
+      then: {required: [renewal_grace_until]}
+      else: {not: {required: [renewal_grace_until]}}
+
+SubscriptionPage:
+  type: object
+  additionalProperties: false
+  description: Caller-owned subscriptions ordered by subscription identifier for stable page ordering.
+  required: [items, total, limit, offset]
+  properties:
+    items:
+      type: array
+      items: {$ref: '#/Subscription'}
+      description: Subscriptions belonging to the authenticated caller only.
+    total:
+      type: integer
+      minimum: 0
+      description: Total number of the caller's subscriptions before pagination.
+    limit:
+      type: integer
+      minimum: 1
+      maximum: 100
+      description: Requested maximum page size.
+    offset:
+      type: integer
+      minimum: 0
+      description: Number of matching subscriptions skipped.
+
+OfferList:
+  type: object
+  additionalProperties: false
+  description: Purchasable offer revisions for one exact scope and one enabled currency; at most one per billing period.
+  required: [items]
+  properties:
+    items:
+      type: array
+      maxItems: 2
+      items: {$ref: '#/SubscriptionOffer'}
+      description: Available monthly and annual offers in that order; empty if new acquisition is disabled or the scope is not on sale.
+
+CancelSubscriptionRequest:
+  type: object
+  additionalProperties: false
+  description: Cancel only the caller's next renewal; no refund or progress deletion is requested.
+  required: [expected_revision]
+  properties:
+    expected_revision:
+      type: integer
+      minimum: 1
+      description: Subscription revision observed by the caller before requesting cancellation.
+
+ScheduleAnnualRequest:
+  type: object
+  additionalProperties: false
+  description: Schedule monthly-to-annual renewal using an approved offer; no caller-provided price or mid-period adjustment is accepted.
+  required: [expected_revision, target_offer_id]
+  properties:
+    expected_revision:
+      type: integer
+      minimum: 1
+      description: Subscription revision observed before scheduling the change.
+    target_offer_id:
+      type: string
+      format: uuid
+      description: Annual offer revision for the identical scope and currency, currently eligible for the caller.
+
+SubscriptionCommand:
+  type: object
+  additionalProperties: false
+  description: Durable command receipt. Pending means recorded, not that a provider-side change has already succeeded.
+  required: [operation_id, subscription_id, action, status]
+  properties:
+    operation_id:
+      type: string
+      format: uuid
+      description: Durable idempotency and audit correlation identity, supplied as the Idempotency-Key.
+    subscription_id:
+      type: string
+      format: uuid
+      description: Caller-owned subscription targeted by the command.
+    action:
+      type: string
+      enum: [cancel_renewal, schedule_annual]
+      description: Commercial action recorded for this operation.
+    status:
+      type: string
+      enum: [pending, applied, failed]
+      description: Current command outcome; failed commands require reconciliation before any new external attempt.
+
+CommercialUnavailable:
+  type: object
+  additionalProperties: false
+  description: Authoritative commercial state or durable processing is temporarily unavailable.
+  required: [message]
+  properties:
+    message:
+      type: string
+      description: Explanation safe to show to the caller, without provider secrets or other users' data.
