@@ -1,7 +1,8 @@
 # Pattern: practice session (the Practice Shell)
 
 **Source:** ADR-049 §1, §4 and §5 · first used by PB-22 slice 3 Phase 7 · revised in MOT-55
-(Figma "Practice Shell — flows", decisions D1–D27)
+(Figma "Practice Shell — flows", decisions D1–D27) and MOT-143 (ADR-057 focused sessions, rows
+13f–13h and 16, decisions D28–D38)
 
 ## When
 
@@ -36,6 +37,11 @@ like the same product.
   opens with that instrument chosen. A second choice, **What to practise: Today's mix | I'll
   choose**, opens the focus picker (MOT-77, D22–D24); "Practise this" on a skill or concept opens
   the setup with the focus already chosen.
+- **Focus picker:** "What do you want to get better at?", with search; then **From your path**,
+  the student's path subjects with their level only; then **More to explore**, one row per area,
+  which opens that area's subjects (D29). A subject is one knowledge node with material for the
+  chosen instrument (ADR-057 §2), shown by its knowledge-map name as it is (D38). The picker shows
+  no rungs and no item counts. A tap picks the subject and goes back to the setup.
 - **Nothing to practise:** when the chosen instrument has nothing to play, the way out is the
   primary action, never a secondary button under an error: **Choose what to practise** (D2, D20).
   A student who has never started a course or path gets **Find where to start** instead, which
@@ -44,6 +50,16 @@ like the same product.
   play-along and exercise by its name, with why it was picked, and the fretboard cells grouped by
   drill with how many there are ("Name the note · 8 notes"). Its primary action is **Let's go**; ×
   leaves without starting the session, so nothing is recorded.
+  - **Subjects:** under the title, the plan names its subjects (at most three, main first), each
+    with the rungs its new items come from ("Diatonic chords · Know it · Hear it") (ADR-057 §5,
+    D28). A chosen session shows **You chose this** once, above its one subject; each item keeps
+    its own reason (D30).
+  - **Review block:** in Today's mix, due items of other subjects form their own group,
+    **Quick review · other subjects**, right after the warm-up; the subjects' items follow under
+    **Your subjects** (D31).
+  - **Rung names** students see: Know it · Hear it · Play it clean · Play it in time · Move it ·
+    Target it · Use it (pt-BR: Saber · Ouvir · Tocar limpo · Tocar no tempo · Mudar de tom · Mirar
+    · Usar). They appear in the plan and the summary, never on item screens (D28).
 - **Item title:** every item names what it is above its stimulus: a play-along by its diagram's
   name, an exercise by its title. A fretboard cell's prompt is its title. The reason it was picked
   stays next to it.
@@ -52,8 +68,12 @@ like the same product.
   item's name and why it was picked. **Continue** starts it. A song chart shows the song so far. After the session's last item the
   summary follows instead, with no card. Exercises and fretboard cells move on as before: they are
   short, and their title names the change.
-- **Summary:** what the run did — minutes, instrument, items — then each item with its result
-  ("up to 76 BPM · Clean", "6 of 8 right", "Not quite"), and the This week tiles of ADR-051. The
+- **Summary:** what the run did — minutes, instrument, items — then one result per subject: its
+  score, the level change on the rung practised and the next rung ("Know it: Learning → Accurate
+  · next: Hear it") (D32). In Today's mix, one line sums up the review block, and each item with
+  its result ("up to 76 BPM · Clean", "6 of 8 right", "Not quite") moves behind **Every item
+  (n)**. A chosen session has one subject, so its items stay listed under it. Then the This week
+  tiles of ADR-051. The
   primary action is **Done** (back to Home); **Practise again** is tertiary (D5). After the
   student's first finished session, an `InstallCard` sits under the results (`install.md`).
 - **S7 challenge run:** the same shell, not the App Bar. "How to answer" is an in-place disclosure,
