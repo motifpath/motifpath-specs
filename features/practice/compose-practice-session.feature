@@ -52,11 +52,12 @@ Feature: Compose a practice session
     Then exactly one item has the reason application
     And the focus time is the 20 minutes less the warm-up and that play-along's estimated time
 
-  Scenario: With no play-along on a focus skill, the ending applies another skill of the path
-    Given no skill of the session's focus items has a play-along on guitar
-    And "alice"'s path skill "chord-tones" has the play-along "chord-tone-riff" on guitar
+  @wip
+  Scenario: With no play-along on any of its subjects, Today's mix has no application ending
+    Given "alice" has due items only on "diatonic-chords", "chord-tones" and "change-chords" on guitar, and none of them has a play-along
+    And "alice"'s path skill "notes-on-high-strings" has the play-along "high-strings-riff" on guitar
     When "alice" composes a 10-minute session with "guitar" in hand
-    Then the last item is "chord-tone-riff" with the reason application
+    Then no item in the session has the reason application
 
   Scenario: With no play-along on the instrument at all, the session has no ending and keeps the time for focus
     Given none of "alice"'s path skills has a play-along on "electric-bass"
@@ -318,9 +319,13 @@ Feature: Compose a practice session
   # ── Focus: subjects and rungs ──────────────────────────────────────────────
   # A subject is one knowledge node. Today's mix takes its subjects in this order until it has
   # three: a teacher's suggestion; the nodes with the most due and weak time; the nodes its new
-  # items come from, path skills first; the stretch nodes. A subject's current rung is the lowest
-  # rung on the ladder (know, hear, play_clean, play_in_time, move, target, use) with material for
-  # the session whose items on that subject are not yet accurate.
+  # items come from, path skills first; the nodes with items coming due within the week, soonest
+  # first; the stretch nodes. Only its subjects' items fill the session, so it may end short.
+  # Due items of other nodes form the review block: it is filled first, from the due share, and
+  # comes right after the warm-up. The application ending plays a subject, main first, or there
+  # is none. A subject's current rung is the lowest rung on the ladder (know, hear, play_clean,
+  # play_in_time, move, target, use) with material for the session whose items on that subject
+  # are not yet accurate.
 
   @wip
   Scenario: Today's mix practises at most three subjects and names them
@@ -349,11 +354,26 @@ Feature: Compose a practice session
     Then the due items outside the focus nodes take at most a fifth of the focus time
 
   @wip
+  Scenario: The review block comes right after the warm-up
+    Given "alice" has a clean play-along "c-major-scale" with a best clean tempo of 100 BPM
+    And "alice" has due items on 6 skills of their path on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then the due items that practise none of the plan's focus nodes come right after the warm-up, before any other item
+
+  @wip
   Scenario: With few nodes due or weak, the nodes of new items complete the subjects
     Given "alice" has due items only on "chord-tones" on guitar
     And "alice"'s path skills "diatonic-chords" and "change-chords" have new items on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then the plan's focus nodes are "chord-tones", "diatonic-chords" and "change-chords", in that order
+
+  @wip
+  Scenario: A caught-up session's subjects are the nodes it reviews ahead, then those it stretches to
+    Given "alice" has nothing due, weak or new on their path for guitar
+    And "alice" has known items of "chord-tones" coming due within the week
+    And "alice" is ready to start the skill "notes-on-high-strings", which builds on a skill they have met
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the plan's focus nodes are "chord-tones" and "notes-on-high-strings", in that order
 
   @wip
   Scenario: A student new to a subject gets new items from its first two rungs
