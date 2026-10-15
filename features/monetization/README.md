@@ -10,6 +10,7 @@ They are not runtime test results or completion of M0. Architectural constraints
 | [Refunds and chargebacks](refunds-and-chargebacks.feature) | First subscription per scope, access-based eligibility start, admin handling, full refunds, retained records and access pending final dispute decisions |
 | [Teacher commercial rights](teacher-commercial-rights.feature) | Price bounds, permanent per-path licenses, permanent purchases, withdrawal, user-pulled free updates and earnings adjustments |
 | [Stripe payment ingestion](stripe-payment-ingestion.feature) | Authoritative subscription checkout, verified durable receipts, business deduplication and reconciliation |
+| [Payment reconciliation](payment-reconciliation.feature) | Provider facts, paid-period uniqueness, stale-event protection, durable recovery and distinct annual reminders |
 | [Refund commands](refund-commands.feature) | Caller-owned full-refund cases, admin-only execution, cross-actor payment uniqueness and pending reconciliation |
 | [Subscription commands](subscription-commands.feature) | Caller ownership, durable receipts, rollback-safe idempotency, revision conflicts and authoritative offer validation |
 
@@ -71,9 +72,10 @@ Core-domain OpenAPI defines caller-owned subscription checkout creation/read and
 Stripe-signature-authenticated financial receipt endpoint. Native provider envelopes are
 not client learning events. Receipt is durable transport acknowledgement; fulfillment
 requires verified payment and business-level uniqueness. Unknown outcomes are reconciled,
-not retried as new operations. Snapshot versus thin delivery and the exact Stripe API version,
-event allowlist, secret-rotation/tolerance settings, replay schedules and financial schema
-mappings still require implementation-ready contracts. Persistent inbox payloads require
+not retried as new operations. The proposed [Stripe processing profile](../../openapi/stripe-event-processing.md)
+defines snapshot delivery, its target API version, notification mapping, signature tolerance
+and reconciliation cadence. The compatible SDK, operational configuration and durable financial
+schemas still need readiness evidence before implementation. Persistent inbox payloads require
 restricted access, data minimization and approved retention; raw provider data is not a public log.
 
 Teacher-path purchase checkout remains gated by commercial version and Connect contracts.
