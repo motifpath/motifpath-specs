@@ -2882,6 +2882,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConflictError'
 
+  /progressions:
+    get:
+      operationId: listProgressions
+      summary: List the progression catalog
+      description: |
+        Returns every progression of the progression catalog, in catalog order: its key, its
+        numerals one bar each (in a major key, I7 IV7 V7 being dominant sevenths), the
+        progressions a learner mistakes it for, and its names. A client reads it to show and
+        grade the progression drills' questions the same way the server does, such as a chart
+        picked for a progression. The catalog is reference data, the same for every user and
+        language, so a client may keep it for the session. Any authenticated user may list it.
+      tags:
+        - Practice
+      responses:
+        "200":
+          description: Every progression of the catalog.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Progression'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
   /chords:
     get:
       operationId: searchChords
@@ -13435,6 +13464,45 @@ components:
         - item_count
         - level
         - current_rung
+
+    Progression:
+      type: object
+      description: |
+        A common chord progression of the progression catalog, by number: one numeral per bar of
+        a major key, asked in whatever key a drill picks.
+      properties:
+        progression_id:
+          type: string
+          format: uuid
+          description: The progression's fixed identifier.
+        key:
+          type: string
+          pattern: '^[0-9A-Za-z][0-9A-Za-z-]*$'
+          description: The progression's key in the catalog, such as I-V-vi-IV, as item keys and answers name it.
+        bars:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            pattern: '^(I|ii|iii|IV|V|vi|viio)7?$'
+          description: |
+            One numeral per bar, such as I V vi IV, or I7 IV7 V7 for a dominant seventh. A
+            four-bar progression has four, a 12-bar form twelve.
+        confusable:
+          type: array
+          items:
+            type: string
+          description: The keys of the progressions a learner mistakes it for; each lists it back.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: The progression's name in each language, such as "I–V–vi–IV (pop)".
+      additionalProperties: false
+      required:
+        - progression_id
+        - key
+        - bars
+        - confusable
+        - names
 
     PracticeSessionItem:
       type: object
