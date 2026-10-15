@@ -40,7 +40,8 @@ student can go.
   - Appearance and language apply at once, with no Save.
   - Sign out happens at once, with no confirm and no toast, and lands on the landing page ("You're
     signed out. Your practice and progress are saved.").
-- **Practice** opens the session setup directly, never a page in between.
+- **Practice** opens the session setup directly, never a page in between. Tools (the Metronome)
+  open from the setup's header, not from the navigation (`metronome.md`).
 - **Learning** lists every course and standalone path the student has started (in progress,
   finished, left); tapping a row continues it in My path (see `learning.md`).
 - **Discover** joins the course and path catalogs behind a Courses | Paths segmented control (see

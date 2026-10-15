@@ -8,6 +8,9 @@ Feature: Climb the tempo ladder of a play-along
   # below 60% of it. The student may choose the next take's tempo, past the target too, and the
   # ladder never goes below a tempo the student chose for the item: only the student lowers it.
   # The student chooses a tempo with a slider, in one gesture, or 5 BPM slower or faster.
+  # A take is played at a note value, a speed factor on the music as written (ADR-061):
+  # quarters x1 (the default), eighths x2, triplets x3, sixteenths x4. Steps move the played BPM
+  # within the note value; the target and the 60% floor compare effective speed (BPM x factor).
 
   Background:
     Given student "alice" plays "guitar"
@@ -57,7 +60,42 @@ Feature: Climb the tempo ladder of a play-along
     Then no rating of the take is sent
     And "alice" can choose another tempo before playing it again
 
+  @web
+  Scenario: A take in eighths plays the music twice as fast over the same click
+    Given "alice" is at 80 BPM on "pentatonic-run"
+    When "alice" chooses eighths for the next take of "pentatonic-run"
+    Then the next take of "pentatonic-run" is at 40 BPM in eighths
+    And its click is at 40 BPM while its notes play as fast as at 80 BPM in quarters
+
+  @web
+  Scenario: The ladder steps within the note value of the takes
+    Given "alice" is at 50 BPM in eighths on "pentatonic-run"
+    When "alice" rates two takes of "pentatonic-run" at 50 BPM in eighths as "clean"
+    Then the next take of "pentatonic-run" is at 55 BPM in eighths
+
+  @web
+  Scenario: A rated take carries the note value it was played at
+    When "alice" rates a take of "pentatonic-run" at 60 BPM in eighths as "clean"
+    Then the rating sent has a tempo of 60 BPM and the note value eighths
+
+  @web
+  Scenario: A take offers the four suggested note values
+    When "alice" opens the note value of "pentatonic-run"
+    Then it offers quarters, eighths, triplets and sixteenths as icons, quarters chosen
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
+
+  @web
+  Scenario: Another note value keeps the effective speed, rounded down to the 5 BPM grid
+    Given "alice" is at 155 BPM on "pentatonic-run"
+    When "alice" chooses triplets for the next take of "pentatonic-run"
+    Then the next take of "pentatonic-run" is at 50 BPM in triplets
+
+  @web
+  Scenario: The target is compared at effective speed
+    Given "alice" is at 60 BPM in eighths on "pentatonic-run"
+    When "alice" rates two takes of "pentatonic-run" at 60 BPM in eighths as "clean"
+    Then the next take of "pentatonic-run" is at 60 BPM in eighths
 
   @web
   Scenario: The ladder never climbs past the target by itself

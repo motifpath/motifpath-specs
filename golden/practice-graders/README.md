@@ -72,7 +72,7 @@ Each file holds:
   everywhere, its `note_name`, `fret_window` and `cells`.
   Adding it to `exercise_option.v1`'s cases changes no grading rule.
 - **Self-assessed evidence** is `source`, `rating` and the measure its kind takes:
-  `tempo_bpm` for a play-along, `changes_per_minute` for a chord change or a root change, none
+  `tempo_bpm` (and its `note_value`, when sent) for a play-along, `changes_per_minute` for a chord change or a root change, none
   for a chord voicing or a root and fifth.
 
 ### Music in the new graders
@@ -134,7 +134,9 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
 
 - The rating and its measure are kept as given. A take of zero chord changes is still a
   rating.
-- A play-along needs `tempo_bpm` and takes no `changes_per_minute`. A chord change and a root
+- A play-along needs `tempo_bpm` and takes no `changes_per_minute`. It may carry the
+  `note_value` the take was played at, which is kept as given (absent means quarters); any
+  other kind with a `note_value` is `response_does_not_fit_item`. A chord change and a root
   change need `changes_per_minute` and take no `tempo_bpm`. A chord voicing and a root and
   fifth are rated alone: either measure is `response_does_not_fit_item`.
 - A chord voicing's diagram, and a root and fifth's or a root change's layout, must exist

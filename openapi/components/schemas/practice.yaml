@@ -202,7 +202,8 @@ SelfRatingResponse:
   description: |
     The student's own rating of a take they played: a play-along at a tempo, chord changes
     counted over a minute, or one chord played cleanly. A play-along rating carries tempo_bpm
-    and no changes_per_minute; a chord-change or root-change rating carries changes_per_minute
+    and no changes_per_minute, and may carry the note_value it was played at (quarters when
+    absent); a chord-change or root-change rating carries changes_per_minute
     and no tempo_bpm; a single chord voicing or a chord's root and fifth (play clean) carries
     neither.
   properties:
@@ -224,7 +225,11 @@ SelfRatingResponse:
       type: integer
       minimum: 1
       maximum: 400
-      description: The tempo of the take, in beats per minute. Present for a play-along.
+      description: |
+        The tempo of the take, in beats per minute, as played: the click's tempo. Present for a
+        play-along.
+    note_value:
+      $ref: '#/NoteValue'
     changes_per_minute:
       type: integer
       minimum: 0
@@ -625,6 +630,25 @@ FeltRating:
     - drill_template_key
     - felt
 
+NoteValue:
+  type: string
+  enum:
+    - halves
+    - quarters
+    - eighths
+    - triplets
+    - sixteenths
+    - quintuplets
+    - sextuplets
+    - thirty_seconds
+  description: |
+    The note value a play-along take was played at: a speed factor on the music as written,
+    with the click staying on the beat. halves = x0.5, quarters = x1 (as written), eighths = x2,
+    triplets = x3, sixteenths = x4, quintuplets = x5, sextuplets = x6, thirty_seconds = x8.
+    A take's effective speed is its tempo_bpm times the factor, in quarter-note beats per
+    minute: 80 BPM in eighths is as fast as 160 BPM in quarters. Tempos of the same item are
+    compared at effective speed. Absent means quarters. Present only with a tempo_bpm.
+
 PracticeItemKind:
   type: string
   enum:
@@ -751,7 +775,9 @@ PracticeEvidence:
     tempo_bpm:
       type: integer
       minimum: 1
-      description: The tempo of a rated play-along take, in beats per minute.
+      description: The tempo of a rated play-along take, in beats per minute, as played.
+    note_value:
+      $ref: '#/NoteValue'
     changes_per_minute:
       type: integer
       minimum: 0

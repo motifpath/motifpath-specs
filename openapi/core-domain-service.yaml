@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.48.0
+  version: 0.49.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -13515,26 +13515,40 @@ components:
               type: integer
               minimum: 20
               description: |
-                The tempo to play this take at. For a warm-up, about 80% of the student's
-                best clean tempo; otherwise the tempo ladder's current step.
+                The tempo to play this take at, in start_note_value. For a warm-up, about 80%
+                of the student's best clean tempo; otherwise the tempo ladder's current step.
+            start_note_value:
+              $ref: './components/schemas/practice.yaml#/NoteValue'
             target_tempo_bpm:
               type: integer
               minimum: 20
-              description: The tempo the item aims for, the tempo of the diagram's default playback.
+              description: |
+                The tempo the item aims for, the tempo of the diagram's default playback, in
+                quarters (as written).
             best_clean_tempo_bpm:
               type:
                 - integer
                 - 'null'
               minimum: 20
               description: |
-                The student's best clean tempo since their latest teacher review. Null when
-                they have no clean take yet.
+                The student's best clean tempo since their latest teacher review, as played,
+                in best_clean_note_value: the clean take with the fastest effective speed. Null
+                when they have no clean take yet.
+            best_clean_note_value:
+              oneOf:
+                - $ref: './components/schemas/practice.yaml#/NoteValue'
+                - type: 'null'
+              description: |
+                The note value the best clean take was played at. Null when there is no clean
+                take yet.
           additionalProperties: false
           required:
             - diagram_id
             - start_tempo_bpm
+            - start_note_value
             - target_tempo_bpm
             - best_clean_tempo_bpm
+            - best_clean_note_value
         diagram_shape:
           type: object
           description: |
@@ -13933,7 +13947,8 @@ components:
             - best_clean_tempo_bpm
           description: |
             What improved. accuracy and fluency are ratios from 0 to 1 over the skill's
-            practised items; best_clean_tempo_bpm is a tempo.
+            practised items; best_clean_tempo_bpm is a tempo at effective speed, in
+            quarter-note beats per minute (80 BPM in eighths is 160).
         before:
           type: number
           minimum: 0
