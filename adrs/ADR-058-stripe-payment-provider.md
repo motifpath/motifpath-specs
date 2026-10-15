@@ -1,6 +1,6 @@
 # ADR-058: Stripe as the payment provider
 
-**Status:** Proposed — provider choice confirmed by Gilson on 2026-10-14; ADR wording awaits review
+**Status:** Accepted — Gilson confirmed approval after merging specs PR #338 on 2026-10-14
 **Date:** 2026-10-14
 **Deciders:** Gilson Yamada (Product Owner and engineering lead)
 **Task:** MOT-117, under MOT-107 / MOT-108
@@ -110,5 +110,4 @@ processor. No second processor or multi-provider routing is introduced by this d
 
 ---
 
-*Provider selected on 2026-10-14. This ADR is proposed for wording review; after acceptance,
-record future architectural changes in a superseding ADR.*
+*Accepted on 2026-10-14. Record future architectural changes in a superseding ADR.*
