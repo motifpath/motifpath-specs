@@ -1,7 +1,7 @@
 # ADR-061: One metronome component, note values as a speed factor, progress at effective speed
 
-**Status:** Proposed
-**Date:** 2026-10-15
+**Status:** Accepted
+**Date:** 2026-10-15 (Proposed) · 2026-10-15 (Accepted, in review of specs#347)
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
 **Task:** MOT-156
 **Amends:**
@@ -157,4 +157,4 @@ migrating evidence.
 
 ---
 
-*This ADR was proposed on 2026-10-15. To revise, create a new ADR with Status: Supersedes ADR-061.*
+*This ADR was proposed and accepted on 2026-10-15. To revise, create a new ADR with Status: Supersedes ADR-061.*
