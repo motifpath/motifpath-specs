@@ -119,8 +119,10 @@ drawn changes (a chord symbol instead of a chord box). `play_along` keeps its ke
 and the progression catalog, never authored, and recalled in the head on every instrument.
 
 - **Items:**
-  - `diatonic_chord` and `chord_function`: every numeral (I ii iii IV V vi viio) in each of the
-    12 major keys, 84 items each.
+  - `diatonic_chord` and `chord_function`: the numerals ii iii IV V vi viio in each of the 12
+    major keys, 72 items each. The tonic is never an item: its chord is the key's own name, so
+    a question about it would answer itself. The I chord still appears as an option and in
+    every chart.
   - `chart_progression`: every progression of the progression catalog, asked in a key picked
     each time.
   - They roll up to the nodes of the families table, and a chart progression also to its

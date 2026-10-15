@@ -36,5 +36,8 @@ holds the rules it follows and what an installation must guarantee.
 - Installing on an empty database twice gives identical IDs.
 - Every numeral is one of the major key's numerals, with an optional `7`.
 - Every `confusable` key exists, and every pair is listed both ways.
+- No progression's name, in any language, contains a confusable progression's whole name as
+  words: a question offering both would say one's answer in the other's name. The plain blues
+  is "12-bar blues, slow change" next to "12-bar blues, quick change" for this reason.
 - Every `nodes` key exists in the knowledge map.
 - Installing aborts if a row with a fixed ID already exists with different data.
