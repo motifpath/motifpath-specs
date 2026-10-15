@@ -37,6 +37,12 @@ Feature: Generated drill questions challenge the student
     And every option has four bars
 
   @wip
+  Scenario: The tonic is never a numeral item, since the key names its chord
+    When every diatonic chord and chord function item of G major is listed
+    Then there is one for each of ii, iii, IV, V, vi and viio
+    And none is for I
+
+  @wip
   Scenario: A function question offers exactly one chord with the asked function
     When the chord function V in G is planned as function_to_chord
     Then it offers four chords of G major
