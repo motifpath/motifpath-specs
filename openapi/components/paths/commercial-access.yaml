@@ -1,0 +1,55 @@
+CommercialAccess:
+  get:
+    operationId: getMyLessonCommercialAccess
+    summary: Evaluate commercial access for a lesson in the caller's copy
+    description: |
+      Evaluate only the authenticated learner's existing StudentPath and a lesson
+      present in that copy. Another learner's copy, missing copy or non-member node
+      returns the same 404. Resolve template/course coverage from trusted copy and
+      enrollment references, never caller-selected subscription scopes or CMS metadata.
+      Paid, grace and independent permanent grants are evaluated together. Cancellation
+      alone does not truncate a paid grant. A successful refund removes only its payment's
+      grant; pending refunds and unresolved disputes do not remove otherwise valid access.
+      Completed-lesson retention follows subscription expiry policy; completion alone
+      does not restore a successfully refunded grant. Pending disputes do not extend
+      expired subscriptions. Acquisition flags OFF do not disable existing grant checks.
+      This is a commercial decision only: allowed does not bypass learning prerequisites,
+      copy membership or other authorization, and blocked does not remove the outline
+      or progress. The response contains no protected lesson content or media URLs.
+      Use trusted server time and authoritative progress; do not accept completion,
+      time, payment or grant claims from the client. No copy, grant or billing mutation
+      occurs. Every decision has an attributable evidence identity and policy revision.
+      Evaluate all applicable independent rights before returning blocked. If required
+      authoritative state or applicable approved policy is unavailable, return 503 rather
+      than inventing an allowed/blocked decision. A final dispute outcome cannot be
+      interpreted without its separately approved policy; independent proven rights can
+      still establish access without relying on that unresolved grant.
+      This read is not an access token or a reusable authorization lease. Protected
+      content/media delivery must independently enforce current authoritative rights;
+      no public asset protection mechanism is selected here.
+    tags: [Commercial access]
+    parameters:
+      - name: student_path_id
+        in: path
+        required: true
+        description: Existing StudentPath held by the authenticated learner.
+        schema: {type: string, format: uuid}
+      - name: content_node_id
+        in: path
+        required: true
+        description: Lesson content node present in that exact learner copy.
+        schema: {type: string, format: uuid}
+    responses:
+      '200':
+        description: Current commercial decision, including a legitimate blocked result.
+        headers:
+          Cache-Control:
+            description: Do not store personalized commercial decisions in shared or local caches.
+            schema: {type: string, const: no-store}
+        content:
+          application/json:
+            schema: {$ref: '../schemas/commercial-access.yaml#/CommercialAccessDecision'}
+      '400': {$ref: './subscriptions.yaml#/InvalidRequest'}
+      '401': {$ref: './subscriptions.yaml#/Unauthenticated'}
+      '404': {$ref: './subscriptions.yaml#/NotFound'}
+      '503': {$ref: './subscriptions.yaml#/Unavailable'}

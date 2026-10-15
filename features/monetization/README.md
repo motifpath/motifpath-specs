@@ -99,3 +99,18 @@ unchanged. Reads themselves are attributable and exclude their new evidence from
 This is a read contract, not an audit-writing API or proof of storage integrity. Retention,
 tamper protection, durable coupling/recovery and resource-specific sanitized state allowlists
 remain implementation gates under ADR-057. No runtime or generated clients are changed.
+
+## Commercial lesson access slice
+
+[Access scenarios](commercial-access.feature) and the
+[access read API](../../openapi/components/paths/commercial-access.yaml) evaluate one lesson
+inside the authenticated learner's existing copy. Independent rights are combined; paid
+cancellation, unpaid-renewal grace, expiry retention and payment-specific refunds retain their
+approved semantics. Completion alone never revives a refunded grant. Unknown required state
+returns unavailable rather than fabricated permission or denial. Decisions are attributable,
+are not reusable capabilities and do not replace delivery-time enforcement or prerequisites.
+
+No copy updates, new path lifecycle, grant-writing API, final dispute policy or media protection
+mechanism is introduced. Stable grant persistence, paid product/version coverage, final dispute
+outcomes and protected delivery contracts remain implementation gates. Existing copy and
+user-pulled update semantics are unchanged.
