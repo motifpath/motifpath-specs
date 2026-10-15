@@ -64,6 +64,25 @@
       }
     },
     {
+      "name": "play-along: a clean take in eighths keeps its tempo and note value as played",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 60,
+        "note_value": "eighths"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "clean",
+          "tempo_bpm": 60,
+          "note_value": "eighths"
+        }
+      }
+    },
+    {
       "name": "chord change: an almost-clean minute with its count",
       "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
       "response": {
@@ -143,6 +162,20 @@
         "rating": "clean",
         "tempo_bpm": 90,
         "changes_per_minute": 40
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a chord-change rating with a note value",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "changes_per_minute": 40,
+        "note_value": "eighths"
       },
       "expected": {
         "result": "rejected",

@@ -38,6 +38,12 @@ Feature: Ingest practice events
     When "alice" submits a practice.item_answered event picking "Em" among "Em", "C", "Am" and "Bm" for the chord on vi in G
     Then the event is accepted and stored in the event log
 
+  @wip
+  Scenario: A play-along take rated with its note value keeps it
+    When "alice" submits a practice.item_answered event rating a take of a play-along "clean" at 60 BPM in eighths
+    Then the event is accepted and stored in the event log
+    And the stored and published practice.item_answered event keeps the tempo of 60 BPM and the note value eighths
+
   Scenario: A guide-tone take with no taps keeps its empty list of taps
     When "alice" submits a practice.item_answered event for a guide-tone take of "ii-V-I" in C at 120 BPM with no taps
     Then the event is accepted and stored in the event log
@@ -127,6 +133,12 @@ Feature: Ingest practice events
     When "alice" submits a practice.item_answered event naming the note "C" among "B", "C" and "C#" for the guitar cell on string 5 at fret 3
     Then the submission is rejected as invalid
     And the rejection identifies "response" as the source of the error
+
+  @wip
+  Scenario: A take rated with a note value that isn't one is rejected
+    When "alice" submits a practice.item_answered event rating a take of a play-along "clean" at 60 BPM in the note value "fifths"
+    Then the submission is rejected as invalid
+    And the rejection identifies "note_value" as the source of the error
 
   Scenario: A generated question's answer offering a single option is rejected
     When "alice" submits a practice.item_answered event picking "Em" among "Em" for the chord on vi in G

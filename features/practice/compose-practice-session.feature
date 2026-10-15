@@ -463,6 +463,18 @@ Feature: Compose a practice session
     When "pentatonic-run" is picked as a due item
     Then it starts at 150 BPM with a target of 120 BPM
 
+  @wip
+  Scenario: A play-along starts in the note value of the best clean take
+    Given "alice"'s best clean tempo on "pentatonic-run" is 50 BPM in eighths and the diagram's default playback is at 120 BPM
+    When "pentatonic-run" is picked as a due item
+    Then it starts at 50 BPM in eighths with a target of 120 BPM
+
+  @wip
+  Scenario: A best clean take past the target in eighths keeps its tempo and note value
+    Given "alice"'s best clean tempo on "pentatonic-run" is 80 BPM in eighths and the diagram's default playback is at 120 BPM
+    When "pentatonic-run" is picked as a due item
+    Then it starts at 80 BPM in eighths with a target of 120 BPM
+
   Scenario: A warm-up on a play-along played clean past its target is 80% of that tempo
     Given "alice" has a clean play-along "c-major-scale" with a best clean tempo of 150 BPM and a default playback at 120 BPM
     When "alice" composes a 10-minute session with "guitar" in hand

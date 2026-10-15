@@ -282,6 +282,7 @@
                           "source": { "const": "self_assessed" },
                           "rating": { "enum": ["struggled", "almost", "clean"] },
                           "tempo_bpm": { "type": "integer", "minimum": 1 },
+                          "note_value": { "enum": ["halves", "quarters", "eighths", "triplets", "sixteenths", "quintuplets", "sextuplets", "thirty_seconds"] },
                           "changes_per_minute": { "type": "integer", "minimum": 0 }
                         }
                       }
