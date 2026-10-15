@@ -2887,7 +2887,7 @@ paths:
       operationId: listProgressions
       summary: List the progression catalog
       description: |
-        Returns every progression of the progression catalog, in catalog order: its key, its
+        Returns every progression of the progression catalog, ordered by key: its key, its
         numerals one bar each (in a major key, I7 IV7 V7 being dominant sevenths), the
         progressions a learner mistakes it for, and its names. A client reads it to show and
         grade the progression drills' questions the same way the server does, such as a chart

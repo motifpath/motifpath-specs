@@ -14,7 +14,7 @@ Feature: List the progression catalog
   @wip
   Scenario: A student lists every progression of the catalog with its numerals
     When "alice" lists the progression catalog
-    Then it lists 10 progressions, in catalog order
+    Then it lists 10 progressions, ordered by key
     And "I-V-vi-IV" has the bars I, V, vi and IV and the name "I–V–vi–IV (pop)"
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
