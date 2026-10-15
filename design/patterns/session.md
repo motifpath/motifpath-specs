@@ -19,7 +19,7 @@ like the same product.
 
 ```text
 ┌────────────────────────────┐
-│ ×          4 / 10          │  exit · position · (options, once one exists)
+│ ×          4 / 10          │  exit · position · options (Tools, on the setup only)
 │ ██████████░░░░░░░░         │  progress, one segment per item
 │ ITEM TITLE · why picked    │  what this item is, and why it's in the session
 │          STIMULUS          │  what is played or shown
@@ -31,6 +31,8 @@ like the same product.
 ```
 
 - **Phases:** setup → today's plan → run → summary. All of them sit in the shell.
+- **Tools:** the header's options slot holds **Tools** (a wrench) on the setup only, never during
+  a run. It opens the tools, the Metronome first (`metronome.md`, MOT-156).
 - **Setup:** one screen asks both questions — the instrument in the student's hands (or **In my
   head**) and how long they have — with today's choice preselected, so **Start practising** is one
   tap (D1). **Practice** in the navigation opens the setup; from an instrument tab on the home, it
