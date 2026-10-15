@@ -133,3 +133,57 @@ CommercialState:
     facts, teacher/path license state and settlement allocations/movements. Unknown fields require
     schema review rather than blind serialization.
   additionalProperties: true
+
+AuditArchiveLocator:
+  type: object
+  additionalProperties: false
+  description: Private rebuildable locator only, not an audit payload or source of financial
+    authority; retained with its archived evidence.
+  required:
+    - environment
+    - audit_entry_id
+    - operation_id
+    - resource_kind
+    - resource_id
+    - recorded_at
+    - order_key
+    - archive_batch_id
+    - entry_sha256
+  properties:
+    environment:
+      type: string
+      minLength: 1
+      description: Trusted archive/environment namespace.
+    audit_entry_id:
+      type: string
+      format: uuid
+      description: Immutable evidence identity used for deduplication.
+    operation_id:
+      type: string
+      format: uuid
+      description: Logical UUID; lookup returns all matching qualified operations in this environment.
+    resource_kind:
+      type: string
+      minLength: 1
+      description: Opaque commercial resource category.
+    resource_id:
+      type: string
+      minLength: 1
+      description: Opaque target identity; no copied personal content.
+    recorded_at:
+      type: string
+      format: date-time
+      description: Original immutable recording instant.
+    order_key:
+      type: string
+      minLength: 1
+      description: Same durable stable order key used by hot audit traversal and snapshot fences.
+    archive_batch_id:
+      type: string
+      format: uuid
+      description: Verified batch catalog reference resolving an immutable object version and exact member
+        location.
+    entry_sha256:
+      type: string
+      pattern: ^[a-f0-9]{64}$
+      description: Checksum of this exact immutable audit entry for archive verification.

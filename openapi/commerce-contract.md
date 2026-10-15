@@ -27,7 +27,15 @@ approval. Currency syntax alone enables nothing. A yearly offer must be cheaper 
 monthly periods for the same scope/currency. No launch prices are invented by example values.
 
 Offer IDs name immutable accepted price revisions. Admin configuration promotion is revision-checked and serialized; concurrent stale changes are
-rejected. Changing a monthly baseline revalidates new annual offers against the discount rule;
+rejected. Subscription price promotion additionally requires expected_offer_id for the exact
+scope/billing period/currency, including explicit null before the first offer. A shared platform
+configuration_id is not an offer-version precondition. Admin GET /admin/subscription-offers
+returns the promoted offer even when acquisition is OFF; 404 means no offer has been promoted.
+Serialize promotion by scope/currency, compare-and-replace the observed offer, validate discount
+relationships and append evidence atomically. Two distinct commands observing the same old offer
+cannot both replace it: after the first promotion, the second returns conflict. Known same-intent
+replays return their original result before the stale-offer check. Changing a monthly baseline
+revalidates new annual offers against the discount rule;
 existing accepted snapshots stay unchanged. Changing a price creates a new ID; history,
 in-flight checkout snapshots and ledger allocations retain the original terms. Existing
 subscriptions adopt changes at next renewal only. One platform scope never implicitly covers
@@ -36,7 +44,7 @@ independent teacher commerce; eligible product/dependency manifests define actua
 ## Ownership, commercial manifests and learner copies
 
 Each content resource has a trusted rights holder, original creator when known and provenance
-evidence. Browser/CMS declarations cannot transfer ownership. Corrections are admin-reviewed,
+evidence. Ownership has its own monotonic revision, distinct from content edits and offer prices. Browser/CMS declarations cannot transfer ownership. Corrections are admin-reviewed,
 revision-checked and append evidence; prior creator and financial obligations remain intact.
 Legacy nullable creators do not imply platform ownership: unresolved owner_kind has null owner_id;
 unresolved records are quarantined
@@ -64,6 +72,18 @@ call has the same boundary as the UI. Own and explicitly reusable free content i
 free visibility alone is not a redistribution license. Premium exercises nested through lessons
 or paths require the same check. Updating dependencies invalidates new-sale validation until
 rechecked. Student Plus is never commercial embedding permission.
+
+First-license acquisition is independent of sale-manifest validation. An admin-issued license
+**offer** binds path_id, licensed_teacher_id, ownership_revision, immutable price/configuration
+and release_id=null. Require a reviewed path-owning teacher and valid platform payment capability;
+do not require an already active embedding license, validated dependency graph or teacher payout
+account. This remains valid for a draft already containing premium exercises. Creating a license
+offer grants no rights. Verified payment issues one license referencing its accepted offer_id,
+not a sale manifest. Only then may the teacher validate the complete premium dependency graph
+and enable path sales; path-purchase offers always require a non-null validated release_id.
+Content edits do not invalidate a license offer solely by changing its dependency graph, but
+changed ownership/ownership revision invalidates it for a new checkout. Recheck caller ownership
+before accepting the acquisition; never transfer a license through a change of path owner.
 
 Embedding licenses are permanent per teacher/path and cover platform premium exercises used by
 that path, including later dependency additions after revalidation. They cannot be transferred
@@ -272,7 +292,8 @@ remain separate; their more frequent sweeps do not trigger normal audit export b
 
 A separate **hourly cleanup** selects eligible expired rows in bounded batches. It must verify
 current durable catalog coverage and required archive protection before deleting. Every selected
-entry must belong to a verified immutable batch with its exact content digest. Check holds again
+entry must belong to a verified immutable batch with its exact content digest and complete
+verified locator-index coverage. Check holds again
 inside the deletion transaction and coordinate hold placement with deletion; a concurrent hold
 must not race an unchecked purge. Skip any row lacking proof, pending export, conflicting
 checksum, unavailable archive verification or an active hold. Do not drop a whole partition
@@ -287,8 +308,30 @@ Long-term evidence reads must remain complete after hot deletion. The admin audi
 both stores through the same authenticated filters/snapshot fence and deduplicates by immutable
 audit_entry_id. Export or cleanup during traversal cannot omit or repeat an entry. Keep a durable
 archive catalog with batch ranges/counts, object/version/checksum and member-set digest; it must
-remain resolvable for the archive lifetime. A rebuildable search projection may accelerate reads,
-but cannot be the only evidence copy. If required archive/index data cannot be read, return
+remain resolvable for the archive lifetime. A **mandatory compact archive locator index** supports
+the API's operation_id and resource_kind/resource_id filters, qualified by trusted environment
+and the same immutable order/snapshot key as recent evidence. Keep it in Postgres as derived
+lookup metadata, not full audit payloads: entry identity, filter keys, recorded_at/order key,
+verified archive batch reference and entry checksum. It has the archive's lifetime rather than
+the hot payload's 30-day TTL. This explicit metadata/index cost avoids scanning years of archive
+objects on an administrator's request. Full evidence remains solely in the recent/immutable
+stores; the index is rebuildable and is never financial authority.
+
+Commit complete locator coverage together with verified batch/catalog status before export work
+is acknowledged. Cleanup additionally requires exact verified locator coverage for every selected
+entry. An archive upload without indexed coverage cannot permit hot deletion. Query the recent
+store and archived locator index in stable order, merge/deduplicate identities, then fetch only
+the verified batches containing that page's matched entries. An archive-only page fetches at most
+limit distinct batches, plus at most one lookahead candidate to determine continuation; queries
+must not scan unrelated objects to locate an operation/resource. Shared batch fetches are reused
+within a page. Retain the existing opaque cursor and snapshot fence across export/deletion.
+The read path validates each returned entry against locator checksum, identity and requested
+filters. Only authorized backend services access locators and archive objects.
+
+If the locator index is unavailable, incomplete or rebuilding, relevant historical queries return
+unavailable rather than falling back to an unbounded archive scan or reporting an empty history.
+Rebuild offline from verified manifests/evidence and restore complete snapshot coverage before
+serving historical reads. If required archive/index data cannot be read, return
 unavailable instead of a partial or apparently empty history. Direct S3 access is not granted
 to the browser. After backup restore, reconcile catalog/object proofs before exporter/purger
 activation; replaying restored old rows must not duplicate financial effects or archive history.

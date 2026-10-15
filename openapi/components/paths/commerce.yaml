@@ -116,13 +116,16 @@ Publish:
   post:
     operationId: createCommercialOffer
     summary: Create an immutable one-time offer revision
-    description: "Owner may price only their own teacher path within configured bounds; only admin may
-      price platform embedding licenses. content_kind must be path. Validate positive price, enabled
-      currency, release/dependency rights, expected_revision and platform configuration. New
-      revisions never rewrite accepted checkout snapshots. Existing subscription offer endpoints
-      retain their distinct scope/period semantics. Every commercial mutation is durably coupled to
-      audit evidence; uncertain external outcomes remain pending. Acquisition OFF never disables
-      existing obligations. "
+    description: Registered content owner or admin only; matching expected_revision and positive
+      enabled-currency price under current configuration. For path_purchase, validate the complete
+      current sale manifest and transitive dependency/license rights. For embedding_license, admin
+      creates an offer bound to the target path, its owning teacher and current ownership revision;
+      validate ownership and configured license price independently of content dependencies. A path
+      already containing unlicensed premium exercises can acquire its first license without a
+      validated sale manifest. License offers have release_id null; they neither publish nor
+      authorize a path sale. New offer revisions never rewrite accepted checkout snapshots. Record
+      durable attributable evidence and enforce idempotent commands before revision checks.
+      Acquisition flags gate new actions, not existing obligations.
     tags:
       - Commerce
     parameters:
@@ -238,14 +241,19 @@ Checkouts:
   post:
     operationId: createMyCommercialCheckout
     summary: Start a permanent purchase or teacher-license checkout
-    description: "Use only eligible current offer_id; reject stale offers with 409. Bind customer,
-      seller, scope, manifest and immutable price/commission revision before provider work. For a
-      purchase already held, return 409; concurrent acquisitions reserve one holder/product scope
-      across keys. For licenses, require authenticated owning teacher, independent of Plus.
-      Account/Connect capability and liquidity prerequisites must pass before taking payment.
-      Browser return never confirms payment; verify and fulfill once through the payment profile.
-      Every commercial mutation is durably coupled to audit evidence; uncertain external outcomes
-      remain pending. Acquisition OFF never disables existing obligations. "
+    description: Use eligible current offer_id; reject stale terms with 409. For path_purchase, require
+      the current validated sale manifest, valid dependency licenses, verified seller/Connect
+      capability and refund liquidity; reserve one active holder/path acquisition across operation
+      keys and reject an already active purchase. For embedding_license, require the caller to match
+      the recorded owning teacher, path and ownership revision, valid platform payment capability
+      and configured license offer; no previously licensed sale manifest or teacher payout account
+      is required. Reserve one active teacher/path license acquisition across keys and reject an
+      existing active license. Verify payment before issuing one permanent teacher/path license
+      bound to its immutable offer. Subsequent paid publication and path-purchase checkout still
+      require full licensed dependency validation. Bind accepted terms, customer and applicable
+      commission revision before provider work; browser return never proves payment. Durable
+      intent/audit precede provider calls; unknown outcomes remain pending and reconcile before any
+      new attempt. Acquisition OFF never stops existing obligations.
     tags:
       - Commerce
     parameters:
@@ -549,7 +557,9 @@ Release:
       referenced revision. Concurrent same-intent publication creates one immutable manifest. This
       operation does not publish a path, alter course checkpoints or update learner copies; existing
       authoring/update endpoints retain their semantics. A changed manifest invalidates new-sale
-      validation until rechecked.
+      validation until rechecked. License acquisition is a separate prerequisite; it validates path
+      ownership without requiring this sale manifest. Only after the license is active may a
+      manifest containing its premium dependency be validated for sale.
     tags:
       - Commerce
     parameters:
@@ -620,7 +630,14 @@ SubscriptionOfferConfig:
       scope/currency; create the monthly baseline first. Immutable offer snapshots preserve prior
       payments and accepted checkout terms. Existing subscriptions adopt approved price changes at
       next renewal only, with the configured annual notices. Duplicate commands return the existing
-      revision; new intentional prices use a new identity. Audit failure prevents change.
+      revision; new intentional prices use a new identity. Audit failure prevents change. Require
+      expected_offer_id for the exact scope/billing period/currency, including explicit null before
+      the first offer. Under a scope/currency serialization boundary, compare the current promoted
+      offer and atomically create/promote its replacement with audit evidence; mismatch returns 409.
+      Different operation keys do not bypass the comparison. Annual discount validation and monthly
+      baseline changes share this boundary. Same-key same-intent replay returns its original
+      recorded result before testing the old expected offer. A changed platform configuration also
+      returns 409. Read the current offer through this admin resource even while acquisition is OFF.
     tags:
       - Commerce
     parameters:
@@ -663,6 +680,71 @@ SubscriptionOfferConfig:
         application/json:
           schema:
             $ref: ../schemas/commerce.yaml#/SubscriptionOfferConfig
+  get:
+    operationId: getCurrentSubscriptionOffer
+    summary: Read the promoted subscription offer as an administrator
+    description: Backend-resolved administrator only. Return the promoted offer for exactly one scope,
+      billing period and currency, independently of acquisition flags or learner cohort eligibility.
+      content_id is required for course/path and forbidden for platform. Missing configured offer
+      returns 404; the caller then uses expected_offer_id null for first creation. Existing offer_id
+      is the precondition for replacement. Malformed or disabled currency/scope returns 400. No
+      credentials are exposed.
+    tags:
+      - Commerce
+    parameters:
+      - name: scope_kind
+        in: query
+        required: true
+        description: Exact coverage kind.
+        schema:
+          type: string
+          enum:
+            - platform
+            - course
+            - path
+      - name: content_id
+        in: query
+        description: Required only for course/path scope.
+        schema:
+          type: string
+          format: uuid
+      - name: billing_period
+        in: query
+        required: true
+        description: Exact recurring interval.
+        schema:
+          type: string
+          enum:
+            - monthly
+            - annual
+      - name: currency
+        in: query
+        required: true
+        description: Enabled original currency.
+        schema:
+          type: string
+          pattern: ^[A-Z]{3}$
+    responses:
+      "200":
+        description: Promoted immutable offer; offer_id is required for a replacement command.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/subscriptions.yaml#/SubscriptionOffer
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
 ReviewRefund:
   post:
     operationId: reviewFullRefundEligibility
@@ -852,10 +934,10 @@ HistoricalRelease:
   get:
     operationId: getCommercialRelease
     summary: Read an authorized immutable commercial manifest
-    description: Owner/admin or a holder whose existing purchase/license/copy references the release
-      only. Other callers receive 404. Resolve historical immutable references after withdrawal;
-      never substitute the latest manifest. This read does not deliver protected lesson content or
-      update the caller copy.
+    description: Owner/admin or a holder whose existing purchase/copy references the release only. Other
+      callers receive 404. Resolve historical immutable references after withdrawal; never
+      substitute the latest manifest. This read does not deliver protected lesson content or update
+      the caller copy.
     tags:
       - Commerce
     parameters:

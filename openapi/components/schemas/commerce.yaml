@@ -46,6 +46,7 @@ Ownership:
     - creator_id
     - source
     - evidence_entry_id
+    - revision
   properties:
     content:
       $ref: "#/ContentRef"
@@ -80,6 +81,10 @@ Ownership:
       type: string
       description: Attributable ownership evidence; edits never erase prior ownership.
       format: uuid
+    revision:
+      type: integer
+      minimum: 1
+      description: Monotonic rights-holder revision; separate from template edits or offer prices.
   allOf:
     - if:
         properties:
@@ -237,8 +242,11 @@ Offer:
               description: One-time purchases and embedding licenses cover one path.
       description: Only the target path covered by this one-time product.
     release_id:
-      type: string
-      description: Validated commercial manifest offered.
+      type:
+        - string
+        - "null"
+      description: Validated sale manifest for path_purchase; null for embedding_license, whose
+        acquisition must not depend on a pre-existing licensed sale manifest.
       format: uuid
     price:
       $ref: "#/PositiveMoney"
@@ -251,6 +259,41 @@ Offer:
       type: string
       description: Authoritative seller; platform steward for a platform license.
       format: uuid
+    licensed_teacher_id:
+      type: string
+      format: uuid
+      description: Core path-owning teacher bound to an embedding-license offer; absent for path purchases.
+    ownership_revision:
+      type: integer
+      minimum: 1
+      description: Observed authoritative path ownership revision for a license offer; content edits do
+        not require an already-licensed sale manifest.
+  allOf:
+    - if:
+        properties:
+          kind:
+            const: path_purchase
+            description: A buyer purchase requires validated redistribution rights.
+      then:
+        properties:
+          release_id:
+            type: string
+            format: uuid
+            description: Fully validated sale manifest.
+        not:
+          anyOf:
+            - required:
+                - licensed_teacher_id
+            - required:
+                - ownership_revision
+      else:
+        required:
+          - licensed_teacher_id
+          - ownership_revision
+        properties:
+          release_id:
+            type: "null"
+            description: License acquisition is independent of sale-manifest validation.
 OfferList:
   type: object
   description: Enabled eligible one-time offers; no offers when acquisition or valid configuration is absent.
@@ -448,7 +491,7 @@ License:
     - license_id
     - teacher_id
     - path_id
-    - release_id
+    - offer_id
     - status
     - payment_id
     - evidence_entry_id
@@ -465,10 +508,6 @@ License:
       type: string
       description: Only licensed path identity.
       format: uuid
-    release_id:
-      type: string
-      description: Issuance manifest; updates revalidate dependency coverage.
-      format: uuid
     status:
       type: string
       description: State changed only by explicit attributable payment/rights policy.
@@ -483,6 +522,11 @@ License:
       type: string
       description: Latest license evidence.
       format: uuid
+    offer_id:
+      type: string
+      format: uuid
+      description: Immutable paid license offer, binding the teacher/path and accepted terms without
+        requiring a sale manifest.
 Purchase:
   type: object
   description: Permanent path acquisition independent of learner/teacher subscription; refunded
@@ -863,6 +907,7 @@ SubscriptionOfferConfig:
     - price
     - configuration_id
     - reason
+    - expected_offer_id
   properties:
     scope:
       $ref: ./subscriptions.yaml#/SubscriptionScope
@@ -885,6 +930,13 @@ SubscriptionOfferConfig:
       type: string
       description: Price-change justification. Applies to existing subscriptions only at next renewal.
       minLength: 1
+    expected_offer_id:
+      type:
+        - string
+        - "null"
+      format: uuid
+      description: Current promoted offer ID observed for this exact scope, period and currency; null only
+        if none exists. Compare and promote atomically; mismatches return conflict.
 ReviewedRefund:
   type: object
   description: Audited admin eligibility review; approval never proves an external refund succeeded.

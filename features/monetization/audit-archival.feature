@@ -109,3 +109,28 @@ Feature: Asynchronous audit archival and bounded recent evidence retention
     Given no committed audit evidence awaits archival
     When the scheduled hourly export runs
     Then no empty archive object is uploaded
+
+  Scenario: Archive upload without lookup coverage cannot permit cleanup
+    Given an expired audit entry has a verified immutable archive object
+    And the historical lookup index has no verified locator for that entry
+    When cleanup runs
+    Then the recent evidence is retained until complete locator coverage is verified
+
+  Scenario: A historical operation lookup fetches only its matching batches
+    Given matching operation evidence has left the recent store
+    And the archive also contains unrelated operations from earlier years
+    When an administrator requests the matching operation's evidence
+    Then the lookup index identifies only the archive batches needed for that page
+    And unrelated archive batches are not scanned to locate the operation
+
+  Scenario: A rebuilding historical index cannot produce an empty result
+    Given an administrator's requested evidence exists only in the archive
+    And its historical lookup index is rebuilding
+    When the administrator requests that history
+    Then the result reports evidence unavailable instead of scanning the entire archive or returning no matches
+
+  Scenario: Recent payload expiry preserves its historical locator
+    Given a recent audit payload reached its thirty-day deadline
+    And its archive and locator coverage are verified without a hold
+    When cleanup removes the recent payload
+    Then its compact historical locator remains available for the archive's retention lifetime

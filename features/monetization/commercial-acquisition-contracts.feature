@@ -70,3 +70,49 @@ Feature: Authoritative offers and one-time acquisition
     Given two administrators observed commercial configuration revision 2
     When their distinct configuration changes compete for promotion
     Then one revision is promoted and the stale change is refused with attributable evidence
+
+  Scenario: A premium-containing draft can acquire its first license
+    Given Bea owns a draft path already containing a platform premium exercise
+    And that path has no embedding license or validated sale manifest
+    When an administrator creates a configured license offer for Bea's current path ownership
+    Then Bea can start that license acquisition without a pre-existing licensed manifest
+
+  Scenario: Creating a license offer does not authorize a path sale
+    Given Bea has an unpaid embedding-license offer for her path
+    And the path embeds a platform premium exercise without another license
+    When Bea requests paid availability for that path
+    Then paid availability is refused until a license is fulfilled and the dependency graph is validated
+
+  Scenario: First-license fulfillment permits later sale validation
+    Given Bea paid for an ownership-bound embedding-license offer without a sale manifest
+    When its verified payment fulfills the permanent teacher-path license
+    Then that license can be used to validate a subsequent commercial sale manifest
+
+  Scenario: A license offer cannot follow an ownership change
+    Given Bea's license offer binds her path ownership revision 1
+    And a reviewed ownership correction changed the path to another teacher at revision 2
+    When Bea starts a new acquisition using her old offer
+    Then the stale ownership-bound offer is refused before a charge is initiated
+
+  Scenario: A stale subscription price edit cannot replace a newer offer
+    Given two administrators observed the same promoted monthly offer for course "First chords"
+    And the first administrator replaced it with a new offer
+    When the second administrator submits a different price using the original observed offer identity
+    Then the second promotion is refused and the first replacement remains current
+
+  Scenario: Concurrent first subscription offers cannot both become current
+    Given no monthly offer exists for course "First chords" in BRL
+    When two administrators create different first offers each explicitly observing no current offer
+    Then one offer becomes current and the competing creation is refused
+
+  Scenario: A subscription price replay returns its original replacement
+    Given an administrator replaced an observed offer through a durable operation
+    And that original offer is no longer current
+    When the administrator repeats the same operation and intent
+    Then the original replacement is returned without another offer promotion
+
+  Scenario: Admin current-offer reads remain available during acquisition rollback
+    Given a monthly subscription offer is promoted for course "First chords"
+    And new subscription acquisition is disabled
+    When an administrator reads its current offer before changing its price
+    Then the promoted offer identity remains available as the replacement precondition

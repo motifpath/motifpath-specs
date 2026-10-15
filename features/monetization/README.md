@@ -64,6 +64,14 @@ MOT-114/115/116/117 and MOT-126/130 are audit, registry, design or contract gate
 runtime switches. MOT-119 implementation must preserve existing lesson rendering/update behavior;
 commercial manifests do not replace live path editing with a new publication/version process.
 
+## Reviewed acquisition and pricing boundaries
+
+License acquisition validates the owning teacher/path and ownership revision without requiring
+an already-licensed sale manifest. License offers use release_id=null; the issued license binds
+the accepted offer. Buyer path offers still require full manifest/dependency validation.
+Subscription price replacements require expected_offer_id (null for first creation), with
+atomic comparison/promotion. Admin current-offer reads work even when acquisition is OFF.
+
 ## Audit retention and asynchronous export
 
 The recent Postgres audit table has a **30-day (720-hour) TTL from recorded_at**. A separate
@@ -71,7 +79,10 @@ asynchronous worker exports hourly batches to S3 Object Lock, with an alert when
 unverified entry exceeds two hours. Hourly cleanup deletes expired hot rows only after exact archival proof
 and hold checks. Failed export or verification retains evidence beyond TTL and raises alerts.
 Financial/idempotency records have separate lifecycles; the audit TTL cannot erase them.
-Long-term archive retention remains seven years after closure. Audit reads span both stores.
+Long-term archive retention remains seven years after closure. Audit reads span both stores
+through a mandatory compact operation/resource locator index, retained with the archive.
+Cleanup requires complete verified locator coverage; historical reads fetch only matching
+page batches and fail explicitly if the index is unavailable/rebuilding.
 See [the export/cleanup contract](../../openapi/commerce-contract.md#hot-audit-ttl-and-asynchronous-archival)
 and [retention scenarios](audit-archival.feature).
 

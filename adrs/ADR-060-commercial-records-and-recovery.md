@@ -23,7 +23,9 @@ payment facts, grants, license/purchase records, balanced journal entries, recen
 outbox work in core-domain Postgres. Commit each internal state transition, its audit evidence
 and outbox messages in one database transaction. Enforce both operation-key uniqueness and
 business-effect uniqueness in durable constraints. Use optimistic revisions for human commands;
-serialize conflicting financial transitions before applying them. Progress remains worker-owned.
+serialize conflicting financial transitions before applying them. Subscription price changes
+compare the observed promoted offer identity (explicit null for first creation), independently of
+the shared pricing configuration. Progress remains worker-owned.
 
 Postgres audit payloads have a **30-day hot-retention TTL**, measured as 720 hours from the
 immutable server `recorded_at`, independently of financial closure. A separate asynchronous
@@ -36,9 +38,12 @@ object version and required retention protection are verified, and no hold appli
 exports retain their source evidence beyond TTL and alert; TTL is never unconditional deletion.
 
 S3 is the long-term evidence store; Postgres retains only recent evidence and the durable export
-catalog needed for recovery. Financial journals, operation fingerprints, business uniqueness,
+catalog and compact locator index needed for bounded historical reads/recovery. Financial journals, operation fingerprints, business uniqueness,
 active grants and unresolved outbox work have separate lifecycles and are not subject to this
-audit-row TTL. Audit reads combine recent and archived evidence without duplicate entries or
+audit-row TTL. Locator metadata is retained for the archive lifetime, contains no full audit
+payload and must be verified before hot-copy cleanup. Historical reads resolve operation/resource
+keys through that index and fetch only matching page batches; unavailable/incomplete indexes
+fail explicitly rather than scanning all archived evidence. Audit reads combine both stores without duplicate entries or
 pagination gaps. The detailed export/retry/purge contract is in the commercial specification.
 
 External commands execute only after durable intent exists, with a stable provider key derived

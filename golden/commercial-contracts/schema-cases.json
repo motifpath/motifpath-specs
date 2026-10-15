@@ -602,11 +602,11 @@
       "license_id": "12345678-1234-4234-8234-123456789012",
       "teacher_id": "12345678-1234-4234-8234-123456789012",
       "path_id": "12345678-1234-4234-8234-123456789012",
-      "release_id": "12345678-1234-4234-8234-123456789012",
+      "offer_id": "12345678-1234-4234-8234-123456789012",
       "status": "active",
       "payment_id": "12345678-1234-4234-8234-123456789012",
       "evidence_entry_id": "12345678-1234-4234-8234-123456789012",
-      "expires_at": "2026-10-15T12:00:00Z"
+      "expires_at": "2027-10-15T12:00:00Z"
     },
     "valid": false
   },
@@ -687,5 +687,223 @@
       }
     },
     "valid": true
+  },
+  {
+    "name": "license acquisition without licensed manifest",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "embedding_license",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": null,
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_id": "12345678-1234-4234-8234-123456789012",
+      "licensed_teacher_id": "12345678-1234-4234-8234-123456789012",
+      "ownership_revision": 1
+    },
+    "valid": true
+  },
+  {
+    "name": "license offer must not require a sale manifest",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "embedding_license",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_id": "12345678-1234-4234-8234-123456789012",
+      "licensed_teacher_id": "12345678-1234-4234-8234-123456789012",
+      "ownership_revision": 1
+    },
+    "valid": false
+  },
+  {
+    "name": "license offer binds teacher ownership",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "embedding_license",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": null,
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_id": "12345678-1234-4234-8234-123456789012",
+      "ownership_revision": 1
+    },
+    "valid": false
+  },
+  {
+    "name": "path purchase still requires validated manifest",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "path_purchase",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": null,
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "first subscription offer explicitly observes absence",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "platform"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 4500,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "New monthly price",
+      "expected_offer_id": null
+    },
+    "valid": true
+  },
+  {
+    "name": "replacement observes original subscription offer",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "platform"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 4500,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "New monthly price",
+      "expected_offer_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "subscription price cannot omit observed offer",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "platform"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 4500,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "New monthly price"
+    },
+    "valid": false
+  },
+  {
+    "name": "subscription observed offer must be UUID or null",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "platform"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 4500,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "New monthly price",
+      "expected_offer_id": "latest"
+    },
+    "valid": false
+  },
+  {
+    "name": "issued first license binds offer not sale manifest",
+    "schema": "commerce.yaml#/License",
+    "value": {
+      "license_id": "12345678-1234-4234-8234-123456789012",
+      "teacher_id": "12345678-1234-4234-8234-123456789012",
+      "path_id": "12345678-1234-4234-8234-123456789012",
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "status": "active",
+      "payment_id": "12345678-1234-4234-8234-123456789012",
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "compact archive locator",
+    "schema": "commercial-audit.yaml#/AuditArchiveLocator",
+    "value": {
+      "environment": "test",
+      "audit_entry_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "resource_kind": "path",
+      "resource_id": "12345678-1234-4234-8234-123456789012",
+      "recorded_at": "2026-10-15T12:00:00Z",
+      "order_key": "stable-order-1",
+      "archive_batch_id": "12345678-1234-4234-8234-123456789012",
+      "entry_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "valid": true
+  },
+  {
+    "name": "archive locator requires verified batch reference",
+    "schema": "commercial-audit.yaml#/AuditArchiveLocator",
+    "value": {
+      "environment": "test",
+      "audit_entry_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "resource_kind": "path",
+      "resource_id": "12345678-1234-4234-8234-123456789012",
+      "recorded_at": "2026-10-15T12:00:00Z",
+      "order_key": "stable-order-1",
+      "entry_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "valid": false
+  },
+  {
+    "name": "archive locator excludes full evidence payload",
+    "schema": "commercial-audit.yaml#/AuditArchiveLocator",
+    "value": {
+      "environment": "test",
+      "audit_entry_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "resource_kind": "path",
+      "resource_id": "12345678-1234-4234-8234-123456789012",
+      "recorded_at": "2026-10-15T12:00:00Z",
+      "order_key": "stable-order-1",
+      "archive_batch_id": "12345678-1234-4234-8234-123456789012",
+      "entry_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "before_state": {}
+    },
+    "valid": false
   }
 ]
