@@ -1,5 +1,14 @@
 # PR Review — Changelog
 
+## [1.15.0] — 2026-10-15
+
+### Changed
+- `HEURISTICS.md` item 8 (normalization destroys uniqueness and information) now also asks, for
+  values compared after normalizing (a unit, a scale, a conversion), which form a kept "best" or
+  "current" value holds when two forms tie, and whether it's the one the user just switched to.
+  From the review of motifpath-core#144, where a clean take in eighths tied the best in quarters
+  at effective speed and the strict comparison kept quarters.
+
 ## [1.14.0] — 2026-10-15
 
 ### Changed

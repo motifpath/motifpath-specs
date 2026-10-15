@@ -98,8 +98,12 @@ plus the five always-on items.
    "playing" after its clip failed to load, so the next answer was timed as instant.)
 8. **Normalization destroys uniqueness and information.** Shortened/normalized/hashed an
    identifier: what guaranteed uniqueness before, and what guarantees it now? Does the destination
-   accept a duplicate **silently**? What does whoever operates it lose for debugging? — *Smell:*
-   truncation/hash with no dedup at the destination.
+   accept a duplicate **silently**? What does whoever operates it lose for debugging? The same
+   goes for values compared after normalizing (a unit, a scale, a conversion): when two forms now
+   compare as equal, which one does a kept "best" or "current" value hold, and is it the form the
+   user just switched to? — *Smell:* truncation/hash with no dedup at the destination; a strict
+   "better than" that keeps the old form on a tie. (From core#144: 80 BPM in eighths tied a best
+   of 160 in quarters, so the best stayed in quarters and the next session undid the switch.)
 9. **Sentinel value inside the deterministic space.** Does the "unknown" fallback share the same
    key space as real values? — *Smell:* a sentinel producing a stable key that never invalidates.
 
