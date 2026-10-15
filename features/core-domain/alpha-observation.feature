@@ -3,7 +3,8 @@
 # PB-8 succeeds when alpha students practise at least 3 times a week and complete more than 70% of
 # their first path. This read is how an admin checks both, a week at a time and one student at a
 # time. It changes nothing. Design: design/patterns/authoring.md ("Alpha observation") and the
-# "Authoring" Figma page, row 19 (decisions D1–D9, approved 2026-10-14).
+# "Authoring" Figma page, row 19 (decisions D1–D9, approved 2026-10-14; D10–D12, for an alpha of
+# thousands, approved 2026-10-15).
 #
 # Terms used below:
 # - The alpha: every user with the student role who has been given at least one path. Teachers and
@@ -191,6 +192,54 @@ Feature: Observe the alpha against PB-8's success metric
     When "ana" observes "alice" for the week of 12 Oct 2026
     Then the 18 nodes of "Guitar foundations" are listed in path order
     And nodes 1 to 11 are completed with their completion dates, node 12 is in progress and nodes 13 to 18 are not started
+
+  # ── Pages, filters and search (D11) ──────────────────────────────────────
+
+  @wip
+  Scenario: Students come a page at a time, in the same order
+    Given the alpha has 45 students
+    When "ana" observes the alpha for the week of 12 Oct 2026, 20 students at a time
+    Then 20 students are listed and 45 students match
+    And asking for the next 20 lists the 21st to the 40th student in the same order
+
+  @wip
+  Scenario: A filter keeps only the students below the target
+    Given the alpha has 7 students and 4 of them have fewer than 3 counted sessions in the week of 12 Oct 2026
+    When "ana" observes the alpha for the week of 12 Oct 2026, keeping only the students below the target
+    Then those 4 students are listed and 4 students match
+
+  @wip
+  Scenario: Every filter's count describes the whole alpha, whatever is asked for
+    Given the alpha has 7 students, 4 below the target in the week of 12 Oct 2026 and 1 quiet
+    When "ana" observes the alpha for the week of 12 Oct 2026, keeping only the quiet students
+    Then the filter counts are 7 in all, 4 below the target and 1 quiet
+    And the cohort summary still counts all 7 students
+
+  @wip
+  Scenario: Searching by name ignores case and accents
+    Given "João Araújo" and "Beatriz Rocha" are students in the alpha
+    When "ana" observes the alpha for the week of 12 Oct 2026, searching for "joao araujo"
+    Then only "João Araújo" is listed
+
+  # ── Students by name (D10, D12) ──────────────────────────────────────────
+
+  @wip
+  Scenario: Students of the alpha are found by part of their name
+    Given "Camila Duarte", "Camila Rocha" and "Beatriz Rocha" are students in the alpha
+    When "ana" looks for students of the alpha named "cami"
+    Then "Camila Duarte" and "Camila Rocha" are found, in that order
+
+  @wip
+  Scenario: Students are named by their ids, leaving out anyone outside the alpha
+    Given "tina" is a teacher who also learns
+    When "ana" asks for the names of "alice" and "tina"
+    Then only "alice" is named
+
+  @wip
+  Scenario: Only admins may look students of the alpha up
+    Given "tina" is signed in as a teacher
+    When "tina" looks for students of the alpha named "a"
+    Then "tina" is refused for lacking permission
 
   # ── Failure cases ────────────────────────────────────────────────────────
 

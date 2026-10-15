@@ -6,7 +6,7 @@
 # The rules behind every number are in features/core-domain/alpha-observation.feature, and the raw
 # events in features/event-ingestion/read-event-log.feature. Design: design/patterns/authoring.md
 # ("Alpha observation") and the "Authoring" Figma page, row 19 (decisions D1–D9, approved
-# 2026-10-14).
+# 2026-10-14; D10–D12, for an alpha of thousands, approved 2026-10-15).
 #
 # These scenarios are verified by motifpath-web's component tests and by manual browser checks,
 # not by any service's BDD suite.
@@ -95,6 +95,12 @@ Feature: Observe the alpha in Teach
     When "ana" searches students for "rocha"
     Then only "Beatriz Rocha" is listed
 
+  Scenario: The list comes 20 at a time
+    Given the alpha has 45 students
+    When "ana" opens Engagement
+    Then 20 students are listed
+    And "Load 20 more" adds the next 20 below them
+
   Scenario: A row opens the student
     When "ana" picks "camila"'s row
     Then the student screen for "camila" opens, for the same week
@@ -120,7 +126,7 @@ Feature: Observe the alpha in Teach
 
   Scenario: "See events" opens the events filtered to the student
     When "ana" picks "See events" on "camila"'s student screen
-    Then the events screen opens with the student chip "Camila Duarte" selected
+    Then the events screen opens with "Camila Duarte" picked as the student
 
   # ── Events ───────────────────────────────────────────────────────────────
 
@@ -129,9 +135,24 @@ Feature: Observe the alpha in Teach
     Then the 12 most recently received events are listed with when they were received, the student's name, the event type and its details
     And "Load 12 more" adds the next 12 below them
 
-  Scenario: Every student has a chip of their own
+  Scenario: Students are found by name
+    When "ana" types "cami" in the student search on the events screen
+    Then "All students", "Camila Duarte" and "Camila Rocha" are offered
+
+  Scenario: Picking a student filters the events and shows them after the search
+    When "ana" picks "Camila Duarte" in the student search
+    Then only "Camila Duarte"'s events are listed
+    And "Camila Duarte" shows as a removable chip after the search, which keeps its place
+
+  Scenario: Removing the picked student shows everyone's events again
+    Given "Camila Duarte" is picked as the student
+    When "ana" removes "Camila Duarte"
+    Then every student's events are listed
+
+  Scenario: Someone outside the alpha is named by the start of their id
+    Given a teacher who also learns, whose id starts with "1a2b3c4d", sent the latest event
     When "ana" opens the events screen
-    Then the student chips are "All students" and one chip for each of the 7 students
+    Then that event's student reads "User 1a2b3c4d…"
 
   Scenario: The type chips filter by group
     When "ana" picks the type chip "Practice sessions"
@@ -139,7 +160,7 @@ Feature: Observe the alpha in Teach
 
   Scenario: The count says how many events match
     Given "camila" has 46 events
-    When "ana" picks the student chip "Camila Duarte"
+    When "ana" picks "Camila Duarte" in the student search
     Then the count reads "46 events for Camila Duarte · showing the latest 12"
 
   # ── Sizes and states ─────────────────────────────────────────────────────
