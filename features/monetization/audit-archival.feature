@@ -15,11 +15,11 @@ Feature: Asynchronous audit archival and bounded recent evidence retention
     When the attempted change rolls back
     Then neither its commercial effect nor export work is committed
 
-  Scenario: Evidence is archived independently soon after commit
+  Scenario: Evidence is archived in the next scheduled hourly batch
     Given a commercial audit entry was committed at "2026-10-15T12:00:00Z"
     And the independent archive is healthy
-    When the asynchronous exporter wakes within the next minute
-    Then it exports and verifies that entry within the five-minute archival target
+    When the next scheduled hourly export runs
+    Then it exports and verifies that entry in the hourly batch
 
   Scenario: A recent copy expires at the exact thirty-day boundary
     Given evidence was recorded at "2026-10-01T12:00:00Z"
@@ -96,11 +96,16 @@ Feature: Asynchronous audit archival and bounded recent evidence retention
     Then archival and safe cleanup continue independently of acquisition
 
   Scenario: A growing archive backlog raises an alert
-    Given the oldest unverified audit entry is more than fifteen minutes old
+    Given the oldest unverified audit entry is more than two hours old
     When archival monitoring evaluates the backlog
-    Then a critical alert identifies the delayed evidence without exposing its sensitive payload
+    Then an alert identifies the delayed evidence without exposing its sensitive payload
 
   Scenario: Restored export metadata is reconciled before cleanup resumes
     Given a backup restored recent evidence and export catalog state
     When the restored service starts
     Then cleanup remains fenced until exact archive proofs and holds are reconciled
+
+  Scenario: An empty hourly sweep does not create archive objects
+    Given no committed audit evidence awaits archival
+    When the scheduled hourly export runs
+    Then no empty archive object is uploaded

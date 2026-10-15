@@ -27,8 +27,9 @@ serialize conflicting financial transitions before applying them. Progress remai
 
 Postgres audit payloads have a **30-day hot-retention TTL**, measured as 720 hours from the
 immutable server `recorded_at`, independently of financial closure. A separate asynchronous
-worker exports committed evidence continuously to independently controlled S3 Object Lock
-storage. Wake at least every minute; target verified archival within five minutes of commit.
+worker exports committed evidence hourly in batches to independently controlled S3 Object Lock
+storage. Alert when the oldest committed unverified entry exceeds two hours. The recent Postgres
+copy serves operational reads while evidence awaits independent archival.
 Export never runs in the business transaction or waits on the user's request. An hourly
 cleanup worker deletes expired hot rows only after exact archive membership, checksum,
 object version and required retention protection are verified, and no hold applies. Failed

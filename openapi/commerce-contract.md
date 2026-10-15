@@ -238,8 +238,11 @@ The **asynchronous audit exporter** is a background worker consuming durable com
 1. The business transaction atomically records mutation, immutable audit entry and export work.
    No S3 request runs inside that transaction or on the synchronous request path. Rollback leaves
    no exportable evidence or outgoing work. Export scheduling is independent of acquisition flags.
-2. Wake at least every 60 seconds and on available work; target completed archive verification
-   within five minutes after commit. Claim bounded batches with recoverable worker leases.
+2. Run hourly, batching pending committed evidence at each scheduled sweep. Do not trigger an
+   export for every new entry; recent operational reads use Postgres while independent archival
+   is pending. Skip upload when there is no pending evidence. Scan all pending work, including
+   older failed batches, rather than a last-hour-only lookback. Claim bounded batches with
+   recoverable worker leases.
    Persist batch identity, immutable member set/digest, counts and content checksum before upload.
    Scope batches and object destinations by trusted environment. A batch never changes members
    once upload is attempted. The catalog is worker metadata, not a mutable audit payload.
@@ -254,10 +257,18 @@ The **asynchronous audit exporter** is a background worker consuming durable com
    replacement archive object. Keep outbox work until verified status and catalog checkpoint
    commit durably together. Failed uploads/verifications retry with bounded backoff and jitter;
    expired worker leases resume existing work rather than abandoning a batch.
-5. Warn when the oldest committed unverified entry exceeds five minutes; alert critically after
-   15 minutes, on checksum/member/lock mismatch, or on a cleanup verification failure. Record
+5. Alert when the oldest committed unverified entry exceeds two hours from recorded_at.
+   Checksum/member/lock mismatches and cleanup verification failures alert immediately,
+   independently of backlog age. Record
    backlog count/oldest age, export latency, retries, archive integrity failures and retained
    rows older than TTL. A long outage is observable; it cannot silently discard evidence.
+
+The hourly schedule accepts approximately one scheduled interval, plus processing time, before
+recent evidence gains independent archive protection. This is the explicit cost/protection
+trade-off; the 30-day hot TTL is not the export interval. Monitor archival lag independently of
+export execution so a stalled exporter cannot suppress its own alert. Retries retain their
+stable batch identity and bounded backoff. Payment/settlement/CMS reconciliation schedules
+remain separate; their more frequent sweeps do not trigger normal audit export batches.
 
 A separate **hourly cleanup** selects eligible expired rows in bounded batches. It must verify
 current durable catalog coverage and required archive protection before deleting. Every selected
