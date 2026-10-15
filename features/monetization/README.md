@@ -2,13 +2,13 @@
 
 This directory is the consolidated contract index for the monetization epic. Business decisions
 from 2026-10-13 through 2026-10-15 are incorporated; scenarios remain `@wip` until runtime
-implementation passes TDD. PR approval accepts proposed API/architecture details, not a deployment.
+implementation passes TDD. PR approval accepts proposed API details, not a deployment.
 
 ## Decisions and source contracts
 
 - [ADR-059: commercial authority, audit and idempotency](../../adrs/ADR-059-commercial-authority-audit-and-idempotency.md), accepted; renumbered from the colliding ADR-057 without changing the decision.
 - [ADR-058: Stripe](../../adrs/ADR-058-stripe-payment-provider.md), accepted.
-- [ADR-060: transactional records and recovery](../../adrs/ADR-060-commercial-records-and-recovery.md), proposed in this consolidated PR.
+- [ADR-060: transactional records and recovery](../../adrs/ADR-060-commercial-records-and-recovery.md), accepted by Gilson Yamada on 2026-10-15.
 - [Commercial architecture and policies](../../openapi/commerce-contract.md): ownership, manifests, licenses, grants, ledger/rounding, settlement, refunds/disputes, CMS, delivery, retention and recovery.
 - [Core-domain API](../../openapi/core-domain-service.yaml): existing subscription/refund/Stripe/audit/access operations plus consolidated commerce operations.
 - [Commercial domain schemas](../../openapi/components/schemas/commerce.yaml) and [private message schemas](../../openapi/components/schemas/commercial-messages.yaml).
@@ -88,9 +88,9 @@ and [retention scenarios](audit-archival.feature).
 
 ## Acceptance and remaining external gates
 
-The consolidated PR completes the specification surfaces for MOT-117; its review must accept
-ADR-060, API additions, message schemas, evidence retention baseline and scenarios before MOT-117
-is marked done. No runtime evidence is claimed by syntax/schema checks. MOT-115 registry and
+ADR-060 was accepted by Gilson Yamada on 2026-10-15. The consolidated PR completes the
+specification surfaces for MOT-117; its review must accept API additions, message schemas and
+scenarios before MOT-117 is marked done. No runtime evidence is claimed by syntax/schema checks. MOT-115 registry and
 MOT-116 Figma approvals remain separate blockers to implementation; no approval is fabricated.
 
 Deployment inputs remain explicit: approved prices/discounts/bounds/commissions and BRL offers;

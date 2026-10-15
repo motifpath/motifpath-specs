@@ -1,6 +1,6 @@
 # ADR-060: Transactional commercial records and recoverable integrations
 
-**Status:** Proposed
+**Status:** Accepted — approved by Gilson Yamada on 2026-10-15
 **Date:** 2026-10-15
 **Deciders:** Gilson Yamada
 **Task:** MOT-117
@@ -118,4 +118,4 @@ availability from authoritative commercial rights and makes a CMS outage surviva
 - [Strapi webhook configuration](https://docs.strapi.io/cms/configurations/server): configurable
   headers do not establish a native signed canonical event protocol.
 
-*Proposed for review; no infrastructure or provider account is configured by this ADR.*
+*Accepted on 2026-10-15. Future architectural changes require a superseding ADR. No infrastructure or provider account is configured by this ADR.*
