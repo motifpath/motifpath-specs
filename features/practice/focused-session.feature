@@ -17,36 +17,30 @@ Feature: Practise a subject the student chooses
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A chosen session holds only items of the chosen node and its subtree
     When "alice" composes a 10-minute session with "guitar" in hand, choosing "common-progressions"
     Then every item in the session practises "common-progressions" or "blues-form"
 
-  @wip
   Scenario: A chosen session names its subject and says it was chosen
     When "alice" composes a 10-minute session with "guitar" in hand, choosing "common-progressions"
     Then the plan's only focus node is "common-progressions"
     And the plan says its focus was chosen by the student
 
-  @wip
   Scenario: The chosen node's due items come first
     Given "alice" has due, weak and new items on "common-progressions" on guitar
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
     Then about 60% of the focus time goes to due items, 25% to weak items and 15% to new items
 
-  @wip
   Scenario: Due items of other nodes are not in a chosen session
     Given "alice" has due items on "chord-tones" on guitar
     When "alice" composes a 10-minute session with "guitar" in hand, choosing "common-progressions"
     Then no item in the session practises "chord-tones"
 
-  @wip
   Scenario: A chosen session has no warm-up
     Given "alice" has a clean play-along "c-major-scale" with a best clean tempo of 100 BPM
     When "alice" composes a 10-minute session with "guitar" in hand, choosing "common-progressions"
     Then no item in the session has the reason warm_up
 
-  @wip
   Scenario: A chosen session ends with a play-along of its subject
     Given "common-progressions" has the play-along "pop-progression" on guitar
     When "alice" composes a 10-minute session with "guitar" in hand, choosing "common-progressions"
@@ -60,32 +54,27 @@ Feature: Practise a subject the student chooses
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A node off the student's paths can be chosen
     Given none of "alice"'s paths includes "hear-progressions", which has items in the head
     When "alice" composes a 10-minute session with no instrument in hand, choosing "hear-progressions"
     Then every item in the session practises "hear-progressions"
 
-  @wip
   Scenario: A node whose requirements aren't met can be chosen
     Given "chord-function" requires "diatonic-chords" at level "accurate", and "alice" is new on "diatonic-chords"
     When "alice" composes a 10-minute session with no instrument in hand, choosing "chord-function"
     Then every item in the session practises "chord-function"
 
-  @wip
   Scenario: A chosen session with no play-along in its subject has no application ending
     Given no item of "hear-progressions" or its subtree is a play-along on guitar
     When "alice" composes a 10-minute session with "guitar" in hand, choosing "hear-progressions"
     Then no item in the session has the reason application
 
-  @wip
   Scenario: When its subject runs out, a chosen session ends early rather than leave it
     Given "find-notes-root-strings" has 24 cells on guitar, all fluent for "alice" and none due within the week
     When "alice" composes a 30-minute session with no instrument in hand, choosing "find-notes-root-strings"
     Then every item in the session practises "find-notes-root-strings"
     And the session's items take less than 30 minutes
 
-  @wip
   Scenario: Time left in a chosen session goes to reviewing the subject ahead, then to more of its new items
     Given "alice" has 1 minute of due items, nothing weak and 20 new items on "common-progressions" on guitar
     And "alice" has known items of "common-progressions" coming due within the week
@@ -95,13 +84,11 @@ Feature: Practise a subject the student chooses
 
   # ── Subjects to choose from ────────────────────────────────────────────────
 
-  @wip
   Scenario: The subjects list offers every node with material for the instrument, grouped by area
     When "alice" lists the subjects they can practise with "guitar" in hand
     Then "common-progressions" is listed in the area "harmony"
     And every listed node has at least one item that suits "guitar" and can be played in hand
 
-  @wip
   Scenario: A subject shows the student's level and current rung
     Given "alice" is accurate on every know item of "diatonic-chords" on guitar
     When "alice" lists the subjects they can practise with "guitar" in hand
@@ -128,13 +115,11 @@ Feature: Practise a subject the student chooses
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A chosen node with nothing to practise in hand is not found
     Given "find-notes-root-strings" is practised only by fretboard cells, recalled in the head
     When "alice" composes a 10-minute session with "guitar" in hand, choosing "find-notes-root-strings"
     Then the request is refused with a not-found error
 
-  @wip
   Scenario: A chosen node that doesn't exist is not found
     When "alice" composes a 10-minute session with no instrument in hand, choosing a node that doesn't exist
     Then the request is refused with a not-found error

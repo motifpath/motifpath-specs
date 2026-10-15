@@ -52,7 +52,6 @@ Feature: Compose a practice session
     Then exactly one item has the reason application
     And the focus time is the 20 minutes less the warm-up and that play-along's estimated time
 
-  @wip
   Scenario: With no play-along on any of its subjects, Today's mix has no application ending
     Given "alice" has due items only on "diatonic-chords", "chord-tones" and "change-chords" on guitar, and none of them has a play-along
     And "alice"'s path skill "notes-on-high-strings" has the play-along "high-strings-riff" on guitar
@@ -327,47 +326,40 @@ Feature: Compose a practice session
   # play_in_time, move, target, use) with material for the session whose items on that subject
   # are not yet accurate.
 
-  @wip
   Scenario: Today's mix practises at most three subjects and names them
     Given "alice" has due and weak items on 6 skills of their path on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then the plan names at most 3 focus nodes
     And every item other than the warm-up and the review block practises one of them
 
-  @wip
   Scenario: The main subject is the node with the most due and weak time
     Given "alice" has 4 minutes of due and weak items on "diatonic-chords" and 2 minutes on "chord-tones" on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then the plan's first focus node is "diatonic-chords"
 
-  @wip
   Scenario: Due items of other nodes come in a review block of at most 5 items
     Given "alice" has due items on 6 skills of their path on guitar, 12 of them outside the session's focus nodes
     When "alice" composes a 30-minute session with "guitar" in hand
     Then exactly 5 items with the reason due practise none of the plan's focus nodes
     And they are the most overdue of those 12
 
-  @wip
   Scenario: The review block never takes more than a fifth of the focus time
     Given "alice" has due items outside the session's focus nodes, each estimated at 30 seconds
     When "alice" composes a 5-minute session with "guitar" in hand
     Then the due items outside the focus nodes take at most a fifth of the focus time
 
-  @wip
   Scenario: The review block comes right after the warm-up
     Given "alice" has a clean play-along "c-major-scale" with a best clean tempo of 100 BPM
     And "alice" has due items on 6 skills of their path on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then the due items that practise none of the plan's focus nodes come right after the warm-up, before any other item
 
-  @wip
   Scenario: With few nodes due or weak, the nodes of new items complete the subjects
     Given "alice" has due items only on "chord-tones" on guitar
     And "alice"'s path skills "diatonic-chords" and "change-chords" have new items on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then the plan's focus nodes are "chord-tones", "diatonic-chords" and "change-chords", in that order
 
-  @wip
   Scenario: A caught-up session's subjects are the nodes it reviews ahead, then those it stretches to
     Given "alice" has nothing due, weak or new on their path for guitar
     And "alice" has known items of "chord-tones" coming due within the week
@@ -388,7 +380,6 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with "guitar" in hand and "diatonic-chords" is a focus node
     Then every new item of "diatonic-chords" in the session is at the hear or play_clean rung
 
-  @wip
   Scenario: Due items are reviewed whatever their rung
     Given "alice" is accurate on every know and hear item of "diatonic-chords" on guitar
     And 3 know items of "diatonic-chords" are due
@@ -402,14 +393,12 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with no instrument in hand and "diatonic-chords" is a focus node
     Then every new item of "diatonic-chords" in the session is at the hear rung
 
-  @wip
   Scenario: A subject accurate on every rung it has takes new items from its top rung
     Given "find-notes-top-strings" has items only at the know rung
     And "alice" is accurate on 80% of its cells on guitar, and 10 of them are new
     When "alice" composes a 10-minute session with no instrument in hand and "find-notes-top-strings" is a focus node
     Then the session may include new know items of "find-notes-top-strings"
 
-  @wip
   Scenario: Every item carries its rung
     When "alice" composes a 10-minute session with "guitar" in hand
     Then every item in the session carries one of the rungs know, hear, play_clean, play_in_time, move, target or use
