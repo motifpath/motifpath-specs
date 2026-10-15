@@ -94,3 +94,113 @@ Feature: Commercial rollout preserves rights and records each operation
     When its resulting commercial update is applied asynchronously
     Then the update's audit evidence identifies "change-1" as its cause
     And the original actor and resulting outcome can be reconstructed
+
+  Scenario: Plus can launch independently of teacher commerce and CMS
+    Given subscription readiness is approved for learner "Alice" in production
+    And Alice is admitted to the subscription beta cohort
+    And CMS integration and teacher settlement onboarding are disabled
+    When Alice starts a Plus checkout using an eligible core-managed offer
+    Then the checkout can be authorized without enabling teacher commerce or CMS
+
+  Scenario: The first embedding license does not require an already licensed sale
+    Given teacher "Bea" owns draft path "Guitar foundations"
+    And the path contains premium exercises but has no embedding license
+    And Bea has an eligible permanent license offer and approved license acquisition readiness
+    And Bea is admitted to the license acquisition cohort
+    And no teacher payout account or validated sale manifest exists
+    When Bea starts checkout for the path's first embedding license
+    Then license checkout can be authorized using the reviewed ownership revision
+
+  Scenario: An existing license remains usable when new license acquisition is disabled
+    Given teacher "Bea" holds a valid permanent embedding license for "Guitar foundations"
+    And new license acquisition is disabled
+    And paid sale activation is enabled for Bea with all other readiness approved
+    When Bea validates the path's premium dependencies for a new paid offer
+    Then the existing license satisfies the commercial permission requirement
+
+  Scenario: Owned content does not require an unrelated premium license
+    Given teacher "Bea" owns every dependency of path "Guitar foundations"
+    And the path contains no premium dependencies
+    And paid sale activation is enabled for Bea with all other readiness approved
+    And new premium license acquisition is disabled
+    When Bea validates the path for a new paid offer
+    Then validation does not require a premium embedding license
+
+  Scenario: Staging admission cannot authorize a production purchase
+    Given learner "Alice" is admitted only to the staging purchase cohort
+    And production purchase cohorts are empty
+    When Alice attempts to purchase "Guitar foundations" in production
+    Then no checkout is created
+
+  Scenario: Buyer admission cannot substitute for seller readiness
+    Given learner "Alice" is admitted to new path purchases
+    And teacher "Bea" is not approved for seller activation
+    When Alice attempts to purchase Bea's path "Guitar foundations"
+    Then no checkout is created
+
+  Scenario: Unavailable activation decisions refuse new checkout
+    Given learner "Alice" has a cached checkout capability
+    And current commercial activation cannot be established
+    When Alice attempts to start a new checkout
+    Then no checkout is created
+
+  Scenario: A committed OFF revision fences a new purchase authorization
+    Given Alice began a purchase attempt before the acquisition OFF revision committed
+    And the attempt has no durable authorization when that revision commits
+    When the attempt tries to authorize the purchase under the older revision
+    Then no checkout intent is authorized
+
+  Scenario: An authorized purchase can finish provider handoff after OFF
+    Given Alice's purchase intent was durably authorized before acquisition was disabled
+    And provider handoff has not yet completed
+    When the authorized operation resumes after acquisition is disabled
+    Then the existing operation can finish without creating a second purchase intent
+
+  Scenario: A completed purchase retry remains available after cohort removal
+    Given purchase operation "purchase-1" was fulfilled for Alice
+    And Alice has since been removed from new purchase cohorts
+    When Alice retries "purchase-1" with the same intent as its authorized owner
+    Then its recorded result is returned without another purchase or grant
+
+  Scenario: CMS outage does not erase permanent buyer access
+    Given Alice permanently purchased path "Guitar foundations"
+    And the editorial CMS is unavailable
+    When Alice opens her retained purchased copy
+    Then her valid permanent grant still permits access
+
+  Scenario: CMS outage blocks an action requiring fresh editorial validation
+    Given a new offer depends on fresh CMS-managed presentation
+    And its required editorial readiness cannot be established
+    When the seller attempts to activate that offer
+    Then the new offer is not activated
+
+  Scenario: Acquisition rollback preserves subscription cancellation
+    Given Alice has an automatically renewing subscription
+    And all new commercial acquisition has been disabled
+    When Alice cancels its next renewal
+    Then the cancellation can be recorded under the existing subscription policy
+
+  Scenario: Missing commercial configuration blocks an enabled checkout
+    Given Plus checkout is enabled for Alice and all flag prerequisites are enabled
+    And no valid price configuration exists for the requested offer
+    When Alice attempts to start checkout
+    Then no checkout is created
+
+  Scenario: Acquisition rollback cannot expose protected content as free
+    Given lesson "Premium chords" requires a valid commercial grant
+    And learner "Alice" has no valid grant for that lesson
+    And commercial acquisition has been disabled
+    When Alice requests the lesson through a direct content link
+    Then the protected lesson content is not delivered
+
+  Scenario: Audit failure prevents activation changes
+    Given new purchases are disabled
+    And durable activation-change evidence cannot be recorded
+    When an authorized operator attempts to enable new purchases
+    Then new purchases remain disabled
+
+  Scenario: Acquisition OFF does not stop evidence archival
+    Given committed commercial evidence awaits archival
+    And all commercial acquisition has been disabled
+    When the scheduled evidence export runs
+    Then the pending evidence remains eligible for verified archival
