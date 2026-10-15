@@ -1,7 +1,7 @@
 # Commercial architecture and integration contracts — MOT-117
 
 Status: consolidated specification for review, 2026-10-15. Business bundle approved by Gilson
-in chat on this date. API additions and ADR-060 require PR review. This is a durable contract,
+in chat on this date. ADR-060 was approved by Gilson on 2026-10-15; API additions still require PR review. This is a durable contract,
 not an implementation plan. No runtime readiness or Figma/flag approval is implied.
 
 ## Authority and identifiers
@@ -336,14 +336,14 @@ unavailable instead of a partial or apparently empty history. Direct S3 access i
 to the browser. After backup restore, reconcile catalog/object proofs before exporter/purger
 activation; replaying restored old rows must not duplicate financial effects or archive history.
 
-Proposed retention baseline for PR approval: seven years after financial/lifecycle closure for
+Accepted architecture retention baseline (ADR-060): seven years after financial/lifecycle closure for
 redacted journals, archived commercial evidence and financial operation fingerprints; keep active permanent
 rights and minimal business-uniqueness tombstones for the entire obligation lifetime. Restricted,
 encrypted provider inbox payloads expire after 30 days once processed/reconciled and free of legal
 hold; unresolved cases retain required evidence under reviewed holds. Redacted operation identity
 and business uniqueness must survive raw-payload deletion and retry-cache expiry. No deletion of
 active rights/uniqueness is permitted by a timer. Separate optional personal contact data from
-pseudonymous transaction references. Retention is an engineering proposal, not a statement of
+pseudonymous transaction references. Retention is an engineering baseline, not a statement of
 statutory compliance; approve jurisdictional/privacy retention before production activation.
 The long-term seven-year rule is independent of the 30-day Postgres audit TTL. Protect archived
 active obligations until closure, then retain through the approved post-closure period; extend
@@ -401,4 +401,4 @@ Primary integration references checked 2026-10-15: [Stripe separate charges/tran
 [idempotency](https://docs.stripe.com/api/idempotent_requests), and
 [Strapi configurable webhook headers](https://docs.strapi.io/cms/configurations/server).
 The adapter, retention baseline, rounding and authorization boundary above are MotifPath design
-choices proposed for review, not promises supplied by those providers.
+choices recorded in accepted ADR-060 and this contract, not promises supplied by those providers.
