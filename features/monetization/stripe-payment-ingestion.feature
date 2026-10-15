@@ -2,7 +2,7 @@
 Feature: Subscription checkout and verified payment ingestion
   A recorded checkout intent uses an authoritative offer and the authenticated learner.
   Financial notifications are verified and durably received before fulfillment.
-  # MOT-117; ADR-058 selects Stripe, ADR-057 requires audit and idempotency.
+  # MOT-117; ADR-058 selects Stripe, ADR-059 requires audit and idempotency.
 
   Scenario: Subscription checkout uses the authoritative offer
     Given Alice can acquire annual platform offer "offer-1" for 400 BRL

@@ -122,3 +122,6 @@ if (failures > 0) {
   console.error(`${failures} problem(s)`)
   process.exit(1)
 }
+
+// Private commercial messages are not reachable through the public OpenAPI document.
+await import('./validate-commercial.mjs')

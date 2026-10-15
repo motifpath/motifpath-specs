@@ -7,12 +7,12 @@ commercial authority, traceability and durable business idempotency remain manda
 
 ## Delivery profile
 
-Target **API v1 snapshot events, version `2026-09-30.endive`**, for the platform's own
-Stripe account. Pin outgoing object reads/commands and the registered snapshot destination
+Target **API v1 snapshot events, version `2026-09-30.endive`**, for the platform and explicitly registered connected-account
+financial destinations. Pin outgoing object reads/commands and the registered snapshot destination
 to that version. Do not inherit a changing account default. Before implementation, select
 and pin a Go SDK release whose generated types match this version; an incompatible SDK is
-a readiness failure, not permission to override strong types. Connect/Accounts v2 and thin
-event delivery are not introduced by this slice.
+a readiness failure, not permission to override strong types. Accounts v2 and thin
+event delivery are not introduced by this contract.
 
 Each environment has an expected account identity, test/live mode, endpoint signing-secret
 set and version manifest. Verify the original raw request bytes, native signature and signed
@@ -50,11 +50,24 @@ alone cannot issue a grant. Notifications outside the allowlist are retained wit
 | `refund.created`, `refund.updated`, `refund.failed` | Read the individual refund and correlated admin operation. Only confirmed full success applies the approved refund/access rule. Unknown outcomes remain processing. |
 | `charge.refunded` | Reconcile individual refund objects and totals; a charge-level or partial-refund notification alone is not a second full refund or automatic full-access removal. |
 | `charge.dispute.created`, `charge.dispute.updated` | Record/reconcile the dispute. Pending disputes and provider holds never themselves block otherwise valid access. |
-| `charge.dispute.closed` | Verify the actual final outcome. Closed is not synonymous with lost or won. Final financial/access treatment still requires its explicit policy contract. |
+| `charge.dispute.closed` | Verify the actual final outcome. Closed is not synonymous with lost or won. Apply verified won/lost outcomes under the consolidated commercial contract; no expired or refunded grant is revived. |
 | `charge.dispute.funds_withdrawn`, `charge.dispute.funds_reinstated` | Record financial movements with their own provider references. They neither refund automatically nor decide content access by themselves. |
 
-This is a subscription/financial-notification profile, not approval of new payment methods,
-Connect onboarding, teacher settlement integration or a one-time teacher purchase checkout.
+One-time path/license checkouts use payment mode with the same durable receipt/operation
+boundary. Verify PaymentIntent/captured charge against the accepted offer/customer and apply
+one purchase/license grant. Add `payment_intent.succeeded` and `payment_intent.payment_failed`
+as reconciliation triggers, never independent fulfillment paths. `transfer.created`,
+`transfer.updated` and `transfer.reversed` reconcile the recorded settlement obligation;
+`payout.created`, `payout.updated`, `payout.paid`, `payout.failed` and `payout.canceled` reconcile
+connected-account bank payout state. Verify the owning account, original source payment and
+recorded beneficiary. A transfer reversal never independently revokes customer access.
+
+Connected events require a separately registered signing destination and expected account scope.
+Verify the original signed payload, connected account identity and test/live context against
+that manifest and registered core mappings. The request cannot choose secrets or a different
+environment. Quarantine unmapped accounts. No arbitrary account is trusted because an `account`
+field is present. Refund/dispute effects remain payment-specific across both product families.
+New payment methods and real account onboarding are deployment work, not activated by this spec.
 
 ## Payment verification and effect identity
 
@@ -109,16 +122,16 @@ that no financial operation occurred. No unattended re-charge or double refund i
 Annual notice scheduling uses each authoritative annual renewal time with distinct seven-day
 and one-day notice identities. One `invoice.upcoming` notification cannot stand in for both.
 Duplicate scheduling cannot send duplicate copies of the same notice; undeliverable notices
-are recorded for the still-unresolved communication recovery policy.
+use durable bounded retries until renewal, then record missed delivery and alert support.
 
 ## Readiness and remaining decisions
 
 Before implementation: approve this profile, pin the matching SDK, validate the account's
 version/notification configuration in sandbox, define durable financial/audit/grant schemas
 and retention/access rules, and prove replay/outage recovery with real persistence tests.
-Final dispute outcomes, partial refunds/credits, exception review and teacher settlement remain
-explicit policy boundaries. This contract selects neither their treatment nor an automatic
-restoration rule. All M0 design/registry/spec approvals remain required.
+Final dispute outcomes, full-refund review and teacher settlement are defined by
+[the consolidated commercial contract](commerce-contract.md). Partial-refund automatic execution
+and credits are not enabled at launch. All M0 design/registry/spec approvals remain required.
 
 ## Primary references
 

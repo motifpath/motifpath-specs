@@ -2,7 +2,7 @@
 Feature: Teacher commercial rights and retained purchases
   Teacher creation tools remain free, licenses are permanent per path,
   and existing buyers retain content when new sales are withdrawn.
-  # MOT-117; ADR-057. Exact license coverage and version references remain contract work.
+  # MOT-117; ADR-059. Consolidated contracts define license coverage and immutable commercial manifests.
 
   Scenario: Teacher creation tools do not require a paid teacher subscription
     Given Bea is a teacher without a paid subscription

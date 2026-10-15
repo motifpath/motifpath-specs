@@ -2,7 +2,7 @@
 Feature: Caller-owned subscription commands are auditable and repeatable
   Cancellation remains available during acquisition rollback.
   Annual switching uses authoritative offers and does not charge mid-period.
-  # MOT-117; supplements the subscription lifecycle and ADR-057 constraints.
+  # MOT-117; supplements the subscription lifecycle and ADR-059 constraints.
 
   Scenario: Existing subscriptions remain visible after cohort removal
     Given Alice has an existing paid subscription

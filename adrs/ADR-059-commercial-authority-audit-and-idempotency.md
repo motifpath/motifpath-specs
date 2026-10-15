@@ -1,4 +1,4 @@
-# ADR-057: Commercial authority, durable audit and idempotent operations
+# ADR-059: Commercial authority, durable audit and idempotent operations
 
 **Status:** Accepted — approved by Gilson Yamada on 2026-10-13 in review of specs PR #315
 **Date:** 2026-10-13
@@ -170,3 +170,6 @@ this ADR. Initial proposed scenarios are in [specs PR #311](https://github.com/m
 ---
 
 *Accepted on 2026-10-13. To revise, create a superseding ADR.*
+
+Identifier corrected from ADR-057 to ADR-059 in MOT-117: ADR-057 is already assigned to
+the drill model on main. The accepted commercial decision, approval and history are unchanged.

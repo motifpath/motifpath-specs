@@ -56,22 +56,24 @@ Execute:
     summary: Execute an eligible full refund as an admin
     description: |
       Require an authenticated backend-resolved admin role (403 for non-admins).
-      Accept only requested, commercially_eligible cases at expected_revision. Cases requiring
-      policy/statutory review are not executable through this limited commercial-policy surface.
+      Accept only requested cases at expected_revision that are commercially_eligible or
+      review_approved by explicit audited admin review. Unreviewed cases are not executable.
       Record durable operator/reason/operation evidence before external refund work. Return
       processing while financial outcome is pending/unknown; never infer failure from a timeout.
       Per-payment financial uniqueness spans request identities and admin actors: concurrent
       admins cannot initiate a second refund, even with distinct keys. A conflicting or uncertain
       execution returns 409; reconcile it instead of issuing another external refund.
       Unresolved competing refund/chargeback settlement also returns 409 until reconciled;
-      this contract does not invent the final financial treatment of a dispute.
+      verified final lost disputes end only that payment grant and require reconciled
+      returned-money accounting before any additional customer refund.
       Same-key same-intent replay returns the original operation's current case before checking
       the originally observed revision. Replays still require admin authorization.
       A confirmed successful refund returns 100% in the original currency with fees absorbed
       by MotifPath, ending only its payment-linked access immediately and retaining progress,
       financial history and independent access. Acquisition switches cannot stop fulfillment.
-      Partial refunds, review overrides and retrying definitively failed executions are outside
-      this contract; a new key is never permission to repeat an uncertain financial operation.
+      Partial refunds are outside this full-refund surface. Explicit admin review and failed-case
+      recovery have separate revision-checked endpoints; a new key never permits repeating
+      an uncertain financial operation.
     tags: [Refunds]
     parameters:
       - $ref: '#/IdempotencyKey'

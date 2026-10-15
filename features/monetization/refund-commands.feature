@@ -2,7 +2,7 @@
 Feature: Refund requests and admin execution preserve payment integrity
   A learner requests a refund of their own payment; an admin executes it.
   Duplicate delivery and concurrent admins cannot refund the same payment twice.
-  # MOT-117; ADR-057. Partial refunds and statutory exceptions remain separate contract work.
+  # MOT-117; ADR-059. Automatic partial refunds are disabled; explicit full-refund review/retry is specified separately.
 
   Scenario: A paid learner can request a full refund without choosing its amount
     Given Alice owns successful payment "payment-1" for 100 BRL

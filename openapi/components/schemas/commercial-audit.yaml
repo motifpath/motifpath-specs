@@ -128,5 +128,8 @@ CommercialState:
     attempt before resource resolution), not a guessed empty state. Before/after evidence
     must distinguish an unchanged attempt from an applied change. Never include secrets,
     credentials, payment instrument data, raw provider envelopes or unrelated personal data.
-    Resource-specific allowlists require approved contracts before implementation.
+    Resource/action allowlists cover only commercial provenance/owner, sale/release/offer/config
+    references, grant scope/source/status/validity, subscription billing/renewal, safe payment/refund
+    facts, teacher/path license state and settlement allocations/movements. Unknown fields require
+    schema review rather than blind serialization.
   additionalProperties: true

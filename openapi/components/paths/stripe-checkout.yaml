@@ -67,7 +67,8 @@ StripeWebhook:
       Stripe-signature authentication replaces bearer authentication on this endpoint.
       Verify the unmodified raw body with the configured environment endpoint secret and
       timestamp/replay tolerance before trusting parsed fields. Validate the expected Stripe
-      account and test/live context; request data cannot select a different account or secret.
+      account or registered connected-account destination and test/live context; request data
+      cannot select a different account, environment or secret.
       Persist the verified envelope/reference, receipt identity and attributable audit evidence
       durably before 200. If persistence fails return 503 so delivery can retry. Unknown event
       kinds/versions or unmapped objects are retained for reconciliation without granting access.
