@@ -80,8 +80,10 @@ StripeWebhook:
       reconciliation of recorded operations against authoritative provider objects; replay uses
       the same business identities. Logging an error or receiving 200 is not proof of fulfillment.
       Do not treat provider holds/open disputes as authority to block access before final decision.
-      Pin the Stripe payload/API version and verification configuration before implementation;
-      provider envelopes are not client-authored learning events.
+      Target API v1 snapshot delivery at 2026-09-30.endive with a 300-second signature tolerance,
+      under the approved environment/account manifest. Unsupported versions are retained for
+      review without business effects. Pin a compatible SDK and validate the destination
+      configuration before implementation; provider envelopes are not client learning events.
     tags: [Payments]
     security:
       - StripeWebhookSignature: []
