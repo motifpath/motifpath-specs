@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.47.0
+  version: 0.47.1
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -6242,8 +6242,11 @@ paths:
         A session is focused: it practises at most three subjects (knowledge nodes), named in
         focus_nodes, main first. For Today's mix the composer picks them: a teacher's
         suggestion, then the nodes with the most due and weak time, then the nodes of new
-        items, then stretch; due items of other nodes come in a review block of at most a
-        fifth of the focus time or 5 items. With focus_node_id, the student chose the subject:
+        items, then the nodes with items coming due within the week, then stretch; only their
+        items fill the session, so it may end short. Due items of other nodes come in a review
+        block of at most a fifth of the focus time or 5 items, filled first from the due share
+        and placed right after the warm-up. The application ending plays one of the subjects,
+        or there is none. With focus_node_id, the student chose the subject:
         only items of that node and its part_of subtree are picked, there is no warm-up, and
         the application ending is a play-along of the subtree, or none. Any node with
         material for the session can be chosen; requirements never gate it.
@@ -13154,7 +13157,8 @@ components:
           description: |
             The session's subjects, main first, shown to the student as what the session works
             on. Every item practises one of them, except the warm-up and, in Today's mix, the
-            review block: due items of other nodes, at most a fifth of the focus time or 5 items.
+            review block: due items of other nodes, at most a fifth of the focus time or 5 items,
+            right after the warm-up.
             One node, the chosen one, when focus_source is chosen.
         items:
           type: array
