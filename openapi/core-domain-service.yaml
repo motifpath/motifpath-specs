@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.44.0
+  version: 0.45.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -26,6 +26,12 @@ security:
   - BearerAuth: []
 
 paths:
+  /users/me/refund-requests:
+    $ref: './components/paths/refunds.yaml#/Requests'
+  /refund-requests/{refund_request_id}:
+    $ref: './components/paths/refunds.yaml#/Request'
+  /admin/refund-requests/{refund_request_id}/execute:
+    $ref: './components/paths/refunds.yaml#/Execute'
   /subscription-offers:
     $ref: './components/paths/subscriptions.yaml#/Offers'
   /users/me/subscriptions:

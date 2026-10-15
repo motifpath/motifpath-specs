@@ -9,6 +9,7 @@ They are not runtime test results or completion of M0. Architectural constraints
 | [Subscription lifecycle](subscription-lifecycle.feature) | Platform-wide/course/path offers, billing periods, renewal, cancellation, grace, switching, retention and independent beta readiness |
 | [Refunds and chargebacks](refunds-and-chargebacks.feature) | First subscription per scope, access-based eligibility start, admin handling, full refunds, retained records and dispute grace |
 | [Teacher commercial rights](teacher-commercial-rights.feature) | Price bounds, permanent per-path licenses, permanent purchases, withdrawal, user-pulled free updates and earnings adjustments |
+| [Refund commands](refund-commands.feature) | Caller-owned full-refund cases, admin-only execution, cross-actor payment uniqueness and pending reconciliation |
 | [Subscription commands](subscription-commands.feature) | Caller ownership, durable receipts, rollback-safe idempotency, revision conflicts and authoritative offer validation |
 
 ## Subscription API slice
@@ -47,3 +48,16 @@ No changes to CI, ignore rules or the existing learner update process are part o
 Gilson owns commercial rollout, financial reconciliation and editorial approvals. Plus is the
 first rollout priority; teacher commerce has independent readiness. Registry approval, the
 commercial Figma approval record and complete approved contracts remain required before code.
+
+## Refund API slice
+
+Core-domain OpenAPI additionally defines caller refund request creation, owner/admin case
+reads and admin-only execution of commercially eligible full refunds. Amount/currency are
+backend-derived; uncertain external outcomes remain processing. Eligibility is evaluated at
+original request time so admin delay cannot invalidate a timely request. This slice does not
+choose statutory exceptions, reject/review overrides, partial refunds, definitive-failure
+retry policy, admin queues, provider callbacks or settlement recovery mechanisms. Those remain
+contract work; none is implicitly granted by a new operation identity.
+Whether refunding a subscription also cancels future renewal requires an explicit contract;
+access removal alone is not a billing-cancellation instruction. Competing uncertain dispute
+settlements must be reconciled before another financial return is attempted.
