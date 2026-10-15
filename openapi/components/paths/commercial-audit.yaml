@@ -1,0 +1,53 @@
+Audit:
+  get:
+    operationId: listCommercialAuditEntries
+    summary: Trace commercial operations and their attempts
+    description: |
+      Require an administrator resolved from authoritative backend identity (403 otherwise).
+      Require operation_id or both resource_kind and resource_id; combine supplied filters
+      with AND. The trusted deployment determines environment; callers cannot select it.
+      An operation UUID alone is not globally unique: its trusted actor/integration,
+      action and business resource namespace remains part of the operation identity.
+      Return immutable sanitized evidence for direct and indirect commercial actions,
+      including failures, denials, duplicate attempts and uncertain external outcomes.
+      Record this read as an attributable audit access operation; that new record is
+      outside the returned snapshot. Acquisition flags do not disable authorized reads.
+      The first page fixes a snapshot and stable append order. Continuations use an
+      opaque cursor bound to that snapshot, filters, administrator and environment.
+      Concurrent appends cannot shift or duplicate entries within that traversal.
+      Unlike catalog page browsing, audit traversal must preserve a fixed evidence set.
+      Tampered, expired or mismatched cursors return 400; start a new traversal explicitly.
+      Empty results mean no matches, never audit storage failure. No mutation is exposed.
+    tags: [Commercial audit]
+    parameters:
+      - name: operation_id
+        in: query
+        description: Logical operation UUID; matches retain their complete trusted namespace.
+        schema: {type: string, format: uuid}
+      - name: resource_kind
+        in: query
+        description: Stable commercial resource category, paired with resource_id.
+        schema: {type: string, minLength: 1, maxLength: 100}
+      - name: resource_id
+        in: query
+        description: Stable business resource identity, paired with resource_kind.
+        schema: {type: string, minLength: 1, maxLength: 255}
+      - name: cursor
+        in: query
+        description: Opaque continuation; repeat the original filters and limit.
+        schema: {type: string, minLength: 1, maxLength: 4096}
+      - $ref: '../../core-domain-service.yaml#/components/parameters/Limit'
+    responses:
+      '200':
+        description: Fixed snapshot page; next_cursor is null when traversal is complete.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/commercial-audit.yaml#/AuditPage'}
+      '400': {$ref: './subscriptions.yaml#/InvalidRequest'}
+      '401': {$ref: './subscriptions.yaml#/Unauthenticated'}
+      '403':
+        description: Authoritative identity does not have administrator permission.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ForbiddenError'}
+      '503': {$ref: './subscriptions.yaml#/Unavailable'}
