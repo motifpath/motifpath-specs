@@ -64,6 +64,17 @@ MOT-114/115/116/117 and MOT-126/130 are audit, registry, design or contract gate
 runtime switches. MOT-119 implementation must preserve existing lesson rendering/update behavior;
 commercial manifests do not replace live path editing with a new publication/version process.
 
+## Audit retention and asynchronous export
+
+The recent Postgres audit table has a **30-day (720-hour) TTL from recorded_at**. A separate
+asynchronous worker wakes at least every minute, targeting verified S3 Object Lock archival
+within five minutes. Hourly cleanup deletes expired hot rows only after exact archival proof
+and hold checks. Failed export or verification retains evidence beyond TTL and raises alerts.
+Financial/idempotency records have separate lifecycles; the audit TTL cannot erase them.
+Long-term archive retention remains seven years after closure. Audit reads span both stores.
+See [the export/cleanup contract](../../openapi/commerce-contract.md#hot-audit-ttl-and-asynchronous-archival)
+and [retention scenarios](audit-archival.feature).
+
 ## Acceptance and remaining external gates
 
 The consolidated PR completes the specification surfaces for MOT-117; its review must accept

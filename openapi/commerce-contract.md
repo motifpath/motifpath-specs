@@ -211,18 +211,79 @@ Consumers use current authoritative aggregate state, not arrival time. The envel
 not an accepted POST /events learning payload or a public financial mutation API.
 
 Restrict database roles: runtime may append audit/journal and update permitted operation state;
-no application role may update/delete prior evidence. Separate audit-reader, support and migration
-roles; admin UI does not imply database superuser. Daily export chained/digested evidence checkpoints
-to separately controlled immutable storage, verify chain/checkpoint completeness on restore and
-alert on gaps. A database digest alone is not independent tamper protection. Secrets/raw payment
-credentials never enter audit evidence. Resource/action state allowlists are: content owner,
+normal application roles may not update/delete prior evidence. Separate audit-reader, exporter,
+cleanup, support and migration roles; admin UI does not imply database superuser. The narrowly
+scoped cleanup role may remove only expired, verified-archived, unheld hot audit rows under the
+rules below; it cannot rewrite evidence, remove archive objects or delete journal/identity records.
+Archive credentials are independent of the application writer and cannot bypass Object Lock.
+Verify chained/digested checkpoint completeness on restore and alert on gaps. A database digest
+alone is not independent tamper protection. Secrets/raw payment credentials never enter audit evidence. Resource/action state allowlists are: content owner,
 creator/provenance, sale state, release/offer/config references; grant scope/source/status/validity;
 subscription scope/offer/period/renewal; payment/refund amount/currency/status/provider-safe refs;
 license teacher/path/status; settlement allocation/movement/status. All other fields require
 explicit schema review; unknown sensitive fields are rejected, not blindly serialized.
 
+### Hot audit TTL and asynchronous archival
+
+**Hot audit TTL: 30 days = 720 hours from immutable server recorded_at in UTC.** It starts when
+the evidence is committed, not when a financial operation closes or when export/retry happens.
+Retries, reads and export attempts never reset it. A row is eligible for removal at
+now >= recorded_at + 720 hours, only with verified archive evidence and no retention hold.
+This TTL applies solely to full audit payload rows. It does not expire financial journals,
+payment/refund records, operation fingerprints, deduplication tombstones, grants, licenses,
+purchases, pending inbox/outbox work or archive-catalog metadata. No database-wide TTL is implied.
+
+The **asynchronous audit exporter** is a background worker consuming durable committed work:
+
+1. The business transaction atomically records mutation, immutable audit entry and export work.
+   No S3 request runs inside that transaction or on the synchronous request path. Rollback leaves
+   no exportable evidence or outgoing work. Export scheduling is independent of acquisition flags.
+2. Wake at least every 60 seconds and on available work; target completed archive verification
+   within five minutes after commit. Claim bounded batches with recoverable worker leases.
+   Persist batch identity, immutable member set/digest, counts and content checksum before upload.
+   Scope batches and object destinations by trusted environment. A batch never changes members
+   once upload is attempted. The catalog is worker metadata, not a mutable audit payload.
+3. Write compressed canonical evidence and an integrity manifest to a dedicated private S3
+   Object Lock archive. Use stable batch/object identity on retries. A timeout leaves export
+   pending until that exact object/version is reconciled; it never authorizes a different batch
+   body under the same key. Verify object version, full content checksum, exact member set/count,
+   readability and the configured lock/retention protection before committing verified status.
+   Upload acknowledgement or an ETag alone is insufficient evidence of a verified archive.
+4. A crash after upload but before local acknowledgement reconciles the same batch/object.
+   Duplicate delivery converges; entry IDs preserve evidence identity even if repair needs a
+   replacement archive object. Keep outbox work until verified status and catalog checkpoint
+   commit durably together. Failed uploads/verifications retry with bounded backoff and jitter;
+   expired worker leases resume existing work rather than abandoning a batch.
+5. Warn when the oldest committed unverified entry exceeds five minutes; alert critically after
+   15 minutes, on checksum/member/lock mismatch, or on a cleanup verification failure. Record
+   backlog count/oldest age, export latency, retries, archive integrity failures and retained
+   rows older than TTL. A long outage is observable; it cannot silently discard evidence.
+
+A separate **hourly cleanup** selects eligible expired rows in bounded batches. It must verify
+current durable catalog coverage and required archive protection before deleting. Every selected
+entry must belong to a verified immutable batch with its exact content digest. Check holds again
+inside the deletion transaction and coordinate hold placement with deletion; a concurrent hold
+must not race an unchecked purge. Skip any row lacking proof, pending export, conflicting
+checksum, unavailable archive verification or an active hold. Do not drop a whole partition
+unless every contained row meets the same rules. Under healthy archival and no holds, rows
+leave the hot table at the first successful hourly sweep after TTL (target within one hour).
+Archive outage/holds suspend deletion, not retention of the original evidence. Purge only the
+hot copy, never its permanent archive or business-effect identity. Record cleanup batch ID,
+operator, entry-set digest/count, cutoff and archive proof in new independently exported audit
+evidence. Cleanup does not recursively delete its own newly created evidence in that sweep.
+
+Long-term evidence reads must remain complete after hot deletion. The admin audit API resolves
+both stores through the same authenticated filters/snapshot fence and deduplicates by immutable
+audit_entry_id. Export or cleanup during traversal cannot omit or repeat an entry. Keep a durable
+archive catalog with batch ranges/counts, object/version/checksum and member-set digest; it must
+remain resolvable for the archive lifetime. A rebuildable search projection may accelerate reads,
+but cannot be the only evidence copy. If required archive/index data cannot be read, return
+unavailable instead of a partial or apparently empty history. Direct S3 access is not granted
+to the browser. After backup restore, reconcile catalog/object proofs before exporter/purger
+activation; replaying restored old rows must not duplicate financial effects or archive history.
+
 Proposed retention baseline for PR approval: seven years after financial/lifecycle closure for
-redacted journals, commercial evidence and financial operation fingerprints; keep active permanent
+redacted journals, archived commercial evidence and financial operation fingerprints; keep active permanent
 rights and minimal business-uniqueness tombstones for the entire obligation lifetime. Restricted,
 encrypted provider inbox payloads expire after 30 days once processed/reconciled and free of legal
 hold; unresolved cases retain required evidence under reviewed holds. Redacted operation identity
@@ -230,6 +291,9 @@ and business uniqueness must survive raw-payload deletion and retry-cache expiry
 active rights/uniqueness is permitted by a timer. Separate optional personal contact data from
 pseudonymous transaction references. Retention is an engineering proposal, not a statement of
 statutory compliance; approve jurisdictional/privacy retention before production activation.
+The long-term seven-year rule is independent of the 30-day Postgres audit TTL. Protect archived
+active obligations until closure, then retain through the approved post-closure period; extend
+locks/holds before expiry, never rely on an already-expired archive object for cleanup proof.
 
 Reconcile outstanding obligations every five minutes and active coverage daily, with durable
 paging/checkpoints, bounded rate-limit backoff and no recent-only loss of old pending work. A

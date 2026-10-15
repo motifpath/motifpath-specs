@@ -17,6 +17,10 @@ Audit:
       Concurrent appends cannot shift or duplicate entries within that traversal.
       Unlike catalog page browsing, audit traversal must preserve a fixed evidence set.
       Tampered, expired or mismatched cursors return 400; start a new traversal explicitly.
+      The snapshot spans recent Postgres evidence and its immutable archive. The hot audit
+      payload TTL is 720 hours from recorded_at; verified archival and absence of holds
+      are required before hot deletion. Export/purge cannot remove or duplicate entries
+      from a traversal. Missing archive evidence returns 503, never partial/empty success.
       Empty results mean no matches, never audit storage failure. No mutation is exposed.
     tags: [Commercial audit]
     parameters:

@@ -19,11 +19,26 @@ provider metadata would make paid access ambiguous. Provider idempotency caches 
 ## Decision
 
 MotifPath will store authoritative commercial operations, immutable accepted offers/manifests,
-payment facts, grants, license/purchase records, balanced journal entries, audit evidence and
+payment facts, grants, license/purchase records, balanced journal entries, recent audit evidence and
 outbox work in core-domain Postgres. Commit each internal state transition, its audit evidence
 and outbox messages in one database transaction. Enforce both operation-key uniqueness and
 business-effect uniqueness in durable constraints. Use optimistic revisions for human commands;
 serialize conflicting financial transitions before applying them. Progress remains worker-owned.
+
+Postgres audit payloads have a **30-day hot-retention TTL**, measured as 720 hours from the
+immutable server `recorded_at`, independently of financial closure. A separate asynchronous
+worker exports committed evidence continuously to independently controlled S3 Object Lock
+storage. Wake at least every minute; target verified archival within five minutes of commit.
+Export never runs in the business transaction or waits on the user's request. An hourly
+cleanup worker deletes expired hot rows only after exact archive membership, checksum,
+object version and required retention protection are verified, and no hold applies. Failed
+exports retain their source evidence beyond TTL and alert; TTL is never unconditional deletion.
+
+S3 is the long-term evidence store; Postgres retains only recent evidence and the durable export
+catalog needed for recovery. Financial journals, operation fingerprints, business uniqueness,
+active grants and unresolved outbox work have separate lifecycles and are not subject to this
+audit-row TTL. Audit reads combine recent and archived evidence without duplicate entries or
+pagination gaps. The detailed export/retry/purge contract is in the commercial specification.
 
 External commands execute only after durable intent exists, with a stable provider key derived
 from the trusted operation namespace. Persist outbound intent and attempt before sending. The
@@ -74,7 +89,7 @@ availability from authoritative commercial rights and makes a CMS outage surviva
 
 ### Negative / Trade-offs
 
-- Outbox/inbox, journal balancing, durable tombstones and backup recovery add operational work.
+- Outbox/inbox, asynchronous archive verification, archive-aware reads, durable tombstones and backup recovery add operational work.
 - MotifPath needs refund liquidity after seller payouts and bears unrecoverable losses.
 - Teacher activation requires real Connect/account/settlement evidence; Plus can proceed independently.
 
