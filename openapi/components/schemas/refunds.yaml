@@ -1,0 +1,101 @@
+CreateRefundRequest:
+  type: object
+  additionalProperties: false
+  description: Request a full refund of a caller-owned payment; no owner, amount or currency may be supplied.
+  required: [payment_id, reason]
+  properties:
+    payment_id:
+      type: string
+      format: uuid
+      description: Stable MotifPath identity of a successful payment owned by the caller.
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 1000
+      pattern: '\S'
+      description: Customer explanation retained with the attributable request; secrets must not be included.
+
+ExecuteRefundRequest:
+  type: object
+  additionalProperties: false
+  description: Admin request to execute an eligible full refund; authoritative payment terms determine its amount.
+  required: [expected_revision, reason]
+  properties:
+    expected_revision:
+      type: integer
+      minimum: 1
+      description: Request revision observed by the admin before issuing this command.
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 1000
+      pattern: '\S'
+      description: Admin handling reason durably recorded with the authenticated operator and operation identity.
+
+RefundRequest:
+  type: object
+  additionalProperties: false
+  description: One full-refund case per payment, preserving audit history and independent grants throughout processing.
+  required: [refund_request_id, payment_id, revision, request_operation_id, requested_at, reason, amount_minor, currency, eligibility, status]
+  properties:
+    refund_request_id:
+      type: string
+      format: uuid
+      description: Stable full-refund case identifier, unique per successful payment.
+    payment_id:
+      type: string
+      format: uuid
+      description: Authoritative MotifPath payment being refunded, never a caller-supplied provider transaction reference.
+    revision:
+      type: integer
+      minimum: 1
+      description: Increasing case revision for optimistic concurrency control.
+    request_operation_id:
+      type: string
+      format: uuid
+      description: Logical operation identity that first created this case; subsequent attempts do not replace it.
+    requested_at:
+      type: string
+      format: date-time
+      description: Original durable request-receipt time used for commercial-window evaluation, not admin handling time.
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 1000
+      description: Original customer explanation, retained unchanged when duplicate request attempts arrive.
+    amount_minor:
+      type: integer
+      minimum: 1
+      maximum: 9007199254740991
+      description: Full successful payment amount in currency minor units, with no fee deduction; MotifPath absorbs processing fees.
+    currency:
+      type: string
+      pattern: '^[A-Z]{3}$'
+      description: Original payment currency; no conversion is requested by this refund surface.
+    eligibility:
+      type: string
+      enum: [commercially_eligible, requires_review]
+      description: |
+        Commercial seven-day eligibility at requested_at: only first subscriptions per
+        learner/scope and paid teacher-path purchases qualify. Start only after payment
+        succeeds and access is available. Renewals/rejoining never reset eligibility.
+        Other cases await admin review; this enum neither decides statutory exceptions
+        nor authorizes an admin to bypass an unresolved policy.
+    status:
+      type: string
+      enum: [requested, processing, succeeded, failed]
+      description: |
+        requested does not initiate a refund. processing includes unknown provider outcomes;
+        failed requires a reconciled definitive failure. succeeded requires authoritative
+        refund confirmation and immediate removal only of this payment's access grant,
+        while retaining progress, financial records and independent valid grants.
+    execution_operation_id:
+      type: string
+      format: uuid
+      description: Durable execution identity, present once execution starts and never replaced by retries or another admin.
+  allOf:
+    - if:
+        properties:
+          status: {const: requested, description: Initial case awaiting admin handling.}
+      then: {not: {required: [execution_operation_id]}}
+      else: {required: [execution_operation_id]}
