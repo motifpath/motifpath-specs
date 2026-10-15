@@ -17,6 +17,12 @@ templates:
   - {key: "exercise:image_recognition", rung: know, item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Image recognition exercises", pt_BR: "Exercícios de reconhecimento de imagem"}, id: bfe9f72d-a2e9-5f43-a774-115b7da268f8}
   - {key: "exercise:image_choice", rung: know, item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Image choice exercises", pt_BR: "Exercícios de escolha de imagem"}, id: 2ba4103e-ce5d-554f-83a5-eba38a6ed2b6}
   - {key: "exercise:audio_selection", rung: hear, item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Sound choice exercises", pt_BR: "Exercícios de escolha de som"}, id: 49aed57b-3886-53de-b6d1-4b842acc8ab1}
+  - {key: "diatonic_chord:numeral_to_chord", rung: know, second_way: "diatonic_chord:chord_to_numeral", item_kind: diatonic_chord, response_type: generated_choice, timed: true, names: {en: "Numeral to chord", pt_BR: "Do grau ao acorde"}, id: b4a81a0e-1141-5139-a06a-6f2c7b0341ea}
+  - {key: "diatonic_chord:chord_to_numeral", rung: know, second_way: "diatonic_chord:numeral_to_chord", item_kind: diatonic_chord, response_type: generated_choice, timed: true, names: {en: "Chord to numeral", pt_BR: "Do acorde ao grau"}, id: cc7434af-9b59-5675-b90f-b340cd2ba8d3}
+  - {key: "chord_function:chord_to_function", rung: know, second_way: "chord_function:function_to_chord", item_kind: chord_function, response_type: generated_choice, timed: true, names: {en: "Chord to function", pt_BR: "Do acorde à função"}, id: a1c08e82-68e2-5d3c-8844-5a79599fc4f3}
+  - {key: "chord_function:function_to_chord", rung: know, second_way: "chord_function:chord_to_function", item_kind: chord_function, response_type: generated_choice, timed: true, names: {en: "Function to chord", pt_BR: "Da função ao acorde"}, id: b0f8fd07-9310-5b17-acb1-77070529421d}
+  - {key: "chart_progression:chart_to_numbers", rung: know, second_way: "chart_progression:numbers_to_chart", item_kind: chart_progression, response_type: generated_choice, timed: true, names: {en: "Read the chart", pt_BR: "Ler a cifra"}, id: 259ed951-c50c-5331-a2de-8475fda08106}
+  - {key: "chart_progression:numbers_to_chart", rung: know, second_way: "chart_progression:chart_to_numbers", item_kind: chart_progression, response_type: generated_choice, timed: true, names: {en: "Pick the chart", pt_BR: "Escolher a cifra"}, id: d63bfeed-3175-5b8a-a838-f543cec550ce}
 
 # Which generated fretboard cells serve which skill, per fretboard layout. A layout is
 # named by its layout instrument; instruments with the same geometry share it (guitar and
@@ -107,3 +113,9 @@ thresholds:
   - {template: "fretboard_cell:find_the_note", version: 1, effective_from: "2026-10-06", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: b4038212-bd6e-5749-8b39-cc8862e1974e}
   - {template: "diagram_shape:name_the_shape", version: 1, effective_from: "2026-10-07", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 1d23d8ce-4370-5f08-9fcb-13c617874643}
   - {template: "diagram_shape:find_the_degree", version: 1, effective_from: "2026-10-07", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 9015ea31-c12f-5cd5-a5ce-6e0c0b507644}
+  - {template: "diatonic_chord:numeral_to_chord", version: 1, effective_from: "2026-10-15", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 5c06f0e7-016c-58e2-aa16-668e7303d0ec}
+  - {template: "diatonic_chord:chord_to_numeral", version: 1, effective_from: "2026-10-15", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: bcac1e2b-b992-5cc4-b79d-84cd0443c2dd}
+  - {template: "chord_function:chord_to_function", version: 1, effective_from: "2026-10-15", fluent_net_ms: 3000, source: default, sessions: 0, students: 0, id: 0708edcd-3cc5-5b26-956b-b2b31fde84c0}
+  - {template: "chord_function:function_to_chord", version: 1, effective_from: "2026-10-15", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 13bb96a1-a854-5ffc-a40e-1f42c9228b73}
+  - {template: "chart_progression:chart_to_numbers", version: 1, effective_from: "2026-10-15", fluent_net_ms: 6000, source: default, sessions: 0, students: 0, id: 434e18dc-ee2e-532e-b748-d2980df715f0}
+  - {template: "chart_progression:numbers_to_chart", version: 1, effective_from: "2026-10-15", fluent_net_ms: 8000, source: default, sessions: 0, students: 0, id: bfcdfcb0-a479-545e-a512-f0cf53e8eace}
