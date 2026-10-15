@@ -3,7 +3,7 @@
 **Source:** ADR-049 §6 (authoring is desktop-first, with minimal responsiveness) · MOT-61 (Figma
 "Authoring", rows 1–13; decisions D1–D29, decided 2026-10-09: all A except D15 = B) · Figma row 17
 (lists after MOT-93, approved 2026-10-12) · Figma row 19 (alpha observation, MOT-8; decisions D1–D9
-of that row, approved 2026-10-14: all A) · MOT-93 (the API for lists at volume, ADR-053) · the chord-progression idea in MOT-94
+of that row, approved 2026-10-14, and D10–D12, approved 2026-10-15: all A) · MOT-93 (the API for lists at volume, ADR-053) · the chord-progression idea in MOT-94
 
 ## When
 
@@ -192,16 +192,19 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
   four `MetricTile`s (3+ sessions this week · 3+ every week so far · First path over 70% · Median
   first path) · `ChoiceChip`s All · Below 3 this week · Quiet 7+ days, each with its count, and
   `SearchField` · one `ObservationRow` per student (Expanded) or `ObservationCard` (Compact), fewest
-  sessions first. The week chip reads None yet · N to go · On target. Weekly bars sit against a
+  sessions first, 20 at a time with "Load 20 more". The chips and the search run on the server, and
+  each chip's count is the whole alpha's for the week (D11). The week chip reads None yet · N to go · On target. Weekly bars sit against a
   dashed line at 3; first-path progress has a mark at 70%. A quiet student's last activity is in
   the danger colour.
 - **Student (19b, 19f):** the same three measures (`MetricTile`s; `WeekSummary` on Compact) ·
   sessions grouped by week with a `Chip` per state (Finished · Ended early · Abandoned), saying
   only finished sessions count · the first path node by node (`PathNodeRow`). On Compact,
   Sessions · First path · Events are tabs (`SegmentedControl`).
-- **Events (19c):** the raw event log, newest first, 12 at a time with "Load 12 more" · one student
-  chip per student (never "+N more") and type chips for the five groups · event types stay as
-  their exact names in every language.
+- **Events (19c, 19g):** the raw event log, newest first, 12 at a time with "Load 12 more" · a
+  student search (type part of a name, pick one; the picked student is a removable `FilterChip`
+  after the search, which keeps a fixed width so it never moves) (D10) and type chips for the five
+  groups · each page names its students by id; someone outside the alpha reads "User 1a2b3c4d…"
+  (D12) · event types stay as their exact names in every language.
 - The rules: `features/core-domain/alpha-observation.feature`, `features/event-ingestion/read-event-log.feature`;
   the screens: `features/web/alpha-observation.feature`.
 
@@ -225,6 +228,9 @@ diagrams and hundreds of exercises, finding the right item matters as much as ed
 
 ## Spec changes this needs
 
+- **MOT-8 at scale (specified 2026-10-15):** `q`, `filter`, `limit` and `offset` on `GET
+  /admin/alpha-observation`, with `students_total` and `filter_counts`; `GET
+  /admin/alpha-observation/students` finds students of the alpha by name or by id.
 - **MOT-8 (specified 2026-10-14):** `GET /admin/alpha-observation` and `GET
   /admin/alpha-observation/students/{student_id}` in core-domain; `GET /admin/events` in event
   ingestion; each student's last activity kept by the aggregation worker
