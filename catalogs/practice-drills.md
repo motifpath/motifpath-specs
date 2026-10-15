@@ -128,6 +128,10 @@ and the progression catalog, never authored, and recalled in the head on every i
   - They roll up to the nodes of the families table, and a chart progression also to its
     progression's nodes. They suit every instrument, so a student who plays guitar and bass
     practises one set. Like fretboard cells, they are practised in the head only.
+  - **They count toward their nodes like any item, from the day they are installed.** Unseen
+    ones count as new. A node a student made accurate through lessons and exercises can
+    therefore show a lower level, and the readiness that requires it can drop, until the
+    drills are practised: the level says what is still to do.
 - **The chords** are the key's triads: major on I IV V, minor on ii iii vi, diminished on viio,
   spelled as the chord catalog spells roots. A progression's I7, IV7 and V7 are dominant
   sevenths. A chord function question asks the triad, never a seventh, which would give the
