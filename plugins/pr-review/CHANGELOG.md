@@ -1,5 +1,13 @@
 # PR Review — Changelog
 
+## [1.14.0] — 2026-10-15
+
+### Changed
+- `HEURISTICS.md` item 13 (same rule, two sides) now also asks, within one layer, whether a list
+  that offers choices and the action that carries one out find the items the same way. From the
+  review of motifpath-core#140, where the subjects list counted items under skills and concepts
+  but a chosen session searched by skill only, so a listed concept had nothing to practise.
+
 ## [1.13.0] — 2026-10-14
 
 ### Changed

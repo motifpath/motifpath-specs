@@ -131,9 +131,14 @@ plus the five always-on items.
     e.g. threshold logic duplicated in `motifpath-web` and `motifpath-core`) diverges in some
     scenario: a config read failure, a different default, a limit applied on one side only? Do
     both sides feed it the **same inputs** — or does the client check unsaved form state while the
-    server checks the saved record? — *Smell:* two defaults for the same rule, in different files;
-    a client-side filter reading the form while the request it guards is validated against what
-    was last saved.
+    server checks the saved record? The same holds within one layer for a list that **offers**
+    choices and the action that **carries one out**: do both find the items the same way, or can
+    the list offer something the action then finds nothing for? — *Smell:* two defaults for the
+    same rule, in different files; a client-side filter reading the form while the request it
+    guards is validated against what was last saved; an offer computed from one source (an index
+    over every classification) while the action queries another (one kind at a time). (From
+    core#140: the subjects list counted items classified under skills and concepts, but a chosen
+    session searched by skill only, so a listed concept had nothing to practise.)
 14. **Surface beyond the code.** Do docs, runbooks, migrations, config, and operator communication
     belong to this change? — *Smell:* new behavior with no trace outside the code.
 
