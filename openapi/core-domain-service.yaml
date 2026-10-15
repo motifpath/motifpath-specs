@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.45.0
+  version: 0.46.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -26,6 +26,12 @@ security:
   - BearerAuth: []
 
 paths:
+  /users/me/subscription-checkouts:
+    $ref: './components/paths/stripe-checkout.yaml#/Checkouts'
+  /users/me/subscription-checkouts/{checkout_id}:
+    $ref: './components/paths/stripe-checkout.yaml#/Checkout'
+  /payments/stripe/webhook:
+    $ref: './components/paths/stripe-checkout.yaml#/StripeWebhook'
   /users/me/refund-requests:
     $ref: './components/paths/refunds.yaml#/Requests'
   /refund-requests/{refund_request_id}:
@@ -6474,6 +6480,11 @@ paths:
 
 components:
   securitySchemes:
+    StripeWebhookSignature:
+      type: apiKey
+      in: header
+      name: Stripe-Signature
+      description: Stripe signature over the unmodified raw body, verified with the trusted environment endpoint secret and timestamp/replay tolerance. Never interchangeable with user bearer credentials.
     BearerAuth:
       type: http
       scheme: bearer
