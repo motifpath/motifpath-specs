@@ -329,9 +329,9 @@ MusicKey:
   type: string
   enum: [C, Db, D, Eb, E, F, F#, G, Ab, A, Bb, B]
   description: |
-    The major key a question was asked in, when its item doesn't fix one: a chart
-    progression, a heard chord, a heard progression or a guide tone. Absent for every other
-    item.
+    A major key. In a response, the key a question was asked in when its item doesn't fix one:
+    a chart progression, a heard chord, a heard progression or a guide tone; absent in a
+    response to any other item. A planned question always names its key.
 
 TimedTapsResponse:
   type: object
@@ -940,3 +940,160 @@ DiagramShapeDrill:
     How a diagram shape is asked. name_the_shape = the shape is shown without its name and the
     student picks it among its family's members; find_the_degree = the shape is shown with its
     root marked and its other positions unlabelled, and the student taps the asked degree.
+
+ChordNumeral:
+  type: string
+  enum: [I, ii, iii, IV, V, vi, viio]
+  description: |
+    A scale degree's chord in a major key, as a roman numeral: upper case for a major triad,
+    lower case for a minor one, and viio for the diminished triad on the seventh degree (vii°).
+
+ChordFunction:
+  type: string
+  enum: [tonic, subdominant, dominant]
+  description: |
+    A chord's harmonic function in a major key. tonic = I, iii and vi (at rest); subdominant =
+    ii and IV (moving away); dominant = V and viio (pulling home).
+
+GeneratedChordDrawing:
+  type: string
+  enum: [chord_boxes, chord_symbols]
+  description: |
+    How the question draws its chords, in the stimulus and in the options. chord_boxes = a
+    chord box per chord, unnamed until answered, from the voicing the plan names (guitar,
+    four-bar charts); chord_symbols = the chord symbol (bass, and every 12-bar chart). A 12-bar
+    chart is laid out in three lines of four bars.
+
+GeneratedChoiceQuestion:
+  type: object
+  description: |
+    A generated question asked among options, as the composer planned it: the way it is asked,
+    the key, what the question gives, and the options in the order they are shown. Exactly the
+    parts the way needs are present; the others are null or empty. Nothing in it marks the
+    answer, and the prompt never names it: the client shows the options as given and sends
+    back the way, the options as shown and the pick, with music_key when the item is a chart
+    progression.
+  properties:
+    way:
+      $ref: '#/GeneratedChoiceWay'
+    music_key:
+      $ref: '#/MusicKey'
+    numeral:
+      oneOf:
+        - $ref: '#/ChordNumeral'
+        - type: 'null'
+      description: The numeral asked about, for numeral_to_chord. Null for every other way.
+    chord:
+      type:
+        - string
+        - 'null'
+      pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim)?$'
+      description: |
+        The chord the question gives, as a chord symbol spelled as the chord catalog spells
+        roots (Bm, F#, Bdim), for chord_to_numeral and chord_to_function. Always one of the key's
+        triads. Null for every other way.
+    function:
+      oneOf:
+        - $ref: '#/ChordFunction'
+        - type: 'null'
+      description: The function asked for, for function_to_chord. Null for every other way.
+    progression:
+      oneOf:
+        - type: object
+          properties:
+            key:
+              type: string
+              pattern: '^[0-9A-Za-z][0-9A-Za-z-]*$'
+              description: The progression's key in the progression catalog, such as I-V-vi-IV.
+            name:
+              type: string
+              description: The progression's name in the student's language, such as "I–V–vi–IV (pop)".
+          additionalProperties: false
+          required:
+            - key
+            - name
+        - type: 'null'
+      description: The progression asked for, for numbers_to_chart. Null for every other way.
+    chart:
+      type: array
+      items:
+        type: string
+        pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+      description: |
+        The chart the question shows, one chord symbol per bar (four or twelve), for
+        chart_to_numbers. Empty for every other way.
+    drawn_as:
+      $ref: '#/GeneratedChordDrawing'
+    options:
+      type: array
+      minItems: 2
+      maxItems: 4
+      items:
+        type: object
+        properties:
+          value:
+            type: string
+            minLength: 1
+            maxLength: 120
+            description: |
+              The option as the response sends it back: a chord symbol, a numeral, a function, a
+              progression key, or a chart (its chord symbols one per bar, separated by single
+              spaces), by way.
+          name:
+            type:
+              - string
+              - 'null'
+            description: |
+              The option's name in the student's language where its value is a key: a function
+              ("Dominant — pulls home") or a progression ("I – V – vi – IV"). Null for a chord, a
+              numeral or a chart, which are shown as they are.
+          chart:
+            type: array
+            items:
+              type: string
+              pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+            description: |
+              For numbers_to_chart, the option's chart, one chord symbol per bar, drawn as
+              drawn_as says. Empty for every other way.
+        additionalProperties: false
+        required:
+          - value
+          - name
+          - chart
+      description: |
+        The options in the order to show them, already shuffled. Different from one another,
+        each a possible answer to the way, the right one among them (four, or two for a 12-bar
+        progression). Which are offered follows the drill catalog's harmony rules.
+    voicings:
+      type: array
+      items:
+        type: object
+        properties:
+          chord:
+            type: string
+            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+            description: The chord symbol, as it appears in chord, chart or the options.
+          diagram_id:
+            type: string
+            format: uuid
+            description: The chord catalog voicing's diagram the client draws as the chord's box.
+        additionalProperties: false
+        required:
+          - chord
+          - diagram_id
+      description: |
+        When drawn_as is chord_boxes, the box of every chord the question draws, one per chord
+        symbol: the chord's open voicing if the catalog has one, else its lowest-difficulty
+        voicing. Empty when drawn_as is chord_symbols.
+  additionalProperties: false
+  required:
+    - way
+    - music_key
+    - numeral
+    - chord
+    - function
+    - progression
+    - chart
+    - drawn_as
+    - options
+    - voicings
