@@ -195,27 +195,23 @@ Feature: Observe the alpha against PB-8's success metric
 
   # ── Pages, filters and search (D11) ──────────────────────────────────────
 
-  @wip
   Scenario: Students come a page at a time, in the same order
     Given the alpha has 45 students
     When "ana" observes the alpha for the week of 12 Oct 2026, 20 students at a time
     Then 20 students are listed and 45 students match
     And asking for the next 20 lists the 21st to the 40th student in the same order
 
-  @wip
   Scenario: A filter keeps only the students below the target
     Given the alpha has 7 students and 4 of them have fewer than 3 counted sessions in the week of 12 Oct 2026
     When "ana" observes the alpha for the week of 12 Oct 2026, keeping only the students below the target
     Then those 4 students are listed and 4 students match
 
-  @wip
   Scenario: Every filter's count describes the whole alpha, whatever is asked for
     Given the alpha has 7 students, 4 below the target in the week of 12 Oct 2026 and 1 quiet
     When "ana" observes the alpha for the week of 12 Oct 2026, keeping only the quiet students
     Then the filter counts are 7 in all, 4 below the target and 1 quiet
     And the cohort summary still counts all 7 students
 
-  @wip
   Scenario: Searching by name ignores case and accents
     Given "João Araújo" and "Beatriz Rocha" are students in the alpha
     When "ana" observes the alpha for the week of 12 Oct 2026, searching for "joao araujo"
@@ -223,19 +219,16 @@ Feature: Observe the alpha against PB-8's success metric
 
   # ── Students by name (D10, D12) ──────────────────────────────────────────
 
-  @wip
   Scenario: Students of the alpha are found by part of their name
     Given "Camila Duarte", "Camila Rocha" and "Beatriz Rocha" are students in the alpha
     When "ana" looks for students of the alpha named "cami"
     Then "Camila Duarte" and "Camila Rocha" are found, in that order
 
-  @wip
   Scenario: Students are named by their ids, leaving out anyone outside the alpha
     Given "tina" is a teacher who also learns
     When "ana" asks for the names of "alice" and "tina"
     Then only "alice" is named
 
-  @wip
   Scenario: Only admins may look students of the alpha up
     Given "tina" is signed in as a teacher
     When "tina" looks for students of the alpha named "a"
