@@ -83,25 +83,37 @@ Feature: Refund eligibility and disputed payment access
     When completion of "refund-1" is received again
     Then no second refund is issued and no additional grant removal is performed
 
-  Scenario: Chargeback access remains available during grace
+  Scenario: Opening a chargeback does not block otherwise valid access
     Given a dispute for Alice's payment opened on "2026-10-01T12:00:00Z"
     And that dispute remains open
     When Alice opens its restricted content on "2026-10-07T12:00:00Z"
-    Then the payment-linked access remains available during dispute grace
+    Then the otherwise valid payment-linked access remains available while the dispute awaits a final decision
 
-  Scenario: An unresolved chargeback blocks its access at grace expiry
+  Scenario: An unresolved chargeback does not block access after seven days
     Given a dispute for Alice's payment opened on "2026-10-01T12:00:00Z"
     And that dispute remains open
     When Alice opens its restricted content on "2026-10-08T12:00:00Z"
-    Then access from that disputed payment is blocked
+    Then the otherwise valid payment-linked access is not blocked because of the unresolved dispute
 
-  Scenario: Duplicate dispute notification does not extend grace
+  Scenario: Duplicate dispute notification does not cause premature blocking
     Given dispute "dispute-1" opened on "2026-10-01T12:00:00Z"
     When another notification for the same dispute arrives on "2026-10-05T12:00:00Z"
-    Then the grace deadline remains "2026-10-08T12:00:00Z"
+    And the dispute has no final decision
+    Then no duplicate financial effect or dispute-based access block occurs
 
-  Scenario: Chargeback blocking preserves an unrelated valid grant
-    Given a disputed payment's grace period has expired
+  Scenario: An unresolved dispute does not affect an unrelated valid grant
+    Given a payment dispute is awaiting a final decision
     And Alice has an independent valid grant for the same content
     When Alice opens that content
     Then the content remains accessible through the independent grant
+
+  Scenario: A pending dispute does not extend an expired subscription
+    Given Alice's paid subscription period and unpaid-renewal grace have ended
+    And its payment dispute still awaits a final decision
+    When Alice opens an unfinished lesson without an independent valid grant
+    Then the lesson remains blocked due to subscription expiry rather than the pending dispute
+
+  Scenario: A successful subscription refund does not cancel future renewals
+    Given Alice's subscription is configured to renew automatically
+    When its eligible first payment is successfully refunded
+    Then future automatic renewal remains enabled until separately cancelled
