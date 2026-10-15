@@ -24,7 +24,6 @@ Feature: Generated drill questions challenge the student
     Then the root's places are marked as the root
     And every other place of the shape is drawn the same, the 3rd's included
 
-  @wip
   Scenario: A numeral question offers only chords of the asked key
     When the diatonic chord vi in G is planned as numeral_to_chord
     Then it offers four chords, all of them chords of G major
@@ -36,36 +35,30 @@ Feature: Generated drill questions challenge the student
     Then its options include "I-vi-IV-V" and "vi-IV-I-V"
     And every option has four bars
 
-  @wip
   Scenario: The tonic is never a numeral item, since the key names its chord
     When every diatonic chord and chord function item of G major is listed
     Then there is one for each of ii, iii, IV, V, vi and viio
     And none is for I
 
-  @wip
   Scenario: A function question offers exactly one chord with the asked function
     When the chord function V in G is planned as function_to_chord
     Then it offers four chords of G major
     And "D" is the only one of them that is dominant in G
 
-  @wip
   Scenario: A chord function question gives the key's triad, never a seventh
     When the chord function V in G is planned as chord_to_function
     Then the chord it gives is "D"
     And it offers tonic, subdominant and dominant
 
-  @wip
   Scenario: A chart question offers the charts of the progression's confusables in the asked key
     When the progression "I-V-vi-IV" is planned as numbers_to_chart in G
     Then its options are the charts "G D Em C", "G Em C D", "Em C G D" and "G Em Am D"
     And the question names "I-V-vi-IV" and G, and no chart
 
-  @wip
   Scenario: A numeral question's wording never names the chord asked for
     When the diatonic chord vi in G is planned as numeral_to_chord
     Then the question names the key and the numeral, and no chord
 
-  @wip
   Scenario: A diatonic chord picked right is next asked the other way
     Given "alice" has picked the chord for vi in G correctly twice and has never named its numeral
     When the diatonic chord vi in G is picked for "alice"'s session in the head
@@ -80,13 +73,11 @@ Feature: Generated drill questions challenge the student
     Then every heard chord in the session is asked again later in the same session
     And at least three other items come between the two times it is asked
 
-  @wip
   Scenario: A chart question is asked in an easy key while the student is learning it
     Given "alice" is learning the chart progression "I-V-vi-IV"
     When it is planned for "alice"
     Then it is asked in one of C, G, D, F and A
 
-  @wip
   Scenario: New diatonic chords come key by key around the circle of fifths
     Given "alice" has never practised a diatonic chord
     When "alice" composes a session in the head whose new items include diatonic chords
@@ -104,31 +95,26 @@ Feature: Generated drill questions challenge the student
     When it is planned for "alice"
     Then the chord plays with no cadence before it
 
-  @wip
   Scenario: On bass, a numeral is answered by picking a chord symbol
     When the diatonic chord vi in G is planned as numeral_to_chord for a session that reads chords on "electric-bass"
     Then it offers four chord symbols, all of them chords of G major
     And no chord is drawn as a chord box
 
-  @wip
   Scenario: On guitar, a chord is drawn as its open voicing's box, unnamed
     When the diatonic chord vi in G is planned as numeral_to_chord for a session that reads chords on "guitar"
     Then every option is drawn as a chord box with no chord name
     And the box of "Em" is the chord catalog's open voicing of Em
 
-  @wip
   Scenario: A student who plays guitar and bass reads chord boxes on an even turn in the head
     Given "alice" has started 2 sessions in the head so far
     When "alice" composes a session in the head with diatonic chords in it
     Then every diatonic chord in the session is drawn as chord boxes
 
-  @wip
   Scenario: A student who plays guitar and bass reads chord symbols on an odd turn in the head
     Given "alice" has started 3 sessions in the head so far
     When "alice" composes a session in the head with diatonic chords in it
     Then every diatonic chord in the session is drawn as chord symbols
 
-  @wip
   Scenario: A 12-bar chart is read as chord symbols, three lines of four
     When the progression "12-bar-blues" is planned as chart_to_numbers in G for a session that reads chords on "guitar"
     Then its chart is drawn as chord symbols in three lines of four bars
