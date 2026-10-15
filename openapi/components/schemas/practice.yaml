@@ -962,7 +962,10 @@ GeneratedChordDrawing:
     How the question draws its chords, in the stimulus and in the options. chord_boxes = a
     chord box per chord, unnamed until answered, from the voicing the plan names (guitar,
     four-bar charts); chord_symbols = the chord symbol (bass, and every 12-bar chart). A 12-bar
-    chart is laid out in three lines of four bars.
+    chart is laid out in three lines of four bars. A session in the head reads chords the way
+    of the student's fretboard layout: guitar or bass, taking turns from one session in the
+    head to the next for a student who plays both, and chord symbols for a student who plays
+    neither. Every generated harmony question of a session reads them the same way.
 
 GeneratedChoiceQuestion:
   type: object

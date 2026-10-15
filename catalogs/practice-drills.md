@@ -152,6 +152,12 @@ and the progression catalog, never authored, and recalled in the head on every i
   - On bass, a chord is its chord symbol.
   - A four-bar chart is drawn as boxes on guitar and as symbols on bass. A 12-bar chart is
     drawn as symbols on every instrument, in three lines of four, as a blues is written.
+  - **Which reading a session uses:** harmony items are recalled in the head, where no
+    instrument is in hand, so a session takes its reading from the student's fretboard
+    layouts. With one of `guitar` and `electric-bass`, always that one. With both, sessions in
+    the head take turns: guitar when the student has started an even number of sessions in the
+    head so far, bass when odd, so both readings get practised. With neither, chord symbols.
+    Every harmony item of a session is drawn the same way.
 - **New items come key by key,** around the circle of fifths from C (C G F D B♭ A E♭ E A♭ B D♭
   F#). A student is offered the new numerals of a key before any of the next key.
 - **The key of a chart question** (rule 5) is picked among C G D F A while the student is new
