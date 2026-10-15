@@ -1,0 +1,75 @@
+CreateSubscriptionCheckout:
+  type: object
+  additionalProperties: false
+  description: Acquire one authoritative subscription offer; caller identity, price and return destinations are server-controlled.
+  required: [offer_id]
+  properties:
+    offer_id:
+      type: string
+      format: uuid
+      description: Current eligible monthly/annual offer revision for the requested platform, course or path scope.
+
+SubscriptionCheckout:
+  type: object
+  additionalProperties: false
+  description: Durable acquisition intent, distinct from proof of paid access; only the owning user can read it.
+  required: [checkout_id, operation_id, offer, created_at, status, fulfillment_status]
+  properties:
+    checkout_id:
+      type: string
+      format: uuid
+      description: Stable MotifPath checkout identity, independent of external session identifiers.
+    operation_id:
+      type: string
+      format: uuid
+      description: Caller operation identity retained across retries, restart and provider reconciliation.
+    offer:
+      $ref: './subscriptions.yaml#/SubscriptionOffer'
+      description: Immutable accepted offer snapshot; replays do not replace it with a later price revision.
+    created_at:
+      type: string
+      format: date-time
+      description: Time the intent and its initial attributable audit evidence were durably accepted.
+    status:
+      type: string
+      enum: [pending, ready, paid, expired, failed]
+      description: pending includes uncertain external creation; ready has a usable session; paid requires verified successful payment, not a browser return. failed requires a definitive reconciled failure.
+    fulfillment_status:
+      type: string
+      enum: [not_started, pending, applied]
+      description: Whether verified payment has produced the intended subscription-period grant; payment receipt alone is not usable access.
+    checkout_url:
+      type: string
+      format: uri
+      pattern: '^https://'
+      description: Stripe-provided session destination after confirmation, exposed only while ready; never copied from user input.
+    expires_at:
+      type: string
+      format: date-time
+      description: Confirmed external session expiry, present while ready; expiration does not prove absence of an uncertain payment.
+  allOf:
+    - if:
+        properties:
+          status: {const: ready, description: A ready session must have a destination and expiry.}
+      then: {required: [checkout_url, expires_at]}
+      else: {not: {anyOf: [{required: [checkout_url]}, {required: [expires_at]}]}}
+    - if:
+        properties:
+          status: {const: paid, description: Only verified payment may enter fulfillment.}
+      then:
+        properties:
+          fulfillment_status: {enum: [pending, applied], description: Verified payment is awaiting or has completed grant fulfillment.}
+      else:
+        properties:
+          fulfillment_status: {const: not_started, description: Unverified payment cannot grant subscription access.}
+
+StripeReceipt:
+  type: object
+  additionalProperties: false
+  description: Durable transport receipt only; no financial or entitlement completion is asserted.
+  required: [receipt_id]
+  properties:
+    receipt_id:
+      type: string
+      format: uuid
+      description: Stable internal receipt for the verified environment/account/event identity; duplicates return the existing identity.

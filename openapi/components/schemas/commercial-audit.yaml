@@ -1,0 +1,189 @@
+AuditPage:
+  type: object
+  additionalProperties: false
+  required: [items, next_cursor]
+  properties:
+    items:
+      type: array
+      maxItems: 100
+      description: Immutable entries in stable append order within the selected snapshot.
+      items: {$ref: '#/AuditEntry'}
+    next_cursor:
+      type: [string, 'null']
+      minLength: 1
+      maxLength: 4096
+      description: Opaque continuation, or null after the last page.
+
+AuditEntry:
+  type: object
+  additionalProperties: false
+  required:
+    - audit_entry_id
+    - operation_id
+    - attempt_id
+    - actor_kind
+    - actor_id
+    - environment
+    - occurred_at
+    - recorded_at
+    - action
+    - resource_kind
+    - resource_id
+    - reason
+    - outcome
+    - before_state
+    - after_state
+    - policy_revision
+    - configuration_revision
+    - correlation_id
+    - caused_by_entry_ids
+    - provider_references
+  properties:
+    audit_entry_id:
+      type: string
+      format: uuid
+      description: Globally unique server-assigned identity of this immutable evidence entry.
+    operation_id:
+      type: string
+      format: uuid
+      description: Logical operation UUID qualified by environment, trusted actor, action and resource.
+    attempt_id:
+      type: string
+      format: uuid
+      description: Server-assigned attempt identity; retries have distinct attempts within one operation.
+    actor_kind:
+      type: string
+      enum: [user, service, provider]
+      description: Trusted initiating identity category, never taken from unverified caller metadata.
+    actor_id:
+      type: string
+      minLength: 1
+      description: Authenticated user or verified service/integration identity for this operation.
+    environment:
+      type: string
+      minLength: 1
+      description: Trusted deployment identity separating financial operation namespaces.
+    occurred_at:
+      type: string
+      format: date-time
+      description: Time of the evidenced action; does not determine traversal order.
+    recorded_at:
+      type: string
+      format: date-time
+      description: Time this evidence was durably appended.
+    action:
+      type: string
+      minLength: 1
+      description: Stable domain action, such as content.price_changed or subscription.refunded.
+    resource_kind:
+      type: string
+      minLength: 1
+      maxLength: 100
+      description: Stable category of the affected business resource.
+    resource_id:
+      type: string
+      minLength: 1
+      maxLength: 255
+      description: Stable identity of the affected business resource.
+    reason:
+      type: string
+      minLength: 1
+      description: Sanitized business reason, refusal cause or automated trigger.
+    outcome:
+      type: string
+      enum: [applied, failed, denied, duplicate, uncertain]
+      description: Evidenced attempt outcome; uncertain never implies external failure or success.
+    before_state:
+      $ref: '#/CommercialState'
+    after_state:
+      $ref: '#/CommercialState'
+    policy_revision:
+      type: string
+      minLength: 1
+      description: Immutable applicable business policy revision.
+    configuration_revision:
+      type: string
+      minLength: 1
+      description: Immutable applicable commercial configuration revision.
+    correlation_id:
+      type: string
+      format: uuid
+      description: Trusted correlation identity propagated across related asynchronous operations.
+    caused_by_entry_ids:
+      type: array
+      uniqueItems: true
+      description: Preceding audit entry identities establishing causation, empty for root actions.
+      items: {type: string, format: uuid}
+    provider_references:
+      type: array
+      uniqueItems: true
+      description: Safe opaque transaction/event references; empty when no provider participated.
+      items: {type: string, minLength: 1}
+
+CommercialState:
+  type: [object, 'null']
+  description: |
+    Allowlisted commercial fields for the resource/action, including relevant version and
+    offer references. Null means no authoritative state was available (for example a denied
+    attempt before resource resolution), not a guessed empty state. Before/after evidence
+    must distinguish an unchanged attempt from an applied change. Never include secrets,
+    credentials, payment instrument data, raw provider envelopes or unrelated personal data.
+    Resource/action allowlists cover only commercial provenance/owner, sale/release/offer/config
+    references, grant scope/source/status/validity, subscription billing/renewal, safe payment/refund
+    facts, teacher/path license state and settlement allocations/movements. Unknown fields require
+    schema review rather than blind serialization.
+  additionalProperties: true
+
+AuditArchiveLocator:
+  type: object
+  additionalProperties: false
+  description: Private rebuildable locator only, not an audit payload or source of financial
+    authority; retained with its archived evidence.
+  required:
+    - environment
+    - audit_entry_id
+    - operation_id
+    - resource_kind
+    - resource_id
+    - recorded_at
+    - order_key
+    - archive_batch_id
+    - entry_sha256
+  properties:
+    environment:
+      type: string
+      minLength: 1
+      description: Trusted archive/environment namespace.
+    audit_entry_id:
+      type: string
+      format: uuid
+      description: Immutable evidence identity used for deduplication.
+    operation_id:
+      type: string
+      format: uuid
+      description: Logical UUID; lookup returns all matching qualified operations in this environment.
+    resource_kind:
+      type: string
+      minLength: 1
+      description: Opaque commercial resource category.
+    resource_id:
+      type: string
+      minLength: 1
+      description: Opaque target identity; no copied personal content.
+    recorded_at:
+      type: string
+      format: date-time
+      description: Original immutable recording instant.
+    order_key:
+      type: string
+      minLength: 1
+      description: Same durable stable order key used by hot audit traversal and snapshot fences.
+    archive_batch_id:
+      type: string
+      format: uuid
+      description: Verified batch catalog reference resolving an immutable object version and exact member
+        location.
+    entry_sha256:
+      type: string
+      pattern: ^[a-f0-9]{64}$
+      description: Checksum of this exact immutable audit entry for archive verification.

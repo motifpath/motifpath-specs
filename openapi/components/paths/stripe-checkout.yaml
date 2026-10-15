@@ -1,0 +1,133 @@
+Checkouts:
+  post:
+    operationId: createMySubscriptionCheckout
+    summary: Create a Stripe session for an authoritative subscription offer
+    description: |
+      Require server-side acquisition/cohort/prerequisite approval for a new operation.
+      Reserve a durable caller/scope intent with its offer/amount/currency and audit evidence
+      before external session creation. Configure subscription mode, the mapped customer/price
+      and return destinations on the server; no client price, owner or return URL is accepted.
+      Refuse retired/ineligible offers, an existing paid/grace subscription or another open
+      checkout for the same caller/scope with 409, even under concurrent different-key requests.
+      Same-key same-intent replay returns the original checkout before acquisition gates or
+      current-offer checks; changed intent returns 409. Unknown external creation outcomes
+      remain pending reconciliation; a retry must not create another session.
+      A 200 pending/ready result is not payment proof. No grant follows from a browser return.
+      Existing authorized obligations remain processable after acquisition switches OFF.
+    tags: [Payments]
+    parameters:
+      - $ref: '#/CheckoutIdempotencyKey'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '../schemas/stripe-checkout.yaml#/CreateSubscriptionCheckout'}
+    responses:
+      '200': {$ref: '#/CheckoutResponse'}
+      '400': {$ref: './subscriptions.yaml#/InvalidRequest'}
+      '401': {$ref: './subscriptions.yaml#/Unauthenticated'}
+      '403': {$ref: './subscriptions.yaml#/Forbidden'}
+      '404': {$ref: './subscriptions.yaml#/NotFound'}
+      '409':
+        description: Conflicting intent, stale/ineligible offer or duplicate caller/scope acquisition.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ConflictError'}
+      '503': {$ref: './subscriptions.yaml#/Unavailable'}
+
+Checkout:
+  parameters:
+    - name: checkout_id
+      in: path
+      required: true
+      description: Stable MotifPath checkout identity owned by the authenticated caller.
+      schema: {type: string, format: uuid}
+  get:
+    operationId: getMySubscriptionCheckout
+    summary: Read the caller's checkout and fulfillment status
+    description: |
+      Read only the authenticated caller's checkout; another user's checkout is 404.
+      Return stored verified state, not client return parameters. Paid and applied fulfillment
+      are distinct. This read never charges, grants or starts a new external session and
+      remains available during acquisition rollback. Grant history is not a complete current
+      access decision: refunds, period expiry and independent grants are resolved separately.
+    tags: [Payments]
+    responses:
+      '200': {$ref: '#/CheckoutResponse'}
+      '400': {$ref: './subscriptions.yaml#/InvalidRequest'}
+      '401': {$ref: './subscriptions.yaml#/Unauthenticated'}
+      '404': {$ref: './subscriptions.yaml#/NotFound'}
+      '503': {$ref: './subscriptions.yaml#/Unavailable'}
+
+StripeWebhook:
+  post:
+    operationId: receiveStripePaymentEvent
+    summary: Durably receive verified Stripe financial notifications
+    description: |
+      Stripe-signature authentication replaces bearer authentication on this endpoint.
+      Verify the unmodified raw body with the configured environment endpoint secret and
+      timestamp/replay tolerance before trusting parsed fields. Validate the expected Stripe
+      account or registered connected-account destination and test/live context; request data
+      cannot select a different account, environment or secret.
+      Persist the verified envelope/reference, receipt identity and attributable audit evidence
+      durably before 200. If persistence fails return 503 so delivery can retry. Unknown event
+      kinds/versions or unmapped objects are retained for reconciliation without granting access.
+      Scope event deduplication by environment/account/event identity. Separately enforce one
+      financial effect and grant per business payment/invoice period across distinct events.
+      Do not assume delivery order or infer paid status from checkout completion alone.
+      Retrieve/reconcile authoritative Stripe invoice/payment state against the recorded offer,
+      customer, account, currency, amount and paid period before any fulfillment.
+      Receipt remains active during acquisition rollback. Missing callbacks are recovered through
+      reconciliation of recorded operations against authoritative provider objects; replay uses
+      the same business identities. Logging an error or receiving 200 is not proof of fulfillment.
+      Do not treat provider holds/open disputes as authority to block access before final decision.
+      Target API v1 snapshot delivery at 2026-09-30.endive with a 300-second signature tolerance,
+      under the approved environment/account manifest. Unsupported versions are retained for
+      review without business effects. Pin a compatible SDK and validate the destination
+      configuration before implementation; provider envelopes are not client learning events.
+    tags: [Payments]
+    security:
+      - StripeWebhookSignature: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: true
+            description: Native Stripe financial event envelope; preserve original bytes for signature verification, then interpret only under the configured delivery version and account.
+            required: [id, type]
+            properties:
+              id:
+                type: string
+                minLength: 1
+                description: Stripe's immutable event identity, scoped by the trusted receiving environment and account.
+              type:
+                type: string
+                minLength: 1
+                description: Native provider event kind; unfamiliar values are retained for reconciliation without issuing rights.
+    responses:
+      '200':
+        description: Verified event durably received or previously received; downstream processing may still be pending.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/stripe-checkout.yaml#/StripeReceipt'}
+      '400': {$ref: './subscriptions.yaml#/InvalidRequest'}
+      '401':
+        description: Missing, invalid or stale Stripe signature; bearer credentials cannot replace it.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/UnauthorizedError'}
+      '503': {$ref: './subscriptions.yaml#/Unavailable'}
+
+CheckoutIdempotencyKey:
+  name: Idempotency-Key
+  in: header
+  required: true
+  description: UUID of one logical acquisition, scoped by trusted environment and authenticated caller/action. Fingerprint the offer intent. Retain it durably beyond provider-key retention and reconcile unknown outcomes before any resubmission.
+  schema: {type: string, format: uuid}
+CheckoutResponse:
+  description: Durable caller-owned checkout and verified payment/fulfillment progress, not a browser assertion of access.
+  content:
+    application/json:
+      schema: {$ref: '../schemas/stripe-checkout.yaml#/SubscriptionCheckout'}
