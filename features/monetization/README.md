@@ -83,3 +83,17 @@ user-pulled content updates. Primary references checked 2026-10-14:
 [Stripe session creation](https://docs.stripe.com/api/checkout/sessions/create),
 [webhook verification/delivery](https://docs.stripe.com/webhooks), and
 [subscription notifications](https://docs.stripe.com/billing/subscriptions/webhooks).
+
+## Commercial audit read slice
+
+[Commercial audit scenarios](commercial-audit.feature) and the
+[audit read API](../../openapi/components/paths/commercial-audit.yaml) define administrator
+inspection of direct and indirect commercial changes. Immutable entries preserve scoped
+operation identity, distinct attempts, trusted actors, before/after state and causal links.
+Corrections append evidence; retries do not repeat commercial effects. Snapshot cursors
+preserve a fixed evidence set while new entries arrive; catalog offset pagination remains
+unchanged. Reads themselves are attributable and exclude their new evidence from the snapshot.
+
+This is a read contract, not an audit-writing API or proof of storage integrity. Retention,
+tamper protection, durable coupling/recovery and resource-specific sanitized state allowlists
+remain implementation gates under ADR-057. No runtime or generated clients are changed.

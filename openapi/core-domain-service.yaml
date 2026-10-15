@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.46.0
+  version: 0.47.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -26,6 +26,8 @@ security:
   - BearerAuth: []
 
 paths:
+  /admin/commercial-audit:
+    $ref: './components/paths/commercial-audit.yaml#/Audit'
   /users/me/subscription-checkouts:
     $ref: './components/paths/stripe-checkout.yaml#/Checkouts'
   /users/me/subscription-checkouts/{checkout_id}:
