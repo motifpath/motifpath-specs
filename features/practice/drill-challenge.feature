@@ -37,6 +37,24 @@ Feature: Generated drill questions challenge the student
     And every option has four bars
 
   @wip
+  Scenario: A function question offers exactly one chord with the asked function
+    When the chord function V in G is planned as function_to_chord
+    Then it offers four chords of G major
+    And "D" is the only one of them that is dominant in G
+
+  @wip
+  Scenario: A chord function question gives the key's triad, never a seventh
+    When the chord function V in G is planned as chord_to_function
+    Then the chord it gives is "D"
+    And it offers tonic, subdominant and dominant
+
+  @wip
+  Scenario: A chart question offers the charts of the progression's confusables in the asked key
+    When the progression "I-V-vi-IV" is planned as numbers_to_chart in G
+    Then its options are the charts "G D Em C", "G Em C D", "Em C G D" and "G Em Am D"
+    And the question names "I-V-vi-IV" and G, and no chart
+
+  @wip
   Scenario: A numeral question's wording never names the chord asked for
     When the diatonic chord vi in G is planned as numeral_to_chord
     Then the question names the key and the numeral, and no chord
@@ -57,6 +75,18 @@ Feature: Generated drill questions challenge the student
     And at least three other items come between the two times it is asked
 
   @wip
+  Scenario: A chart question is asked in an easy key while the student is learning it
+    Given "alice" is learning the chart progression "I-V-vi-IV"
+    When it is planned for "alice"
+    Then it is asked in one of C, G, D, F and A
+
+  @wip
+  Scenario: New diatonic chords come key by key around the circle of fifths
+    Given "alice" has never practised a diatonic chord
+    When "alice" composes a session in the head whose new items include diatonic chords
+    Then every new diatonic chord in the session is in C major
+
+  @wip
   Scenario: A heard chord is played after a cadence until the student is accurate on it
     Given "alice" is learning the heard chord vi in G
     When it is planned for "alice"
@@ -69,10 +99,34 @@ Feature: Generated drill questions challenge the student
     Then the chord plays with no cadence before it
 
   @wip
-  Scenario: On bass, a numeral is answered by tapping the chord's root
-    When the diatonic chord vi in G is planned as numeral_to_chord on "electric-bass"
-    Then the student is asked to tap the root of vi in G on the bass fretboard
-    And no place on the fretboard is marked
+  Scenario: On bass, a numeral is answered by picking a chord symbol
+    When the diatonic chord vi in G is planned as numeral_to_chord for a session that reads chords on "electric-bass"
+    Then it offers four chord symbols, all of them chords of G major
+    And no chord is drawn as a chord box
+
+  @wip
+  Scenario: On guitar, a chord is drawn as its open voicing's box, unnamed
+    When the diatonic chord vi in G is planned as numeral_to_chord for a session that reads chords on "guitar"
+    Then every option is drawn as a chord box with no chord name
+    And the box of "Em" is the chord catalog's open voicing of Em
+
+  @wip
+  Scenario: A student who plays guitar and bass reads chord boxes on an even turn in the head
+    Given "alice" has started 2 sessions in the head so far
+    When "alice" composes a session in the head with diatonic chords in it
+    Then every diatonic chord in the session is drawn as chord boxes
+
+  @wip
+  Scenario: A student who plays guitar and bass reads chord symbols on an odd turn in the head
+    Given "alice" has started 3 sessions in the head so far
+    When "alice" composes a session in the head with diatonic chords in it
+    Then every diatonic chord in the session is drawn as chord symbols
+
+  @wip
+  Scenario: A 12-bar chart is read as chord symbols, three lines of four
+    When the progression "12-bar-blues" is planned as chart_to_numbers in G for a session that reads chords on "guitar"
+    Then its chart is drawn as chord symbols in three lines of four bars
+    And it offers "12-bar-blues" and "12-bar-blues-quick-change"
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
@@ -85,5 +139,5 @@ Feature: Generated drill questions challenge the student
   Scenario: An answer among options the plan didn't offer is rejected
     Given the diatonic chord vi in G was planned as numeral_to_chord with four chord options
     When "alice" answers it with a chord that was not one of the four
-    Then the answer is rejected as unknown_option
+    Then the answer is rejected as invalid_choices
     And no evidence is stored

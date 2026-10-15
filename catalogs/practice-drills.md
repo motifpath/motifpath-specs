@@ -43,7 +43,8 @@ questions are per template, never per item.
 - **Play-alongs and chord changes** have no template. They are measured in tempo and changes
   per minute, against targets that come from the music.
 - An answer's template comes from its item kind and response type (and, for exercises, the
-  exercise's type). Keys never change.
+  exercise's type; for a generated question asked among options, the way it was asked:
+  `diatonic_chord:numeral_to_chord`). Keys never change.
 
 ## Challenge rules
 
@@ -66,21 +67,22 @@ They bind generated drills only: authored exercises are their author's responsib
 whose generator can produce an invalid item is not installed: its property test runs over every
 item of the catalog, every way and every variant.
 
-## Drill families v2 (planned)
+## Drill families v2
 
 Declared by ADR-057 and built one slice at a time. The item key schemes, response types,
 graders and golden cases of every family are specified together (`PracticeItemKey` and the
 responses in the practice schemas; `golden/practice-graders/`), so each is graded alike from
 the start. Each slice then adds its templates and fluent times to `practice-drills.yaml` (with
-fixed IDs) and its generator; until then a family installs nothing. Every family has a bass version on the `electric-bass`
-layout: chord boxes become chord symbols, or the answer is the chord's root (or chord tone)
-tapped on the bass fretboard, at positions computed from the chord's formula and the tuning.
+fixed IDs) and its generator; until then a family installs nothing. The P1 harmony families
+are installed (see "Harmony drills" below). Every family has a bass version on the
+`electric-bass` layout: chord boxes become chord symbols, or the answer is a chord tone tapped
+on the bass fretboard, at positions computed from the chord's formula and the tuning.
 
 | Family (item kind) | One item is | Templates (rung) | Second way | Nodes | Slice |
 |---|---|---|---|---|---|
 | `diatonic_chord` | a numeral in a major key | `numeral_to_chord` (know): "In G, which chord is vi?", pick the chord · `chord_to_numeral` (know): a chord and a key, pick the numeral | each other | `diatonic-chords`, `roman-numerals` | P1 |
-| `chord_function` | a numeral in a major key | `chord_to_function` (know): "In D, A7 is…", pick tonic, subdominant or dominant · `function_to_chord` (know): pick a chord with the asked function | each other | `chord-function` | P1 |
-| `chart_progression` | a progression (`progressions.yaml`) | `chart_to_numbers` (know): four chords in a key, pick the progression · `numbers_to_chart` (know): a progression and a key, pick its chart | each other | `read-chord-charts`, `common-progressions` | P1 |
+| `chord_function` | a numeral in a major key | `chord_to_function` (know): "In G, D is…", pick tonic, subdominant or dominant · `function_to_chord` (know): pick a chord with the asked function | each other | `chord-function` | P1 |
+| `chart_progression` | a progression (`progressions.yaml`) | `chart_to_numbers` (know): its chart in a key, pick the progression · `numbers_to_chart` (know): a progression and a key, pick its chart | each other | `read-chord-charts`, `common-progressions` | P1 |
 | `heard_chord` | a numeral in a major key | `cadence_then_chord` (hear): a cadence sets the key, a chord plays, pick the numeral; no cadence once accurate | comes back | `hear-chord-quality`, `hear-progressions` | P2 |
 | `heard_progression` | a progression | `progression_by_number` (hear): four chords in a random key, pick the progression; confusable progressions offered | comes back | `hear-progressions`, `common-progressions` | P2 |
 | `chord_voicing` | a chord voicing (bass: a chord's root and fifth) | none, self-rated (play_clean) | — | `play-open-chords` (bass: `play-root-fifth-lines`) | P3 |
@@ -110,6 +112,58 @@ and for a find every instance's fret window.
 
 The bass versions of the harmony and ear families are the same items: only how an option is
 drawn changes (a chord symbol instead of a chord box). `play_along` keeps its key and grader.
+
+## Harmony drills
+
+`diatonic_chord`, `chord_function` and `chart_progression` are generated from the major keys
+and the progression catalog, never authored, and recalled in the head on every instrument.
+
+- **Items:**
+  - `diatonic_chord` and `chord_function`: every numeral (I ii iii IV V vi viio) in each of the
+    12 major keys, 84 items each.
+  - `chart_progression`: every progression of the progression catalog, asked in a key picked
+    each time.
+  - They roll up to the nodes of the families table, and a chart progression also to its
+    progression's nodes. They suit every instrument, so a student who plays guitar and bass
+    practises one set. Like fretboard cells, they are practised in the head only.
+- **The chords** are the key's triads: major on I IV V, minor on ii iii vi, diminished on viio,
+  spelled as the chord catalog spells roots. A progression's I7, IV7 and V7 are dominant
+  sevenths. A chord function question asks the triad, never a seventh, which would give the
+  dominant away.
+- **The options** are shuffled, four at most:
+  - numeral to chord: the answer and the three chords of the key whose numerals are nearest
+    the asked one around the scale (one step away, then two), so every option is a chord of
+    the key;
+  - chord to numeral: the answer and the three numerals nearest it;
+  - chord to function: tonic, subdominant and dominant;
+  - function to chord: one chord of the key with the asked function, and three of the key's
+    chords with other functions;
+  - read the chart and pick the chart: the progression, then its confusables, then theirs, up
+    to four, all with as many bars as the progression. The two 12-bar forms are confusable
+    only with each other, so they offer two.
+
+  A tie between equally near options is broken at random.
+- **The prompt** names the key and what the question gives (the numeral, the chord, the
+  function or the progression), never the answer.
+- **How it is drawn:**
+  - On guitar, a chord is a chord box, unnamed until answered. A chord always gets the same
+    box: its open voicing if the chord catalog has one, else its lowest-difficulty voicing,
+    the lowest fret on a tie. The plan names the voicing, so every client draws the same box.
+  - On bass, a chord is its chord symbol.
+  - A four-bar chart is drawn as boxes on guitar and as symbols on bass. A 12-bar chart is
+    drawn as symbols on every instrument, in three lines of four, as a blues is written.
+  - **Which reading a session uses:** harmony items are recalled in the head, where no
+    instrument is in hand, so a session takes its reading from the student's fretboard
+    layouts. With one of `guitar` and `electric-bass`, always that one. With both, sessions in
+    the head take turns: guitar when the student has started an even number of sessions in the
+    head so far, bass when odd, so both readings get practised. With neither, chord symbols.
+    Every harmony item of a session is drawn the same way.
+- **New items come key by key,** around the circle of fifths from C (C G F D B♭ A E♭ E A♭ B D♭
+  F#). A student is offered the new numerals of a key before any of the next key.
+- **The key of a chart question** (rule 5) is picked among C G D F A while the student is new
+  or learning on the item, and among all 12 keys from accurate on.
+- **Ways:** each family's two templates are each other's second way. With no right answers
+  yet, numeral to chord, chord to function and read the chart come first.
 
 ## Fretboard cells
 
@@ -191,8 +245,14 @@ drawn changes (a chord symbol instead of a chord box). `play_along` keeps its ke
     | `fretboard_cell:find_the_note` | 4 s |
     | `diagram_shape:name_the_shape` | 4 s |
     | `diagram_shape:find_the_degree` | 4 s |
+    | `diatonic_chord:numeral_to_chord` | 4 s |
+    | `diatonic_chord:chord_to_numeral` | 4 s |
+    | `chord_function:chord_to_function` | 3 s |
+    | `chord_function:function_to_chord` | 4 s |
+    | `chart_progression:chart_to_numbers` | 6 s |
+    | `chart_progression:numbers_to_chart` | 8 s |
 
-    The fretboard and diagram shape defaults stand in until the team benchmarks the drill,
+    The fretboard, diagram shape and harmony defaults stand in until the team benchmarks the drill,
     which needs the drill built first; the benchmark is their version 2.
 
   - or a **benchmark**, twice the team's median net time on the drill.
@@ -230,3 +290,5 @@ drawn changes (a chord symbol instead of a chord box). `play_along` keeps its ke
 - Every family matches at least one catalog diagram, every matched diagram's `{shape}` is
   one of its family's members, and no diagram belongs to two families.
 - Installing aborts if a row with a fixed ID already exists with different data.
+- Every chord a harmony item can draw on guitar (every key's triads, every progression's chords
+  in every key) has an active voicing in the chord catalog.

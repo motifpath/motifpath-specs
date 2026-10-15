@@ -513,6 +513,38 @@
       }
     },
     {
+      "name": "chart to numbers: a 12-bar chart offers the two 12-bar forms",
+      "item_key": "chart_progression:12-bar-blues-quick-change",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chart_to_numbers",
+        "music_key": "G",
+        "options": [
+          "12-bar-blues-quick-change",
+          "12-bar-blues"
+        ],
+        "choice": "12-bar-blues-quick-change",
+        "latency_ms": 5200
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 5200,
+          "answer_key": {
+            "way": "chart_to_numbers",
+            "music_key": "G",
+            "answer": "12-bar-blues-quick-change",
+            "offered": [
+              "12-bar-blues-quick-change",
+              "12-bar-blues"
+            ]
+          }
+        }
+      }
+    },
+    {
       "name": "cadence then chord: right, with the sound it played",
       "item_key": "heard_chord:vi",
       "response": {
