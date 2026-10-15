@@ -9,6 +9,16 @@ They are not runtime test results or completion of M0. Architectural constraints
 | [Subscription lifecycle](subscription-lifecycle.feature) | Platform-wide/course/path offers, billing periods, renewal, cancellation, grace, switching, retention and independent beta readiness |
 | [Refunds and chargebacks](refunds-and-chargebacks.feature) | First subscription per scope, access-based eligibility start, admin handling, full refunds, retained records and dispute grace |
 | [Teacher commercial rights](teacher-commercial-rights.feature) | Price bounds, permanent per-path licenses, permanent purchases, withdrawal, user-pulled free updates and earnings adjustments |
+| [Subscription commands](subscription-commands.feature) | Caller ownership, durable receipts, rollback-safe idempotency, revision conflicts and authoritative offer validation |
+
+## Subscription API slice
+
+[Core-domain OpenAPI](../../openapi/core-domain-service.yaml) defines proposed offer and
+caller-owned subscription reads, renewal cancellation and scheduled annual switching.
+Payloads and error/operation semantics are in its referenced subscription schemas and paths.
+The slice accepts no caller-owned price or actor field. Cancellation does not create a refund;
+pending operation receipts do not assert external billing success. Existing acquisitions,
+checkout, refund execution, grants, CMS sync and provider callbacks are separate contract work.
 
 Amounts and dates in scenarios are examples, not launch prices. Configurability does not
 authorize the browser or editorial metadata to override authoritative prices, rights or ledger
@@ -31,8 +41,8 @@ No changes to CI, ignore rules or the existing learner update process are part o
 - Withdrawal preserves purchased copies. The exact retained path reference must reconcile the
   latest-version requirement with [ADR-055](../../adrs/ADR-055-update-a-copy-to-latest.md)'s
   user-initiated updates. These scenarios preserve its eligibility and progress rules.
-- OpenAPI and commercial event contracts still need definition; neither public endpoint shapes
-  nor provider event schemas are introduced by these feature files.
+- Remaining commercial API and event contracts still need definition. The subscription API
+  slice above covers only its stated reads and lifecycle commands, not checkout or callbacks.
 
 Gilson owns commercial rollout, financial reconciliation and editorial approvals. Plus is the
 first rollout priority; teacher commerce has independent readiness. Registry approval, the
