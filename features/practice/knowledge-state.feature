@@ -84,19 +84,16 @@ Feature: Derive a student's knowledge of an item from evidence
 
   # A take's tempo is compared at effective speed: its BPM times its note value's factor
   # (quarters x1, eighths x2, triplets x3, sixteenths x4; no note value = quarters; ADR-061).
-  @wip
   Scenario: A clean take in eighths beats a faster-looking tempo in quarters
     Given "alice"'s best clean tempo on "pentatonic-run" is 110 BPM
     When "alice" rates a take of "pentatonic-run" as "clean" at 60 BPM in eighths
     Then "alice"'s best clean tempo on "pentatonic-run" is 60 BPM in eighths
 
-  @wip
   Scenario: A take in eighths that isn't clean above the best clean tempo's effective speed doesn't count
     Given "alice"'s best clean tempo on "pentatonic-run" is 110 BPM
     When "alice" rates a take of "pentatonic-run" as "struggled" at 60 BPM in eighths
     Then the take is not counted as a miss
 
-  @wip
   Scenario: A take in quarters slower than a best clean tempo in eighths is a real miss
     Given "alice"'s best clean tempo on "pentatonic-run" is 60 BPM in eighths
     When "alice" rates a take of "pentatonic-run" as "struggled" at 110 BPM

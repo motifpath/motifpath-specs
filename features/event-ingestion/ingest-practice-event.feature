@@ -38,7 +38,6 @@ Feature: Ingest practice events
     When "alice" submits a practice.item_answered event picking "Em" among "Em", "C", "Am" and "Bm" for the chord on vi in G
     Then the event is accepted and stored in the event log
 
-  @wip
   Scenario: A play-along take rated with its note value keeps it
     When "alice" submits a practice.item_answered event rating a take of a play-along "clean" at 60 BPM in eighths
     Then the event is accepted and stored in the event log
@@ -134,7 +133,6 @@ Feature: Ingest practice events
     Then the submission is rejected as invalid
     And the rejection identifies "response" as the source of the error
 
-  @wip
   Scenario: A take rated with a note value that isn't one is rejected
     When "alice" submits a practice.item_answered event rating a take of a play-along "clean" at 60 BPM in the note value "fifths"
     Then the submission is rejected as invalid
