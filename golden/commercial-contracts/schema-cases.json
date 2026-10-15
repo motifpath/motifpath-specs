@@ -1,0 +1,909 @@
+[
+  {
+    "name": "positive money",
+    "schema": "commerce.yaml#/PositiveMoney",
+    "value": {
+      "amount_minor": 100,
+      "currency": "BRL"
+    },
+    "valid": true
+  },
+  {
+    "name": "offer",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "path_purchase",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "checkout pending",
+    "schema": "commerce.yaml#/Checkout",
+    "value": {
+      "checkout_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "offer": {
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "kind": "path_purchase",
+        "content": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "release_id": "12345678-1234-4234-8234-123456789012",
+        "price": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "configuration_revision": "1",
+        "seller_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "status": "pending",
+      "fulfillment_status": "not_started"
+    },
+    "valid": true
+  },
+  {
+    "name": "configuration input",
+    "schema": "commerce.yaml#/ConfigurationInput",
+    "value": {
+      "enabled_currencies": [
+        "BRL"
+      ],
+      "teacher_minimum": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "teacher_maximum": {
+        "amount_minor": 50000,
+        "currency": "BRL"
+      },
+      "commission_basis_points": 2000,
+      "teacher_fee_basis_points": 0,
+      "reason": "Approved configuration",
+      "expected_revision": 0
+    },
+    "valid": true
+  },
+  {
+    "name": "payment",
+    "schema": "commerce.yaml#/Payment",
+    "value": {
+      "payment_id": "12345678-1234-4234-8234-123456789012",
+      "holder_id": "12345678-1234-4234-8234-123456789012",
+      "amount": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "provider_account_id": "acct_verified",
+      "provider_payment_id": "pi_verified",
+      "paid_at": "2026-10-15T12:00:00Z",
+      "access_available_at": null,
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "grant",
+    "schema": "commerce.yaml#/Grant",
+    "value": {
+      "grant_id": "12345678-1234-4234-8234-123456789012",
+      "holder_id": "12345678-1234-4234-8234-123456789012",
+      "scope": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "basis": "permanent_purchase",
+      "status": "active",
+      "source_id": "12345678-1234-4234-8234-123456789012",
+      "valid_from": "2026-10-15T12:00:00Z",
+      "valid_until": null,
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "private payment message",
+    "schema": "commercial-messages.yaml#/CommercialMessage",
+    "value": {
+      "message_id": "12345678-1234-4234-8234-123456789012",
+      "version": 1,
+      "environment": "test",
+      "operation": {
+        "operation_id": "12345678-1234-4234-8234-123456789012",
+        "actor_id": "12345678-1234-4234-8234-123456789012",
+        "action": "acquire",
+        "resource_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "correlation_id": "12345678-1234-4234-8234-123456789012",
+      "caused_by_entry_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_revision": 1,
+      "occurred_at": "2026-10-15T12:00:00Z",
+      "type": "payment.verified",
+      "payload": {
+        "payment_id": "12345678-1234-4234-8234-123456789012",
+        "holder_id": "12345678-1234-4234-8234-123456789012",
+        "amount": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "provider_account_id": "acct_verified",
+        "provider_payment_id": "pi_verified",
+        "paid_at": "2026-10-15T12:00:00Z",
+        "access_available_at": null,
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": true
+  },
+  {
+    "name": "invalid positive amount 0",
+    "schema": "commerce.yaml#/PositiveMoney",
+    "value": {
+      "amount_minor": 0,
+      "currency": "BRL"
+    },
+    "valid": false
+  },
+  {
+    "name": "invalid positive amount -1",
+    "schema": "commerce.yaml#/PositiveMoney",
+    "value": {
+      "amount_minor": -1,
+      "currency": "BRL"
+    },
+    "valid": false
+  },
+  {
+    "name": "invalid positive amount 1.5",
+    "schema": "commerce.yaml#/PositiveMoney",
+    "value": {
+      "amount_minor": 1.5,
+      "currency": "BRL"
+    },
+    "valid": false
+  },
+  {
+    "name": "invalid positive amount 9007199254740992",
+    "schema": "commerce.yaml#/PositiveMoney",
+    "value": {
+      "amount_minor": 9007199254740992,
+      "currency": "BRL"
+    },
+    "valid": false
+  },
+  {
+    "name": "bad currency",
+    "schema": "commerce.yaml#/Money",
+    "value": {
+      "amount_minor": 100,
+      "currency": "brl"
+    },
+    "valid": false
+  },
+  {
+    "name": "injected owner",
+    "schema": "commerce.yaml#/CheckoutRequest",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "owner_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "ready without URL",
+    "schema": "commerce.yaml#/Checkout",
+    "value": {
+      "checkout_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "offer": {
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "kind": "path_purchase",
+        "content": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "release_id": "12345678-1234-4234-8234-123456789012",
+        "price": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "configuration_revision": "1",
+        "seller_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "status": "ready",
+      "fulfillment_status": "not_started"
+    },
+    "valid": false
+  },
+  {
+    "name": "unpaid applied fulfillment",
+    "schema": "commerce.yaml#/Checkout",
+    "value": {
+      "checkout_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "offer": {
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "kind": "path_purchase",
+        "content": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "release_id": "12345678-1234-4234-8234-123456789012",
+        "price": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "configuration_revision": "1",
+        "seller_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "status": "pending",
+      "fulfillment_status": "applied"
+    },
+    "valid": false
+  },
+  {
+    "name": "paid pending fulfillment",
+    "schema": "commerce.yaml#/Checkout",
+    "value": {
+      "checkout_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "offer": {
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "kind": "path_purchase",
+        "content": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "release_id": "12345678-1234-4234-8234-123456789012",
+        "price": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "configuration_revision": "1",
+        "seller_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "status": "paid",
+      "fulfillment_status": "pending"
+    },
+    "valid": true
+  },
+  {
+    "name": "ready valid",
+    "schema": "commerce.yaml#/Checkout",
+    "value": {
+      "checkout_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "offer": {
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "kind": "path_purchase",
+        "content": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "release_id": "12345678-1234-4234-8234-123456789012",
+        "price": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "configuration_revision": "1",
+        "seller_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "status": "ready",
+      "fulfillment_status": "not_started",
+      "checkout_url": "https://checkout.stripe.com/example",
+      "expires_at": "2026-10-15T12:00:00Z"
+    },
+    "valid": true
+  },
+  {
+    "name": "URL on paid receipt",
+    "schema": "commerce.yaml#/Checkout",
+    "value": {
+      "checkout_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "offer": {
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "kind": "path_purchase",
+        "content": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "release_id": "12345678-1234-4234-8234-123456789012",
+        "price": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "configuration_revision": "1",
+        "seller_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "status": "paid",
+      "fulfillment_status": "applied",
+      "checkout_url": "https://checkout.stripe.com/example"
+    },
+    "valid": false
+  },
+  {
+    "name": "injected config identity",
+    "schema": "commerce.yaml#/ConfigurationInput",
+    "value": {
+      "enabled_currencies": [
+        "BRL"
+      ],
+      "teacher_minimum": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "teacher_maximum": {
+        "amount_minor": 50000,
+        "currency": "BRL"
+      },
+      "commission_basis_points": 2000,
+      "teacher_fee_basis_points": 0,
+      "reason": "Approved configuration",
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "expected_revision": 0
+    },
+    "valid": false
+  },
+  {
+    "name": "returned config identity",
+    "schema": "commerce.yaml#/Configuration",
+    "value": {
+      "enabled_currencies": [
+        "BRL"
+      ],
+      "teacher_minimum": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "teacher_maximum": {
+        "amount_minor": 50000,
+        "currency": "BRL"
+      },
+      "commission_basis_points": 2000,
+      "teacher_fee_basis_points": 0,
+      "reason": "Approved configuration",
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "revision": 1
+    },
+    "valid": true
+  },
+  {
+    "name": "commission out of range",
+    "schema": "commerce.yaml#/ConfigurationInput",
+    "value": {
+      "enabled_currencies": [
+        "BRL"
+      ],
+      "teacher_minimum": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "teacher_maximum": {
+        "amount_minor": 50000,
+        "currency": "BRL"
+      },
+      "commission_basis_points": 10001,
+      "teacher_fee_basis_points": 0,
+      "reason": "Approved configuration",
+      "expected_revision": 0
+    },
+    "valid": false
+  },
+  {
+    "name": "review with undocumented basis",
+    "schema": "commerce.yaml#/ReviewedRefund",
+    "value": {
+      "expected_revision": 1,
+      "decision": "approve_full_refund",
+      "policy_basis": "",
+      "reason": "review"
+    },
+    "valid": false
+  },
+  {
+    "name": "private wrong payload",
+    "schema": "commercial-messages.yaml#/CommercialMessage",
+    "value": {
+      "message_id": "12345678-1234-4234-8234-123456789012",
+      "version": 1,
+      "environment": "test",
+      "operation": {
+        "operation_id": "12345678-1234-4234-8234-123456789012",
+        "actor_id": "12345678-1234-4234-8234-123456789012",
+        "action": "acquire",
+        "resource_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "correlation_id": "12345678-1234-4234-8234-123456789012",
+      "caused_by_entry_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_revision": 1,
+      "occurred_at": "2026-10-15T12:00:00Z",
+      "type": "payment.verified",
+      "payload": {
+        "grant_id": "12345678-1234-4234-8234-123456789012",
+        "holder_id": "12345678-1234-4234-8234-123456789012",
+        "scope": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "basis": "permanent_purchase",
+        "status": "active",
+        "source_id": "12345678-1234-4234-8234-123456789012",
+        "valid_from": "2026-10-15T12:00:00Z",
+        "valid_until": null,
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": false
+  },
+  {
+    "name": "private unknown event",
+    "schema": "commercial-messages.yaml#/CommercialMessage",
+    "value": {
+      "message_id": "12345678-1234-4234-8234-123456789012",
+      "version": 1,
+      "environment": "test",
+      "operation": {
+        "operation_id": "12345678-1234-4234-8234-123456789012",
+        "actor_id": "12345678-1234-4234-8234-123456789012",
+        "action": "acquire",
+        "resource_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "correlation_id": "12345678-1234-4234-8234-123456789012",
+      "caused_by_entry_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_revision": 1,
+      "occurred_at": "2026-10-15T12:00:00Z",
+      "type": "lesson.started",
+      "payload": {
+        "payment_id": "12345678-1234-4234-8234-123456789012",
+        "holder_id": "12345678-1234-4234-8234-123456789012",
+        "amount": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "provider_account_id": "acct_verified",
+        "provider_payment_id": "pi_verified",
+        "paid_at": "2026-10-15T12:00:00Z",
+        "access_available_at": null,
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": false
+  },
+  {
+    "name": "private missing causation",
+    "schema": "commercial-messages.yaml#/CommercialMessage",
+    "value": {
+      "message_id": "12345678-1234-4234-8234-123456789012",
+      "version": 1,
+      "environment": "test",
+      "operation": {
+        "operation_id": "12345678-1234-4234-8234-123456789012",
+        "actor_id": "12345678-1234-4234-8234-123456789012",
+        "action": "acquire",
+        "resource_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "correlation_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_revision": 1,
+      "occurred_at": "2026-10-15T12:00:00Z",
+      "type": "payment.verified",
+      "payload": {
+        "payment_id": "12345678-1234-4234-8234-123456789012",
+        "holder_id": "12345678-1234-4234-8234-123456789012",
+        "amount": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "provider_account_id": "acct_verified",
+        "provider_payment_id": "pi_verified",
+        "paid_at": "2026-10-15T12:00:00Z",
+        "access_available_at": null,
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": false
+  },
+  {
+    "name": "private unsupported version",
+    "schema": "commercial-messages.yaml#/CommercialMessage",
+    "value": {
+      "message_id": "12345678-1234-4234-8234-123456789012",
+      "version": 2,
+      "environment": "test",
+      "operation": {
+        "operation_id": "12345678-1234-4234-8234-123456789012",
+        "actor_id": "12345678-1234-4234-8234-123456789012",
+        "action": "acquire",
+        "resource_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "correlation_id": "12345678-1234-4234-8234-123456789012",
+      "caused_by_entry_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_revision": 1,
+      "occurred_at": "2026-10-15T12:00:00Z",
+      "type": "payment.verified",
+      "payload": {
+        "payment_id": "12345678-1234-4234-8234-123456789012",
+        "holder_id": "12345678-1234-4234-8234-123456789012",
+        "amount": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "provider_account_id": "acct_verified",
+        "provider_payment_id": "pi_verified",
+        "paid_at": "2026-10-15T12:00:00Z",
+        "access_available_at": null,
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": false
+  },
+  {
+    "name": "private grant message",
+    "schema": "commercial-messages.yaml#/CommercialMessage",
+    "value": {
+      "message_id": "12345678-1234-4234-8234-123456789012",
+      "version": 1,
+      "environment": "test",
+      "operation": {
+        "operation_id": "12345678-1234-4234-8234-123456789012",
+        "actor_id": "12345678-1234-4234-8234-123456789012",
+        "action": "acquire",
+        "resource_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "correlation_id": "12345678-1234-4234-8234-123456789012",
+      "caused_by_entry_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_revision": 1,
+      "occurred_at": "2026-10-15T12:00:00Z",
+      "type": "grant.changed",
+      "payload": {
+        "grant_id": "12345678-1234-4234-8234-123456789012",
+        "holder_id": "12345678-1234-4234-8234-123456789012",
+        "scope": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "basis": "permanent_purchase",
+        "status": "active",
+        "source_id": "12345678-1234-4234-8234-123456789012",
+        "valid_from": "2026-10-15T12:00:00Z",
+        "valid_until": null,
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": true
+  },
+  {
+    "name": "license with time expiry",
+    "schema": "commerce.yaml#/License",
+    "value": {
+      "license_id": "12345678-1234-4234-8234-123456789012",
+      "teacher_id": "12345678-1234-4234-8234-123456789012",
+      "path_id": "12345678-1234-4234-8234-123456789012",
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "status": "active",
+      "payment_id": "12345678-1234-4234-8234-123456789012",
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012",
+      "expires_at": "2027-10-15T12:00:00Z"
+    },
+    "valid": false
+  },
+  {
+    "name": "active permanent grant cannot expire",
+    "schema": "commerce.yaml#/Grant",
+    "value": {
+      "grant_id": "12345678-1234-4234-8234-123456789012",
+      "holder_id": "12345678-1234-4234-8234-123456789012",
+      "scope": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "basis": "permanent_purchase",
+      "status": "active",
+      "source_id": "12345678-1234-4234-8234-123456789012",
+      "valid_from": "2026-10-15T12:00:00Z",
+      "valid_until": "2027-10-15T12:00:00Z",
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "subscription grant needs period end",
+    "schema": "commerce.yaml#/Grant",
+    "value": {
+      "grant_id": "12345678-1234-4234-8234-123456789012",
+      "holder_id": "12345678-1234-4234-8234-123456789012",
+      "scope": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "basis": "subscription_period",
+      "status": "active",
+      "source_id": "12345678-1234-4234-8234-123456789012",
+      "valid_from": "2026-10-15T12:00:00Z",
+      "valid_until": null,
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "review approval needs evidence",
+    "schema": "refunds.yaml#/RefundRequest",
+    "value": {
+      "refund_request_id": "12345678-1234-4234-8234-123456789012",
+      "payment_id": "12345678-1234-4234-8234-123456789012",
+      "revision": 2,
+      "request_operation_id": "12345678-1234-4234-8234-123456789012",
+      "requested_at": "2026-10-15T12:00:00Z",
+      "reason": "Customer request",
+      "amount_minor": 100,
+      "currency": "BRL",
+      "eligibility": "review_approved",
+      "status": "requested"
+    },
+    "valid": false
+  },
+  {
+    "name": "review approval with evidence",
+    "schema": "refunds.yaml#/RefundRequest",
+    "value": {
+      "refund_request_id": "12345678-1234-4234-8234-123456789012",
+      "payment_id": "12345678-1234-4234-8234-123456789012",
+      "revision": 2,
+      "request_operation_id": "12345678-1234-4234-8234-123456789012",
+      "requested_at": "2026-10-15T12:00:00Z",
+      "reason": "Customer request",
+      "amount_minor": 100,
+      "currency": "BRL",
+      "eligibility": "review_approved",
+      "status": "requested",
+      "review": {
+        "decision": "approve_full_refund",
+        "reviewed_at": "2026-10-15T12:00:00Z",
+        "reason": "Approved full return",
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": true
+  },
+  {
+    "name": "license acquisition without licensed manifest",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "embedding_license",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": null,
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_id": "12345678-1234-4234-8234-123456789012",
+      "licensed_teacher_id": "12345678-1234-4234-8234-123456789012",
+      "ownership_revision": 1
+    },
+    "valid": true
+  },
+  {
+    "name": "license offer must not require a sale manifest",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "embedding_license",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_id": "12345678-1234-4234-8234-123456789012",
+      "licensed_teacher_id": "12345678-1234-4234-8234-123456789012",
+      "ownership_revision": 1
+    },
+    "valid": false
+  },
+  {
+    "name": "license offer binds teacher ownership",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "embedding_license",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": null,
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_id": "12345678-1234-4234-8234-123456789012",
+      "ownership_revision": 1
+    },
+    "valid": false
+  },
+  {
+    "name": "path purchase still requires validated manifest",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "path_purchase",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": null,
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "first subscription offer explicitly observes absence",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "platform"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 4500,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "New monthly price",
+      "expected_offer_id": null
+    },
+    "valid": true
+  },
+  {
+    "name": "replacement observes original subscription offer",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "platform"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 4500,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "New monthly price",
+      "expected_offer_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "subscription price cannot omit observed offer",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "platform"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 4500,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "New monthly price"
+    },
+    "valid": false
+  },
+  {
+    "name": "subscription observed offer must be UUID or null",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "platform"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 4500,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "New monthly price",
+      "expected_offer_id": "latest"
+    },
+    "valid": false
+  },
+  {
+    "name": "issued first license binds offer not sale manifest",
+    "schema": "commerce.yaml#/License",
+    "value": {
+      "license_id": "12345678-1234-4234-8234-123456789012",
+      "teacher_id": "12345678-1234-4234-8234-123456789012",
+      "path_id": "12345678-1234-4234-8234-123456789012",
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "status": "active",
+      "payment_id": "12345678-1234-4234-8234-123456789012",
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "compact archive locator",
+    "schema": "commercial-audit.yaml#/AuditArchiveLocator",
+    "value": {
+      "environment": "test",
+      "audit_entry_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "resource_kind": "path",
+      "resource_id": "12345678-1234-4234-8234-123456789012",
+      "recorded_at": "2026-10-15T12:00:00Z",
+      "order_key": "stable-order-1",
+      "archive_batch_id": "12345678-1234-4234-8234-123456789012",
+      "entry_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "valid": true
+  },
+  {
+    "name": "archive locator requires verified batch reference",
+    "schema": "commercial-audit.yaml#/AuditArchiveLocator",
+    "value": {
+      "environment": "test",
+      "audit_entry_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "resource_kind": "path",
+      "resource_id": "12345678-1234-4234-8234-123456789012",
+      "recorded_at": "2026-10-15T12:00:00Z",
+      "order_key": "stable-order-1",
+      "entry_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "valid": false
+  },
+  {
+    "name": "archive locator excludes full evidence payload",
+    "schema": "commercial-audit.yaml#/AuditArchiveLocator",
+    "value": {
+      "environment": "test",
+      "audit_entry_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "resource_kind": "path",
+      "resource_id": "12345678-1234-4234-8234-123456789012",
+      "recorded_at": "2026-10-15T12:00:00Z",
+      "order_key": "stable-order-1",
+      "archive_batch_id": "12345678-1234-4234-8234-123456789012",
+      "entry_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "before_state": {}
+    },
+    "valid": false
+  }
+]

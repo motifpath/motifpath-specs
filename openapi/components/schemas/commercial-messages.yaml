@@ -1,0 +1,192 @@
+OperationNamespace:
+  type: object
+  description: Trusted command namespace; operation UUID alone is not globally unique.
+  additionalProperties: false
+  required:
+    - operation_id
+    - actor_id
+    - action
+    - resource_id
+  properties:
+    operation_id:
+      type: string
+      description: Durable scoped UUID.
+      format: uuid
+    actor_id:
+      type: string
+      description: Authenticated actor/integration.
+      minLength: 1
+    action:
+      type: string
+      description: Stable command action.
+      minLength: 1
+    resource_id:
+      type: string
+      description: Internal business target.
+      format: uuid
+CommercialMessage:
+  type: object
+  description: Private outbox message. Typed payload version 1, at-least-once delivery and business
+    deduplication.
+  additionalProperties: false
+  required:
+    - message_id
+    - version
+    - environment
+    - operation
+    - correlation_id
+    - caused_by_entry_id
+    - aggregate_id
+    - aggregate_revision
+    - occurred_at
+    - type
+    - payload
+  properties:
+    message_id:
+      type: string
+      description: Stable server message identity reused on retry.
+      format: uuid
+    version:
+      type: integer
+      description: Private schema version.
+      const: 1
+    environment:
+      type: string
+      description: Trusted isolated deployment.
+      minLength: 1
+    operation:
+      $ref: "#/OperationNamespace"
+      description: Original initiating operation namespace.
+    correlation_id:
+      type: string
+      description: Trusted causal chain identity.
+      format: uuid
+    caused_by_entry_id:
+      type: string
+      description: Prior audit evidence establishing cause.
+      format: uuid
+    aggregate_id:
+      type: string
+      description: Internal resource aggregate.
+      format: uuid
+    aggregate_revision:
+      type: integer
+      description: Monotonic authoritative aggregate revision.
+      minimum: 1
+    occurred_at:
+      type: string
+      description: Original occurrence time, never arrival-order authority.
+      format: date-time
+    type:
+      type: string
+      description: Private domain fact kind.
+      enum:
+        - payment.verified
+        - grant.changed
+        - purchase.fulfilled
+        - license.changed
+        - refund.confirmed
+        - dispute.resolved
+        - settlement.changed
+        - commercial_content.changed
+        - cms.sync_requested
+    payload:
+      type: object
+      description: Type-specific sanitized authoritative payload.
+  oneOf:
+    - properties:
+        type:
+          const: payment.verified
+          description: Select matching typed payload.
+        payload:
+          $ref: ./commerce.yaml#/Payment
+          description: Sanitized payment.verified payload.
+    - properties:
+        type:
+          const: grant.changed
+          description: Select matching typed payload.
+        payload:
+          $ref: ./commerce.yaml#/Grant
+          description: Sanitized grant.changed payload.
+    - properties:
+        type:
+          const: purchase.fulfilled
+          description: Select matching typed payload.
+        payload:
+          $ref: ./commerce.yaml#/Purchase
+          description: Sanitized purchase.fulfilled payload.
+    - properties:
+        type:
+          const: license.changed
+          description: Select matching typed payload.
+        payload:
+          $ref: ./commerce.yaml#/License
+          description: Sanitized license.changed payload.
+    - properties:
+        type:
+          const: refund.confirmed
+          description: Select matching typed payload.
+        payload:
+          allOf:
+            - $ref: ./refunds.yaml#/RefundRequest
+            - properties:
+                status:
+                  const: succeeded
+                  description: Only confirmed full success emits this fact.
+          description: Sanitized refund.confirmed payload.
+    - properties:
+        type:
+          const: dispute.resolved
+          description: Select matching typed payload.
+        payload:
+          $ref: "#/DisputeResult"
+          description: Sanitized dispute.resolved payload.
+    - properties:
+        type:
+          const: settlement.changed
+          description: Select matching typed payload.
+        payload:
+          $ref: ./commerce.yaml#/Settlement
+          description: Sanitized settlement.changed payload.
+    - properties:
+        type:
+          const: commercial_content.changed
+          description: Select matching typed payload.
+        payload:
+          $ref: ./commerce.yaml#/CommercialContent
+          description: Sanitized commercial_content.changed payload.
+    - properties:
+        type:
+          const: cms.sync_requested
+          description: Select matching typed payload.
+        payload:
+          $ref: ./commerce.yaml#/SyncHint
+          description: Sanitized cms.sync_requested payload.
+DisputeResult:
+  type: object
+  description: Verified final dispute identity and outcome; provider funds movement alone is insufficient.
+  additionalProperties: false
+  required:
+    - payment_id
+    - provider_dispute_id
+    - outcome
+    - resolved_at
+  properties:
+    payment_id:
+      type: string
+      description: Mapped payment.
+      format: uuid
+    provider_dispute_id:
+      type: string
+      description: Verified provider dispute identity.
+      minLength: 1
+    outcome:
+      type: string
+      description: Verified final outcome.
+      enum:
+        - won
+        - lost
+    resolved_at:
+      type: string
+      description: Authoritative final decision instant.
+      format: date-time

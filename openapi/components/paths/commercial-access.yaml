@@ -21,9 +21,9 @@ CommercialAccess:
       occurs. Every decision has an attributable evidence identity and policy revision.
       Evaluate all applicable independent rights before returning blocked. If required
       authoritative state or applicable approved policy is unavailable, return 503 rather
-      than inventing an allowed/blocked decision. A final dispute outcome cannot be
-      interpreted without its separately approved policy; independent proven rights can
-      still establish access without relying on that unresolved grant.
+      than inventing an allowed/blocked decision. A verified final won dispute preserves still-valid rights; final lost immediately ends
+      only that payment grant. No outcome restarts an expired period or revives a refunded
+      grant. Independent proven rights remain valid.
       This read is not an access token or a reusable authorization lease. Protected
       content/media delivery must independently enforce current authoritative rights;
       no public asset protection mechanism is selected here.

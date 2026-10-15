@@ -101,7 +101,7 @@ processor. No second processor or multi-provider routing is introduced by this d
 
 ## Related ADRs and primary evidence
 
-- [Commercial authority, audit and idempotency](ADR-057-commercial-authority-audit-and-idempotency.md): application invariants remain binding.
+- [Commercial authority, audit and idempotency](ADR-059-commercial-authority-audit-and-idempotency.md): application invariants remain binding.
 - [ADR-012](ADR-012-idempotency-delivery-strategy.md): delivery/reconciliation precedent; financial effects need their own uniqueness.
 - [ADR-022](ADR-022-drop-notion-project-tracking.md): research/plans remain local; this durable provider decision is versioned.
 - [Stripe Billing](https://stripe.com/br/billing/pricing), [Connect account configuration](https://docs.stripe.com/connect/accounts), [marketplace refunds/disputes](https://docs.stripe.com/connect/marketplace/tasks/refunds-disputes), [idempotency](https://docs.stripe.com/api/idempotent_requests).

@@ -74,13 +74,15 @@ RefundRequest:
       description: Original payment currency; no conversion is requested by this refund surface.
     eligibility:
       type: string
-      enum: [commercially_eligible, requires_review]
+      enum: [commercially_eligible, requires_review, review_approved]
       description: |
         Commercial seven-day eligibility at requested_at: only first subscriptions per
         learner/scope and paid teacher-path purchases qualify. Start only after payment
         succeeds and access is available. Renewals/rejoining never reset eligibility.
-        Other cases await admin review; this enum neither decides statutory exceptions
-        nor authorizes an admin to bypass an unresolved policy.
+        Other cases await audited admin review. review_approved requires a documented
+        approved policy/statutory basis and current case revision. Approval does not
+        assert financial success. Window ends inclusively 168 hours after the later
+        of verified payment success and first access availability, using UTC.
     status:
       type: string
       enum: [requested, processing, succeeded, failed]
@@ -92,10 +94,41 @@ RefundRequest:
     execution_operation_id:
       type: string
       format: uuid
-      description: Durable execution identity, present once execution starts and never replaced by retries or another admin.
+      description: Original durable execution identity, present once execution starts and never replaced; retry attempt identities append in audit history.
+    review:
+      type: object
+      additionalProperties: false
+      description: Latest explicit admin review, present after review; prior decisions remain in audit history.
+      required: [decision, reviewed_at, reason, evidence_entry_id]
+      properties:
+        decision:
+          type: string
+          enum: [approve_full_refund, decline]
+          description: Audited handling decision; approval is not financial refund completion.
+        reviewed_at:
+          type: string
+          format: date-time
+          description: Trusted review instant; never replaces original requested_at for eligibility.
+        reason:
+          type: string
+          minLength: 1
+          description: Customer-safe review explanation without confidential evidence or other users' data.
+        evidence_entry_id:
+          type: string
+          format: uuid
+          description: Immutable evidence of the handling decision and its authenticated operator.
   allOf:
     - if:
         properties:
           status: {const: requested, description: Initial case awaiting admin handling.}
       then: {not: {required: [execution_operation_id]}}
       else: {required: [execution_operation_id]}
+    - if:
+        properties:
+          eligibility: {const: review_approved, description: Reviewed eligibility requires documented approval.}
+      then:
+        required: [review]
+        properties:
+          review:
+            properties:
+              decision: {const: approve_full_refund, description: Only an explicit full-refund approval authorizes execution.}

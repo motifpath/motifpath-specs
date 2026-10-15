@@ -17,6 +17,15 @@ Audit:
       Concurrent appends cannot shift or duplicate entries within that traversal.
       Unlike catalog page browsing, audit traversal must preserve a fixed evidence set.
       Tampered, expired or mismatched cursors return 400; start a new traversal explicitly.
+      The snapshot spans recent Postgres evidence and its immutable archive. The hot audit
+      payload TTL is 720 hours from recorded_at; verified archival and absence of holds
+      are required before hot deletion. Export/purge cannot remove or duplicate entries
+      from a traversal. A mandatory environment-qualified operation/resource locator index
+      resolves archived matches in snapshot order; only matching page batches are fetched,
+      not an unbounded archive scan. Complete verified locator coverage is required before
+      hot deletion. Missing/incomplete/rebuilding historical indexes or archive evidence
+      return 503, never partial/empty success. Locator metadata follows archive retention,
+      independently of the 720-hour full-payload TTL.
       Empty results mean no matches, never audit storage failure. No mutation is exposed.
     tags: [Commercial audit]
     parameters:

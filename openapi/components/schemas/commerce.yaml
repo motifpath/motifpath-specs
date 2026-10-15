@@ -1,0 +1,1296 @@
+Money:
+  type: object
+  description: Exact original-currency money; no floating-point amounts or cross-currency netting.
+  additionalProperties: false
+  required:
+    - amount_minor
+    - currency
+  properties:
+    amount_minor:
+      type: integer
+      description: Nonnegative amount in currency minor units.
+      minimum: 0
+      maximum: 9007199254740991
+    currency:
+      type: string
+      description: Configured enabled ISO 4217 currency; a code does not enable a market.
+      pattern: ^[A-Z]{3}$
+ContentRef:
+  type: object
+  description: Existing core content identity; editorial document IDs are never authority.
+  additionalProperties: false
+  required:
+    - kind
+    - content_id
+  properties:
+    kind:
+      type: string
+      description: Existing content family.
+      enum:
+        - course
+        - path
+        - content_node
+        - exercise
+    content_id:
+      type: string
+      description: Stable core content identifier.
+      format: uuid
+Ownership:
+  type: object
+  description: Authoritative provenance retained across revisions and learner copies.
+  additionalProperties: false
+  required:
+    - content
+    - owner_kind
+    - owner_id
+    - creator_id
+    - source
+    - evidence_entry_id
+    - revision
+  properties:
+    content:
+      $ref: "#/ContentRef"
+      description: Attributed content.
+    owner_kind:
+      type: string
+      description: Commercial rights holder.
+      enum:
+        - platform
+        - teacher
+        - unresolved
+    owner_id:
+      type:
+        - string
+        - "null"
+      description: Core identity of platform steward or owning teacher.
+      format: uuid
+    creator_id:
+      type:
+        - string
+        - "null"
+      description: Known original creator; null requires explicit reviewed migration evidence.
+      format: uuid
+    source:
+      type: string
+      description: Attribution origin.
+      enum:
+        - native
+        - imported
+        - reviewed_legacy
+    evidence_entry_id:
+      type: string
+      description: Attributable ownership evidence; edits never erase prior ownership.
+      format: uuid
+    revision:
+      type: integer
+      minimum: 1
+      description: Monotonic rights-holder revision; separate from template edits or offer prices.
+  allOf:
+    - if:
+        properties:
+          owner_kind:
+            const: unresolved
+            description: Unreviewed provenance cannot establish commercial ownership.
+      then:
+        properties:
+          owner_id:
+            type: "null"
+            description: No fabricated owner for unresolved legacy attribution.
+      else:
+        properties:
+          owner_id:
+            type: string
+            format: uuid
+            description: Reviewed core rights holder.
+Release:
+  type: object
+  description: Immutable commercial manifest, not a new path publishing or learner-update process.
+  additionalProperties: false
+  required:
+    - release_id
+    - content
+    - revision
+    - manifest_sha256
+    - dependency_release_ids
+    - created_at
+    - evidence_entry_id
+    - ownership
+    - content_sha256
+    - core_version_ref
+    - dependencies
+  properties:
+    release_id:
+      type: string
+      description: Server-issued immutable commercial release identifier.
+      format: uuid
+    content:
+      $ref: "#/ContentRef"
+      description: Stable sale/license scope.
+    revision:
+      type: integer
+      description: Monotonic manifest revision for this content.
+      minimum: 1
+    manifest_sha256:
+      type: string
+      description: Digest of canonical immutable manifest including dependency and rights references.
+      pattern: ^[a-f0-9]{64}$
+    dependency_release_ids:
+      type: array
+      description: Transitive validated commercial dependency releases.
+      items:
+        type: string
+        description: Dependency commercial release.
+        format: uuid
+      uniqueItems: true
+    created_at:
+      type: string
+      description: Trusted manifest commit time.
+      format: date-time
+    evidence_entry_id:
+      type: string
+      description: Publish/validation audit evidence.
+      format: uuid
+    ownership:
+      $ref: "#/Ownership"
+      description: Immutable reviewed ownership snapshot at commercial publication.
+    content_sha256:
+      type: string
+      pattern: ^[a-f0-9]{64}$
+      description: Immutable digest of the referenced content state.
+    core_version_ref:
+      type:
+        - string
+        - "null"
+      description: Existing core version reference where one exists; null for live path content, whose
+        digest is captured.
+    dependencies:
+      type: array
+      description: Complete validated dependency records, including transitive rights evidence.
+      items:
+        $ref: "#/Dependency"
+CommercialContent:
+  type: object
+  description: Authoritative commercial state independent of editorial availability and existing copy
+    lifecycles.
+  additionalProperties: false
+  required:
+    - ownership
+    - revision
+    - sale_state
+    - release
+  properties:
+    ownership:
+      $ref: "#/Ownership"
+      description: Reviewed ownership/provenance.
+    revision:
+      type: integer
+      description: Optimistic commercial state revision.
+      minimum: 1
+    sale_state:
+      type: string
+      description: New-acquisition state; withdrawal never deletes prior grants.
+      enum:
+        - free
+        - paid
+        - withdrawn
+    release:
+      oneOf:
+        - $ref: "#/Release"
+        - type: "null"
+      description: Latest validated manifest, or null before first commercial validation.
+  allOf:
+    - if:
+        properties:
+          sale_state:
+            const: paid
+            description: Paid content needs an immutable validated commercial release.
+      then:
+        properties:
+          release:
+            $ref: "#/Release"
+            description: Required validated paid content manifest.
+Offer:
+  type: object
+  description: Immutable backend-approved one-time offer revision; configurable terms never come from
+    checkout input.
+  additionalProperties: false
+  required:
+    - offer_id
+    - kind
+    - content
+    - release_id
+    - price
+    - configuration_revision
+    - seller_id
+  properties:
+    offer_id:
+      type: string
+      description: Immutable offer revision identity.
+      format: uuid
+    kind:
+      type: string
+      description: One-time commercial product family.
+      enum:
+        - path_purchase
+        - embedding_license
+    content:
+      allOf:
+        - $ref: "#/ContentRef"
+        - properties:
+            kind:
+              const: path
+              description: One-time purchases and embedding licenses cover one path.
+      description: Only the target path covered by this one-time product.
+    release_id:
+      type:
+        - string
+        - "null"
+      description: Validated sale manifest for path_purchase; null for embedding_license, whose
+        acquisition must not depend on a pre-existing licensed sale manifest.
+      format: uuid
+    price:
+      $ref: "#/PositiveMoney"
+      description: Strictly positive configured offer price.
+    configuration_revision:
+      type: string
+      description: Approved immutable pricing/commission configuration.
+      minLength: 1
+    seller_id:
+      type: string
+      description: Authoritative seller; platform steward for a platform license.
+      format: uuid
+    licensed_teacher_id:
+      type: string
+      format: uuid
+      description: Core path-owning teacher bound to an embedding-license offer; absent for path purchases.
+    ownership_revision:
+      type: integer
+      minimum: 1
+      description: Observed authoritative path ownership revision for a license offer; content edits do
+        not require an already-licensed sale manifest.
+  allOf:
+    - if:
+        properties:
+          kind:
+            const: path_purchase
+            description: A buyer purchase requires validated redistribution rights.
+      then:
+        properties:
+          release_id:
+            type: string
+            format: uuid
+            description: Fully validated sale manifest.
+        not:
+          anyOf:
+            - required:
+                - licensed_teacher_id
+            - required:
+                - ownership_revision
+      else:
+        required:
+          - licensed_teacher_id
+          - ownership_revision
+        properties:
+          release_id:
+            type: "null"
+            description: License acquisition is independent of sale-manifest validation.
+OfferList:
+  type: object
+  description: Enabled eligible one-time offers; no offers when acquisition or valid configuration is absent.
+  additionalProperties: false
+  required:
+    - items
+  properties:
+    items:
+      type: array
+      description: Eligible revisions for the requested product and content.
+      items:
+        $ref: "#/Offer"
+        description: One-time offer.
+CheckoutRequest:
+  type: object
+  description: One acquisition intent; amounts, owner, seller and return URL are backend-controlled.
+  additionalProperties: false
+  required:
+    - offer_id
+  properties:
+    offer_id:
+      type: string
+      description: Current eligible immutable offer revision.
+      format: uuid
+Checkout:
+  type: object
+  description: One-time acquisition, not proof of access; server-managed Stripe session.
+  additionalProperties: false
+  required:
+    - checkout_id
+    - operation_id
+    - offer
+    - status
+    - fulfillment_status
+  properties:
+    checkout_id:
+      type: string
+      description: Stable internal checkout identity.
+      format: uuid
+    operation_id:
+      type: string
+      description: Durable scoped command identity.
+      format: uuid
+    offer:
+      $ref: "#/Offer"
+      description: Accepted immutable commercial terms.
+    status:
+      type: string
+      description: Unknown external outcomes remain pending until reconciliation.
+      enum:
+        - pending
+        - ready
+        - paid
+        - expired
+        - failed
+    fulfillment_status:
+      type: string
+      description: Verified payment and business uniqueness precede applied fulfillment.
+      enum:
+        - not_started
+        - pending
+        - applied
+    checkout_url:
+      type: string
+      description: Verified HTTPS Stripe destination, only while ready.
+      format: uri
+      pattern: ^https://
+    expires_at:
+      type: string
+      description: Verified Stripe session expiry, only while ready.
+      format: date-time
+  allOf:
+    - if:
+        properties:
+          status:
+            const: ready
+            description: Constraint for status.
+      then:
+        required:
+          - checkout_url
+          - expires_at
+      else:
+        not:
+          anyOf:
+            - required:
+                - checkout_url
+            - required:
+                - expires_at
+    - if:
+        properties:
+          status:
+            const: paid
+            description: Constraint for status.
+      then:
+        properties:
+          fulfillment_status:
+            enum:
+              - pending
+              - applied
+            description: Constraint for fulfillment status.
+      else:
+        properties:
+          fulfillment_status:
+            const: not_started
+            description: Constraint for fulfillment status.
+Grant:
+  type: object
+  description: Immutable grant identity with attributable lifecycle transitions; independent rights
+    never overwrite one another.
+  additionalProperties: false
+  required:
+    - grant_id
+    - holder_id
+    - scope
+    - basis
+    - status
+    - source_id
+    - valid_from
+    - valid_until
+    - evidence_entry_id
+  properties:
+    grant_id:
+      type: string
+      description: Stable entitlement identity.
+      format: uuid
+    holder_id:
+      type: string
+      description: Authoritative learner identity.
+      format: uuid
+    scope:
+      $ref: ./subscriptions.yaml#/SubscriptionScope
+      description: Coverage resolved from trusted product and learner-copy relationships.
+    basis:
+      type: string
+      description: Source of independent entitlement.
+      enum:
+        - free
+        - subscription_period
+        - permanent_purchase
+        - completed_lesson_retention
+    status:
+      type: string
+      description: Current attributable grant state.
+      enum:
+        - active
+        - ended
+    source_id:
+      type: string
+      description: Payment, free allocation or completion-retention source identity.
+      format: uuid
+    valid_from:
+      type: string
+      description: Inclusive start of this grant.
+      format: date-time
+    valid_until:
+      type:
+        - string
+        - "null"
+      description: Exclusive end; null only for untimed rights.
+      format: date-time
+    evidence_entry_id:
+      type: string
+      description: Latest state evidence; original issuance remains immutable in history.
+      format: uuid
+  allOf:
+    - if:
+        properties:
+          basis:
+            const: subscription_period
+            description: Constraint for basis.
+      then:
+        properties:
+          valid_until:
+            type: string
+            format: date-time
+            description: A subscription grant always has a finite period end.
+    - if:
+        properties:
+          basis:
+            const: permanent_purchase
+            description: Constraint for basis.
+          status:
+            const: active
+            description: Constraint for status.
+      then:
+        properties:
+          valid_until:
+            type: "null"
+            description: Active permanent rights have no time expiry.
+License:
+  type: object
+  description: Permanent per-path commercial embedding permission; student Plus is not this license.
+  additionalProperties: false
+  required:
+    - license_id
+    - teacher_id
+    - path_id
+    - offer_id
+    - status
+    - payment_id
+    - evidence_entry_id
+  properties:
+    license_id:
+      type: string
+      description: Stable teacher license identity.
+      format: uuid
+    teacher_id:
+      type: string
+      description: Licensed teacher identity.
+      format: uuid
+    path_id:
+      type: string
+      description: Only licensed path identity.
+      format: uuid
+    status:
+      type: string
+      description: State changed only by explicit attributable payment/rights policy.
+      enum:
+        - active
+        - ended
+    payment_id:
+      type: string
+      description: Successful acquisition payment.
+      format: uuid
+    evidence_entry_id:
+      type: string
+      description: Latest license evidence.
+      format: uuid
+    offer_id:
+      type: string
+      format: uuid
+      description: Immutable paid license offer, binding the teacher/path and accepted terms without
+        requiring a sale manifest.
+Purchase:
+  type: object
+  description: Permanent path acquisition independent of learner/teacher subscription; refunded
+    payment rights end separately.
+  additionalProperties: false
+  required:
+    - purchase_id
+    - holder_id
+    - path_id
+    - release_id
+    - payment_id
+    - grant_id
+    - status
+    - evidence_entry_id
+  properties:
+    purchase_id:
+      type: string
+      description: Stable purchase identity.
+      format: uuid
+    holder_id:
+      type: string
+      description: Buyer identity.
+      format: uuid
+    path_id:
+      type: string
+      description: Purchased template scope.
+      format: uuid
+    release_id:
+      type: string
+      description: Immutable accepted sale manifest.
+      format: uuid
+    payment_id:
+      type: string
+      description: Successful original payment.
+      format: uuid
+    grant_id:
+      type: string
+      description: Independent permanent grant.
+      format: uuid
+    status:
+      type: string
+      description: Payment-linked lifecycle, never delete the purchase.
+      enum:
+        - active
+        - refunded
+        - chargeback_lost
+    evidence_entry_id:
+      type: string
+      description: Latest evidence; retained learner copy follows existing update rules.
+      format: uuid
+Holding:
+  oneOf:
+    - $ref: "#/Purchase"
+      description: Permanent path purchase.
+    - $ref: "#/License"
+      description: Teacher embedding license.
+  description: One caller-owned purchase or teacher license.
+HoldingsPage:
+  type: object
+  description: Caller-owned acquisitions, including ended records, ordered by identity.
+  additionalProperties: false
+  required:
+    - items
+    - total
+    - limit
+    - offset
+  properties:
+    items:
+      type: array
+      description: Only caller-owned holdings.
+      items:
+        $ref: "#/Holding"
+        description: Purchase or license.
+    total:
+      type: integer
+      description: Total caller-owned records.
+      minimum: 0
+    limit:
+      type: integer
+      description: Requested page size.
+      minimum: 1
+      maximum: 100
+    offset:
+      type: integer
+      description: Skipped caller-owned records.
+      minimum: 0
+Command:
+  type: object
+  description: Durable receipt for an admin or owner command; pending is not external success.
+  additionalProperties: false
+  required:
+    - operation_id
+    - resource_id
+    - status
+    - evidence_entry_id
+  properties:
+    operation_id:
+      type: string
+      description: Durable scoped logical identity.
+      format: uuid
+    resource_id:
+      type: string
+      description: Stable target identity.
+      format: uuid
+    status:
+      type: string
+      description: Unknown external effects remain pending.
+      enum:
+        - pending
+        - applied
+        - failed
+    evidence_entry_id:
+      type: string
+      description: Attributable attempt evidence.
+      format: uuid
+ChangeSale:
+  type: object
+  description: Owner proposes a commercial change; core enforces rights, prices and rollout.
+  additionalProperties: false
+  required:
+    - expected_revision
+    - sale_state
+    - reason
+  properties:
+    expected_revision:
+      type: integer
+      description: Observed commercial revision.
+      minimum: 1
+    sale_state:
+      type: string
+      description: Target state; withdrawal affects only new acquisition.
+      enum:
+        - free
+        - paid
+        - withdrawn
+    reason:
+      type: string
+      description: Attributable business reason.
+      minLength: 1
+CreateOffer:
+  type: object
+  description: Authorized owner chooses terms within approved configuration; backend owns resulting
+    immutable offer.
+  additionalProperties: false
+  required:
+    - expected_revision
+    - kind
+    - price
+    - reason
+  properties:
+    expected_revision:
+      type: integer
+      description: Observed commercial content revision.
+      minimum: 1
+    kind:
+      type: string
+      description: Authorized offer family.
+      enum:
+        - path_purchase
+        - embedding_license
+    price:
+      $ref: "#/PositiveMoney"
+      description: Strictly positive configured offer price.
+    reason:
+      type: string
+      description: Attributable price-change reason.
+      minLength: 1
+Configuration:
+  type: object
+  description: Immutable platform commercial configuration; invalid or missing values disable new sales.
+  additionalProperties: false
+  required:
+    - enabled_currencies
+    - teacher_minimum
+    - teacher_maximum
+    - commission_basis_points
+    - teacher_fee_basis_points
+    - reason
+    - configuration_id
+    - revision
+  properties:
+    configuration_id:
+      type: string
+      description: Server-assigned immutable revision identity.
+      format: uuid
+      readOnly: true
+    enabled_currencies:
+      type: array
+      description: Explicitly approved merchant currencies; no implicit USD.
+      minItems: 1
+      uniqueItems: true
+      items:
+        type: string
+        description: Enabled currency code.
+        pattern: ^[A-Z]{3}$
+        enum:
+          - BRL
+    teacher_minimum:
+      $ref: "#/PositiveMoney"
+      description: Strictly positive teacher price bound.
+    teacher_maximum:
+      $ref: "#/PositiveMoney"
+      description: Strictly positive teacher price bound.
+    commission_basis_points:
+      type: integer
+      description: Platform share of gross before separately recorded fees; denominator 10000.
+      minimum: 0
+      maximum: 10000
+    teacher_fee_basis_points:
+      type: integer
+      description: Configured teacher share of actual provider sale fees; refund processing fees remain
+        MotifPath cost.
+      minimum: 0
+      maximum: 10000
+    reason:
+      type: string
+      description: Admin configuration-change reason.
+      minLength: 1
+    revision:
+      type: integer
+      minimum: 1
+      description: Monotonic environment configuration revision.
+Balance:
+  type: object
+  description: Teacher balance per currency; no cross-currency conversion or voluntary reserve.
+  additionalProperties: false
+  required:
+    - teacher_id
+    - currency
+    - available_minor
+    - pending_minor
+    - recovery_due_minor
+    - as_of
+  properties:
+    teacher_id:
+      type: string
+      description: Authenticated teacher identity.
+      format: uuid
+    currency:
+      type: string
+      description: Original accounting currency.
+      pattern: ^[A-Z]{3}$
+    available_minor:
+      type: integer
+      description: Settled earnings available after approved recovery offsets.
+      minimum: 0
+      maximum: 9007199254740991
+    pending_minor:
+      type: integer
+      description: Earned but unsettled amount.
+      minimum: 0
+      maximum: 9007199254740991
+    recovery_due_minor:
+      type: integer
+      description: Unrecovered prior teacher earnings to offset against future earnings.
+      minimum: 0
+      maximum: 9007199254740991
+    as_of:
+      type: string
+      description: Authoritative reconciliation instant.
+      format: date-time
+BalanceList:
+  type: object
+  description: Caller-only teacher balances.
+  additionalProperties: false
+  required:
+    - items
+  properties:
+    items:
+      type: array
+      description: One row per currency.
+      items:
+        $ref: "#/Balance"
+        description: Currency balance.
+SyncHint:
+  type: object
+  description: Restricted CMS notification hint; never authoritative commercial state.
+  additionalProperties: false
+  required:
+    - source_document_id
+    - event_id
+    - event_kind
+    - occurred_at
+  properties:
+    source_document_id:
+      type: string
+      description: CMS document identity mapped to a registered core content identity.
+      minLength: 1
+    event_id:
+      type: string
+      description: Adapter-generated durable notification identity.
+      format: uuid
+    event_kind:
+      type: string
+      description: Editorial change hint only.
+      enum:
+        - changed
+        - published
+        - withdrawn
+        - deleted
+    occurred_at:
+      type: string
+      description: Untrusted source time, retained as evidence rather than ordering authority.
+      format: date-time
+SyncReceipt:
+  type: object
+  description: Durable hint receipt; does not assert synchronized rights or grant access.
+  additionalProperties: false
+  required:
+    - receipt_id
+  properties:
+    receipt_id:
+      type: string
+      description: Internal environment/source/event receipt identity.
+      format: uuid
+PositiveMoney:
+  allOf:
+    - $ref: "#/Money"
+      description: Original-currency monetary terms.
+    - properties:
+        amount_minor:
+          type: integer
+          description: Strictly positive price.
+          minimum: 1
+  description: Paid price; free access is a separate grant, not a zero-value payment.
+OwnershipCommand:
+  type: object
+  description: Admin-only correction of provenance; never silently transfer an existing commercial obligation.
+  additionalProperties: false
+  required:
+    - expected_revision
+    - owner_kind
+    - owner_id
+    - reason
+  properties:
+    expected_revision:
+      type: integer
+      description: Observed commercial content revision.
+      minimum: 1
+    owner_kind:
+      type: string
+      description: Verified rights-holder category.
+      enum:
+        - platform
+        - teacher
+    owner_id:
+      type: string
+      description: Reviewed core rights holder.
+      format: uuid
+    reason:
+      type: string
+      description: Rights evidence and correction justification.
+      minLength: 1
+PublishRelease:
+  type: object
+  description: Validate and freeze the current dependency manifest without updating existing learner copies.
+  additionalProperties: false
+  required:
+    - expected_revision
+    - reason
+  properties:
+    expected_revision:
+      type: integer
+      description: Observed commercial revision.
+      minimum: 1
+    reason:
+      type: string
+      description: Attributable commercial manifest-publication reason.
+      minLength: 1
+SubscriptionOfferConfig:
+  type: object
+  description: Admin-only immutable subscription offer creation; existing subscription commands remain
+    unchanged.
+  additionalProperties: false
+  required:
+    - scope
+    - billing_period
+    - price
+    - configuration_id
+    - reason
+    - expected_offer_id
+  properties:
+    scope:
+      $ref: ./subscriptions.yaml#/SubscriptionScope
+      description: Independent platform, course or path offer scope.
+    billing_period:
+      type: string
+      description: Recurring billing interval.
+      enum:
+        - monthly
+        - annual
+    price:
+      $ref: "#/PositiveMoney"
+      description: Full interval price; annual must be discounted against twelve current monthly periods
+        for the same scope/currency.
+    configuration_id:
+      type: string
+      description: Current approved commercial configuration.
+      format: uuid
+    reason:
+      type: string
+      description: Price-change justification. Applies to existing subscriptions only at next renewal.
+      minLength: 1
+    expected_offer_id:
+      type:
+        - string
+        - "null"
+      format: uuid
+      description: Current promoted offer ID observed for this exact scope, period and currency; null only
+        if none exists. Compare and promote atomically; mismatches return conflict.
+ReviewedRefund:
+  type: object
+  description: Audited admin eligibility review; approval never proves an external refund succeeded.
+  additionalProperties: false
+  required:
+    - expected_revision
+    - decision
+    - policy_basis
+    - reason
+  properties:
+    expected_revision:
+      type: integer
+      description: Observed refund-case revision.
+      minimum: 1
+    decision:
+      type: string
+      description: Explicit review disposition.
+      enum:
+        - approve_full_refund
+        - decline
+    policy_basis:
+      type: string
+      description: Applicable approved policy or documented statutory determination.
+      minLength: 1
+    reason:
+      type: string
+      description: Attributable review evidence; do not place sensitive documents in public fields.
+      minLength: 1
+Settlement:
+  type: object
+  description: Attributable settlement obligation and provider movement evidence; transfer and bank
+    payout are distinct.
+  additionalProperties: false
+  required:
+    - settlement_id
+    - teacher_id
+    - amount
+    - status
+    - sale_payment_ids
+    - evidence_entry_id
+  properties:
+    settlement_id:
+      type: string
+      description: Internal obligation identity.
+      format: uuid
+    teacher_id:
+      type: string
+      description: Beneficiary core teacher identity.
+      format: uuid
+    amount:
+      $ref: "#/Money"
+      description: Currency-specific amount after approved commission/fees/recovery.
+    status:
+      type: string
+      description: Unknown external transfer/payout outcomes remain pending.
+      enum:
+        - pending
+        - transferred
+        - paid_out
+        - failed
+    sale_payment_ids:
+      type: array
+      description: Exactly identified source sale payments; each allocated earning is reserved once.
+      minItems: 1
+      uniqueItems: true
+      items:
+        type: string
+        description: Original sale payment.
+        format: uuid
+    evidence_entry_id:
+      type: string
+      description: Latest obligation evidence.
+      format: uuid
+SettlementPage:
+  type: object
+  description: Teacher-owned settlement history ordered by stable settlement identity.
+  additionalProperties: false
+  required:
+    - items
+    - total
+    - limit
+    - offset
+  properties:
+    items:
+      type: array
+      description: Caller settlement records.
+      items:
+        $ref: "#/Settlement"
+        description: Settlement obligation.
+    total:
+      type: integer
+      description: Matching records.
+      minimum: 0
+    limit:
+      type: integer
+      description: Requested page size.
+      minimum: 1
+      maximum: 100
+    offset:
+      type: integer
+      description: Skipped records.
+      minimum: 0
+Payment:
+  type: object
+  description: Immutable successful payment facts with append-only financial corrections.
+  additionalProperties: false
+  required:
+    - payment_id
+    - holder_id
+    - amount
+    - provider_account_id
+    - provider_payment_id
+    - paid_at
+    - access_available_at
+    - offer_id
+    - evidence_entry_id
+  properties:
+    payment_id:
+      type: string
+      description: Internal payment identity distinct from checkout/session.
+      format: uuid
+    holder_id:
+      type: string
+      description: Backend-correlated customer.
+      format: uuid
+    amount:
+      $ref: "#/PositiveMoney"
+      description: Confirmed captured amount in original currency.
+    provider_account_id:
+      type: string
+      description: Safe verified account reference.
+      minLength: 1
+    provider_payment_id:
+      type: string
+      description: Immutable verified payment fact; uniqueness also includes trusted environment/account.
+      minLength: 1
+    paid_at:
+      type: string
+      description: Authoritative payment-success time.
+      format: date-time
+    access_available_at:
+      type:
+        - string
+        - "null"
+      description: First usable access availability; null before fulfillment, never guessed from receipt.
+      format: date-time
+    offer_id:
+      type: string
+      description: Accepted immutable offer.
+      format: uuid
+    evidence_entry_id:
+      type: string
+      description: Original payment verification evidence.
+      format: uuid
+JournalLine:
+  type: object
+  description: One exact posting; a journal balances separately for each currency.
+  additionalProperties: false
+  required:
+    - account
+    - side
+    - amount
+    - party_id
+  properties:
+    account:
+      type: string
+      description: Commercial account category.
+      enum:
+        - provider_clearing
+        - customer_refund
+        - platform_commission
+        - provider_fees
+        - teacher_earnings
+        - teacher_recovery
+        - transfer_clearing
+        - bank_payout
+        - platform_loss
+    side:
+      type: string
+      description: Posting direction.
+      enum:
+        - debit
+        - credit
+    amount:
+      $ref: "#/PositiveMoney"
+      description: Strictly positive original-currency amount.
+    party_id:
+      type: string
+      description: Core beneficiary or platform account identity.
+      format: uuid
+Journal:
+  type: object
+  description: Immutable balanced posting set; balance/effect uniqueness validated transactionally.
+  additionalProperties: false
+  required:
+    - journal_id
+    - source_id
+    - source_action
+    - lines
+    - occurred_at
+    - evidence_entry_id
+  properties:
+    journal_id:
+      type: string
+      description: Server-assigned immutable identity.
+      format: uuid
+    source_id:
+      type: string
+      description: Internal source financial/business fact; unique with source action and environment.
+      format: uuid
+    source_action:
+      type: string
+      description: Stable business action distinguishing sale/refund/transfer/recovery postings.
+      minLength: 1
+    lines:
+      type: array
+      description: At least two postings; sum debits equals credits per currency.
+      minItems: 2
+      items:
+        $ref: "#/JournalLine"
+        description: Journal posting.
+    occurred_at:
+      type: string
+      description: Trusted financial occurrence instant.
+      format: date-time
+    evidence_entry_id:
+      type: string
+      description: Audit evidence linked in same commit.
+      format: uuid
+ConfigurationInput:
+  type: object
+  description: Immutable platform commercial configuration; invalid or missing values disable new sales.
+  additionalProperties: false
+  required:
+    - enabled_currencies
+    - teacher_minimum
+    - teacher_maximum
+    - commission_basis_points
+    - teacher_fee_basis_points
+    - reason
+    - expected_revision
+  properties:
+    enabled_currencies:
+      type: array
+      description: Explicitly approved merchant currencies; no implicit USD.
+      minItems: 1
+      uniqueItems: true
+      items:
+        type: string
+        description: Enabled currency code.
+        pattern: ^[A-Z]{3}$
+        enum:
+          - BRL
+    teacher_minimum:
+      $ref: "#/PositiveMoney"
+      description: Strictly positive teacher price bound.
+    teacher_maximum:
+      $ref: "#/PositiveMoney"
+      description: Strictly positive teacher price bound.
+    commission_basis_points:
+      type: integer
+      description: Platform share of gross before separately recorded fees; denominator 10000.
+      minimum: 0
+      maximum: 10000
+    teacher_fee_basis_points:
+      type: integer
+      description: Configured teacher share of actual provider sale fees; refund processing fees remain
+        MotifPath cost.
+      minimum: 0
+      maximum: 10000
+    reason:
+      type: string
+      description: Admin configuration-change reason.
+      minLength: 1
+    expected_revision:
+      type: integer
+      minimum: 0
+      description: Current configuration revision; zero only before first configuration.
+Dependency:
+  type: object
+  additionalProperties: false
+  description: Exact transitive commercial dependency and its validated redistribution permission.
+  required:
+    - content
+    - content_sha256
+    - release_id
+    - permission
+    - evidence_entry_id
+  properties:
+    content:
+      $ref: "#/ContentRef"
+      description: Referenced core resource.
+    content_sha256:
+      type: string
+      pattern: ^[a-f0-9]{64}$
+      description: Immutable referenced content digest.
+    release_id:
+      type: string
+      format: uuid
+      description: Referenced immutable commercial manifest.
+    permission:
+      type: string
+      enum:
+        - own
+        - free_reuse
+        - premium_license
+      description: Reviewed permission; free display alone is not free redistribution.
+    license_id:
+      type: string
+      format: uuid
+      description: Owning teacher/path license, required only for premium_license.
+    evidence_entry_id:
+      type: string
+      format: uuid
+      description: Validated ownership/reuse/license evidence.
+  allOf:
+    - if:
+        properties:
+          permission:
+            const: premium_license
+            description: Platform premium embedding requires the owning teacher/path license.
+      then:
+        required:
+          - license_id
+      else:
+        not:
+          required:
+            - license_id
+PaymentPage:
+  type: object
+  additionalProperties: false
+  description: Caller-owned verified successful payments, ordered by payment identity; available
+    during rollback.
+  required:
+    - items
+    - total
+    - limit
+    - offset
+  properties:
+    items:
+      type: array
+      description: Only successful payments owned by the authenticated caller.
+      items:
+        $ref: "#/Payment"
+    total:
+      type: integer
+      minimum: 0
+      description: Total matching payments.
+    limit:
+      type: integer
+      minimum: 1
+      maximum: 100
+      description: Requested page size.
+    offset:
+      type: integer
+      minimum: 0
+      description: Skipped records.

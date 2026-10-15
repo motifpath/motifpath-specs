@@ -2,7 +2,7 @@
 Feature: Subscription scope and paid-period lifecycle
   Platform-wide and content-specific subscriptions have independently configured offers.
   Cancellation preserves paid-period access; commercial expiry preserves learning history.
-  # MOT-117; ADR-057. Provider and exact monetary values are not selected here.
+  # MOT-117; ADR-059. Stripe is selected; monetary values are configured through approved offer revisions.
 
   Scenario: Configure prices independently for each subscription scope
     Given the monthly platform-wide offer costs 40 BRL

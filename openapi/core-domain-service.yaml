@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.48.0
+  version: 0.49.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -26,6 +26,44 @@ security:
   - BearerAuth: []
 
 paths:
+  /admin/commercial-configurations/current:
+    $ref: './components/paths/commerce.yaml#/CurrentConfiguration'
+  /users/me/payments:
+    $ref: './components/paths/commerce.yaml#/Payments'
+  /commercial-releases/{release_id}:
+    $ref: './components/paths/commerce.yaml#/HistoricalRelease'
+  /admin/refund-requests/{refund_request_id}/retry:
+    $ref: './components/paths/commerce.yaml#/RetryRefund'
+  /commercial-content/{content_kind}/{content_id}/ownership:
+    $ref: './components/paths/commerce.yaml#/Ownership'
+  /commercial-content/{content_kind}/{content_id}/releases:
+    $ref: './components/paths/commerce.yaml#/Release'
+  /admin/subscription-offers:
+    $ref: './components/paths/commerce.yaml#/SubscriptionOfferConfig'
+  /admin/refund-requests/{refund_request_id}/review:
+    $ref: './components/paths/commerce.yaml#/ReviewRefund'
+  /teachers/me/commercial-settlements:
+    $ref: './components/paths/commerce.yaml#/Settlements'
+  /commercial-content/{content_kind}/{content_id}:
+    $ref: './components/paths/commerce.yaml#/Content'
+  /commercial-content/{content_kind}/{content_id}/sale-state:
+    $ref: './components/paths/commerce.yaml#/Sale'
+  /commercial-content/{content_kind}/{content_id}/offers:
+    $ref: './components/paths/commerce.yaml#/Publish'
+  /commercial-offers:
+    $ref: './components/paths/commerce.yaml#/Offers'
+  /users/me/commercial-checkouts:
+    $ref: './components/paths/commerce.yaml#/Checkouts'
+  /users/me/commercial-checkouts/{checkout_id}:
+    $ref: './components/paths/commerce.yaml#/Checkout'
+  /users/me/commercial-holdings:
+    $ref: './components/paths/commerce.yaml#/Holdings'
+  /teachers/me/commercial-balances:
+    $ref: './components/paths/commerce.yaml#/Balances'
+  /admin/commercial-configurations:
+    $ref: './components/paths/commerce.yaml#/Configuration'
+  /integrations/cms/commercial-hints:
+    $ref: './components/paths/commerce.yaml#/CMS'
   /students/me/student-paths/{student_path_id}/content-nodes/{content_node_id}/commercial-access:
     $ref: './components/paths/commercial-access.yaml#/CommercialAccess'
   /admin/commercial-audit:
@@ -6484,6 +6522,10 @@ paths:
 
 components:
   securitySchemes:
+    CMSAdapterAuth:
+      type: http
+      scheme: bearer
+      description: Environment-isolated CMS adapter service credential; never a user JWT or provider key.
     StripeWebhookSignature:
       type: apiKey
       in: header

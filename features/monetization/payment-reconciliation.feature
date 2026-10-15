@@ -2,7 +2,7 @@
 Feature: Payment notifications and reconciliation converge on durable commercial facts
   Delayed or repeated financial observations do not duplicate or reverse valid effects.
   Recovery keeps the original operation and never invents a new payment.
-  # MOT-117; commercial authority and provider decisions remain in ADR-057/058.
+  # MOT-117; commercial authority and provider decisions remain in ADR-059/058.
 
   Scenario: Subscription creation alone cannot grant paid access
     Given a subscription was created at the payment provider

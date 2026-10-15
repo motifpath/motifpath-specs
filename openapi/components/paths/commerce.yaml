@@ -1,0 +1,994 @@
+Content:
+  get:
+    operationId: getCommercialContent
+    summary: Read authoritative commercial content
+    description: Registered content owner or admin only; other callers receive 404. content_kind must be
+      course, path, content_node or exercise. Public editorial metadata is not ownership proof.
+    tags:
+      - Commerce
+    parameters:
+      - name: content_kind
+        in: path
+        required: true
+        description: Existing core content kind.
+        schema:
+          type: string
+          minLength: 1
+          enum:
+            - course
+            - path
+            - content_node
+            - exercise
+      - name: content_id
+        in: path
+        required: true
+        description: Stable core content identity.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/CommercialContent
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+Sale:
+  post:
+    operationId: changeCommercialSaleState
+    summary: Change free, paid or withdrawn commercial state
+    description: Require registered owner or admin and matching expected_revision. Allowed content_kind
+      is course or path. Free-to-paid and price/withdrawal changes retain actor, prior/resulting
+      state and immutable references. Paid requires validated transitive rights and valid configured
+      offers. Do not modify existing buyer grants/copies or auto-update learners. CMS hints cannot
+      invoke this authority. Every commercial mutation is durably coupled to audit evidence;
+      uncertain external outcomes remain pending. Acquisition OFF never disables existing
+      obligations.  Existing free grants are grandfathered explicitly; paid conversion never creates
+      an unrequested charge or silently removes their granted access.
+    tags:
+      - Commerce
+    parameters:
+      - name: content_kind
+        in: path
+        required: true
+        description: Existing core content kind.
+        schema:
+          type: string
+          minLength: 1
+          enum:
+            - course
+            - path
+      - name: content_id
+        in: path
+        required: true
+        description: Stable core content identity.
+        schema:
+          type: string
+          format: uuid
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, actor, action and resource. Fingerprint canonical
+          full intent. Same identity/intent returns recorded status before stale-revision checks;
+          conflicting intent returns 409. Persist identity and attempts beyond provider cache
+          lifetime; concurrent business uniqueness spans keys and actors.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/Command
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/commerce.yaml#/ChangeSale
+Publish:
+  post:
+    operationId: createCommercialOffer
+    summary: Create an immutable one-time offer revision
+    description: Registered content owner or admin only; matching expected_revision and positive
+      enabled-currency price under current configuration. For path_purchase, validate the complete
+      current sale manifest and transitive dependency/license rights. For embedding_license, admin
+      creates an offer bound to the target path, its owning teacher and current ownership revision;
+      validate ownership and configured license price independently of content dependencies. A path
+      already containing unlicensed premium exercises can acquire its first license without a
+      validated sale manifest. License offers have release_id null; they neither publish nor
+      authorize a path sale. New offer revisions never rewrite accepted checkout snapshots. Record
+      durable attributable evidence and enforce idempotent commands before revision checks.
+      Acquisition flags gate new actions, not existing obligations.
+    tags:
+      - Commerce
+    parameters:
+      - name: content_kind
+        in: path
+        required: true
+        description: Existing core content kind.
+        schema:
+          type: string
+          minLength: 1
+          enum:
+            - path
+      - name: content_id
+        in: path
+        required: true
+        description: Stable core content identity.
+        schema:
+          type: string
+          format: uuid
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, actor, action and resource. Fingerprint canonical
+          full intent. Same identity/intent returns recorded status before stale-revision checks;
+          conflicting intent returns 409. Persist identity and attempts beyond provider cache
+          lifetime; concurrent business uniqueness spans keys and actors.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/Offer
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/commerce.yaml#/CreateOffer
+Offers:
+  get:
+    operationId: listCommercialOffers
+    summary: List eligible one-time acquisition offers
+    description: Require kind and path_id. kind must be path_purchase or embedding_license. Resolve
+      caller eligibility and approved offers server-side; return empty items if
+      acquisition/configuration/prerequisites are unavailable. A disabled currency or malformed kind
+      returns 400. A missing path returns 404. Do not expose a teacher license offer as student
+      content access. Path-purchase offers require sale_state paid; withdrawn/free paths are not
+      sold. A teacher may acquire an eligible path embedding license before enabling that path for
+      paid sales.
+    tags:
+      - Commerce
+    parameters:
+      - name: kind
+        in: query
+        required: true
+        description: Requested one-time product family.
+        schema:
+          type: string
+          minLength: 1
+          enum:
+            - path_purchase
+            - embedding_license
+      - name: path_id
+        in: query
+        required: true
+        description: Target path.
+        schema:
+          type: string
+          format: uuid
+      - name: currency
+        in: query
+        required: true
+        description: Enabled currency.
+        schema:
+          type: string
+          pattern: ^[A-Z]{3}$
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/OfferList
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+Checkouts:
+  post:
+    operationId: createMyCommercialCheckout
+    summary: Start a permanent purchase or teacher-license checkout
+    description: Use eligible current offer_id; reject stale terms with 409. For path_purchase, require
+      the current validated sale manifest, valid dependency licenses, verified seller/Connect
+      capability and refund liquidity; reserve one active holder/path acquisition across operation
+      keys and reject an already active purchase. For embedding_license, require the caller to match
+      the recorded owning teacher, path and ownership revision, valid platform payment capability
+      and configured license offer; no previously licensed sale manifest or teacher payout account
+      is required. Reserve one active teacher/path license acquisition across keys and reject an
+      existing active license. Verify payment before issuing one permanent teacher/path license
+      bound to its immutable offer. Subsequent paid publication and path-purchase checkout still
+      require full licensed dependency validation. Bind accepted terms, customer and applicable
+      commission revision before provider work; browser return never proves payment. Durable
+      intent/audit precede provider calls; unknown outcomes remain pending and reconcile before any
+      new attempt. Acquisition OFF never stops existing obligations.
+    tags:
+      - Commerce
+    parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, actor, action and resource. Fingerprint canonical
+          full intent. Same identity/intent returns recorded status before stale-revision checks;
+          conflicting intent returns 409. Persist identity and attempts beyond provider cache
+          lifetime; concurrent business uniqueness spans keys and actors.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/Checkout
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/commerce.yaml#/CheckoutRequest
+Checkout:
+  get:
+    operationId: getMyCommercialCheckout
+    summary: Read one-time acquisition status
+    description: Owner only; another user receives 404. No provider/session metadata may substitute for
+      internal ownership. Unknown creation/payment outcomes remain pending and must be reconciled
+      before any new external attempt.
+    tags:
+      - Commerce
+    parameters:
+      - name: checkout_id
+        in: path
+        required: true
+        description: Caller-owned checkout identity.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/Checkout
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+Holdings:
+  get:
+    operationId: listMyCommercialHoldings
+    summary: List permanent purchases and teacher licenses
+    description: Return caller-owned purchase and teacher-license records including ended records.
+      Stable identity ordering, total/limit/offset; acquisition OFF never hides history. These
+      records do not bypass delivery-time access checks.
+    tags:
+      - Commerce
+    parameters:
+      - $ref: ../../core-domain-service.yaml#/components/parameters/Limit
+      - $ref: ../../core-domain-service.yaml#/components/parameters/Offset
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/HoldingsPage
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+Balances:
+  get:
+    operationId: listMyCommercialBalances
+    summary: Read teacher earnings by currency
+    description: Require backend-resolved teacher identity. Return only own reconciled balances;
+      non-teachers receive 403. Currency balances do not expose customer payment data. Provider
+      settlement and recovery offsets determine availability; no voluntary reserve.
+    tags:
+      - Commerce
+    parameters: []
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/BalanceList
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller is not a backend-resolved teacher.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+Configuration:
+  post:
+    operationId: createCommercialConfiguration
+    summary: Record immutable platform pricing and allocation configuration
+    description: Admin only. Validate teacher minimum <= maximum and matching configured currency;
+      reject nonpositive or impossible prices. Changes create a new immutable revision and never
+      alter historical offer/checkout terms. No sales before a complete valid configuration.
+      Subscription prices and annual discounts are represented by immutable monthly/annual offer
+      revisions; this endpoint does not create them. Configuration is never taken from CMS. Every
+      commercial mutation is durably coupled to audit evidence; uncertain external outcomes remain
+      pending. Acquisition OFF never disables existing obligations.  Serialize environment
+      configuration promotion using expected_revision (zero only before first configuration); stale
+      concurrent edits return 409.
+    tags:
+      - Commerce
+    parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, actor, action and resource. Fingerprint canonical
+          full intent. Same identity/intent returns recorded status before stale-revision checks;
+          conflicting intent returns 409. Persist identity and attempts beyond provider cache
+          lifetime; concurrent business uniqueness spans keys and actors.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/Configuration
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/commerce.yaml#/ConfigurationInput
+CMS:
+  post:
+    operationId: receiveCMSCommercialHint
+    summary: Durably accept a CMS editorial synchronization hint
+    description: Require the environment-specific CMS adapter bearer credential over TLS, isolated from
+      user authentication. Authenticate before storing. Deduplicate trusted source/environment/event
+      identity and reject changed payload for that identity with 409. Resolve only registered source
+      mappings; never trust a CMS owner, price, license or grant claim. Persist receipt and audit
+      before 200. Worker pulls canonical metadata through a read-only CMS credential, validates core
+      revision/rights and reconciles; source timestamps do not establish ordering. Unprovisioned or
+      disabled CMS integration cannot expand rights. Native Strapi payloads must pass through the
+      configured adapter; this contract does not assume Strapi emits a signed canonical envelope.
+    tags:
+      - Commerce
+    security:
+      - CMSAdapterAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/commerce.yaml#/SyncHint
+    responses:
+      "200":
+        description: Durable transport receipt, not synchronization completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/SyncReceipt
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+Ownership:
+  post:
+    operationId: correctCommercialOwnership
+    summary: Correct authoritative ownership as an administrator
+    description: Backend-resolved admin only. Verify legal/creator evidence and expected_revision;
+      append provenance correction without rewriting original creator or transferring existing
+      financial obligations. CMS/user claims cannot establish ownership. Same-intent retry returns
+      the original result; conflicting reuse or stale revision returns 409. Durable audit failure
+      prevents mutation.
+    tags:
+      - Commerce
+    parameters:
+      - name: content_kind
+        in: path
+        required: true
+        description: Existing core content kind.
+        schema:
+          type: string
+          minLength: 1
+          enum:
+            - course
+            - path
+            - content_node
+            - exercise
+      - name: content_id
+        in: path
+        required: true
+        description: Stable core content identity.
+        schema:
+          type: string
+          format: uuid
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, actor, action and resource. Fingerprint canonical
+          full intent. Same identity/intent returns recorded status before stale-revision checks;
+          conflicting intent returns 409. Persist identity and attempts beyond provider cache
+          lifetime; concurrent business uniqueness spans keys and actors.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative recorded result; pending never claims external success.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/Command
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/commerce.yaml#/OwnershipCommand
+Release:
+  post:
+    operationId: publishCommercialRelease
+    summary: Freeze validated commercial dependency references
+    description: Registered owner or admin only. Validate existing content revision and complete
+      transitive dependency graph, reject cycles, missing rights, stale critical metadata and
+      unsupported third-party dependencies. Platform premium exercises in a paid teacher path
+      require its teacher/path permanent license; a student subscription is insufficient. Check each
+      referenced revision. Concurrent same-intent publication creates one immutable manifest. This
+      operation does not publish a path, alter course checkpoints or update learner copies; existing
+      authoring/update endpoints retain their semantics. A changed manifest invalidates new-sale
+      validation until rechecked. License acquisition is a separate prerequisite; it validates path
+      ownership without requiring this sale manifest. Only after the license is active may a
+      manifest containing its premium dependency be validated for sale.
+    tags:
+      - Commerce
+    parameters:
+      - name: content_kind
+        in: path
+        required: true
+        description: Existing core content kind.
+        schema:
+          type: string
+          minLength: 1
+          enum:
+            - course
+            - path
+            - content_node
+            - exercise
+      - name: content_id
+        in: path
+        required: true
+        description: Stable core content identity.
+        schema:
+          type: string
+          format: uuid
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, actor, action and resource. Fingerprint canonical
+          full intent. Same identity/intent returns recorded status before stale-revision checks;
+          conflicting intent returns 409. Persist identity and attempts beyond provider cache
+          lifetime; concurrent business uniqueness spans keys and actors.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative recorded result; pending never claims external success.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/Release
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/commerce.yaml#/PublishRelease
+SubscriptionOfferConfig:
+  post:
+    operationId: createSubscriptionOfferRevision
+    summary: Create an authoritative subscription offer revision
+    description: Admin only. Require current valid commercial configuration and positive
+      enabled-currency amount. Annual price must be lower than twelve monthly payments for the same
+      scope/currency; create the monthly baseline first. Immutable offer snapshots preserve prior
+      payments and accepted checkout terms. Existing subscriptions adopt approved price changes at
+      next renewal only, with the configured annual notices. Duplicate commands return the existing
+      revision; new intentional prices use a new identity. Audit failure prevents change. Require
+      expected_offer_id for the exact scope/billing period/currency, including explicit null before
+      the first offer. Under a scope/currency serialization boundary, compare the current promoted
+      offer and atomically create/promote its replacement with audit evidence; mismatch returns 409.
+      Different operation keys do not bypass the comparison. Annual discount validation and monthly
+      baseline changes share this boundary. Same-key same-intent replay returns its original
+      recorded result before testing the old expected offer. A changed platform configuration also
+      returns 409. Read the current offer through this admin resource even while acquisition is OFF.
+    tags:
+      - Commerce
+    parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, actor, action and resource. Fingerprint canonical
+          full intent. Same identity/intent returns recorded status before stale-revision checks;
+          conflicting intent returns 409. Persist identity and attempts beyond provider cache
+          lifetime; concurrent business uniqueness spans keys and actors.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative recorded result; pending never claims external success.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/subscriptions.yaml#/SubscriptionOffer
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/commerce.yaml#/SubscriptionOfferConfig
+  get:
+    operationId: getCurrentSubscriptionOffer
+    summary: Read the promoted subscription offer as an administrator
+    description: Backend-resolved administrator only. Return the promoted offer for exactly one scope,
+      billing period and currency, independently of acquisition flags or learner cohort eligibility.
+      content_id is required for course/path and forbidden for platform. Missing configured offer
+      returns 404; the caller then uses expected_offer_id null for first creation. Existing offer_id
+      is the precondition for replacement. Malformed or disabled currency/scope returns 400. No
+      credentials are exposed.
+    tags:
+      - Commerce
+    parameters:
+      - name: scope_kind
+        in: query
+        required: true
+        description: Exact coverage kind.
+        schema:
+          type: string
+          enum:
+            - platform
+            - course
+            - path
+      - name: content_id
+        in: query
+        description: Required only for course/path scope.
+        schema:
+          type: string
+          format: uuid
+      - name: billing_period
+        in: query
+        required: true
+        description: Exact recurring interval.
+        schema:
+          type: string
+          enum:
+            - monthly
+            - annual
+      - name: currency
+        in: query
+        required: true
+        description: Enabled original currency.
+        schema:
+          type: string
+          pattern: ^[A-Z]{3}$
+    responses:
+      "200":
+        description: Promoted immutable offer; offer_id is required for a replacement command.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/subscriptions.yaml#/SubscriptionOffer
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+ReviewRefund:
+  post:
+    operationId: reviewFullRefundEligibility
+    summary: Record an explicit admin refund review
+    description: Backend-resolved admin only; matching expected_revision and case requiring review.
+      approve_full_refund records explicit approved-policy/statutory justification and permits the
+      existing full execution endpoint; it does not return money or revoke access. decline retains
+      the case and reason without claiming commercially eligible status. No partial refund is
+      executed here. Repeat review uses the same durable operation, conflicting disposition/revision
+      returns 409. A declined case can be reviewed again only with new explicit evidence and current
+      revision. Uncertain external financial outcomes cannot be overridden by review.
+    tags:
+      - Commerce
+    parameters:
+      - name: refund_request_id
+        in: path
+        required: true
+        description: Existing admin-handled refund case.
+        schema:
+          type: string
+          format: uuid
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, actor, action and resource. Fingerprint canonical
+          full intent. Same identity/intent returns recorded status before stale-revision checks;
+          conflicting intent returns 409. Persist identity and attempts beyond provider cache
+          lifetime; concurrent business uniqueness spans keys and actors.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative recorded result; pending never claims external success.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/Command
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/commerce.yaml#/ReviewedRefund
+Settlements:
+  get:
+    operationId: listMyCommercialSettlements
+    summary: Read teacher settlement history
+    description: Backend-resolved teacher only; expose own financial obligations/history. No customer
+      details or provider credentials. Include unresolved and failed obligations; unknown external
+      outcomes stay pending, not failed. New-acquisition OFF cannot hide obligations or pause their
+      recovery.
+    tags:
+      - Commerce
+    parameters:
+      - $ref: ../../core-domain-service.yaml#/components/parameters/Limit
+      - $ref: ../../core-domain-service.yaml#/components/parameters/Offset
+    responses:
+      "200":
+        description: Authoritative recorded result; pending never claims external success.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/SettlementPage
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller is not a backend-resolved teacher.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+RetryRefund:
+  post:
+    operationId: retryFailedFullRefund
+    summary: Retry a definitively failed refund as an administrator
+    description: Admin only. Require failed case at expected_revision and authoritative reconciliation
+      proving no prior successful/pending refund or competing dispute return. Unknown outcomes
+      remain processing and return 409. Reuse case/business identity, retain original execution
+      evidence and append a distinct attributable retry attempt; never replace prior history. A new
+      key alone cannot authorize another refund. Check original eligibility or approved review, then
+      apply the existing full refund execution invariants. Same-intent retries return recorded state
+      before revision checks. Acquisition OFF cannot disable support.
+    tags:
+      - Commerce
+    parameters:
+      - name: refund_request_id
+        in: path
+        required: true
+        description: Existing admin-handled refund case.
+        schema:
+          type: string
+          format: uuid
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, actor, action and resource. Fingerprint canonical
+          full intent. Same identity/intent returns recorded status before stale-revision checks;
+          conflicting intent returns 409. Persist identity and attempts beyond provider cache
+          lifetime; concurrent business uniqueness spans keys and actors.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative recorded result; pending never claims external success.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/refunds.yaml#/RefundRequest
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/refunds.yaml#/ExecuteRefundRequest
+Payments:
+  get:
+    operationId: listMyCommercialPayments
+    summary: List successful payments for refund/support references
+    description: Return only authenticated caller-owned verified payments across subscription, purchase
+      and license acquisitions, including refunded payments whose original facts remain unchanged.
+      Refund status is read from its case; a refund does not delete the original payment. No
+      payer-controlled owner filter. Acquisition OFF never hides receipts. Safe provider references
+      are not payment credentials. This read does not create grants or refunds.
+    tags:
+      - Commerce
+    parameters:
+      - $ref: ../../core-domain-service.yaml#/components/parameters/Limit
+      - $ref: ../../core-domain-service.yaml#/components/parameters/Offset
+    responses:
+      "200":
+        description: Authoritative caller-visible records.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/PaymentPage
+      "400": &a1
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401": &a2
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "404": &a3
+        $ref: ./subscriptions.yaml#/NotFound
+      "503": &a4
+        $ref: ./subscriptions.yaml#/Unavailable
+HistoricalRelease:
+  get:
+    operationId: getCommercialRelease
+    summary: Read an authorized immutable commercial manifest
+    description: Owner/admin or a holder whose existing purchase/copy references the release only. Other
+      callers receive 404. Resolve historical immutable references after withdrawal; never
+      substitute the latest manifest. This read does not deliver protected lesson content or update
+      the caller copy.
+    tags:
+      - Commerce
+    parameters:
+      - name: release_id
+        in: path
+        required: true
+        description: Immutable commercial manifest identity.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative caller-visible records.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/Release
+      "400": *a1
+      "401": *a2
+      "404": *a3
+      "503": *a4
+CurrentConfiguration:
+  get:
+    operationId: getCurrentCommercialConfiguration
+    summary: Read the current authoritative commercial configuration
+    description: Backend-resolved administrator only. Return the currently promoted immutable
+      configuration and its revision. Before first configuration return 404; new sales remain
+      disabled. Never expose credentials. Acquisition OFF does not hide administrative configuration
+      history from authorized roles.
+    tags:
+      - Commerce
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/Configuration
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable

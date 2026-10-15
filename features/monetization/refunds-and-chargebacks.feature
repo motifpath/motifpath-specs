@@ -2,7 +2,7 @@
 Feature: Refund eligibility and disputed payment access
   Full refunds are handled by an admin and return the full customer payment.
   Refund eligibility is remembered per learner and subscription scope.
-  # MOT-117; ADR-057. Examples describe the commercial policy, not exceptions to statutory rights.
+  # MOT-117; ADR-059. Examples describe the commercial policy, not exceptions to statutory rights.
 
   Scenario: First subscription refund eligibility begins when paid access becomes available
     Given Alice's first subscription payment succeeded on "2026-10-01T12:00:00Z"
