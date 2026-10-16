@@ -1,6 +1,6 @@
 ---
 name: pr-review
-version: 1.15.0
+version: 1.16.0
 description: >
   Review a proposed pull request against MotifPath conventions and the intent behind the change,
   across any of the four MotifPath repos (motifpath-core, motifpath-web, motifpath-infra,
@@ -109,8 +109,8 @@ common (a spec change in `motifpath-specs` ships alongside a `motifpath-core` ha
 - **Deploy order:** do they ship together? If not, does each intermediate state still work —
   particularly `make generate` / `npm run generate:api` re-run against the *old* spec vs. the new
   one?
-- **Duplicated rule:** the same business rule computed in two places (e.g. threshold precedence
-  logic) — does it diverge in some scenario?
+- **Duplicated rule:** the same business rule computed in two repos (a server and a client, a
+  planner and a grader) — is one pinned to the other, or can they diverge in some scenario?
 - **Half the work:** a spec changed with no consuming repo updated, or a consuming repo changed
   ahead of the spec that's supposed to define it (violates Spec-Driven Development)?
 - **Public contract:** is this breaking for a consumer not in this PR?
