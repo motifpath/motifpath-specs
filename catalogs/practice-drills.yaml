@@ -6,7 +6,9 @@
 
 # Every template names its rung on the practice ladder: know, hear, play_clean, play_in_time,
 # move, target, use. A generated template asked among options names its second_way: the other
-# template that asks the same item, so a lucky guess meets the other way (ADR-057).
+# template that asks the same item, so a lucky guess meets the other way (ADR-057). A template
+# with comes_back: true also brings its item back later in the same session, asked that way
+# again, after at least three other items; a template with no second way always does.
 templates:
   - {key: "fretboard_cell:name_the_note", rung: know, second_way: "fretboard_cell:find_the_note", item_kind: fretboard_cell, response_type: name_the_note, timed: true, names: {en: "Name the note", pt_BR: "Diga a nota"}, id: 4c6ffb77-ee8b-5fda-b243-784f4209bc65}
   - {key: "fretboard_cell:find_the_note", rung: know, second_way: "fretboard_cell:name_the_note", item_kind: fretboard_cell, response_type: find_the_note, timed: true, names: {en: "Find the note", pt_BR: "Ache a nota"}, id: 6e38da0b-df26-5aa8-ab14-3b6640582174}
@@ -23,6 +25,9 @@ templates:
   - {key: "chord_function:function_to_chord", rung: know, second_way: "chord_function:chord_to_function", item_kind: chord_function, response_type: generated_choice, timed: true, names: {en: "Function to chord", pt_BR: "Da função ao acorde"}, id: b0f8fd07-9310-5b17-acb1-77070529421d}
   - {key: "chart_progression:chart_to_numbers", rung: know, second_way: "chart_progression:numbers_to_chart", item_kind: chart_progression, response_type: generated_choice, timed: true, names: {en: "Read the chart", pt_BR: "Ler a cifra"}, id: 259ed951-c50c-5331-a2de-8475fda08106}
   - {key: "chart_progression:numbers_to_chart", rung: know, second_way: "chart_progression:chart_to_numbers", item_kind: chart_progression, response_type: generated_choice, timed: true, names: {en: "Pick the chart", pt_BR: "Escolher a cifra"}, id: d63bfeed-3175-5b8a-a838-f543cec550ce}
+  - {key: "heard_chord:cadence_then_chord", rung: hear, second_way: "heard_chord:see_then_name", comes_back: true, item_kind: heard_chord, response_type: generated_choice, timed: true, names: {en: "Hear the chord", pt_BR: "Ouça o acorde"}, id: 001c9d1a-6bcb-5d1b-8656-b65a9a8dddfb}
+  - {key: "heard_chord:see_then_name", rung: hear, second_way: "heard_chord:cadence_then_chord", item_kind: heard_chord, response_type: generated_choice, timed: true, names: {en: "See the chord", pt_BR: "Veja o acorde"}, id: 91209c2d-71e8-52b2-a19b-f286d85f1c07}
+  - {key: "heard_progression:progression_by_number", rung: hear, comes_back: true, item_kind: heard_progression, response_type: generated_choice, timed: true, names: {en: "Hear the progression", pt_BR: "Ouça a progressão"}, id: c236ecad-5bd5-5755-b012-fd1999ee46b8}
 
 # Which generated fretboard cells serve which skill, per fretboard layout. A layout is
 # named by its layout instrument; instruments with the same geometry share it (guitar and
@@ -119,3 +124,10 @@ thresholds:
   - {template: "chord_function:function_to_chord", version: 1, effective_from: "2026-10-15", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 13bb96a1-a854-5ffc-a40e-1f42c9228b73}
   - {template: "chart_progression:chart_to_numbers", version: 1, effective_from: "2026-10-15", fluent_net_ms: 6000, source: default, sessions: 0, students: 0, id: 434e18dc-ee2e-532e-b748-d2980df715f0}
   - {template: "chart_progression:numbers_to_chart", version: 1, effective_from: "2026-10-15", fluent_net_ms: 8000, source: default, sessions: 0, students: 0, id: bfcdfcb0-a479-545e-a512-f0cf53e8eace}
+  - {template: "heard_chord:cadence_then_chord", version: 1, effective_from: "2026-10-16", fluent_net_ms: 3000, source: default, sessions: 0, students: 0, id: 5f5c21a4-5763-5f40-8e48-94d0803d760b}
+  - {template: "heard_chord:see_then_name", version: 1, effective_from: "2026-10-16", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 39073f67-3437-52fa-85d0-da2945a41600}
+  - {template: "heard_progression:progression_by_number", version: 1, effective_from: "2026-10-16", fluent_net_ms: 5000, source: default, sessions: 0, students: 0, id: 85f712d5-a4cb-5057-bae4-4db002e17974}
+
+# The tempo a question asked by ear starts at, in quarter notes per minute, by the student's
+# level on the item. The student may change it, and the answer is never graded on it.
+hear_tempo_bpm: {new: 70, learning: 70, accurate: 90, fluent: 110, retained: 110}

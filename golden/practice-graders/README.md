@@ -146,15 +146,15 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
 
 - **The way must be one of the kind's ways:** `numeral_to_chord` or `chord_to_numeral` for a
   diatonic chord; `chord_to_function` or `function_to_chord` for a chord function;
-  `chart_to_numbers` or `numbers_to_chart` for a chart progression; `cadence_then_chord` for a
-  heard chord; `progression_by_number` for a heard progression. Any other way is
+  `chart_to_numbers` or `numbers_to_chart` for a chart progression; `cadence_then_chord` or
+  `see_then_name` for a heard chord; `progression_by_number` for a heard progression. Any other way is
   `response_does_not_fit_item`.
 - **`music_key` comes with the kinds asked in any key** (chart progression, heard chord, heard
   progression), and with no other kind. Missing or extra, it is `response_does_not_fit_item`.
 - A progression the catalog doesn't have, in the item key, is `unknown_reference`.
 - **The right answer:**
   - `numeral_to_chord`: the key's chord on the numeral.
-  - `chord_to_numeral` and `cadence_then_chord`: the numeral.
+  - `chord_to_numeral`, `cadence_then_chord` and `see_then_name`: the numeral.
   - `chord_to_function`: the numeral's function.
   - `function_to_chord`: the key's chord on the numeral.
   - `chart_to_numbers` and `progression_by_number`: the progression's key.
@@ -163,7 +163,7 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
 - **The options are checked** before the pick (`invalid_choices` on any failure):
   - every option is a possible answer of the way:
     - a chord of the key, triads only, for `numeral_to_chord` and `function_to_chord`;
-    - a numeral, for `chord_to_numeral` and `cadence_then_chord`;
+    - a numeral, for `chord_to_numeral`, `cadence_then_chord` and `see_then_name`;
     - `tonic`, `subdominant` or `dominant`, for `chord_to_function`;
     - a progression of the catalog, for `chart_to_numbers` and `progression_by_number`;
     - the chart of a catalog progression in `music_key`, for `numbers_to_chart`;

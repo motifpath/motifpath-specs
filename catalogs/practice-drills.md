@@ -25,7 +25,8 @@ questions are per template, never per item.
   template of the same item kind that asks the same item another way. The composer asks an item
   the way with fewer right answers, so a lucky guess meets the other way. A template with no
   second way of its own instead brings its item back later in the same session, after at least
-  three other items.
+  three other items. A template marked `comes_back` does both: an ear drill's second way is
+  seen, not heard, so the item also comes back by ear in the same session.
 
 - **Fretboard cells** have two templates, one for each way of asking about a cell:
   - `fretboard_cell:name_the_note`: the cell is shown, and the student names its note.
@@ -74,7 +75,7 @@ graders and golden cases of every family are specified together (`PracticeItemKe
 responses in the practice schemas; `golden/practice-graders/`), so each is graded alike from
 the start. Each slice then adds its templates and fluent times to `practice-drills.yaml` (with
 fixed IDs) and its generator; until then a family installs nothing. The P1 harmony families
-are installed (see "Harmony drills" below). Every family has a bass version on the
+and the P2 ear families are installed (see "Harmony drills" and "Ear drills" below). Every family has a bass version on the
 `electric-bass` layout: chord boxes become chord symbols, or the answer is a chord tone tapped
 on the bass fretboard, at positions computed from the chord's formula and the tuning.
 
@@ -83,8 +84,8 @@ on the bass fretboard, at positions computed from the chord's formula and the tu
 | `diatonic_chord` | a numeral in a major key | `numeral_to_chord` (know): "In G, which chord is vi?", pick the chord · `chord_to_numeral` (know): a chord and a key, pick the numeral | each other | `diatonic-chords`, `roman-numerals` | P1 |
 | `chord_function` | a numeral in a major key | `chord_to_function` (know): "In G, D is…", pick tonic, subdominant or dominant · `function_to_chord` (know): pick a chord with the asked function | each other | `chord-function` | P1 |
 | `chart_progression` | a progression (`progressions.yaml`) | `chart_to_numbers` (know): its chart in a key, pick the progression · `numbers_to_chart` (know): a progression and a key, pick its chart | each other | `read-chord-charts`, `common-progressions` | P1 |
-| `heard_chord` | a numeral in a major key | `cadence_then_chord` (hear): a cadence sets the key, a chord plays, pick the numeral; no cadence once accurate | comes back | `hear-chord-quality`, `hear-progressions` | P2 |
-| `heard_progression` | a progression | `progression_by_number` (hear): four chords in a random key, pick the progression; confusable progressions offered | comes back | `hear-progressions`, `common-progressions` | P2 |
+| `heard_chord` | a numeral in a major key | `cadence_then_chord` (hear): a cadence sets the key, a chord plays, pick the numeral; the tonic alone once accurate · `see_then_name` (hear): a key and the chord drawn, pick the numeral | each other, and comes back by ear | `hear-chord-quality`, `hear-progressions` | P2 |
+| `heard_progression` | a 4-bar progression | `progression_by_number` (hear): four chords in a random key, pick the progression; confusable progressions offered | comes back | `hear-progressions`, `common-progressions` | P2 |
 | `chord_voicing` | a chord voicing (bass: a chord's root and fifth) | none, self-rated (play_clean) | — | `play-open-chords` (bass: `play-root-fifth-lines`) | P3 |
 | `chord_change` | two chords (bass: their roots) | none, changes per minute (play_in_time) | — | `change-chords` (bass: `play-root-notes`) | P3 |
 | `play_along` | a diagram | next key after a clean take (move) | — | the diagram's nodes, `play-shapes-in-any-key` | P4 |
@@ -170,6 +171,47 @@ and the progression catalog, never authored, and recalled in the head on every i
   or learning on the item, and among all 12 keys from accurate on.
 - **Ways:** each family's two templates are each other's second way. With no right answers
   yet, numeral to chord, chord to function and read the chart come first.
+
+## Ear drills
+
+`heard_chord` and `heard_progression` are generated from the major keys and the progression
+catalog, like the harmony drills, and recognised by ear in the head on every instrument.
+
+- **Items:**
+  - `heard_chord`: the numerals ii iii IV V vi viio, 6 items, each asked in a key picked each
+    time among all 12. The tonic is never an item, since the cadence ends on it.
+  - `heard_progression`: every 4-bar progression of the progression catalog. The 12-bar forms
+    are never asked by ear: twelve bars are too long to hold before answering.
+  - They roll up to the nodes of the families table, and a heard progression also to its
+    progression's nodes. Like the harmony drills, they count toward their nodes from the day
+    they are installed, and suit every instrument.
+- **The playback** is in 4/4, one chord a bar, in the chords' voicings (the voicing rule of
+  the harmony drills):
+  - `cadence_then_chord`: I IV V I, then the asked chord, while the student is new or learning
+    on the item. From accurate on, the tonic chord alone, for one bar, then the asked chord: a
+    numeral still needs a key, and the tonic is the least it takes.
+  - `progression_by_number`: the progression's four bars.
+  - The bars that set the key show their numerals; the asked chord's bar shows "?", and a
+    progression's bars show nothing. The chords are sounded, never named.
+  - On a session that reads chords on bass, each chord's root also plays under it in the bass
+    voice. The chords keep their guitar voicing.
+- **The tempo** starts by the student's level on the item (`hear_tempo_bpm`): 70 BPM while new
+  or learning, 90 once accurate, 110 once fluent. The student may change the tempo and the note
+  value (quarters, eighths, triplets, sixteenths) before or between plays. A note value is a
+  speed factor, as for play-alongs: eighths play two chords a bar. Neither is graded; the
+  latency is judged net of the sound heard once, at the speed it was played (`audio_ms`).
+- **The options:**
+  - `cadence_then_chord` and `see_then_name`: the answer and the three numerals nearest it
+    around the scale (one step away, then two), until the student is fluent on the item; then
+    all seven numerals, the tonic included, in scale order.
+  - `progression_by_number`: the progression, then its confusables, then theirs, up to four,
+    all of four bars. Confusable progressions are asked next to each other in a session.
+- **`see_then_name`** names the key and draws the chord, a box on guitar and a symbol on bass,
+  by the session's reading (the harmony drills' rule). It plays nothing. It is the ear drill's
+  second way, so a lucky guess by ear meets the chord's numeral by sight; the item also comes
+  back by ear later in the same session.
+- **Ways:** `cadence_then_chord` comes first. When an item comes back in the same session, it
+  is asked by ear again, in a newly picked key.
 
 ## Fretboard cells
 
@@ -257,8 +299,11 @@ and the progression catalog, never authored, and recalled in the head on every i
     | `chord_function:function_to_chord` | 4 s |
     | `chart_progression:chart_to_numbers` | 6 s |
     | `chart_progression:numbers_to_chart` | 8 s |
+    | `heard_chord:cadence_then_chord` | 3 s after the sound |
+    | `heard_chord:see_then_name` | 4 s |
+    | `heard_progression:progression_by_number` | 5 s after the sound |
 
-    The fretboard, diagram shape and harmony defaults stand in until the team benchmarks the drill,
+    The fretboard, diagram shape, harmony and ear defaults stand in until the team benchmarks the drill,
     which needs the drill built first; the benchmark is their version 2.
 
   - or a **benchmark**, twice the team's median net time on the drill.
@@ -288,6 +333,7 @@ and the progression catalog, never authored, and recalled in the head on every i
 
 - Every template names a rung of the ladder, and a `second_way` names another template of the
   same item kind.
+- `hear_tempo_bpm` gives a tempo for every knowledge level.
 
 - Installing on an empty database twice gives identical template and threshold IDs.
 - The generated cells for a layout are exactly the strings and frets listed. A string the

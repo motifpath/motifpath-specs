@@ -274,8 +274,8 @@ GeneratedChoiceResponse:
       description: |
         The options as shown, in the order shown. What an option is depends on the way: a
         chord symbol (a root, then m, dim or nothing: G, Em, F#dim) for numeral_to_chord and
-        function_to_chord; a numeral (I ii iii IV V vi viio) for chord_to_numeral and
-        cadence_then_chord; tonic, subdominant or dominant for chord_to_function; a progression
+        function_to_chord; a numeral (I ii iii IV V vi viio) for chord_to_numeral,
+        cadence_then_chord and see_then_name; tonic, subdominant or dominant for chord_to_function; a progression
         key for chart_to_numbers and progression_by_number; a chart, the progression's chord
         symbols one per bar separated by single spaces (G D Em C), for numbers_to_chart. A
         chord's root may be spelled either way (F# or Gb).
@@ -294,8 +294,9 @@ GeneratedChoiceResponse:
       type: integer
       minimum: 0
       description: |
-        Milliseconds of sound the question plays once before it can be answered (the cadence
-        and the chord, or the progression), at the tempo it was played. It is taken off the
+        Milliseconds of sound the question plays once before it can be answered (the cadence,
+        or the tonic chord alone, then the chord; or the progression), at the tempo and note
+        value it was played at. It is taken off the
         latency before the answer is judged against the drill's fluent time. Present for
         questions asked by ear only.
   additionalProperties: false
@@ -317,6 +318,7 @@ GeneratedChoiceWay:
     - numbers_to_chart
     - cadence_then_chord
     - progression_by_number
+    - see_then_name
   description: |
     How a generated question was asked, which fixes what its options are and which one is
     right. numeral_to_chord = a key and a numeral are named, pick its chord; chord_to_numeral
@@ -325,10 +327,11 @@ GeneratedChoiceWay:
     one chord with it; chart_to_numbers = a chart is shown, pick its progression;
     numbers_to_chart = a progression and a key are named, pick its chart; cadence_then_chord =
     a cadence sets the key and a chord plays, pick its numeral; progression_by_number = a
-    progression plays, pick it. A diatonic chord is asked numeral_to_chord or
+    progression plays, pick it; see_then_name = a key is named and a chord is shown, pick its
+    numeral. A diatonic chord is asked numeral_to_chord or
     chord_to_numeral; a chord function chord_to_function or function_to_chord; a chart
-    progression chart_to_numbers or numbers_to_chart; a heard chord cadence_then_chord; a
-    heard progression progression_by_number.
+    progression chart_to_numbers or numbers_to_chart; a heard chord cadence_then_chord or
+    see_then_name; a heard progression progression_by_number.
 
 MusicKey:
   type: string
@@ -993,6 +996,61 @@ GeneratedChordDrawing:
     head to the next for a student who plays both, and chord symbols for a student who plays
     neither. Every generated harmony question of a session reads them the same way.
 
+GeneratedChoicePlayback:
+  type: object
+  description: |
+    The sound of a question asked by ear: bars in 4/4, one chord a bar, played in the voicings
+    the question lists. The student may change the tempo and the note value before or between
+    plays; the answer is never graded on either. A note value is a speed factor: eighths play
+    two chords a bar, at twice the speed.
+  properties:
+    tempo_bpm:
+      type: integer
+      minimum: 40
+      maximum: 240
+      description: |
+        The tempo it starts at, in quarter notes per minute, set by the student's level on the
+        item: 70 while new or learning, 90 once accurate, 110 once fluent.
+    bass_line:
+      type: boolean
+      description: |
+        True when the session reads chords on electric-bass: each chord's root plays under it in
+        the bass voice, on every beat of its bar. False otherwise.
+    bars:
+      type: array
+      minItems: 2
+      maxItems: 5
+      items:
+        type: object
+        properties:
+          chord:
+            type: string
+            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim)?$'
+            description: |
+              The bar's chord symbol, spelled as the chord catalog spells roots. It is sounded,
+              never shown.
+          numeral:
+            oneOf:
+              - $ref: '#/ChordNumeral'
+              - type: 'null'
+            description: |
+              The numeral shown on the bar, for the bars that set the key. Null for a bar whose
+              chord is asked, shown as "?".
+        additionalProperties: false
+        required:
+          - chord
+          - numeral
+      description: |
+        The bars in the order they play. cadence_then_chord: the cadence I IV V I with their
+        numerals, or only I with its numeral once the student is accurate on the item, then the
+        asked chord with no numeral. progression_by_number: the progression's four bars, none
+        with a numeral.
+  additionalProperties: false
+  required:
+    - tempo_bpm
+    - bass_line
+    - bars
+
 GeneratedChoiceQuestion:
   type: object
   description: |
@@ -1001,7 +1059,8 @@ GeneratedChoiceQuestion:
     parts the way needs are present; the others are null or empty. Nothing in it marks the
     answer, and the prompt never names it: the client shows the options as given and sends
     back the way, the options as shown and the pick, with music_key when the item is a chart
-    progression.
+    progression, a heard chord or a heard progression. A question asked by ear also carries
+    the playback the client sounds before the options can be picked.
   properties:
     way:
       $ref: '#/GeneratedChoiceWay'
@@ -1019,8 +1078,8 @@ GeneratedChoiceQuestion:
       pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim)?$'
       description: |
         The chord the question gives, as a chord symbol spelled as the chord catalog spells
-        roots (Bm, F#, Bdim), for chord_to_numeral and chord_to_function. Always one of the key's
-        triads. Null for every other way.
+        roots (Bm, F#, Bdim), for chord_to_numeral, chord_to_function and see_then_name. Always
+        one of the key's triads. Null for every other way.
     function:
       oneOf:
         - $ref: '#/ChordFunction'
@@ -1056,7 +1115,7 @@ GeneratedChoiceQuestion:
     options:
       type: array
       minItems: 2
-      maxItems: 4
+      maxItems: 7
       items:
         type: object
         properties:
@@ -1090,9 +1149,11 @@ GeneratedChoiceQuestion:
           - name
           - chart
       description: |
-        The options in the order to show them, already shuffled. Different from one another,
-        each a possible answer to the way, the right one among them (four, or two for a 12-bar
-        progression). Which are offered follows the drill catalog's harmony rules.
+        The options in the order to show them, already shuffled; all seven numerals come in scale
+        order instead, since where one sits then says nothing. Different from one another,
+        each a possible answer to the way, the right one among them: four, two for a 12-bar
+        progression, and all seven numerals for a heard chord once the student is fluent on it.
+        Which are offered follows the drill catalog's harmony and ear rules.
     voicings:
       type: array
       items:
@@ -1111,9 +1172,18 @@ GeneratedChoiceQuestion:
           - chord
           - diagram_id
       description: |
-        When drawn_as is chord_boxes, the box of every chord the question draws, one per chord
-        symbol: the chord's open voicing if the catalog has one, else its lowest-difficulty
-        voicing. Empty when drawn_as is chord_symbols.
+        The voicing of every chord the question draws as a box or sounds, one per chord symbol:
+        the chord's open voicing if the catalog has one, else its lowest-difficulty voicing. A
+        question asked by ear lists every chord of its playback, whatever drawn_as says; any
+        other question lists the chords it draws when drawn_as is chord_boxes, and none when it
+        is chord_symbols.
+    playback:
+      oneOf:
+        - $ref: '#/GeneratedChoicePlayback'
+        - type: 'null'
+      description: |
+        What the client plays before the options can be picked, for cadence_then_chord and
+        progression_by_number. Null for every other way.
   additionalProperties: false
   required:
     - way
