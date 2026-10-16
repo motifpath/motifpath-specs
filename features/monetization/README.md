@@ -32,6 +32,13 @@ implementation passes TDD. PR approval accepts proposed API details, not a deplo
 | [Financial contracts](commercial-financial-contracts.feature) | Exact refund deadline, admin review/retry, final disputes, rounding and settlement |
 | [Integration contracts](commercial-integration-contracts.feature) | CMS hints, private messages, audit coupling, media bypass and restore fencing |
 
+## Rollout controls
+
+[Commercial activation registry](../../openapi/commercial-rollout-contract.md) defines proposed
+MOT-115-r3 names, ownership, default-OFF targeting, independent readiness tracks and audited
+rollback. [Commercial control scenarios](commercial-controls.feature) cover activation boundaries;
+registry and Figma approvals remain separate from contract integration.
+
 ## Deliverable and flag mapping
 
 Flag names below match the proposed MOT-115 registry; registry approval is tracked in MOT-115,

@@ -1,0 +1,206 @@
+@wip
+Feature: Commercial rollout preserves rights and records each operation
+  Commercial activation controls new actions without removing existing rights.
+  Every direct or indirect commercial operation is traceable.
+  Repeated delivery of one logical operation produces its business effects once.
+
+  Scenario: Commercial capabilities are disabled by default
+    Given no commercial activation has been configured for an environment
+    When a learner attempts to start a Plus checkout in that environment
+    Then no checkout is created
+
+  Scenario: An enabled checkout requires its prerequisites
+    Given Plus checkout is enabled for learner "Alice"
+    And payment processing readiness is disabled
+    When Alice attempts to start a Plus checkout
+    Then no checkout is created
+
+  Scenario: A learner outside the approved cohort cannot start a purchase
+    Given new path purchases are enabled for the approved private beta cohort
+    And learner "Alice" is not in that cohort
+    When Alice attempts to purchase path "Guitar foundations"
+    Then no checkout is created
+
+  Scenario: Disabling purchases preserves an existing permanent purchase
+    Given learner "Alice" has permanently purchased path "Guitar foundations"
+    And Alice has no Plus subscription
+    And new path purchases have been disabled
+    When Alice opens her purchased path
+    Then Alice retains access to the purchased content
+
+  Scenario: Rollback retains learning progress
+    Given learner "Alice" has completed lesson "First chords"
+    When commercial acquisition is disabled
+    Then Alice's completion of "First chords" remains recorded
+
+  Scenario: An authorized payment is fulfilled after checkout is disabled
+    Given checkout "checkout-1" was authorized for Alice's purchase of "Guitar foundations"
+    And new path purchases have since been disabled
+    When the verified successful payment for "checkout-1" is received
+    Then Alice's permanent purchase is fulfilled once
+
+  Scenario: Changing free content to paid records the commercial transition
+    Given path "Guitar foundations" is free
+    And teacher "Bea" is authorized to change its commercial status
+    When Bea changes the path to paid using operation "change-1" with reason "Introduce paid offer"
+    Then durable audit evidence identifies Bea and operation "change-1"
+    And the evidence records the path's free and paid states, reason, time and outcome
+
+  Scenario: Audit failure prevents an untraceable commercial change
+    Given path "Guitar foundations" is free
+    And durable audit evidence cannot be recorded
+    When an authorized teacher attempts to change the path to paid
+    Then the path remains free
+
+  Scenario: Repeating a commercial change does not repeat its effects
+    Given operation "change-1" changed "Guitar foundations" from free to paid
+    When the same operation is submitted again with the same intent
+    Then the recorded result of "change-1" is returned
+    And no second commercial transition occurs
+    And the repeated attempt is traceable
+
+  Scenario: Reusing an operation identity with different intent is refused
+    Given operation "change-1" changed "Guitar foundations" from free to paid
+    When operation "change-1" is submitted to change the path from paid to free
+    Then the conflicting operation is refused
+    And the path remains paid
+
+  Scenario: Concurrent purchase retries fulfill one purchase
+    Given purchase operation "purchase-1" is authorized for Alice and "Guitar foundations"
+    When two attempts to fulfill "purchase-1" arrive concurrently
+    Then one purchase receipt and one permanent grant are recorded
+
+  Scenario: Retrying after a restart returns the completed operation
+    Given purchase operation "purchase-1" was fulfilled durably
+    And its reply did not reach Alice
+    And the service has restarted
+    When Alice retries "purchase-1" with the same intent
+    Then the completed result is returned without another purchase or grant
+
+  Scenario: Different payment notifications do not duplicate one purchase
+    Given verified notification "event-1" fulfilled payment "payment-1"
+    When verified notification "event-2" reports the same successful payment
+    Then no additional purchase receipt or grant is created
+    And both notification attempts are traceable to "payment-1"
+
+  Scenario: An uncertain payment outcome is reconciled before another charge
+    Given charge operation "charge-1" has an unknown provider outcome
+    When the operation is retried
+    Then its existing pending status is retained until reconciliation establishes the outcome
+    And no second charge is initiated while the outcome is unknown
+
+  Scenario: Commercial evidence connects an indirect change to its effects
+    Given operation "change-1" authorized a free-to-paid transition for "Guitar foundations"
+    When its resulting commercial update is applied asynchronously
+    Then the update's audit evidence identifies "change-1" as its cause
+    And the original actor and resulting outcome can be reconstructed
+
+  Scenario: Plus can launch independently of teacher commerce and CMS
+    Given subscription readiness is approved for learner "Alice" in production
+    And Alice is admitted to the subscription beta cohort
+    And CMS integration and teacher settlement onboarding are disabled
+    When Alice starts a Plus checkout using an eligible core-managed offer
+    Then the checkout can be authorized without enabling teacher commerce or CMS
+
+  Scenario: The first embedding license does not require an already licensed sale
+    Given teacher "Bea" owns draft path "Guitar foundations"
+    And the path contains premium exercises but has no embedding license
+    And Bea has an eligible permanent license offer and approved license acquisition readiness
+    And Bea is admitted to the license acquisition cohort
+    And no teacher payout account or validated sale manifest exists
+    When Bea starts checkout for the path's first embedding license
+    Then license checkout can be authorized using the reviewed ownership revision
+
+  Scenario: An existing license remains usable when new license acquisition is disabled
+    Given teacher "Bea" holds a valid permanent embedding license for "Guitar foundations"
+    And new license acquisition is disabled
+    And paid sale activation is enabled for Bea with all other readiness approved
+    When Bea validates the path's premium dependencies for a new paid offer
+    Then the existing license satisfies the commercial permission requirement
+
+  Scenario: Owned content does not require an unrelated premium license
+    Given teacher "Bea" owns every dependency of path "Guitar foundations"
+    And the path contains no premium dependencies
+    And paid sale activation is enabled for Bea with all other readiness approved
+    And new premium license acquisition is disabled
+    When Bea validates the path for a new paid offer
+    Then validation does not require a premium embedding license
+
+  Scenario: Staging admission cannot authorize a production purchase
+    Given learner "Alice" is admitted only to the staging purchase cohort
+    And production purchase cohorts are empty
+    When Alice attempts to purchase "Guitar foundations" in production
+    Then no checkout is created
+
+  Scenario: Buyer admission cannot substitute for seller readiness
+    Given learner "Alice" is admitted to new path purchases
+    And teacher "Bea" is not approved for seller activation
+    When Alice attempts to purchase Bea's path "Guitar foundations"
+    Then no checkout is created
+
+  Scenario: Unavailable activation decisions refuse new checkout
+    Given learner "Alice" has a cached checkout capability
+    And current commercial activation cannot be established
+    When Alice attempts to start a new checkout
+    Then no checkout is created
+
+  Scenario: A committed OFF revision fences a new purchase authorization
+    Given Alice began a purchase attempt before the acquisition OFF revision committed
+    And the attempt has no durable authorization when that revision commits
+    When the attempt tries to authorize the purchase under the older revision
+    Then no checkout intent is authorized
+
+  Scenario: An authorized purchase can finish provider handoff after OFF
+    Given Alice's purchase intent was durably authorized before acquisition was disabled
+    And provider handoff has not yet completed
+    When the authorized operation resumes after acquisition is disabled
+    Then the existing operation can finish without creating a second purchase intent
+
+  Scenario: A completed purchase retry remains available after cohort removal
+    Given purchase operation "purchase-1" was fulfilled for Alice
+    And Alice has since been removed from new purchase cohorts
+    When Alice retries "purchase-1" with the same intent as its authorized owner
+    Then its recorded result is returned without another purchase or grant
+
+  Scenario: CMS outage does not erase permanent buyer access
+    Given Alice permanently purchased path "Guitar foundations"
+    And the editorial CMS is unavailable
+    When Alice opens her retained purchased copy
+    Then her valid permanent grant still permits access
+
+  Scenario: CMS outage blocks an action requiring fresh editorial validation
+    Given a new offer depends on fresh CMS-managed presentation
+    And its required editorial readiness cannot be established
+    When the seller attempts to activate that offer
+    Then the new offer is not activated
+
+  Scenario: Acquisition rollback preserves subscription cancellation
+    Given Alice has an automatically renewing subscription
+    And all new commercial acquisition has been disabled
+    When Alice cancels its next renewal
+    Then the cancellation can be recorded under the existing subscription policy
+
+  Scenario: Missing commercial configuration blocks an enabled checkout
+    Given Plus checkout is enabled for Alice and all flag prerequisites are enabled
+    And no valid price configuration exists for the requested offer
+    When Alice attempts to start checkout
+    Then no checkout is created
+
+  Scenario: Acquisition rollback cannot expose protected content as free
+    Given lesson "Premium chords" requires a valid commercial grant
+    And learner "Alice" has no valid grant for that lesson
+    And commercial acquisition has been disabled
+    When Alice requests the lesson through a direct content link
+    Then the protected lesson content is not delivered
+
+  Scenario: Audit failure prevents activation changes
+    Given new purchases are disabled
+    And durable activation-change evidence cannot be recorded
+    When an authorized operator attempts to enable new purchases
+    Then new purchases remain disabled
+
+  Scenario: Acquisition OFF does not stop evidence archival
+    Given committed commercial evidence awaits archival
+    And all commercial acquisition has been disabled
+    When the scheduled evidence export runs
+    Then the pending evidence remains eligible for verified archival
