@@ -617,6 +617,84 @@
       }
     },
     {
+      "name": "see then name: right",
+      "item_key": "heard_chord:V",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "see_then_name",
+        "music_key": "Eb",
+        "options": [
+          "IV",
+          "V",
+          "vi",
+          "iii"
+        ],
+        "choice": "V",
+        "latency_ms": 2400
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2400,
+          "answer_key": {
+            "way": "see_then_name",
+            "music_key": "Eb",
+            "answer": "V",
+            "offered": [
+              "IV",
+              "V",
+              "vi",
+              "iii"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "see then name: wrong, among all seven numerals",
+      "item_key": "heard_chord:ii",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "see_then_name",
+        "music_key": "A",
+        "options": [
+          "I",
+          "ii",
+          "iii",
+          "IV",
+          "V",
+          "vi",
+          "viio"
+        ],
+        "choice": "IV",
+        "latency_ms": 3100
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 3100,
+          "answer_key": {
+            "way": "see_then_name",
+            "music_key": "A",
+            "answer": "ii",
+            "offered": [
+              "I",
+              "ii",
+              "iii",
+              "IV",
+              "V",
+              "vi",
+              "viio"
+            ]
+          }
+        }
+      }
+    },
+    {
       "name": "rejected: a way of another kind",
       "item_key": "diatonic_chord:G:vi",
       "response": {
@@ -882,6 +960,47 @@
         "string": 1,
         "fret": 0,
         "latency_ms": 1000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: see then name with a chord among the numerals",
+      "item_key": "heard_chord:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "see_then_name",
+        "music_key": "G",
+        "options": [
+          "vi",
+          "IV",
+          "Em",
+          "iii"
+        ],
+        "choice": "vi",
+        "latency_ms": 2000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
+      }
+    },
+    {
+      "name": "rejected: see then name asked of a diatonic chord",
+      "item_key": "diatonic_chord:G:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "see_then_name",
+        "options": [
+          "vi",
+          "IV",
+          "ii",
+          "iii"
+        ],
+        "choice": "vi",
+        "latency_ms": 2000
       },
       "expected": {
         "result": "rejected",
