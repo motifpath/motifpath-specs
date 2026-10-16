@@ -9,7 +9,7 @@ follows and what an installation must guarantee.
 - **Three instruments, beginner to solid intermediate:** electric guitar, acoustic guitar
   (steel-string and nylon violão, in popular styles) and 4-string electric bass. The core is
   blues/rock plus Brazilian popular music. Style is a tag on content, never a branch of the tree.
-- **340 nodes: 216 skills under 16 roots, 124 concepts under 11 roots.**
+- **341 nodes: 216 skills under 16 roots, 125 concepts under 11 roots.**
   - Built from two 2026-10-02 research maps:
     - electric guitar: RSL, Trinity, RGT@LCM, Berklee Online, MI, JustinGuitar, Guitar
       Tricks, Fender Play, Pickup Music, EM&T;
@@ -24,7 +24,9 @@ follows and what an installation must guarantee.
   - bass: 5-string, Fretless, Double thumb, Walking over ii–V–I;
   - acoustic: 7-string violão, Body percussion;
   - plus Use modal interchange.
-- **Edges: 335 `applies` and 136 `requires`.**
+  - A placeholder concept needn't be applied or required: it marks what comes after solid
+    intermediate, and no beginner-to-intermediate skill uses it yet.
+- **Edges: 357 `applies` and 140 `requires`.**
   - `requires` comes only from the research's sourced dependencies (syllabus or method
     order, research or stated synthesis), one edge per target.
   - Not encoded:
@@ -32,6 +34,8 @@ follows and what an installation must guarantee.
     - edges the research found unsupported or contradicted: licks require intervals, rest
       stroke requires free stroke, fills require chart-building, MPB shapes require barre
       chords.
+  - Synthesis edges (`basis: Syn`) give an instrument its own prerequisites where the
+    sourced ones don't count for it, so its readiness measures something.
 
 ## Rules
 
@@ -64,6 +68,19 @@ follows and what an installation must guarantee.
 - **A `requires` edge counts for an instrument only when both nodes are for that
   instrument.** "Improvise over a blues" requires "Play minor pentatonic position 1" for a
   guitarist, not for a bassist. Every edge shares at least one instrument.
+- **A `requires` edge to a parent asks for the parent's own level.** That level rolls up every
+  item in the parent's subtree that suits the instrument, so the requirement is met when the
+  group as a whole reaches it, not when any one child does. Point an edge at a leaf when one
+  child is what's needed: "Hybrid picking" requires "Place the picking-hand fingers", not all
+  of fingerstyle.
+- **Every skill is classified with a concept on each of its instruments.** A lesson needs at
+  least one skill and one concept that suit its instrument, so a leaf skill applies at least
+  one concept valid on every instrument it is for.
+  - A skill that no concept describes says why in `unapplied`, an annotation for authors
+    that isn't installed. Only "Plan a practice routine" has one: a routine organises other
+    skills.
+- **Every concept is reachable.** A leaf concept that isn't a placeholder is applied by at
+  least one skill or required by a node, so practice and recommendations can get to it.
 
 ## Delivery
 
@@ -92,6 +109,15 @@ follows and what an installation must guarantee.
     parent;
   - `applies` runs only skill → concept;
   - `requires` has no cycle, and the two ends of every `requires` edge share an instrument.
+- **Classification and readiness hold on every instrument.** The compiler refuses a map that
+  breaks any of these:
+  - every leaf skill applies a concept valid on each of its instruments, or says in
+    `unapplied` why none fits (and then applies none);
+  - every leaf concept below level A is applied by a skill or required by a node;
+  - for every instrument a `requires` edge counts for, its target has a leaf for that
+    instrument, so the requirement has items to measure;
+  - a node whose `requires` edges count for one of its instruments has at least one that
+    counts for each of them, so no instrument's readiness is trivially complete.
 - **Installation fails loudly.** It aborts if a catalog instrument or a node key already
   exists with different data. It never invents or silently skips a row.
 - **Every basic catalog diagram has at least one skill and one concept** from the map.
