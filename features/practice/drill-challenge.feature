@@ -64,6 +64,32 @@ Feature: Generated drill questions challenge the student
     When the diatonic chord vi in G is picked for "alice"'s session in the head
     Then it is asked as chord_to_numeral
 
+  @wip
+  Scenario: A heard chord named right by ear is next asked by sight
+    Given "alice" has named the heard chord vi by ear correctly twice and has never named it by sight
+    When the heard chord vi is picked for "alice"'s session in the head
+    Then it is asked as see_then_name
+
+  @wip
+  Scenario: A heard chord asked by sight shows the chord and names the key
+    When the heard chord vi is planned as see_then_name in G for a session that reads chords on "guitar"
+    Then the question names G and draws the box of "Em", unnamed
+    And it offers numerals, one of them vi
+    And it plays nothing
+
+  @wip
+  Scenario: A cadence's bars show their numerals, and the asked chord's bar shows none
+    Given "alice" is learning the heard chord vi in G
+    When it is planned for "alice"
+    Then the bars play "G", "C", "D", "G" and then "Em"
+    And the first four bars show I, IV, V and I, and the last shows no numeral
+
+  @wip
+  Scenario: A heard progression's bars show no numeral
+    When the heard progression "I-V-vi-IV" is planned as progression_by_number in G
+    Then the bars play "G", "D", "Em" and "C"
+    And no bar shows a numeral
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   @wip
@@ -72,6 +98,7 @@ Feature: Generated drill questions challenge the student
     When "alice" composes a 10-minute session with no instrument in hand
     Then every heard chord in the session is asked again later in the same session
     And at least three other items come between the two times it is asked
+    And the second time it is asked by ear, as cadence_then_chord
 
   Scenario: A chart question is asked in an easy key while the student is learning it
     Given "alice" is learning the chart progression "I-V-vi-IV"
@@ -90,10 +117,53 @@ Feature: Generated drill questions challenge the student
     Then a cadence in G plays before the chord
 
   @wip
-  Scenario: A heard chord is played with no cadence once the student is accurate on it
+  Scenario: A heard chord is played after the tonic alone once the student is accurate on it
     Given "alice" is accurate on the heard chord vi in G
     When it is planned for "alice"
-    Then the chord plays with no cadence before it
+    Then only the tonic chord of G plays, for one bar, before the chord
+
+  @wip
+  Scenario: A heard chord offers four numerals until the student is fluent on it
+    Given "alice" is accurate on the heard chord vi
+    When it is planned for "alice"
+    Then it offers vi and the three numerals nearest it
+
+  @wip
+  Scenario: A heard chord offers all seven numerals once the student is fluent on it
+    Given "alice" is fluent on the heard chord vi
+    When it is planned for "alice"
+    Then it offers I, ii, iii, IV, V, vi and viio
+
+  @wip
+  Scenario Outline: A heard question starts at the tempo of the student's level
+    Given "alice" is <level> on the heard progression "I-V-vi-IV"
+    When it is planned for "alice"
+    Then its playback starts at <bpm> BPM
+
+    Examples:
+      | level    | bpm |
+      | learning | 70  |
+      | accurate | 90  |
+      | fluent   | 110 |
+
+  @web
+  Scenario: A heard question's tempo and note value can be changed without changing the grade
+    Given the heard progression "I-V-vi-IV" was planned for "alice" at 70 BPM
+    When "alice" plays it at 120 BPM in eighths and picks "I-V-vi-IV"
+    Then the answer is graded right
+    And the answer carries the sound it played at that speed as its audio time
+
+  @wip
+  Scenario: Heard progressions are four bars only
+    When every heard progression item is listed
+    Then there is one for each 4-bar progression of the progression catalog
+    And none is for "12-bar-blues" or "12-bar-blues-quick-change"
+
+  @wip
+  Scenario: On bass, a root line plays under a heard question's chords
+    When the heard progression "I-V-vi-IV" is planned as progression_by_number in G for a session that reads chords on "electric-bass"
+    Then its playback has a bass line
+    And its bars still play the chords "G", "D", "Em" and "C"
 
   Scenario: On bass, a numeral is answered by picking a chord symbol
     When the diatonic chord vi in G is planned as numeral_to_chord for a session that reads chords on "electric-bass"
@@ -126,6 +196,13 @@ Feature: Generated drill questions challenge the student
     Given a drill template "diatonic_chord:numeral_to_chord" whose second way is "fretboard_cell:find_the_note"
     When the practice drill catalog is installed
     Then the installation aborts, naming "diatonic_chord:numeral_to_chord"
+
+  @wip
+  Scenario: A heard chord answered by sight with an option that is not a numeral is rejected
+    Given the heard chord vi in G was planned as see_then_name
+    When "alice" answers it with the options "vi", "IV", "Em" and "iii"
+    Then the answer is rejected as invalid_choices
+    And no evidence is stored
 
   @wip
   Scenario: An answer among options the plan didn't offer is rejected
