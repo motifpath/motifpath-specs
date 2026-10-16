@@ -1,6 +1,10 @@
 # Commercial activation registry — MOT-115
 
-**Revision:** MOT-115-r3 · **Status:** Proposed; explicit PO registry approval pending.
+**Revision:** MOT-115-r3 · **Status:** Approved by Gilson Yamada on 2026-10-15.
+
+Approval was explicitly recorded in chat after PR #311 merged. Scope: flag names, accountability,
+targeting, dependencies and rollback rules in this revision. Figma and deployment approvals
+remain separate.
 
 This is the durable activation contract for new commercial capabilities. It does not enable flags, approve Figma revisions or prove runtime readiness. All defaults are OFF in local, test, staging and production; every environment starts with empty subject allowlists. No environment inherits another environment’s activation or cohort.
 
@@ -104,4 +108,4 @@ MOT-118–125, MOT-127–129 and MOT-131–133 are mapped above; MOT-137 owns co
 
 Proposed behavior is in [commercial controls](../features/monetization/commercial-controls.feature), complemented by the [contract index](../features/monetization/README.md). Scenarios remain @wip until runtime TDD and real persistence/recovery verification pass. Syntax and graph checks establish only specification consistency.
 
-MOT-117 contracts and accepted ADR-058/059/060 remain authoritative. MOT-115-r3 requires explicit PO approval recording approver, reviewed revision and date before its names/activation decisions become approved. PR creation or integration alone is not that approval. Figma, deployment configuration and runtime evidence remain separate gates. Local implementation plans and JSON review artifacts remain unversioned under ADR-022.
+MOT-117 contracts and accepted ADR-058/059/060 remain authoritative. Gilson Yamada explicitly approved MOT-115-r3 on 2026-10-15 after PR #311 merged. Its registry names and activation decisions are approved within that recorded scope. Future registry changes require a new reviewed revision. PR creation or integration alone does not approve future changes. Figma, deployment configuration and runtime evidence remain separate gates. Local implementation plans and JSON review artifacts remain unversioned under ADR-022.

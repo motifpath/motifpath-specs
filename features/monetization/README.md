@@ -34,16 +34,15 @@ implementation passes TDD. PR approval accepts proposed API details, not a deplo
 
 ## Rollout controls
 
-[Commercial activation registry](../../openapi/commercial-rollout-contract.md) defines proposed
+[Commercial activation registry](../../openapi/commercial-rollout-contract.md) defines approved
 MOT-115-r3 names, ownership, default-OFF targeting, independent readiness tracks and audited
 rollback. [Commercial control scenarios](commercial-controls.feature) cover activation boundaries;
-registry and Figma approvals remain separate from contract integration.
+Gilson approved registry revision MOT-115-r3 on 2026-10-15; Figma approval remains separate.
 
 ## Deliverable and flag mapping
 
-Flag names below match the proposed MOT-115 registry; registry approval is tracked in MOT-115,
-not asserted here. Every default is OFF. New actions require backend evaluation and cohort
-approval; OFF never disables existing rights, progress, audit, cancellation, refund, reconciliation
+Flag names below match MOT-115-r3, explicitly approved by Gilson Yamada on 2026-10-15.
+Every default is OFF. New actions require backend evaluation and cohort approval; OFF never disables existing rights, progress, audit, cancellation, refund, reconciliation
 or settlement obligations. UI mirrors decisions. Plus and teacher commerce have separate readiness.
 
 | Ticket | Proposed flag(s), prefix `monetization.` | Contract surface and scenarios |
@@ -95,10 +94,11 @@ and [retention scenarios](audit-archival.feature).
 
 ## Acceptance and remaining external gates
 
-ADR-060 was accepted by Gilson Yamada on 2026-10-15. The consolidated PR completes the
-specification surfaces for MOT-117; its review must accept API additions, message schemas and
-scenarios before MOT-117 is marked done. No runtime evidence is claimed by syntax/schema checks. MOT-115 registry and
-MOT-116 Figma approvals remain separate blockers to implementation; no approval is fabricated.
+ADR-060 was accepted by Gilson Yamada on 2026-10-15. PRs #344 and #353 merged the
+completed MOT-117 specification surfaces and architecture acceptance into the epic.
+No runtime evidence is claimed by syntax/schema checks. Gilson explicitly approved
+MOT-115-r3 on 2026-10-15. MOT-116 Figma approval remains a separate blocker to implementation;
+no design or deployment approval is implied.
 
 Deployment inputs remain explicit: approved prices/discounts/bounds/commissions and BRL offers;
 Brazilian Stripe/Connect capabilities, fees and refund liquidity; pinned compatible SDK and CMS
