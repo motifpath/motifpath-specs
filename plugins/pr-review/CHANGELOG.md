@@ -1,5 +1,25 @@
 # PR Review — Changelog
 
+## [1.16.0] — 2026-10-16
+
+### Changed
+- `HEURISTICS.md` rewritten principle-first: every item now states the principle that must stay
+  true, the questions that test it, and an abstract smell. All PR numbers, product nouns and
+  incident narratives are gone from the checklist (their history stays in the entries below), so
+  an item is matched by the shape of a problem in unfamiliar code rather than by a past case's
+  names. Same 24 items, numbers and axes; items that had grown a clause per incident (4, 7, 13)
+  are restated around one principle. The activation table no longer names a repo and adds rows
+  for extension points, reference data and new tests.
+- `HEURISTICS.md` item 18 (test the real path) now also asks whether a test fakes away the
+  nondeterminism a guarantee has to survive (a no-op shuffle, a fixed seed, a frozen clock, a
+  fake that never fails). From the MOT-148 work in motifpath-core#143, where the application
+  test's no-op shuffle hid that the composer's shuffle undid the circle-of-fifths order of new
+  keys; only BDD with the real shuffle caught it.
+- `LEARNING.md`: the filter gains a fourth question ("is it stated as a principle, not a case?"),
+  the checklist takes no cases even as parentheticals, provenance goes to this changelog and the
+  commit, and widening an item means restating its principle, not appending a clause.
+- `SKILL.md` 4d's duplicated-rule example is stated generally.
+
 ## [1.15.0] — 2026-10-15
 
 ### Changed
