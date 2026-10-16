@@ -29,7 +29,6 @@ Feature: Generated drill questions challenge the student
     Then it offers four chords, all of them chords of G major
     And one of them is E minor
 
-  @wip
   Scenario: A progression question offers its confusable progressions first
     When the progression "I-V-vi-IV" is planned as progression_by_number
     Then its options include "I-vi-IV-V" and "vi-IV-I-V"
@@ -64,27 +63,23 @@ Feature: Generated drill questions challenge the student
     When the diatonic chord vi in G is picked for "alice"'s session in the head
     Then it is asked as chord_to_numeral
 
-  @wip
   Scenario: A heard chord named right by ear is next asked by sight
     Given "alice" has named the heard chord vi by ear correctly twice and has never named it by sight
     When the heard chord vi is picked for "alice"'s session in the head
     Then it is asked as see_then_name
 
-  @wip
   Scenario: A heard chord asked by sight shows the chord and names the key
     When the heard chord vi is planned as see_then_name in G for a session that reads chords on "guitar"
     Then the question names G and draws the box of "Em", unnamed
     And it offers numerals, one of them vi
     And it plays nothing
 
-  @wip
   Scenario: A cadence's bars show their numerals, and the asked chord's bar shows none
     Given "alice" is learning the heard chord vi in G
     When it is planned for "alice"
     Then the bars play "G", "C", "D", "G" and then "Em"
     And the first four bars show I, IV, V and I, and the last shows no numeral
 
-  @wip
   Scenario: A heard progression's bars show no numeral
     When the heard progression "I-V-vi-IV" is planned as progression_by_number in G
     Then the bars play "G", "D", "Em" and "C"
@@ -92,7 +87,6 @@ Feature: Generated drill questions challenge the student
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A drill with no second way brings its item back later in the session
     Given "alice" has new heard chords of G major
     When "alice" composes a 10-minute session with no instrument in hand
@@ -110,31 +104,26 @@ Feature: Generated drill questions challenge the student
     When "alice" composes a session in the head whose new items include diatonic chords
     Then every new diatonic chord in the session is in C major
 
-  @wip
   Scenario: A heard chord is played after a cadence until the student is accurate on it
     Given "alice" is learning the heard chord vi in G
     When it is planned for "alice"
     Then a cadence in G plays before the chord
 
-  @wip
   Scenario: A heard chord is played after the tonic alone once the student is accurate on it
     Given "alice" is accurate on the heard chord vi in G
     When it is planned for "alice"
     Then only the tonic chord of G plays, for one bar, before the chord
 
-  @wip
   Scenario: A heard chord offers four numerals until the student is fluent on it
     Given "alice" is accurate on the heard chord vi
     When it is planned for "alice"
     Then it offers vi and the three numerals nearest it
 
-  @wip
   Scenario: A heard chord offers all seven numerals once the student is fluent on it
     Given "alice" is fluent on the heard chord vi
     When it is planned for "alice"
     Then it offers I, ii, iii, IV, V, vi and viio
 
-  @wip
   Scenario Outline: A heard question starts at the tempo of the student's level
     Given "alice" is <level> on the heard progression "I-V-vi-IV"
     When it is planned for "alice"
@@ -153,13 +142,11 @@ Feature: Generated drill questions challenge the student
     Then the answer is graded right
     And the answer carries the sound it played at that speed as its audio time
 
-  @wip
   Scenario: Heard progressions are four bars only
     When every heard progression item is listed
     Then there is one for each 4-bar progression of the progression catalog
     And none is for "12-bar-blues" or "12-bar-blues-quick-change"
 
-  @wip
   Scenario: On bass, a root line plays under a heard question's chords
     When the heard progression "I-V-vi-IV" is planned as progression_by_number in G for a session that reads chords on "electric-bass"
     Then its playback has a bass line
