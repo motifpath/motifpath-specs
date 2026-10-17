@@ -50,7 +50,7 @@ stay short.
   Instrument (one), Language (one), Teacher (one). That is all.
   - Level, Instrument and Language are `ChoiceChip` groups. Teacher is a `MenuRow` that opens a
     searchable single-choice list ("Any teacher" first).
-  - **No skill or concept picker for students.** There are 216 skills in 16 areas and 124 concepts
+  - **No skill or concept picker for students.** There are 216 skills in 16 areas and 125 concepts
     in 11 areas; a picker for them was too busy on a phone (two versions were rejected), and most
     skills match no course in a small catalog.
 - **A skill or concept filter arrives only from context:** "Find courses for this skill" on Your
