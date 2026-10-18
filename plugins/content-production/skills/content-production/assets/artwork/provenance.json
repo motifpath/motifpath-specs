@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-18",
+  "tool": "OpenAI built-in image generation",
+  "assets": [
+    {
+      "file": "violet-ribbon.png",
+      "prompt": "Premium abstract 16:9 background. Deep indigo #05072C, sculptural luminous violet #7C3CFF and lilac #C97CFF satin ribbon forming an open rising loop on the right third, evoking musical phrasing and a learning path. Left 60% nearly solid indigo. Restrained studio lighting, no text, logo, stars, sparkles or notation."
+    },
+    {
+      "file": "electric-guitar.png",
+      "prompt": "Premium editorial still life photograph, 4:3 horizontal. Six-string electric guitar with dark matte charcoal finish, chrome strings and bridge, violet and lilac studio rim lighting against deep indigo. Guitar diagonally on right, negative space at left. No people, hands, text, logos or sheet music. Generated illustrative image, not documentary evidence."
+    },
+    {
+      "file": "motif-path-mark.svg",
+      "source": "motifpath-brand/logo/svg/motif-path-mark.svg",
+      "modifications": "none"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "content-production",
+  "displayName": "Content Production",
+  "version": "1.2.0",
+  "description": "Produce practical, classified, localized MotifPath learning content and native practice storyboards.",
+  "author": {
+    "name": "MotifPath Team"
+  },
+  "repository": "https://github.com/motifpath/motifpath-specs",
+  "skills": "./skills/"
+}
