@@ -10,6 +10,7 @@ Changes here propagate to all consuming repositories before any implementation b
                 openapi/components/schemas/events.yaml
 /features     → Business rule specs (Gherkin .feature files, nested per domain)
 /adrs         → Architecture Decision Records
+/curriculum   → Pedagogical principles that guide planning courses, paths and lessons
 /prompts      → Versioned AI task prompts
 /evals        → Golden sets for PromptFoo evaluation
 /golden       → Language-neutral golden cases shared by core and web (e.g. practice graders),
