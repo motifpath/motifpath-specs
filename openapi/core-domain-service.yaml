@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.51.0
+  version: 0.52.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -13508,9 +13508,10 @@ components:
       type: object
       description: |
         One item of a composed session, with what the client needs to present it. Exactly
-        one of fretboard_cell, exercise, play_along, diagram_shape and generated_choice is
-        present, matching kind: generated_choice for a diatonic chord, a chord function or a
-        chart progression.
+        one of fretboard_cell, exercise, play_along, diagram_shape, generated_choice,
+        chord_voicing, chord_change, root_fifth and root_change is present, matching kind:
+        generated_choice for a diatonic chord, a chord function, a chart progression, a heard
+        chord or a heard progression.
       properties:
         item_key:
           $ref: './components/schemas/practice.yaml#/PracticeItemKey'
@@ -13686,6 +13687,14 @@ components:
             - asked_interval
         generated_choice:
           $ref: './components/schemas/practice.yaml#/GeneratedChoiceQuestion'
+        chord_voicing:
+          $ref: './components/schemas/practice.yaml#/PlannedChordVoicing'
+        chord_change:
+          $ref: './components/schemas/practice.yaml#/PlannedChordChange'
+        root_fifth:
+          $ref: './components/schemas/practice.yaml#/PlannedRootFifth'
+        root_change:
+          $ref: './components/schemas/practice.yaml#/PlannedRootChange'
       required:
         - item_key
         - kind
