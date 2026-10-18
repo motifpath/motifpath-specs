@@ -1,5 +1,6 @@
 # MotifPath practice drill catalog v2 — the drill templates, the generated fretboard cells,
-# the diagram shape families and the timed thresholds installed in every environment. Rules: practice-drills.md.
+# the diagram shape families, the timed thresholds, the chord drills and the change targets
+# installed in every environment. Rules: practice-drills.md.
 #
 # IDs are UUID v5 under the catalog namespace, from "drill-template/<key>" and
 # "drill-threshold/<template key>/v<version>" (reference-data.md).
@@ -131,3 +132,50 @@ thresholds:
 # The tempo a question asked by ear starts at, in quarter notes per minute, by the student's
 # level on the item. The student may change it, and the answer is never graded on it.
 hear_tempo_bpm: {new: 70, learning: 70, accurate: 90, fluent: 110, retained: 110}
+
+# Chords played in hand (MOT-79): single chords played clean, and minutes of changes between two
+# chords, one change on every beat. A chord is an open voicing of the chord catalog, by its key;
+# on bass, the same chord's symbol, played as its root and fifth (or its root, in a change) on
+# the electric-bass layout. A change is one item for both directions, keyed in the order listed.
+# IDs are UUID v5 from "chord-drill/<voicing key>" and "chord-change/<from key>/<to key>".
+chord_drills:
+  bass_layout: electric-bass
+  voicings:
+    - {voicing: c-open, chord: "C", id: 85f8c0cf-00ab-5e44-9bf8-93b6dfc2b30e}
+    - {voicing: a-open, chord: "A", id: 756f0c7d-7099-55b7-9eb6-a8a6188d6666}
+    - {voicing: g-open, chord: "G", id: 2767fdc8-10f9-5bf7-967f-f0f3ca6f1654}
+    - {voicing: e-open, chord: "E", id: 35ee8677-7105-51f4-8944-749c2d1b1dc8}
+    - {voicing: d-open, chord: "D", id: cdd31617-a8c3-58f8-b1be-89eaa9294a66}
+    - {voicing: a-minor-open, chord: "Am", id: 5dbf1f22-5a33-5b37-8470-db3bb73461e0}
+    - {voicing: e-minor-open, chord: "Em", id: c8afa71b-2c2d-53bf-bd70-0ca14ae99d9a}
+    - {voicing: d-minor-open, chord: "Dm", id: 91e7bc54-7b01-526a-961c-81097785473c}
+  changes:
+    - {from: a-minor-open, to: c-open, id: 411f2e7c-89a6-5b73-bb8f-e1d02dc60e3c}
+    - {from: c-open, to: g-open, id: 0ea30916-1a46-5553-a22f-7e5bb3d87e69}
+    - {from: g-open, to: d-open, id: b17fcf5b-4b27-579b-99c2-b19661ae22c0}
+    - {from: d-open, to: a-open, id: 98fe3b03-9add-5b07-bf94-b4b3c2ec8c38}
+    - {from: a-open, to: e-open, id: ecf9af8a-1c33-508b-88f1-bb0f4e5f66cb}
+    - {from: a-minor-open, to: e-open, id: 6995e0fb-7955-581a-a777-dcb75af3f452}
+    - {from: e-minor-open, to: g-open, id: e194a68a-7295-5a8b-975a-2b4a575ada31}
+    - {from: d-open, to: e-minor-open, id: f3dafcce-6314-5817-aa24-ecb203aeb9e8}
+    - {from: a-minor-open, to: d-minor-open, id: eec553a2-ab5b-5276-9567-325dae6091e2}
+    - {from: e-minor-open, to: c-open, id: e467d02e-4ae4-5ec3-a6ca-401126630f96}
+  # At most this many of each in one session.
+  max_voicings_per_session: 4
+  max_changes_per_session: 2
+  # Seconds each takes in a session: a change is a bar of count-in, the minute and the count.
+  voicing_seconds: 20
+  change_seconds: 90
+  # The change ladder, in BPM (one change on every beat): the first minute's tempo, the step,
+  # and the floor.
+  change_first_tempo_bpm: 40
+  change_tempo_step_bpm: 5
+  change_min_tempo_bpm: 20
+  # A minute's rating, from the share of its beats that changed cleanly.
+  change_rating_from: {clean: 0.9, almost: 0.6}
+
+# Versioned targets for chord and root changes: the clean changes a minute that count as fully
+# fluent, for every pair, on every instrument. Versioned like the fluent times; never edit an
+# installed one. IDs are UUID v5 from "change-target/v<version>".
+change_targets:
+  - {version: 1, effective_from: "2026-10-18", changes_per_minute: 60, source: default, id: 02685c89-9b1e-5fd8-bd54-a733ce804181}

@@ -164,6 +164,28 @@ ADR defers to it on:
 - **new choice drills carry their options in the plan**; name the note keeps client-picked
   distractors.
 
+**Amended:** 2026-10-18, planning the chord drills (MOT-79, drill set v2 slice P3), by Gilson.
+Chords played in hand join sessions:
+- **in hand, not only play-alongs and exercises**: an in-hand session also picks single chords
+  (`chord_voicing`; on bass, a chord's root and fifth, `root_fifth`) and changes between two
+  chords (`chord_change`; on bass, `root_change`). They are focus items, never the warm-up or the
+  application ending, and never in the head. The items are a curated set in the practice drill
+  catalog: no "chords the student has met" is tracked, and they are offered like any node's items
+  (a path skill's as new, with no prerequisite in practice; others as stretch);
+- **at most 4 single chords and 2 changes a session**, like the cap on generated drills. A single
+  chord takes 20 seconds; a change takes 90 (a bar of count-in, the minute, the count). On guitar,
+  a single chord comes before a change that uses it;
+- **a change is one minute at a tempo, one change on every beat.** The student counts the clean
+  changes, and the take sends the tempo and the count. Its rating is no longer the student's: it
+  follows from the share of the minute's beats that changed cleanly (clean from 90%, almost from
+  60%, struggled below), so the count and the rating never disagree;
+- **the change ladder runs across sessions**, since a session plays a change once: the plan
+  starts a change at the tempo of its last minute, 5 BPM up after two clean minutes in a row and
+  5 down after a struggle, never below 20; the first minute starts at 40;
+- **the target is the catalog's**: 60 clean changes a minute, for every pair, on guitar and bass,
+  versioned like the fluent times. Before this a change had no target, so any clean minute counted
+  as fully fluent.
+
 ---
 
 ## Context
@@ -408,8 +430,9 @@ One piece of evidence per observation, the only stored learning state:
   play-along is never the ending (its review belongs in the focus block), and an ending longer than
   a quarter of the session is skipped.
 - **Playing in hand, recall in the head** (amended 2026-10-07, by Gilson, reversing 2026-10-06): a
-  session with the instrument in hand picks play-alongs and authored exercises, never a fretboard
-  cell or a diagram shape, though they suit the instrument; those are recalled in the head only.
+  session with the instrument in hand picks play-alongs, authored exercises and (amended
+  2026-10-18) single chords and chord changes, never a fretboard cell or a diagram shape, though
+  they suit the instrument; those are recalled in the head only.
   With nothing to play, an in-hand session is not found, and the client offers one in the head.
 - **In the head** (amended 2026-10-06): fretboard cells of every layout among the student's
   instruments, diagram shapes of their instruments, and exercises; no warm-up and no application ending, since both are play-alongs.
@@ -439,7 +462,8 @@ One piece of evidence per observation, the only stored learning state:
   warm-up, and the application ending last.
 - **Item time:** a play-along is sized by its takes at its start tempo; an exercise by its authored
   `estimated_duration_seconds`, or 30 seconds without one; a fretboard cell by 8 seconds; a
-  diagram shape by 10 seconds.
+  diagram shape by 10 seconds; a single chord by 20 seconds and a chord change by 90 (amended
+  2026-10-18).
 - **Focus time:** the session minus the warm-up and the application ending (one play-along at its
   estimated time). The mix shares the focus time. A warm-up
   play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the
@@ -682,7 +706,8 @@ shown from evidence (tempo history, speed per string, levels).
 
 - `exercise.answer_sent` is retired: the challenge emits `practice.item_answered` (amended 2026-10-05).
 - Evidence stays in MongoDB; the archive question is reopened only by a measured trigger.
-- Tempo targets for play-alongs and chord changes stay authored (they come from the music).
+- Tempo targets for play-alongs stay authored (they come from the music). A chord change's target
+  is the drill catalog's, the same for every pair (amended 2026-10-18).
 - Audio detection is reserved as an evidence source and is its own later spike.
 - A future take-storage decision can extend ADR-021 (presigned upload, object storage) to student
   media, and add an optional take reference to teacher notes.

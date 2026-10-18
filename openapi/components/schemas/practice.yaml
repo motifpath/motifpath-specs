@@ -203,9 +203,9 @@ SelfRatingResponse:
     The student's own rating of a take they played: a play-along at a tempo, chord changes
     counted over a minute, or one chord played cleanly. A play-along rating carries tempo_bpm
     and no changes_per_minute, and may carry the note_value it was played at (quarters when
-    absent); a chord-change or root-change rating carries changes_per_minute
-    and no tempo_bpm; a single chord voicing or a chord's root and fifth (play clean) carries
-    neither.
+    absent); a chord-change or root-change take carries both tempo_bpm and changes_per_minute,
+    and its rating is derived from them (see rating); a single chord voicing or a chord's root
+    and fifth (play clean) carries neither.
   properties:
     response_type:
       type: string
@@ -220,14 +220,19 @@ SelfRatingResponse:
         - clean
       description: |
         How the take went, in the student's judgement. struggled = fell apart or needed to
-        stop; almost = got through with slips; clean = no slips at this measure.
+        stop; almost = got through with slips; clean = no slips at this measure. For a chord
+        change or a root change the rating is not the student's: it follows from the share of
+        the minute's beats that changed cleanly (changes_per_minute / tempo_bpm), clean from
+        0.9, almost from 0.6, struggled below. The server derives it whatever is sent, and a
+        client sends the same.
     tempo_bpm:
       type: integer
       minimum: 1
       maximum: 400
       description: |
         The tempo of the take, in beats per minute, as played: the click's tempo. Present for a
-        play-along.
+        play-along, and for a chord change or a root change, where the student changes on every
+        beat, so it is also the number of changes the minute asked for.
     note_value:
       $ref: '#/NoteValue'
     changes_per_minute:
@@ -235,8 +240,8 @@ SelfRatingResponse:
       minimum: 0
       maximum: 600
       description: |
-        The number of chord changes made in one minute. Present for a chord change and a root
-        change.
+        The number of chord changes in one minute that rang clean, counted by the student. Present
+        for a chord change and a root change, and never more than tempo_bpm.
   additionalProperties: false
   required:
     - response_type
@@ -1206,3 +1211,145 @@ GeneratedChoiceQuestion:
     - drawn_as
     - options
     - voicings
+
+FretPlace:
+  type: object
+  description: One place on a fretboard layout.
+  properties:
+    string:
+      type: integer
+      minimum: 1
+      description: The string, 1 being the highest-pitched.
+    fret:
+      type: integer
+      minimum: 0
+      description: The fret; 0 is the open string.
+  additionalProperties: false
+  required: [string, fret]
+
+PlannedChordVoicing:
+  type: object
+  description: |
+    A single chord to fret, strum once and rate (kind chord_voicing). The chord is named:
+    playing it is the skill. The take is rated by the student and has no measure.
+  properties:
+    diagram_id:
+      type: string
+      format: uuid
+      description: The chord catalog voicing diagram to play, drawn as its chord box.
+    chord_symbol:
+      type: string
+      description: The chord's symbol, such as Am, shown with the box.
+  additionalProperties: false
+  required: [diagram_id, chord_symbol]
+
+PlannedRootFifth:
+  type: object
+  description: |
+    A chord's root and fifth to play on a bass layout and rate (kind root_fifth). Both places
+    are marked: playing them is the skill. The take is rated by the student and has no measure.
+  properties:
+    layout_instrument_id:
+      type: string
+      format: uuid
+      description: The instrument whose fretboard layout and tuning the places belong to.
+    chord_symbol:
+      type: string
+      description: The chord's symbol, such as Am.
+    root:
+      $ref: '#/FretPlace'
+    fifth:
+      $ref: '#/FretPlace'
+  additionalProperties: false
+  required: [layout_instrument_id, chord_symbol, root, fifth]
+
+ChangeMinute:
+  type: object
+  description: |
+    The tempo ladder and the student's record for a minute of changes between two chords (or
+    two roots), one change on every beat, so a tempo is also the number of changes the minute
+    asks for. The take sends the tempo played and the clean changes counted.
+  properties:
+    start_tempo_bpm:
+      type: integer
+      minimum: 20
+      description: |
+        The tempo to start the minute at, from the ladder: the tempo of the item's last minute,
+        5 higher after two clean minutes in a row and 5 lower after a struggled one, never below
+        20; 40 when the item was never played. The student may set another before starting.
+    target_changes_per_minute:
+      type: integer
+      minimum: 1
+      description: The clean changes a minute that count as fully fluent, the same for every pair.
+    best_clean_changes_per_minute:
+      type:
+        - integer
+        - 'null'
+      minimum: 0
+      description: |
+        The most clean changes the student counted in a clean minute since their latest teacher
+        review. Null when they have no clean minute yet.
+    last_changes_per_minute:
+      type:
+        - integer
+        - 'null'
+      minimum: 0
+      description: |
+        The clean changes counted in the item's last minute, where the count starts. Null when
+        the item was never played.
+  additionalProperties: false
+  required:
+    - start_tempo_bpm
+    - target_changes_per_minute
+    - best_clean_changes_per_minute
+    - last_changes_per_minute
+
+PlannedChordChange:
+  type: object
+  description: |
+    A minute of changes between two chords, back and forth (kind chord_change). Both chords are
+    named and drawn as their chord boxes.
+  properties:
+    from_diagram_id:
+      type: string
+      format: uuid
+      description: The first chord's voicing diagram, the first of the item key.
+    to_diagram_id:
+      type: string
+      format: uuid
+      description: The second chord's voicing diagram.
+    from_chord_symbol:
+      type: string
+      description: The first chord's symbol.
+    to_chord_symbol:
+      type: string
+      description: The second chord's symbol.
+    minute:
+      $ref: '#/ChangeMinute'
+  additionalProperties: false
+  required: [from_diagram_id, to_diagram_id, from_chord_symbol, to_chord_symbol, minute]
+
+PlannedRootChange:
+  type: object
+  description: |
+    A minute of changes between two chords' roots on a bass layout (kind root_change). Both
+    roots are marked.
+  properties:
+    layout_instrument_id:
+      type: string
+      format: uuid
+      description: The instrument whose fretboard layout and tuning the places belong to.
+    from_chord_symbol:
+      type: string
+      description: The first chord's symbol, the first of the item key.
+    to_chord_symbol:
+      type: string
+      description: The second chord's symbol.
+    from_root:
+      $ref: '#/FretPlace'
+    to_root:
+      $ref: '#/FretPlace'
+    minute:
+      $ref: '#/ChangeMinute'
+  additionalProperties: false
+  required: [layout_instrument_id, from_chord_symbol, to_chord_symbol, from_root, to_root, minute]

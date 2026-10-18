@@ -1,6 +1,6 @@
 {
   "grader": "self_rating.v1",
-  "description": "Takes the student rates themselves: a play-along at a tempo, chord or root changes counted over a minute, or one chord voicing or a chord's root and fifth played cleanly. The grader checks the take fits the item and keeps the rating and its measure as they are.",
+  "description": "Takes the student rates themselves: a play-along at a tempo, or one chord voicing or a chord's root and fifth played cleanly; the grader checks the take fits the item and keeps the rating and its measure as they are. A minute of chord or root changes at a tempo, one change on every beat, is rated by its count instead: the share of the beats that changed cleanly.",
   "reference": {
     "diagrams": {
       "00000000-0000-4000-8000-0000000000f1": {
@@ -83,11 +83,12 @@
       }
     },
     {
-      "name": "chord change: an almost-clean minute with its count",
+      "name": "chord change: 42 clean changes at 60 BPM is almost (70% of the beats)",
       "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
       "response": {
         "response_type": "self_rating",
         "rating": "almost",
+        "tempo_bpm": 60,
         "changes_per_minute": 42
       },
       "expected": {
@@ -95,16 +96,18 @@
         "evidence": {
           "source": "self_assessed",
           "rating": "almost",
+          "tempo_bpm": 60,
           "changes_per_minute": 42
         }
       }
     },
     {
-      "name": "chord change: zero changes in a minute is still a rating",
+      "name": "chord change: zero clean changes in a minute is still a take, and a struggle",
       "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
       "response": {
         "response_type": "self_rating",
         "rating": "struggled",
+        "tempo_bpm": 40,
         "changes_per_minute": 0
       },
       "expected": {
@@ -112,8 +115,93 @@
         "evidence": {
           "source": "self_assessed",
           "rating": "struggled",
+          "tempo_bpm": 40,
           "changes_per_minute": 0
         }
+      }
+    },
+    {
+      "name": "chord change: exactly 60% of the beats is almost",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "almost",
+        "tempo_bpm": 50,
+        "changes_per_minute": 30
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "almost",
+          "tempo_bpm": 50,
+          "changes_per_minute": 30
+        }
+      }
+    },
+    {
+      "name": "chord change: just under 60% of the beats is a struggle",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "struggled",
+        "tempo_bpm": 50,
+        "changes_per_minute": 29
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "struggled",
+          "tempo_bpm": 50,
+          "changes_per_minute": 29
+        }
+      }
+    },
+    {
+      "name": "chord change: the rating follows the count, whatever rating was sent",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 60,
+        "changes_per_minute": 20
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "struggled",
+          "tempo_bpm": 60,
+          "changes_per_minute": 20
+        }
+      }
+    },
+    {
+      "name": "rejected: a chord-change take without its tempo",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "changes_per_minute": 40
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "measure_missing"
+      }
+    },
+    {
+      "name": "rejected: more clean changes than beats in the minute",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 40,
+        "changes_per_minute": 41
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
       }
     },
     {
@@ -129,11 +217,12 @@
       }
     },
     {
-      "name": "rejected: a chord-change rating without its count",
+      "name": "rejected: a chord-change take without its count",
       "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
       "response": {
         "response_type": "self_rating",
-        "rating": "clean"
+        "rating": "clean",
+        "tempo_bpm": 60
       },
       "expected": {
         "result": "rejected",
@@ -155,27 +244,33 @@
       }
     },
     {
-      "name": "rejected: a chord-change rating with a tempo",
+      "name": "chord change: 54 clean changes at 60 BPM is clean (90% of the beats)",
       "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
       "response": {
         "response_type": "self_rating",
         "rating": "clean",
-        "tempo_bpm": 90,
-        "changes_per_minute": 40
+        "tempo_bpm": 60,
+        "changes_per_minute": 54
       },
       "expected": {
-        "result": "rejected",
-        "reason": "response_does_not_fit_item"
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "clean",
+          "tempo_bpm": 60,
+          "changes_per_minute": 54
+        }
       }
     },
     {
-      "name": "rejected: a chord-change rating with a note value",
+      "name": "rejected: a chord-change take with a note value",
       "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
       "response": {
         "response_type": "self_rating",
         "rating": "clean",
-        "changes_per_minute": 40,
-        "note_value": "eighths"
+        "tempo_bpm": 60,
+        "note_value": "eighths",
+        "changes_per_minute": 40
       },
       "expected": {
         "result": "rejected",
@@ -201,6 +296,7 @@
       "response": {
         "response_type": "self_rating",
         "rating": "clean",
+        "tempo_bpm": 60,
         "changes_per_minute": 40
       },
       "expected": {
@@ -267,11 +363,12 @@
       }
     },
     {
-      "name": "root change: a minute's count on bass",
+      "name": "root change: every beat changed cleanly on bass",
       "item_key": "root_change:00000000-0000-4000-8000-0000000000b1:C:G",
       "response": {
         "response_type": "self_rating",
         "rating": "clean",
+        "tempo_bpm": 30,
         "changes_per_minute": 30
       },
       "expected": {
@@ -279,6 +376,7 @@
         "evidence": {
           "source": "self_assessed",
           "rating": "clean",
+          "tempo_bpm": 30,
           "changes_per_minute": 30
         }
       }
@@ -347,11 +445,12 @@
       }
     },
     {
-      "name": "rejected: a root-change rating without its count",
+      "name": "rejected: a root-change take without its count",
       "item_key": "root_change:00000000-0000-4000-8000-0000000000b1:C:G",
       "response": {
         "response_type": "self_rating",
-        "rating": "clean"
+        "rating": "clean",
+        "tempo_bpm": 30
       },
       "expected": {
         "result": "rejected",
@@ -359,13 +458,26 @@
       }
     },
     {
-      "name": "rejected: a root-change rating with a tempo",
+      "name": "rejected: a root-change take without its tempo",
       "item_key": "root_change:00000000-0000-4000-8000-0000000000b1:C:G",
       "response": {
         "response_type": "self_rating",
         "rating": "clean",
-        "tempo_bpm": 90,
         "changes_per_minute": 30
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "measure_missing"
+      }
+    },
+    {
+      "name": "rejected: a root change with more clean changes than beats",
+      "item_key": "root_change:00000000-0000-4000-8000-0000000000b1:C:G",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 30,
+        "changes_per_minute": 31
       },
       "expected": {
         "result": "rejected",
