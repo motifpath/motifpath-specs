@@ -31,9 +31,9 @@ from measured data. Each one names the MotifPath events that will confirm or ref
    - Confirm with: course and path enrolment by style tag, and play-along completion.
 4. **The early quitting points are physical and predictable:** tuning, finger pain, posture,
    barre chords and the F chord.
-   - **Map:** each has a skill that practice and recommendations can target. Today
-     `play-e-shape-barre` covers barre chords, but nothing covers building finger strength
-     and calluses, or posture without pain.
+   - **Map:** each has a skill that practice and recommendations can target: `tune-with-tuner`,
+     `build-finger-strength`, `play-without-tension`, and the barre chords (`play-e-shape-barre`
+     and `play-a-shape-barre`), which require finger strength.
    - Confirm with: early-left and abandoned sessions in the first four weeks, by skill
      (ADR-046 events).
 

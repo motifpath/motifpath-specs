@@ -177,8 +177,10 @@ skills:
   - {key: hold-bass, parent: instrument-basics, names: {en: "Hold the bass and place the plucking hand", pt_BR: "Segurar o baixo e posicionar a mão direita"}, instruments: bass, level: B, applies: [parts-of-the-instrument]}
   - {key: play-five-string-bass, parent: instrument-basics, names: {en: "Play a 5-string bass", pt_BR: "Tocar baixo de 5 cordas"}, instruments: bass, level: A, applies: [bass-tuning]}
   - {key: play-fretless-bass, parent: instrument-basics, names: {en: "Play fretless bass", pt_BR: "Tocar baixo fretless"}, instruments: bass, level: A, applies: [bass-tuning]}
+  - {key: build-finger-strength, parent: instrument-basics, names: {en: "Build finger strength and calluses", pt_BR: "Fortalecer os dedos e formar calos"}, instruments: fretted, level: B, applies: [finger-numbering, chromatic-scale]}
+  - {key: play-without-tension, parent: instrument-basics, names: {en: "Play without tension or pain", pt_BR: "Tocar sem tensão e sem dor"}, instruments: fretted, level: B, applies: [parts-of-the-instrument]}
   - {key: hold-violao, parent: instrument-basics, names: {en: "Sit and hold the acoustic guitar", pt_BR: "Postura com o violão (clássica e popular)"}, instruments: acoustic, level: B, applies: [parts-of-the-instrument]}
-  - {key: choose-capo-for-singer, parent: instrument-basics, names: {en: "Choose a capo position for a singer's key", pt_BR: "Escolher a casa do capotraste para o tom do cantor"}, instruments: acoustic, level: EI, applies: [key-center, transposition]}
+  - {key: choose-capo-for-singer, parent: instrument-basics, names: {en: "Choose a capo position for a singer's key", pt_BR: "Escolher a casa do capotraste para o tom do cantor"}, instruments: acoustic, level: EI, applies: [key-center, transposition, diatonic-chords]}
   - {key: play-open-tunings, parent: instrument-basics, names: {en: "Play in open tunings", pt_BR: "Tocar em afinações abertas"}, instruments: acoustic, level: I, applies: [open-tunings]}
   - {key: play-seven-string-violao, parent: instrument-basics, names: {en: "Play 7-string violão", pt_BR: "Tocar violão de 7 cordas"}, instruments: acoustic, level: A, applies: [alternating-bass]}
 
@@ -201,7 +203,7 @@ skills:
   - {key: play-triad-arpeggios, parent: play-arpeggios, names: {en: "Play major and minor triad arpeggios", pt_BR: "Arpejos de tríades maiores e menores"}, instruments: guitars, level: EI, applies: [major-triads, minor-triads, interval-shapes, chord-construction]}
   - {key: play-seventh-arpeggios, parent: play-arpeggios, names: {en: "Play seventh-chord arpeggios", pt_BR: "Arpejos de tétrades"}, instruments: guitars, level: I, applies: [seventh-chords, dominant-seventh]}
   - {key: map-fretboard-caged, parent: fretboard-fluency, names: {en: "Map chords and scales with CAGED", pt_BR: "Mapear o braço com o Sistema CAGED"}, instruments: guitars, level: I, applies: [caged-system, barre-chord-shapes, major-scale]}
-  - {key: play-shapes-in-any-key, parent: fretboard-fluency, names: {en: "Play shapes in any key", pt_BR: "Tocar os desenhos em qualquer tom"}, instruments: guitars, level: EI, applies: [transposition, key-center, note-names, circle-of-fifths]}
+  - {key: play-shapes-in-any-key, parent: fretboard-fluency, names: {en: "Play shapes in any key", pt_BR: "Tocar os desenhos em qualquer tom"}, instruments: guitars, level: EI, applies: [transposition, key-center, note-names, circle-of-fifths, diatonic-chords]}
   - {key: find-root-fifth-octave, parent: fretboard-fluency, names: {en: "Find the root, fifth and octave from any note", pt_BR: "Achar tônica, quinta e oitava a partir de qualquer nota"}, instruments: bass, level: B, applies: [root-fifth-octave-shape]}
 
   # Fretting-hand technique
@@ -330,7 +332,7 @@ skills:
   - {key: hear-chord-quality, parent: ear, names: {en: "Recognise chord quality by ear", pt_BR: "Reconhecer acordes maiores, menores e com sétima"}, instruments: all, level: EI, applies: [major-triads, minor-triads, dominant-seventh, diminished-augmented-triads]}
   - {key: repeat-rhythms, parent: ear, names: {en: "Repeat rhythms by ear", pt_BR: "Repetir ritmos de ouvido (ditado rítmico)"}, instruments: all, level: EI, applies: [note-values, syncopation]}
   - {key: hear-licks, parent: ear, names: {en: "Recognise licks by ear", pt_BR: "Reconhecer licks de ouvido"}, instruments: all, level: EI, applies: [lick, minor-pentatonic, scale-degrees]}
-  - {key: find-key-by-ear, parent: ear, names: {en: "Find the key of a song by ear", pt_BR: "Achar o tom de uma música de ouvido"}, instruments: all, level: EI, applies: [key-center, major-minor-tonality]}
+  - {key: find-key-by-ear, parent: ear, names: {en: "Find the key of a song by ear", pt_BR: "Achar o tom de uma música de ouvido"}, instruments: all, level: EI, applies: [key-center, major-minor-tonality, diatonic-chords]}
   - {key: hear-progressions, parent: ear, names: {en: "Hear progressions by number", pt_BR: "Reconhecer progressões por graus"}, instruments: all, level: I, applies: [roman-numerals, common-progressions, chord-function, cadences]}
   - {key: transcribe, parent: ear, names: {en: "Transcribe a riff or solo", pt_BR: "Tirar música de ouvido (transcrever)"}, instruments: all, level: I, applies: [tablature, lick, key-center]}
 
@@ -363,6 +365,7 @@ skills:
   - {key: memorise-song, parent: repertoire, names: {en: "Memorise a song", pt_BR: "Decorar uma música"}, instruments: all, level: B, applies: [song-form]}
   - {key: perform-song, parent: repertoire, names: {en: "Perform a song for others", pt_BR: "Apresentar uma música para outras pessoas"}, instruments: all, level: EI, applies: [dynamics, song-form]}
   - {key: keep-going-after-mistakes, parent: repertoire, names: {en: "Keep going after mistakes", pt_BR: "Seguir tocando depois de errar"}, instruments: all, level: EI, applies: [pulse-and-tempo, song-form]}
+  - {key: play-with-band, parent: repertoire, names: {en: "Play your part with a band", pt_BR: "Tocar sua parte com a banda"}, instruments: all, level: B, applies: [song-form, chord-charts, pulse-and-tempo]}
   - {key: arrange-song, parent: repertoire, names: {en: "Arrange a song for one guitar", pt_BR: "Fazer um arranjo de uma música para guitarra"}, instruments: guitars, level: I, applies: [chord-tones, song-form, inversions]}
   - {key: sing-while-playing, parent: repertoire, names: {en: "Sing while playing", pt_BR: "Cantar e tocar ao mesmo tempo"}, instruments: acoustic, level: EI, applies: [song-form]}
   - {key: accompany-singer, parent: repertoire, names: {en: "Accompany a singer", pt_BR: "Acompanhar um cantor"}, instruments: acoustic, level: EI, applies: [key-center, song-form]}
@@ -428,6 +431,8 @@ requires:
   - {from: play-a-shape-barre, to: find-notes-root-strings, level: accurate, basis: S}
   - {from: play-e-shape-barre, to: fret-cleanly, level: fluent, basis: Syn}
   - {from: play-a-shape-barre, to: fret-cleanly, level: fluent, basis: Syn}
+  - {from: play-e-shape-barre, to: build-finger-strength, level: accurate, basis: Syn}
+  - {from: play-a-shape-barre, to: build-finger-strength, level: accurate, basis: Syn}
   - {from: palm-muting, to: downstrokes, level: accurate, basis: Syn}
   - {from: play-riffs, to: downstrokes, level: accurate, basis: S}
   - {from: play-riffs, to: read-tab, level: accurate, basis: S}
@@ -489,6 +494,8 @@ requires:
   - {from: combine-licks, to: play-lick-in-time, level: fluent, basis: R}
   - {from: combine-licks, to: vary-lick, level: accurate, basis: R}
   - {from: perform-song, to: memorise-song, level: retained, basis: Syn}
+  - {from: play-with-band, to: play-along-recording, level: accurate, basis: Syn}
+  - {from: lock-in-with-band, to: play-with-band, level: fluent, basis: Syn}
   - {from: match-gain-to-style, to: set-amp-tone, level: accurate, basis: Syn}
   - {from: interval-names, to: note-names, level: accurate, basis: Syn}
   - {from: interval-names, to: tones-and-semitones, level: accurate, basis: Syn}

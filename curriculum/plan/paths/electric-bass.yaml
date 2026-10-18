@@ -30,13 +30,14 @@ paths:
     status: idea
     intent:
       anchor: alternate-index-middle
-      supporting: [cross-strings-plucking, bass-fingering, control-note-length, set-bass-amp-tone]
+      supporting: [cross-strings-plucking, bass-fingering, fret-cleanly, control-note-length, set-bass-amp-tone]
       assumes: [play-root-notes]
       ends_with: play-along-recording
     lessons:
       - {title: "Alternando indicador e médio", type: video, section: Mão direita, skills: [alternate-index-middle], concepts: [note-values]}
       - {title: "Trocando de corda com os dedos", type: video, section: Mão direita, skills: [cross-strings-plucking], concepts: [string-names]}
       - {title: "Digitação 1-2-4 e um dedo por casa", type: video, section: Mão esquerda, skills: [bass-fingering], concepts: [finger-numbering]}
+      - {title: "Som limpo: onde apertar a corda", type: video, section: Mão esquerda, skills: [fret-cleanly], concepts: [finger-numbering]}
       - {title: "Controlando a duração das notas", type: video, section: Som, skills: [control-note-length], concepts: [articulation, rests-and-ties]}
       - {title: "Regulando o timbre no amplificador", type: video, section: Som, skills: [set-bass-amp-tone], concepts: [gear-and-signal]}
       - {title: "A música com som firme, com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}

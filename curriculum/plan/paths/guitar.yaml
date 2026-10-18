@@ -50,11 +50,12 @@ paths:
     status: idea
     intent:
       anchor: fret-cleanly
-      supporting: [finger-independence, practise-slowly, choose-strings]
+      supporting: [build-finger-strength, play-without-tension, finger-independence, practise-slowly, choose-strings]
       assumes: [play-open-chords]
       ends_with: play-along-recording
     lessons:
-      - {title: "Por que dói no começo e como passar dessa fase", type: video, section: Dedos, skills: [fret-cleanly], concepts: [finger-numbering, parts-of-the-instrument]}
+      - {title: "Por que dói no começo e como passar dessa fase", type: video, section: Dedos, skills: [build-finger-strength], concepts: [finger-numbering, chromatic-scale]}
+      - {title: "Postura relaxada: tocar sem tensão", type: video, section: Dedos, skills: [play-without-tension], concepts: [parts-of-the-instrument]}
       - {title: "Som limpo: onde apertar a corda", type: video, section: Dedos, skills: [fret-cleanly], concepts: [finger-numbering]}
       - {title: "Exercício cromático para os quatro dedos", type: video, section: Dedos, skills: [finger-independence], concepts: [chromatic-scale, finger-numbering]}
       - {title: "Devagar e subindo o andamento", type: video, section: Como estudar, skills: [practise-slowly], concepts: [pulse-and-tempo]}
