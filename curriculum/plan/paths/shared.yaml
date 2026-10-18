@@ -53,7 +53,7 @@ paths:
       assumes: []
       ends_with: play-along-recording
     lessons:
-      - {title: "Os nomes das notas: dó, ré, mi e C, D, E", type: article, section: Notas, skills: [match-pitch], concepts: [note-names, sharps-and-flats]}
+      - {title: "Os nomes das notas: dó, ré, mi e C, D, E", type: article, section: Notas, skills: [match-pitch], concepts: [note-names, sharps-and-flats, tones-and-semitones, octaves]}
       - {title: "Achando uma nota de ouvido", type: video, section: Ouvido, skills: [match-pitch], concepts: [note-names, octaves]}
       - {title: "Cantando o que você toca", type: video, section: Ouvido, skills: [sing-what-you-play], concepts: [major-scale]}
       - {title: "Repetindo frases curtas de ouvido", type: video, section: Ouvido, skills: [echo-phrases], concepts: [call-and-response]}
