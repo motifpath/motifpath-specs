@@ -204,3 +204,13 @@ Feature: Grade a practice answer into evidence
     When "alice" answers that diagram as a shape by naming the shape "A" after 2000 milliseconds
     Then the answer is rejected because the reference is unknown
     And "alice" has no evidence for that diagram
+
+  Scenario: A heard chord named by sight among options that aren't all numerals yields no evidence
+    When "alice" answers the heard chord vi in G, asked see_then_name, by picking "vi" among "vi", "IV", "Em" and "iii"
+    Then the answer is rejected because the choices are invalid
+    And "alice" has no evidence for that question
+
+  Scenario: A chord picked that isn't among a generated question's options yields no evidence
+    When "alice" answers the diatonic chord vi in G, asked numeral_to_chord, by picking "D" among "Em", "C", "Am" and "Bm"
+    Then the answer is rejected because the choices are invalid
+    And "alice" has no evidence for that question

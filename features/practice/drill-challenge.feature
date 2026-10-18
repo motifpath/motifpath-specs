@@ -184,16 +184,5 @@ Feature: Generated drill questions challenge the student
     When the practice drill catalog is installed
     Then the installation aborts, naming "diatonic_chord:numeral_to_chord"
 
-  @wip
-  Scenario: A heard chord answered by sight with an option that is not a numeral is rejected
-    Given the heard chord vi in G was planned as see_then_name
-    When "alice" answers it with the options "vi", "IV", "Em" and "iii"
-    Then the answer is rejected as invalid_choices
-    And no evidence is stored
-
-  @wip
-  Scenario: An answer among options the plan didn't offer is rejected
-    Given the diatonic chord vi in G was planned as numeral_to_chord with four chord options
-    When "alice" answers it with a chord that was not one of the four
-    Then the answer is rejected as invalid_choices
-    And no evidence is stored
+  # Answers that don't fit their question's options are graded in
+  # grade-practice-response.feature.
