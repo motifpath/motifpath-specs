@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0 — 2026-10-18
+
+- Replace the ten-slide starter with a 47-slide MotifPath presentation library,
+  editable music diagrams, six native layouts and a filled pt_BR lesson example.
+- Add a PowerPoint template, font/artwork kit and guidance for consistent reuse.
+- Require visual review as well as structural validation for content presentations.
+
 ## 1.1.0 — 2026-10-18
 
 - Add separately runnable Plan, Do, Check and Act phases with resumable cycle records.

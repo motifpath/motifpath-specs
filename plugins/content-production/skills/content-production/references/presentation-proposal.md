@@ -8,12 +8,24 @@ Keep Google Slides optional for storyboarding, recording support and collaborati
 ## Editable template
 
 Use [the presentation deck](../assets/content-presentation-template.pptx).
-It contains author guidance and a production brief, six reusable learning layouts
-(payoff, method, demonstration, attempt, feedback, application), a native-delivery
-handoff and a PDCA review page. Every placeholder is intentional and editable.
+It is a 47-slide presentation library: five orientation pages, 31 learner-facing
+layouts, five production-resource pages and six filled pt_BR lesson examples.
+The library covers covers/dividers, outcomes, prerequisites, explanations,
+comparisons, methods, image/audio/video, fretboards, chord shapes, count grids,
+tablature, harmony, musical form, questions, feedback, practice, application,
+reflection, summaries and references. Music diagrams and tables remain editable.
+Six native title/body layouts supplement the duplicate-and-edit sample slides.
+The theme uses the canonical MotifPath palette and Manrope typography. Original
+brand artwork remains unchanged; generated supporting images are illustrative.
+Every placeholder is intentional and editable.
 Duplicate only the layouts the unit needs. Remove the author pages before learner delivery.
 The deck is in English as an authoring template; replace learner-facing placeholders
 with copy in the unit's declared locale. It contains no working exercise or grading engine.
+
+Use the companion `content-presentation-template.potx` to start a new presentation
+in PowerPoint, or duplicate slides from the PPTX. Read `presentation-guide.md` for
+layout selection, fonts, image provenance and import limitations. The full kit
+contains the editable deck/template, artwork, font files and font license.
 
 ## Presentation grammar
 

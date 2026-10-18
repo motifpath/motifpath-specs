@@ -1,6 +1,6 @@
 ---
 name: content-production
-version: 1.1.0
+version: 1.2.0
 description: Plan, produce, check and improve MotifPath lessons, exercises and practice resources with practical outcomes, knowledge-map classification and locale-specific language. Use for editorial content production and content presentation storyboards; software implementation and curriculum redesign remain separate tasks.
 ---
 
@@ -13,6 +13,12 @@ Use [the content template](references/content-template.md) for the production pa
 considering Google Slides. The editable deck is
 [assets/content-presentation-template.pptx](assets/content-presentation-template.pptx).
 Duplicate its learning layouts as needed and omit author-review pages from learner delivery.
+Use the 47-slide library and its [presentation guide](references/presentation-guide.md)
+as the visual baseline for content presentations. Select layouts by learning purpose,
+preserve the brand theme, and adapt editable music diagrams to the actual instrument
+and example. The filled pt_BR lesson illustrates the visual system, not approved content.
+Keep author instructions in notes or author-only pages. Check every rendered slide;
+a structurally valid deck alone does not establish presentation quality.
 
 ## Run a PDCA phase
 
