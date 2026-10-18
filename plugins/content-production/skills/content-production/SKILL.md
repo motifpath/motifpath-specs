@@ -1,7 +1,7 @@
 ---
 name: content-production
-version: 1.0.0
-description: Produce, adapt or review MotifPath lessons, exercises and practice resources with practical outcomes, knowledge-map classification and locale-specific language. Use for editorial content production and content presentation storyboards; software implementation and curriculum redesign remain separate tasks.
+version: 1.1.0
+description: Plan, produce, check and improve MotifPath lessons, exercises and practice resources with practical outcomes, knowledge-map classification and locale-specific language. Use for editorial content production and content presentation storyboards; software implementation and curriculum redesign remain separate tasks.
 ---
 
 # Content production
@@ -10,7 +10,42 @@ Produce a small usable learning outcome, not an exposition of a topic. Write the
 instructions in English; write each learner-facing unit in its declared language.
 Use [the content template](references/content-template.md) for the production packet and
 [the presentation proposal](references/presentation-proposal.md) when storyboarding or
-considering Google Slides.
+considering Google Slides. The editable deck is
+[assets/content-presentation-template.pptx](assets/content-presentation-template.pptx).
+Duplicate its learning layouts as needed and omit author-review pages from learner delivery.
+
+## Run a PDCA phase
+
+Accept `phase: plan | do | check | act | cycle`, a unit/batch key and, when resuming,
+the latest production packet. Natural language phase requests work too. If no phase is
+specified, infer it from the requested action and state it. For a new unit, start with Plan.
+For an existing unit, inspect its packet before choosing the next phase. `cycle` runs the
+phases that available evidence permits; it does not bypass review, runtime or release gates.
+Read the relevant sections below within the selected phase, not as a mandatory full rerun.
+
+| Phase | Work | Required output and exit condition |
+|---|---|---|
+| Plan | Refresh sources, define outcome/audience/locale, classification, curriculum participation, prerequisites, modalities, capability needs and success check | A production brief with valid classification or explicit gaps, acceptance criteria, observation method and unknown baseline. Ready for Do only when choices required for drafting are resolved. |
+| Do | Draft the complete unit and assets using the brief, content packet and editable presentation template where useful | A versioned draft, asset/interaction inventory and source links. Keep unverified capabilities explicit. Missing classification may allow an exploratory draft but never readiness/publication. |
+| Check | Review the exact draft against the brief and all quality criteria below, including references, music, locale, classification and runtime where accessible | Evidence per criterion, severity, finding and correction. Distinguish AI self-check, human editorial review and runtime verification. Verdict: pass / revise / blocked. Unperformed checks remain pending. |
+| Act | Use Check findings and learner evidence to choose a disposition | Record revise, retain, propose release or retire, with rationale, version changes, unresolved findings and next phase. No available learner evidence means provisional decisions, not proven improvement. |
+
+Resume from the saved packet and preserve completed work. Return the phase performed,
+inputs and source revision, outputs/version, findings, gate status and next phase. Run only
+the requested phase unless the user asks for the cycle or clearly authorizes further work.
+If inputs are incomplete, identify the missing input and continue independent work without
+claiming the phase passed.
+
+Act routes corrections to Do, changed objectives/classification/curriculum to Plan, and
+unresolved verification to Check. Retaining a unit does not require an artificial rewrite.
+Publication remains a separate authorized action after the applicable gates pass. Track
+proposed principles/plan/catalog changes for review rather than silently editing them.
+
+Invocation examples:
+- “Plan a pt_BR unit about alternate picking for electric guitar.”
+- “Do the draft from this approved brief.”
+- “Check unit X revision 2 for localization and musical accuracy.”
+- “Act on these learner observations and propose the next revision.”
 
 ## Read the living sources first
 

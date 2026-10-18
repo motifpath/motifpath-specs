@@ -3,6 +3,18 @@
 Copy and fill this template for each language-specific unit. This is an editorial artifact,
 not an API payload. Replace prompts with concrete content; mark unknowns and their impact.
 
+## PDCA cycle record
+
+- Unit/batch key; cycle number; current phase; content version; packet version.
+- Requested scope: selected phase or cycle; inputs and prior packet/version.
+- Plan: outcome, acceptance criteria, observation method, baseline or unknown.
+- Do: draft/assets produced and changes from the brief.
+- Check: exact revision reviewed, evidence, findings/severity, reviewer type,
+  pass / revise / blocked verdict, pending human/runtime checks.
+- Act: revise / retain / propose release / retire, rationale, evidence limitations,
+  change log, unresolved findings and next phase.
+- Publication approval and delivery status recorded separately.
+
 ## Identity and source evidence
 
 - Working key/title; version/date; author/reviewer; status: draft / review / ready.

@@ -5,6 +5,16 @@ Use the content packet as the source of truth for a learning unit. Deliver the l
 experience through supported native article/video, exercises, diagrams and practice items.
 Keep Google Slides optional for storyboarding, recording support and collaborative review.
 
+## Editable template
+
+Use [the presentation deck](../assets/content-presentation-template.pptx).
+It contains author guidance and a production brief, six reusable learning layouts
+(payoff, method, demonstration, attempt, feedback, application), a native-delivery
+handoff and a PDCA review page. Every placeholder is intentional and editable.
+Duplicate only the layouts the unit needs. Remove the author pages before learner delivery.
+The deck is in English as an authoring template; replace learner-facing placeholders
+with copy in the unit's declared locale. It contains no working exercise or grading engine.
+
 ## Presentation grammar
 
 Lead with the musical payoff, give the complete method, demonstrate, invite an attempt,
