@@ -1,0 +1,31 @@
+# MPB, bossa e samba: dedilhado, Brazilian levadas, MPB voicings, baixarias and singing
+# while playing. Builds on Fundamentos. Format and workflow: ../../README.md.
+
+courses:
+
+  - key: ac-mpb
+    track: mpb
+    title: "MPB no violão"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: idea
+    checkpoints: [ac-first-dedilhado, ac-baiao, ac-first-melody, ac-ligados]
+
+  - key: ac-bossa-samba
+    track: mpb
+    title: "Bossa, samba e MPB no violão"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    checkpoints: [ac-barre, ac-bossa, ac-samba, ac-fingerstyle-bass, ac-minor-melody, ac-sing-and-play, ac-accompany-singer, sh-swing-and-three, sh-rhythm-groove, sh-harmony-in-use, sh-practice-habits]
+
+  - key: ba-mpb
+    track: mpb
+    title: "Bossa, samba e baião no baixo"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-bass]
+    status: idea
+    checkpoints: [ba-root-fifth-octave, ba-read-line, ba-chord-tones, ba-bossa, ba-baiao, sh-rhythm-groove, sh-swing-and-three, sh-practice-habits]

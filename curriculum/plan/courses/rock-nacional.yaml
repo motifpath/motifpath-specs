@@ -1,0 +1,58 @@
+# Rock nacional: riffs, power chords, barre chords, solos and tone. Builds on Fundamentos.
+# Format and workflow: ../../README.md.
+
+courses:
+
+  - key: el-rock
+    track: rock-nacional
+    title: "Rock nacional na guitarra"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-guitar]
+    status: idea
+    checkpoints: [el-rock-power-chords, el-first-melody, el-first-lick, el-first-solo]
+
+  - key: el-rock-solos
+    track: rock-nacional
+    title: "Riffs, solos e blues na guitarra"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-guitar]
+    status: idea
+    checkpoints: [el-barre, sh-swing-and-three, el-blues, el-bends, el-whole-neck, el-licks, el-minor-melody, sh-harmony-in-use, sh-practice-habits, sh-perform]
+
+  - key: ba-rock
+    track: rock-nacional
+    title: "Rock nacional no baixo"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-bass]
+    status: idea
+    checkpoints: [ba-root-fifth-octave, ba-first-riff, ba-blues-line, ba-first-phrase]
+
+  - key: ba-rock-groove
+    track: rock-nacional
+    title: "Groove, blues e solos no baixo"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-bass]
+    status: idea
+    checkpoints: [ba-lock-with-drums, ba-ghost-notes, ba-chord-tones, ba-walking-blues, ba-blues-solo, sh-rhythm-groove, sh-harmony-in-use, sh-practice-habits, sh-perform]
+
+  - key: ac-rock
+    track: rock-nacional
+    title: "Rock nacional no violão"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: idea
+    checkpoints: [ac-rock-riffs, ac-first-melody, ac-ligados, ac-first-improv]
+
+  - key: ac-rock-solos
+    track: rock-nacional
+    title: "Pestanas, blues e solos no violão"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    checkpoints: [ac-barre, ac-blues, ac-whole-neck, ac-licks, sh-practice-habits, sh-perform]
