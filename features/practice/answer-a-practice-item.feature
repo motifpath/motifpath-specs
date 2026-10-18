@@ -103,6 +103,77 @@ Feature: Answer a practice item the way it can be graded honestly
     Then the clip stops
     And the answer is sent with a latency of 0 milliseconds and no audio length
 
+  # ── Chords played in hand ──────────────────────────────────────────────────
+  # A single chord is fretted, strummed once and rated (Figma 17h; bass 18h). A chord change is a
+  # minute at a tempo, one change on every beat (17i ready, 17i2 running, 17j count; bass 18i):
+  # the student counts the changes that rang clean, and the share of the beats that did rates it.
+
+  @web
+  Scenario: A single chord shows its chord box, named, and is answered by a self-rating
+    Given "alice"'s session plans the single chord "a-minor-open"
+    When the item is shown
+    Then the chord box of "a-minor-open" is drawn with the name "Am"
+    And rating it "almost" sends a self_rating of "almost" with no tempo and no count
+
+  @web
+  Scenario: On bass, a root and fifth marks both places and is answered by a self-rating
+    Given "alice"'s session plans the root and fifth of "Am" on the "electric-bass" layout
+    When the item is shown
+    Then the bass board marks the root and the fifth at the places the plan gives
+    And rating it "clean" sends a self_rating of "clean" with no tempo and no count
+
+  @web
+  Scenario: A chord change is ready at the plan's tempo, which the student may change first
+    Given "alice"'s session plans the chord change "a-minor-open" to "c-open" starting at 45 BPM, with a best clean count of 16
+    When the item is shown
+    Then both chord boxes are drawn with their names
+    And the tempo is set to 45 BPM, the metronome ticks while it is tried, and the best of 16 clean changes is shown
+    And nothing is sent until the minute is over
+
+  @web
+  Scenario: Starting the minute gives a bar of count-in, then 60 seconds with nothing to tap
+    Given "alice" is ready on a chord change at 60 BPM
+    When "alice" starts the minute
+    Then the metronome counts in one bar, then the timer runs 60 seconds at 60 BPM
+    And no control but leaving the session can be used until the minute is over
+
+  @web
+  Scenario: When the minute is up, the count starts at the item's last count
+    Given "alice"'s session plans a chord change whose last count was 18
+    When "alice"'s minute is over
+    Then the clean changes count shows 18
+
+  @web
+  Scenario: A chord change never counted starts its count at 0
+    Given "alice"'s session plans a chord change never played
+    When "alice"'s minute is over
+    Then the clean changes count shows 0
+
+  @web
+  Scenario: The count can't go above the tempo
+    Given "alice" played a minute of changes at 40 BPM
+    When "alice" raises the count to 40
+    Then the count can't be raised further
+
+  @web
+  Scenario: Saving the count sends the tempo, the count and the rating they give
+    Given "alice" played a minute of changes at 60 BPM
+    When "alice" saves 42 clean changes
+    Then the practice.item_answered response is a self_rating of "almost" at 60 BPM with 42 changes per minute
+
+  @web
+  Scenario: The tempo the student set is the one sent, not the plan's
+    Given "alice"'s session plans a chord change starting at 45 BPM
+    And "alice" sets the tempo to 50 BPM before starting the minute
+    When "alice" saves 48 clean changes after the minute
+    Then the practice.item_answered response is a self_rating of "clean" at 50 BPM with 48 changes per minute
+
+  @web
+  Scenario: Leaving the session during the minute sends no answer for the change
+    Given "alice"'s minute of chord changes is running
+    When "alice" leaves the session
+    Then no practice.item_answered event is sent for the chord change
+
   # ── Not answered ───────────────────────────────────────────────────────────
 
   @web
