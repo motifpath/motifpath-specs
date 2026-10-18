@@ -72,8 +72,9 @@ Each file holds:
   everywhere, its `note_name`, `fret_window` and `cells`.
   Adding it to `exercise_option.v1`'s cases changes no grading rule.
 - **Self-assessed evidence** is `source`, `rating` and the measure its kind takes:
-  `tempo_bpm` (and its `note_value`, when sent) for a play-along, `changes_per_minute` for a chord change or a root change, none
-  for a chord voicing or a root and fifth.
+  `tempo_bpm` (and its `note_value`, when sent) for a play-along, `tempo_bpm` and
+  `changes_per_minute` for a chord change or a root change, none for a chord voicing or a root
+  and fifth.
 
 ### Music in the new graders
 
@@ -132,15 +133,21 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
 
 ### `self_rating.v1`
 
-- The rating and its measure are kept as given. A take of zero chord changes is still a
-  rating.
+- The rating and its measure are kept as given, except a change's rating (below). A take of
+  zero chord changes is still a rating.
 - A play-along needs `tempo_bpm` and takes no `changes_per_minute`. It may carry the
   `note_value` the take was played at, which is kept as given (absent means quarters); any
   other kind with a `note_value` is `response_does_not_fit_item`. A chord change and a root
-  change need `changes_per_minute` and take no `tempo_bpm`. A chord voicing and a root and
+  change need both `tempo_bpm` and `changes_per_minute`. A chord voicing and a root and
   fifth are rated alone: either measure is `response_does_not_fit_item`.
 - A chord voicing's diagram, and a root and fifth's or a root change's layout, must exist
   (`unknown_reference`).
+- **A change is one minute at `tempo_bpm`, one change on every beat**, and
+  `changes_per_minute` counts the changes that rang clean. More clean changes than beats is
+  `response_does_not_fit_item`.
+- **A change's rating follows from its count**, whatever rating was sent: the share of the
+  beats that changed cleanly, `changes_per_minute / tempo_bpm`. `clean` from 0.9, `almost` from
+  0.6, `struggled` below. The evidence keeps the derived rating, the tempo and the count.
 
 ### `generated_choice.v1`
 

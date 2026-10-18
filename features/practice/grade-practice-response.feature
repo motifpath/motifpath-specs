@@ -30,6 +30,14 @@ Feature: Grade a practice answer into evidence
     When "alice" rates a take of play-along "pentatonic-run" as "clean" at 90 BPM
     Then "alice" has self-assessed evidence for play-along "pentatonic-run" rated "clean" at 90 BPM
 
+  # A chord change is one minute at a tempo, one change on every beat; the student counts the
+  # changes that rang clean, and the share of the beats that did rates the minute (MOT-79).
+  @wip
+  Scenario: A minute of chord changes is rated by the share of beats that changed cleanly
+    Given the chord voicing diagrams "a-minor-open" and "c-open"
+    When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 60 BPM with 42 clean changes
+    Then "alice" has self-assessed evidence for that chord change rated "almost" at 60 BPM with 42 clean changes
+
   Scenario: Evidence keeps the raw response and the event that sent it
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "C" after 1800 milliseconds
     Then the evidence keeps the response exactly as "alice" sent it
@@ -135,6 +143,18 @@ Feature: Grade a practice answer into evidence
     When "alice" answers that shape by finding the degree "3" on string 4 at fret 2 after 3000 milliseconds
     Then "alice" has auto-graded evidence for that shape that is wrong with a latency of 3000 milliseconds
 
+  @wip
+  Scenario: A chord change's rating follows its count, whatever rating was sent
+    Given the chord voicing diagrams "a-minor-open" and "c-open"
+    When "alice" sends a minute of changes between "a-minor-open" and "c-open" rated "clean" at 60 BPM with 20 clean changes
+    Then "alice" has self-assessed evidence for that chord change rated "struggled" at 60 BPM with 20 clean changes
+
+  @wip
+  Scenario: Nine clean changes in ten beats is a clean minute
+    Given the chord voicing diagrams "a-minor-open" and "c-open"
+    When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 60 BPM with 54 clean changes
+    Then "alice" has self-assessed evidence for that chord change rated "clean" at 60 BPM with 54 clean changes
+
   # ── Failure cases ──────────────────────────────────────────────────────────
 
   Scenario: Choices that leave out the cell's note yield no evidence
@@ -181,6 +201,20 @@ Feature: Grade a practice answer into evidence
     When "alice" rates a take of play-along "pentatonic-run" as "clean" without a tempo
     Then the answer is rejected because its measure is missing
     And "alice" has no evidence for play-along "pentatonic-run"
+
+  @wip
+  Scenario: A minute of chord changes without its tempo yields no evidence
+    Given the chord voicing diagrams "a-minor-open" and "c-open"
+    When "alice" sends a minute of changes between "a-minor-open" and "c-open" with 40 clean changes and no tempo
+    Then the answer is rejected because its measure is missing
+    And "alice" has no evidence for that chord change
+
+  @wip
+  Scenario: More clean changes than beats in the minute yields no evidence
+    Given the chord voicing diagrams "a-minor-open" and "c-open"
+    When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 40 BPM with 41 clean changes
+    Then the answer is rejected because the response does not fit the item
+    And "alice" has no evidence for that chord change
 
   Scenario: A cell on a string the instrument doesn't have yields no evidence
     When "alice" answers the guitar cell on string 7 at fret 3 by naming the note "C" after 1800 milliseconds
