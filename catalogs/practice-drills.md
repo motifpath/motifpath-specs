@@ -41,8 +41,9 @@ questions are per template, never per item.
   `exercise:<exercise_type>`. They are `know`, or `hear` when the student answers what they hear
   (`audio_recognition`, `audio_selection`). A family's exercises share one threshold, since one exercise
   rarely gathers enough answers to calibrate on its own.
-- **Play-alongs and chord changes** have no template. They are measured in tempo and changes
-  per minute, against targets that come from the music.
+- **Play-alongs and chord changes** have no template. A play-along is measured in tempo,
+  against the target its music sets; a chord change in clean changes per minute, against the
+  catalog's change target (see "Chord drills").
 - An answer's template comes from its item kind and response type (and, for exercises, the
   exercise's type; for a generated question asked among options, the way it was asked:
   `diatonic_chord:numeral_to_chord`). Keys never change.
@@ -75,7 +76,8 @@ graders and golden cases of every family are specified together (`PracticeItemKe
 responses in the practice schemas; `golden/practice-graders/`), so each is graded alike from
 the start. Each slice then adds its templates and fluent times to `practice-drills.yaml` (with
 fixed IDs) and its generator; until then a family installs nothing. The P1 harmony families
-and the P2 ear families are installed (see "Harmony drills" and "Ear drills" below). Every family has a bass version on the
+and the P2 ear families are installed (see "Harmony drills" and "Ear drills" below), and so
+are the P3 chord families (see "Chord drills"). Every family has a bass version on the
 `electric-bass` layout: chord boxes become chord symbols, or the answer is a chord tone tapped
 on the bass fretboard, at positions computed from the chord's formula and the tuning.
 
@@ -213,6 +215,52 @@ catalog, like the harmony drills, and recognised by ear in the head on every ins
 - **Ways:** `cadence_then_chord` comes first. When an item comes back in the same session, it
   is asked by ear again, in a newly picked key.
 
+## Chord drills
+
+`chord_voicing` and `chord_change` (on bass, `root_fifth` and `root_change`) are played with the
+instrument in hand and rated, never recalled in the head.
+
+- **Items** are a curated set (`chord_drills`), not every voicing of the chord catalog:
+  - single chords: the open voicings of C, A, G, E, D, Am, Em and Dm, keyed
+    `chord_voicing:<voicing diagram id>`;
+  - changes: ten pairs of those chords (Am–C, C–G, G–D, D–A, A–E, Am–E, Em–G, D–Em, Am–Dm,
+    Em–C), keyed `chord_change:<from diagram id>:<to diagram id>` in the order listed. A pair is
+    one item, practised both ways in the same minute;
+  - on bass, the same chords by symbol on the `electric-bass` layout:
+    `root_fifth:<layout id>:<chord>` and `root_change:<layout id>:<from chord>:<to chord>`.
+  - They roll up to the nodes of the families table: `play-open-chords` and `change-chords` on
+    guitar, `play-root-fifth-lines` and `play-root-notes` on bass. A chord voicing suits the
+    instruments its diagram is linked to; a bass item suits the instruments of its layout.
+  - When a student gets them is the knowledge map's call, as for any node: `change-chords`
+    requires `play-open-chords` at accurate, so a change is stretch until the single chords
+    are. Which chords a student has met is not tracked.
+- **In a session** they are focus items of an in-hand session, never in the head, never the
+  warm-up or the application ending. At most 4 single chords and 2 changes a session. A single
+  chord takes 20 seconds, a change 90 (a bar of count-in, the minute and the count). On guitar,
+  a single chord comes before a change that uses it in the same session.
+- **How they are drawn:** a guitar chord is its voicing's chord box, named (playing it is the
+  skill, so the name gives nothing away). On bass, the root and fifth are marked on the bass
+  board, at the positions ADR-057 computes (lowest fret, then lowest string), inside frets 0–5;
+  a root change marks both roots.
+- **A single chord** is fretted, strummed once and rated clean, almost or struggled by the
+  student. It has no measure, so a clean take is fully fluent and accuracy alone decides its
+  level.
+- **A change** is one minute at a tempo, one change on every beat:
+  - the student sets the tempo before the minute (the metronome ticks while they try it), starts
+    it after a bar of count-in, and counts the changes that rang clean when it is over. The count
+    starts at the item's last count;
+  - the take sends the tempo and the count. Its rating follows from the share of the beats that
+    changed cleanly, count ÷ tempo: clean from 0.9, almost from 0.6, struggled below. The student
+    doesn't rate it, so the count and the rating never disagree;
+  - **the ladder** runs across sessions, since a session plays a change once. The plan starts a
+    change at the tempo of its last minute: 5 BPM up after two clean minutes in a row, 5 down
+    after a struggled one, never below 20. A change never played starts at 40;
+  - **the target** is the catalog's change target, the same for every pair and instrument: 60
+    clean changes a minute (version 1). A minute's fluency is its count ÷ the target. The best
+    clean count is the student's edge: a minute that isn't clean above it doesn't count against
+    them, as for a play-along's tempo.
+- **Not asked among options**, so the challenge rules on options and second ways don't apply.
+
 ## Fretboard cells
 
 - **Cells are generated, never authored.** For each skill, each layout lists the strings and
@@ -334,6 +382,10 @@ catalog, like the harmony drills, and recognised by ear in the head on every ins
 - Every template names a rung of the ladder, and a `second_way` names another template of the
   same item kind.
 - `hear_tempo_bpm` gives a tempo for every knowledge level.
+- Every chord drill names an open voicing of the chord catalog that exists, every change pair
+  names two of the chord drills' voicings, and no pair is listed twice in either order.
+- The chord drills' chord symbols are the chords of their voicings.
+- A change target version 1 is installed before chord changes reach students.
 
 - Installing on an empty database twice gives identical template and threshold IDs.
 - The generated cells for a layout are exactly the strings and frets listed. A string the

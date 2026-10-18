@@ -27,6 +27,9 @@ scripts can refer to rows by ID instead of looking them up by name.
   | Fretboard cell range (a skill's strings and frets on a layout) | `fretboard-cells/<skill key>/<layout instrument key>` |
   | Chord definition, template, voicing and voicing diagram | the chord catalog's keys, as `chord-voicings.md` defines |
   | Progression | `progression/<key>` |
+  | Chord drill (a single chord played clean) | `chord-drill/<voicing key>` |
+  | Chord change pair | `chord-change/<from voicing key>/<to voicing key>` |
+  | Change target version | `change-target/v<version>` |
 
 - Voices use their slug as ID (`acoustic-guitar`), which is already fixed.
 - Keys never change, so neither do IDs. Renaming a row changes its names, never its ID.
