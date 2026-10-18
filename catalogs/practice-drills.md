@@ -231,9 +231,9 @@ instrument in hand and rated, never recalled in the head.
   - They roll up to the nodes of the families table: `play-open-chords` and `change-chords` on
     guitar, `play-root-fifth-lines` and `play-root-notes` on bass. A chord voicing suits the
     instruments its diagram is linked to; a bass item suits the instruments of its layout.
-  - When a student gets them is the knowledge map's call, as for any node: `change-chords`
-    requires `play-open-chords` at accurate, so a change is stretch until the single chords
-    are. Which chords a student has met is not tracked.
+  - They are offered like any node's items: a path skill's as new, whatever it requires (no
+    prerequisite in practice), and other nodes' as stretch. Which chords a student has met is
+    not tracked.
 - **In a session** they are focus items of an in-hand session, never in the head, never the
   warm-up or the application ending. At most 4 single chords and 2 changes a session. A single
   chord takes 20 seconds, a change 90 (a bar of count-in, the minute and the count). On guitar,

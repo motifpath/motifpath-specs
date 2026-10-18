@@ -170,8 +170,8 @@ Chords played in hand join sessions:
   (`chord_voicing`; on bass, a chord's root and fifth, `root_fifth`) and changes between two
   chords (`chord_change`; on bass, `root_change`). They are focus items, never the warm-up or the
   application ending, and never in the head. The items are a curated set in the practice drill
-  catalog: no "chords the student has met" is tracked, and the knowledge map's `requires` edges
-  decide when a node's items are offered, as for any node;
+  catalog: no "chords the student has met" is tracked, and they are offered like any node's items
+  (a path skill's as new, with no prerequisite in practice; others as stretch);
 - **at most 4 single chords and 2 changes a session**, like the cap on generated drills. A single
   chord takes 20 seconds; a change takes 90 (a bar of count-in, the minute, the count). On guitar,
   a single chord comes before a change that uses it;
