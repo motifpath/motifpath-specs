@@ -8,6 +8,16 @@ then approved a narrow first unit with shared foundations and one-string guitar
 application. This replaces the proposed tablature/rhythm pair, which was not selected.
 The two editorial working keys below identify packets, not installed content IDs.
 
+## Superseding calibration — 2026-10-18
+
+The product owner has restarted both units at Plan. The previous one-string-only
+scope and required generated audio are superseded by
+[first-notes-proposal-v2.md](first-notes-proposal-v2.md). All detailed v1 requirements
+below remain historical context, not the current production authorization.
+MOT-160/PR #366 contains the earlier production experiment; it is not approved for
+continuation or publication. Review a short draft and diagram proposals before
+producing complete units or media. Do not generate audio without an explicit request.
+
 ## Source basis and curriculum participation
 
 Baseline: motifpath-specs `75c894818519002c2d56c0c8e6578ee2e29055c3`, including
