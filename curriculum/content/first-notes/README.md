@@ -1,4 +1,6 @@
-# First-notes pilot — editorial review kit
+# First-notes pilot — superseded v1 experiment
+
+**Superseded by PO feedback, 2026-10-18.** Restart at the short-draft/diagram proposal in `curriculum/pilots/first-notes-proposal-v2.md`. These v1 files are retained for history, not approved production. Do not regenerate audio or continue full media production without explicit authorization.
 
 Open `preview.html` in a browser after extracting the whole folder. Keep the assets and fonts folders beside it. Both Portuguese lessons include audio controls, diagrams, practice and feedback. Download links and answers are local; no login is required.
 

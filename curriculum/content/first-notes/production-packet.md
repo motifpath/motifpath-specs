@@ -1,5 +1,10 @@
 # First-notes pilot — production packet v1
 
+**Disposition: revise / return to Plan.** PO feedback on 2026-10-18 supersedes this
+production direction. Review `curriculum/pilots/first-notes-proposal-v2.md` first.
+Both units become instrument-neutral; generated audio is excluded from the new
+plan. Existing assets are historical, not approved for continuation or publication.
+
 **MOT-160 · Do · 1.0.0-draft · 2026-10-18.** Reviewable content and reference
 assets, not published native lessons. Author: Codex. Human musical/locale reviewer:
 pending (MOT-161). No learner evidence or baseline is available.
