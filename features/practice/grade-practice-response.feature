@@ -32,7 +32,6 @@ Feature: Grade a practice answer into evidence
 
   # A chord change is one minute at a tempo, one change on every beat; the student counts the
   # changes that rang clean, and the share of the beats that did rates the minute (MOT-79).
-  @wip
   Scenario: A minute of chord changes is rated by the share of beats that changed cleanly
     Given the chord voicing diagrams "a-minor-open" and "c-open"
     When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 60 BPM with 42 clean changes
@@ -143,13 +142,11 @@ Feature: Grade a practice answer into evidence
     When "alice" answers that shape by finding the degree "3" on string 4 at fret 2 after 3000 milliseconds
     Then "alice" has auto-graded evidence for that shape that is wrong with a latency of 3000 milliseconds
 
-  @wip
   Scenario: A chord change's rating follows its count, whatever rating was sent
     Given the chord voicing diagrams "a-minor-open" and "c-open"
     When "alice" sends a minute of changes between "a-minor-open" and "c-open" rated "clean" at 60 BPM with 20 clean changes
     Then "alice" has self-assessed evidence for that chord change rated "struggled" at 60 BPM with 20 clean changes
 
-  @wip
   Scenario: Nine clean changes in ten beats is a clean minute
     Given the chord voicing diagrams "a-minor-open" and "c-open"
     When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 60 BPM with 54 clean changes
@@ -202,14 +199,12 @@ Feature: Grade a practice answer into evidence
     Then the answer is rejected because its measure is missing
     And "alice" has no evidence for play-along "pentatonic-run"
 
-  @wip
   Scenario: A minute of chord changes without its tempo yields no evidence
     Given the chord voicing diagrams "a-minor-open" and "c-open"
     When "alice" sends a minute of changes between "a-minor-open" and "c-open" with 40 clean changes and no tempo
     Then the answer is rejected because its measure is missing
     And "alice" has no evidence for that chord change
 
-  @wip
   Scenario: More clean changes than beats in the minute yields no evidence
     Given the chord voicing diagrams "a-minor-open" and "c-open"
     When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 40 BPM with 41 clean changes
