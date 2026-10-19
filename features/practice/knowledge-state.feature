@@ -101,31 +101,26 @@ Feature: Derive a student's knowledge of an item from evidence
 
   # A chord change's fluency is its clean count over the catalog's change target, 60 clean changes
   # a minute; a single chord has no measure, so a clean take is fully fluent (MOT-79).
-  @wip
   Scenario: Five clean minutes near the target make a chord change fluent
     Given "alice" practises the chord change "a-minor-open" to "c-open"
     When "alice" plays 5 clean minutes of it on 5 different days, each 54 clean changes at 60 BPM
     Then "alice"'s level for the chord change is "fluent"
 
-  @wip
   Scenario: Clean minutes far below the target leave a chord change accurate, not fluent
     Given "alice" practises the chord change "a-minor-open" to "c-open"
     When "alice" plays 5 clean minutes of it on 5 different days, each 30 clean changes at 30 BPM
     Then "alice"'s level for the chord change is "accurate"
 
-  @wip
   Scenario: A struggled minute above the best clean count doesn't count against the student
     Given "alice"'s best clean count on the chord change "a-minor-open" to "c-open" is 40
     When "alice" plays a minute of it with 45 clean changes at 90 BPM
     Then the minute is not counted as a miss
 
-  @wip
   Scenario: A struggled minute at or below the best clean count is a real miss
     Given "alice"'s best clean count on the chord change "a-minor-open" to "c-open" is 40
     When "alice" plays a minute of it with 30 clean changes at 60 BPM
     Then the minute is counted as a miss
 
-  @wip
   Scenario: Five clean takes make a single chord fluent
     Given "alice" practises the single chord "a-minor-open"
     When "alice" rates 5 takes of it "clean" on 5 different days

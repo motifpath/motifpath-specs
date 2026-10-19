@@ -416,107 +416,90 @@ Feature: Compose a practice session
   # minute, 5 BPM up after two clean minutes in a row, 5 down after a struggled one, never below
   # 20, and 40 for a change never played. Its target is the catalog's: 60 clean changes a minute.
 
-  @wip
   Scenario: An in-hand guitar session plays single chords of a path skill
     Given "alice"'s path skill "play-open-chords" has new single chords on guitar
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the session includes single chords of "play-open-chords" with the reason new
     And every single chord in the session is at the play_clean rung
 
-  @wip
   Scenario: A single chord is planned with its chord box and name
     Given "alice"'s path skill "play-open-chords" has new single chords on guitar
     When the single chord "a-minor-open" is picked for "alice"'s session with "guitar" in hand
     Then it names the voicing diagram of "a-minor-open" and the chord "Am"
 
-  @wip
   Scenario: A chord change is planned with both chords and its minute
     Given "alice"'s path skill "change-chords" has new chord changes on guitar
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the session includes a chord change of "change-chords" at the play_in_time rung
     And it names both chords' voicing diagrams and symbols, and a target of 60 clean changes a minute
 
-  @wip
   Scenario: An in-hand bass session plays a chord's root and fifth, both marked
     Given "alice"'s path skill "play-root-fifth-lines" has new root and fifth items on electric bass
     When the root and fifth of "Am" is picked for "alice"'s session with "electric-bass" in hand
     Then its root is on string 3 at fret 0 and its fifth on string 4 at fret 0 of the "electric-bass" layout
 
-  @wip
   Scenario: A session with the instrument in hand plays at most 4 single chords and 2 changes
     Given "alice" has 8 new single chords and 10 new chord changes on guitar, and nothing else
     When "alice" composes a 30-minute session with "guitar" in hand
     Then the session has at most 4 single chords and at most 2 chord changes
     And the session's items take less than 30 minutes
 
-  @wip
   Scenario: On guitar, a single chord comes before a change that uses it
     Given "alice" has the new single chord "a-minor-open" and the new chord change "a-minor-open" to "c-open" on guitar
     When both are picked for "alice"'s session with "guitar" in hand
     Then the single chord "a-minor-open" comes before the chord change
 
-  @wip
   Scenario: A single chord takes 20 seconds of the session and a change 90
     Given "alice" has new single chords and new chord changes on guitar
     When "alice" composes a 10-minute session with "guitar" in hand
     Then every single chord in the session is estimated at 20 seconds
     And every chord change in the session is estimated at 90 seconds
 
-  @wip
   Scenario: A chord change never played starts at 40 BPM
     Given "alice" has never played the chord change "a-minor-open" to "c-open"
     When the chord change is picked as a new item
     Then its minute starts at 40 BPM, with no best clean count and no last count
 
-  @wip
   Scenario: A chord change starts at the tempo of its last minute
     Given "alice"'s last minute of "a-minor-open" to "c-open" was almost, 40 clean changes at 55 BPM
     When the chord change is picked as a due item
     Then its minute starts at 55 BPM, and its last count is 40
 
-  @wip
   Scenario: Two clean minutes in a row raise the next minute by 5 BPM
     Given "alice"'s last two minutes of "a-minor-open" to "c-open" were clean, the last at 50 BPM
     When the chord change is picked as a due item
     Then its minute starts at 55 BPM
 
-  @wip
   Scenario: A single clean minute keeps the tempo
     Given "alice"'s minutes of "a-minor-open" to "c-open" were struggled, then clean at 50 BPM
     When the chord change is picked as a due item
     Then its minute starts at 50 BPM
 
-  @wip
   Scenario: A struggled minute lowers the next minute by 5 BPM
     Given "alice"'s last minute of "a-minor-open" to "c-open" was struggled at 50 BPM
     When the chord change is picked as a due item
     Then its minute starts at 45 BPM
 
-  @wip
   Scenario: The change ladder never goes below 20 BPM
     Given "alice"'s last minute of "a-minor-open" to "c-open" was struggled at 20 BPM
     When the chord change is picked as a due item
     Then its minute starts at 20 BPM
 
-  @wip
   Scenario: A chord change carries the best clean count since the latest teacher review
     Given "alice" counted 30, then 38, then 34 clean changes of "a-minor-open" to "c-open", each minute clean
     When the chord change is picked as a due item
     Then its best clean count is 38 and its last count is 34
 
-  @wip
   Scenario: A session in the head never plays chords
     Given "alice" has new single chords and new chord changes on guitar
     When "alice" composes a 10-minute session with no instrument in hand
     Then no item in the session is a single chord, a chord change, a root and fifth or a root change
 
-  @wip
   Scenario: A chord item is never the warm-up or the application ending
     Given "alice" is fluent on every single chord of "play-open-chords" on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then no single chord or chord change has the reason warm_up or application
 
-  @wip
   Scenario: An in-hand session with only chords to play is composed
     Given student "bob"'s only path skill is "play-open-chords", practised by single chords on guitar
     When "bob" composes a 10-minute session with "guitar" in hand
