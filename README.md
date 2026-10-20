@@ -93,7 +93,7 @@ This repository defines reusable GitHub Actions workflows consumed by all other 
 
 | Workflow | File | Purpose |
 |---|---|---|
-| Sync main → dev | `.github/workflows/reusable-sync-main-to-dev.yml` | Auto-opens PR to sync `main` back to `dev` after any merge |
+| Sync main → dev (and stage) | `.github/workflows/reusable-sync-main-to-dev.yml` | Auto-opens PRs to sync `main` back to `dev`, and to `stage` where that branch exists, after any merge |
 
 > **GitHub Actions permission required:** Enable *"Allow motifpath repositories to
 > call reusable workflows"* in the org's Actions settings, or callers will fail.

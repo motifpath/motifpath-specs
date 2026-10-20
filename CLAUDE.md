@@ -100,7 +100,7 @@ repo README for first-time setup.
 
 ## Reusable Workflows (.github/workflows/)
 This repo defines reusable GitHub Actions workflows consumed by all service repos.
-`reusable-sync-main-to-dev.yml` — auto-opens a PR from main to dev after any merge to main.
+`reusable-sync-main-to-dev.yml` — auto-opens a PR from main to dev, and to stage where that branch exists, after any merge to main.
 NEVER edit caller workflows in other repos to add logic — keep logic here, callers stay minimal.
 
 <!-- BEGIN AWS Agent Toolkit rules -->

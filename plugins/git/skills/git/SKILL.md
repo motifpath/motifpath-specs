@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-version: 1.1.0
+version: 1.2.0
 description: >
   Enforce MotifPath git conventions across all repositories — automatically and proactively.
   Trigger on any git-related task: writing commit messages, naming branches, creating PR
@@ -223,20 +223,31 @@ NEVER create a branch without a task code. If the developer doesn't have one, fl
 
 ## Protected Branches and Dev Flow
 
-MotifPath uses a two-level protected branch model:
+MotifPath uses protected `main` and `dev` branches. The deployable repositories
+(`motifpath-core`, `motifpath-web`) add a third, `stage`, between them:
 
 ```
-main  ← production-ready, protected, receives PRs from dev only
-dev   ← integration branch, protected, receives PRs from feature branches
+main   ← production, protected; receives release PRs (from stage, or from dev where there is no stage) and hotfixes
+stage  ← release candidate, protected; deployable repos only; every push deploys staging
+dev    ← integration branch, protected, receives PRs from feature branches
 ```
+
+`motifpath-specs` and `motifpath-infra` have no `stage`: specs are not deployed, and
+Terraform picks its environment by directory, not by branch.
 
 ### Rules
 
 - `main` is NEVER a direct PR target from a feature branch
 - `dev` receives all feature, fix, chore, and spec PRs
-- `main` only receives PRs from `dev` (release PRs)
-- Both `main` and `dev` require at least one approved PR review before merge
-- Direct commits to either `main` or `dev` are blocked by branch protection
+- `main` only receives release PRs (`stage → main` in deployable repos, `dev → main`
+  elsewhere) and `hotfix/*` PRs
+- In deployable repos, `stage` only receives `dev → stage` release-candidate PRs and the
+  automated `main → stage` sync
+- Promotions (`dev → stage`, `stage → main`) and sync PRs are merged with a **merge commit** —
+  never squash or rebase. Production deploys only commits contained in `main`; a squash gives
+  the release new SHAs, and the images staging ran no longer qualify
+- `main`, `stage` and `dev` require at least one approved PR review before merge
+- Direct commits to `main`, `stage` or `dev` are blocked by branch protection
 
 ### Full Branch Lifecycle
 
@@ -254,13 +265,16 @@ main (production)
               └── [PR → review → merge to dev]
 
         [multiple features accumulated in dev]
-        └── [release PR: dev → main, tagged v1.1.0]
+        └── [release-candidate PR: dev → stage — deploys staging]
+              └── [release PR: stage → main, tagged v1.1.0]
 ```
 
-### Release PR (dev → main)
+### Release PR (stage → main, or dev → main)
 
-When `dev` is stable and ready for release, a PR from `dev` to `main` is opened.
-This is the only time `main` receives a PR from `dev`. The release PR must include:
+In deployable repos, `dev` is promoted to `stage` first; merging it deploys staging, where
+the release is checked. Once it holds up, a PR from `stage` to `main` is opened, and the
+production deploy then runs the images staging already ran. Repos without `stage` open the
+release PR from `dev` to `main`. The release PR must include:
 
 ```markdown
 ## Release vX.Y.Z
@@ -290,15 +304,17 @@ main (production)
   └── hotfix/BUG-099/student-path-crash-on-empty-graph
         ├── fix(student-path): guard against empty graph on path initialisation
         └── [PR → review → merge to main, tagged vX.Y.Z-patch]
-        └── [sync-main-to-dev workflow opens PR automatically]
+        └── [sync-main-to-dev workflow opens PRs to dev (and stage) automatically]
 ```
 
 **Hotfix rules:**
 - Branch FROM `main` — never from `dev`
 - PR targets `main` first — gets an expedited but still mandatory review
 - After merging to `main`: the `sync-main-to-dev` GitHub Actions workflow
-  automatically opens a PR from `main` to `dev` — no manual step required
-- Review and merge the automated sync PR promptly — never leave `dev` behind `main`
+  automatically opens a PR from `main` to `dev`, and one to `stage` in the repos that have
+  it — no manual step required
+- Review and merge the automated sync PRs promptly, with a merge commit — never leave `dev`
+  or `stage` behind `main`. A `stage` without the hotfix would ship a release without it
 - Tag `main` with a patch version after the hotfix merges: `v1.2.1`
 - Hotfix branches are deleted after the hotfix PR merges
 
@@ -414,10 +430,11 @@ Flag PRs with more than 400 lines changed (excluding generated files):
 | PR with no description | Generate description from the commit history |
 | TODO comment without a linked issue | Replace with a GitHub issue reference |
 | `//nolint` without explanation | Add inline comment explaining the specific reason |
-| Release PR missing rollback plan | Every dev → main PR must define a rollback strategy |
-| Hotfix branch targeting `dev` | Hotfixes target `main` first — automation syncs to `dev` |
+| Release PR missing rollback plan | Every release PR into `main` must define a rollback strategy |
+| Squash-merging a promotion | `dev → stage`, `stage → main` and sync PRs use a merge commit, so the SHAs staging ran stay in `main` |
+| Hotfix branch targeting `dev` | Hotfixes target `main` first — automation syncs to `dev` and `stage` |
 | Hotfix for non-critical bugs | Only production-breaking issues justify a hotfix |
-| Ignoring the automated sync PR | Review and merge the sync PR promptly — never leave `dev` behind `main` |
+| Ignoring the automated sync PRs | Review and merge them promptly — never leave `dev` or `stage` behind `main` |
 
 ---
 
@@ -426,26 +443,30 @@ Flag PRs with more than 400 lines changed (excluding generated files):
 ```
 main (protected — production only)
   │
+  ├── stage (protected — release candidate; deployable repos only; deploys staging)
+  │     └── [release PR: stage → main, merge commit, tagged vX.Y.Z]
+  │
   ├── dev (protected — integration)
   │     └── feat/MTP-001/node-unlocking-teacher-override  →  PR to dev
   │     └── fix/BUG-042/exercise-score-boundary           →  PR to dev
   │     └── spec/MTP-001/threshold-override-gherkin       →  PR to dev
-  │     └── [release PR: dev → main, tagged vX.Y.Z]
+  │     └── [promotion: dev → stage, merge commit]  (dev → main where there is no stage)
   │
   └── hotfix/BUG-099/student-path-crash  →  PR to main (urgent)
                                          →  sync-main-to-dev workflow
-                                            opens PR to dev automatically
+                                            opens PRs to dev and stage automatically
 ```
 
 Rules:
-- `main` and `dev` are always protected — no direct commits, ever
+- `main`, `stage` and `dev` are always protected — no direct commits, ever
 - All feature work branches from `dev` and targets `dev`
-- `main` only receives PRs from `dev` (releases) or `hotfix/*` (critical fixes)
-- After any hotfix merges to `main`, it must also merge to `dev` immediately
+- `main` only receives release PRs (`stage`, or `dev` where there is no `stage`) or `hotfix/*`
+- After any hotfix merges to `main`, it must also merge to `dev` (and `stage`) immediately
 - Feature branches are short-lived — days, not weeks
 - Draft PRs for work-in-progress needing early feedback
-- Squash merge for noisy intermediate commits
-- Merge commit for branches where history matters
+- Squash merge for noisy intermediate commits on feature PRs into `dev`
+- Merge commit for promotions and sync PRs (`dev → stage`, `stage → main`, `main → dev/stage`),
+  and for branches where history matters
 
 ## Code Review
 
