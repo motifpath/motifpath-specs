@@ -9,7 +9,8 @@ Feature: Practise a subject the student chooses
   # node and its part_of subtree: its due items, then weak, then new, at the usual shares, then
   # review ahead and more new items of the subtree, never anything else. It has no warm-up, and an
   # application ending only with a play-along in the subtree. New items come from the subject's
-  # current rung and the next one. Evidence counts like in any other session.
+  # current rung and the next one. Evidence counts like in any other session: an answer never
+  # says how its session was chosen, so knowledge-state.feature covers it for every session.
 
   Background:
     Given student "alice" plays "guitar" and "electric-bass"
@@ -45,12 +46,6 @@ Feature: Practise a subject the student chooses
     Given "common-progressions" has the play-along "pop-progression" on guitar
     When "alice" composes a 10-minute session with "guitar" in hand, choosing "common-progressions"
     Then the last item is "pop-progression" with the reason application
-
-  @wip
-  Scenario: Answers in a chosen session count like any other
-    Given "alice" has never answered the heard progression "I-V-vi-IV"
-    When "alice" answers it right in a session where they chose "hear-progressions"
-    Then "alice"'s level for the heard progression "I-V-vi-IV" is "learning"
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
@@ -94,9 +89,9 @@ Feature: Practise a subject the student chooses
     When "alice" lists the subjects they can practise with "guitar" in hand
     Then "diatonic-chords" shows "alice"'s level on guitar and the current rung hear
 
-  @wip
   Scenario: The subjects list in the head offers only nodes with recall material
     Given "play-open-chords" has only self-rated chord items, played in hand
+    And "find-notes-root-strings" is practised only by fretboard cells, recalled in the head
     When "alice" lists the subjects they can practise with no instrument in hand
     Then "play-open-chords" is not listed
     And "find-notes-root-strings" is listed
