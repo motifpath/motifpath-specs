@@ -35,8 +35,8 @@ Each file holds:
   - `fretboard_cell` → `fretboard_cell.v2` (`fretboard_cell.v1` before 2026-10-08; its file stays
     for the evidence it graded)
   - `exercise` → `exercise_option.v1`
-  - `play_along`, `chord_change`, `chord_voicing`, `root_fifth` and `root_change` →
-    `self_rating.v1`
+  - `play_along`, `chord_change`, `chord_voicing`, `root_fifth`, `root_change` and
+    `progression_keys` → `self_rating.v1`
   - `diagram_shape` → `diagram_shape.v1`
   - `diatonic_chord`, `chord_function`, `chart_progression`, `heard_chord` and
     `heard_progression` → `generated_choice.v1`
@@ -72,7 +72,8 @@ Each file holds:
   everywhere, its `note_name`, `fret_window` and `cells`.
   Adding it to `exercise_option.v1`'s cases changes no grading rule.
 - **Self-assessed evidence** is `source`, `rating` and the measure its kind takes:
-  `tempo_bpm` (and its `note_value`, when sent) for a play-along, `tempo_bpm` and
+  `tempo_bpm` (and its `note_value`, when sent) for a play-along, the same plus `music_key`
+  for a progression key tour take, `tempo_bpm` and
   `changes_per_minute` for a chord change or a root change, none for a chord voicing or a root
   and fifth.
 
@@ -137,11 +138,16 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
   zero chord changes is still a rating.
 - A play-along needs `tempo_bpm` and takes no `changes_per_minute`. It may carry the
   `note_value` the take was played at, which is kept as given (absent means quarters); any
-  other kind with a `note_value` is `response_does_not_fit_item`. A chord change and a root
+  other kind but a progression key tour with a `note_value` is `response_does_not_fit_item`. A chord change and a root
   change need both `tempo_bpm` and `changes_per_minute`. A chord voicing and a root and
   fifth are rated alone: either measure is `response_does_not_fit_item`.
 - A chord voicing's diagram, and a root and fifth's or a root change's layout, must exist
   (`unknown_reference`).
+- **A progression key tour take** is rated like a play-along: it needs `tempo_bpm`
+  (`measure_missing`), may carry its `note_value`, and takes no `changes_per_minute`. It also
+  needs the `music_key` it was played in, which is kept as given. A missing `music_key`, or a
+  `music_key` on any other kind this grader takes, is `response_does_not_fit_item`. Its
+  progression and its layout must exist (`unknown_reference`).
 - **A change is one minute at `tempo_bpm`, one change on every beat**, and
   `changes_per_minute` counts the changes that rang clean. More clean changes than beats is
   `response_does_not_fit_item`.

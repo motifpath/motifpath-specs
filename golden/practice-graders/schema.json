@@ -283,7 +283,8 @@
                           "rating": { "enum": ["struggled", "almost", "clean"] },
                           "tempo_bpm": { "type": "integer", "minimum": 1 },
                           "note_value": { "enum": ["halves", "quarters", "eighths", "triplets", "sixteenths", "quintuplets", "sextuplets", "thirty_seconds"] },
-                          "changes_per_minute": { "type": "integer", "minimum": 0 }
+                          "changes_per_minute": { "type": "integer", "minimum": 0 },
+                          "music_key": { "enum": ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"] }
                         }
                       }
                     ]
