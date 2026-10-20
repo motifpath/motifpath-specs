@@ -274,7 +274,23 @@ main (production)
 In deployable repos, `dev` is promoted to `stage` first; merging it deploys staging, where
 the release is checked. Once it holds up, a PR from `stage` to `main` is opened, and the
 production deploy then runs the images staging already ran. Repos without `stage` open the
-release PR from `dev` to `main`. The release PR must include:
+release PR from `dev` to `main`.
+
+In the deployable repos, **a release is a `vX.Y.Z` tag on `main`, and pushing it deploys
+production**. Tag the `stage → main` merge commit once it is on `main`:
+
+```bash
+git fetch origin main && git tag -a v1.1.0 origin/main -m "v1.1.0" && git push origin v1.1.0
+```
+
+- Untagged builds are intermediate ones: release candidates and staging-only deploys.
+- Rolling back means redeploying an earlier tag.
+- Never move or delete a release tag: it would point a release name at different code. A tag
+  ruleset blocks this.
+- Each repository versions on its own: core and web numbers are unrelated.
+- Bump minor for a release with new behaviour and patch for a fix-only release or a hotfix.
+
+The release PR must include:
 
 ```markdown
 ## Release vX.Y.Z
@@ -303,7 +319,7 @@ for the next regular release cycle.
 main (production)
   └── hotfix/BUG-099/student-path-crash-on-empty-graph
         ├── fix(student-path): guard against empty graph on path initialisation
-        └── [PR → review → merge to main, tagged vX.Y.Z-patch]
+        └── [PR → review → merge to main, then tag vX.Y.(Z+1) — the tag deploys production]
         └── [sync-main-to-dev workflow opens PRs to dev (and stage) automatically]
 ```
 
@@ -315,7 +331,8 @@ main (production)
   it — no manual step required
 - Review and merge the automated sync PRs promptly, with a merge commit — never leave `dev`
   or `stage` behind `main`. A `stage` without the hotfix would ship a release without it
-- Tag `main` with a patch version after the hotfix merges: `v1.2.1`
+- Tag `main` with the next patch version after the hotfix merges (`v1.2.1`) once its images are
+  built: in core and web, pushing the tag deploys production
 - Hotfix branches are deleted after the hotfix PR merges
 
 **When NOT to use hotfix:**
@@ -431,6 +448,7 @@ Flag PRs with more than 400 lines changed (excluding generated files):
 | TODO comment without a linked issue | Replace with a GitHub issue reference |
 | `//nolint` without explanation | Add inline comment explaining the specific reason |
 | Release PR missing rollback plan | Every release PR into `main` must define a rollback strategy |
+| Moving or deleting a release tag | Tags are immutable releases; cut a new patch version instead |
 | Squash-merging a promotion | `dev → stage`, `stage → main` and sync PRs use a merge commit, so the SHAs staging ran stay in `main` |
 | Hotfix branch targeting `dev` | Hotfixes target `main` first — automation syncs to `dev` and `stage` |
 | Hotfix for non-critical bugs | Only production-breaking issues justify a hotfix |
