@@ -131,11 +131,19 @@ Feature: Answer a practice item the way it can be graded honestly
     And nothing is sent until the minute is over
 
   @web
-  Scenario: Starting the minute gives a bar of count-in, then 60 seconds with nothing to tap
+  Scenario: Starting the minute gives a bar of count-in, then 60 seconds with nothing to tap but Restart
     Given "alice" is ready on a chord change at 60 BPM
     When "alice" starts the minute
     Then the metronome counts in one bar, then the timer runs 60 seconds at 60 BPM
-    And no control but leaving the session can be used until the minute is over
+    And no control but Restart and leaving the session can be used until the minute is over
+
+  @web
+  Scenario: Restarting the minute throws it away and is ready again at the same tempo
+    Given "alice" set the tempo to 50 BPM and started the minute of chord changes
+    When "alice" restarts it during the minute
+    Then the metronome stops and the timer shows the whole minute again
+    And the tempo is still 50 BPM and can be changed
+    And no practice.item_answered event is sent for the chord change
 
   @web
   Scenario: When the minute is up, the count starts at the item's last count
