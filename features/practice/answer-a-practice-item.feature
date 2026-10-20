@@ -182,6 +182,62 @@ Feature: Answer a practice item the way it can be graded honestly
     When "alice" leaves the session
     Then no practice.item_answered event is sent for the chord change
 
+  # ── Progression key tours ──────────────────────────────────────────────────
+  # A progression is played along with, key after key around the cycle of fourths (Figma 17k;
+  # bass 18z). Each take is rated; the tour's next key and tempo are in progression-key-tour.feature.
+
+  @web
+  Scenario: A tour shows the progression's chart in the take's key, the key line and the tempo
+    Given "alice"'s session plans the progression key tour of "I-V-vi-IV" on guitar starting in A at 85 BPM, with C, F, Bb, Eb, Ab, Db, F#, B and E clean
+    When the item is shown
+    Then the chart reads "A E F#m D" in chord symbols
+    And the key line shows five keys around A, with the clean ones ticked
+    And the tempo is set to 85 BPM, and the primary action is "Start take in A"
+
+  @web
+  Scenario: The line above the chart names the last clean key and tempo and the key to play
+    Given "alice" rated the take in E "clean" at 85 BPM
+    When the take in A is shown
+    Then it reads "Clean in E at 85 BPM · now in A"
+
+  @web
+  Scenario: On guitar, a chord's box is shown on demand
+    Given the take in A of a tour on guitar is shown
+    When "alice" opens the chord card of "F#m"
+    Then the box of the voicing the plan gives for "F#m" is drawn
+
+  @web
+  Scenario: On bass, the board marks each chord's root, third and fifth
+    Given "alice"'s session plans the progression key tour of "I-V-vi-IV" on the "electric-bass" layout starting in G
+    When the item is shown
+    Then the chart reads "G D Em C" in chord symbols
+    And the bass board marks the root, third and fifth of each chord at the places the plan gives
+
+  @web
+  Scenario: A take is a bar of count-in, then the progression over its backing
+    Given "alice" is about to play a take of a four-bar tour in A at 85 BPM
+    When "alice" starts the take
+    Then the metronome counts in one bar, then the backing plays the chart 4 times through at 85 BPM
+
+  @web
+  Scenario: Rating a take sends its tempo, note value and key
+    Given "alice" played a take of the tour in A at 85 BPM in quarters
+    When "alice" rates it "clean"
+    Then the practice.item_answered response is a self_rating of "clean" at 85 BPM in quarters in A
+
+  @web
+  Scenario: The summary says how many keys are clean at the tour tempo
+    Given "alice"'s session plans a tour at 85 BPM with 9 keys clean
+    When "alice" makes 2 more keys clean and the session ends
+    Then the session summary says "Clean in 11 of 12 keys at 85 BPM" for the tour
+
+  @web
+  Scenario: A take started at the wrong tempo is restarted without rating it
+    Given "alice" started a take of the tour in A at 180 BPM
+    When "alice" restarts it
+    Then no rating of the take is sent
+    And the take doesn't count among the tour's takes
+
   # ── Not answered ───────────────────────────────────────────────────────────
 
   @web
