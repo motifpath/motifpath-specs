@@ -1,6 +1,6 @@
 # ADR-062: Alpha hosting as built — us-east-2, IAM-user CI keys, fixed deploy documents, merge-commit promotions
 
-**Status:** Proposed
+**Status:** Accepted — 2026-10-20
 **Date:** 2026-10-20
 **Deciders:** Gilson (PO), Claude Code
 **Supersedes (in part):** ADR-039 (Region `us-east-1`; CI authentication through GitHub OIDC;
