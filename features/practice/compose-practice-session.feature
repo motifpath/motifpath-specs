@@ -510,35 +510,32 @@ Feature: Compose a practice session
   # backing, key after key around the cycle of fourths (rung move, MOT-150). It is a focus item of
   # an in-hand session only, at most one a session, sized like a play-along over 3 takes. On
   # guitar the chart is in chord symbols, with a voicing per chord; on bass the board marks each
-  # chord's root, third and fifth. The tour itself is in progression-key-tour.feature.
+  # chord's root, third and fifth. A tour takes about 4 minutes, so a session shorter than about
+  # 30 minutes has no room for one in its new share. The tour itself is in
+  # progression-key-tour.feature.
 
-  @wip
   Scenario: An in-hand guitar session plays a progression key tour of a path skill
     Given "alice"'s path skill "common-progressions" has new progression key tours on guitar
-    When "alice" composes a 20-minute session with "guitar" in hand
+    When "alice" composes a 30-minute session with "guitar" in hand
     Then the session includes a progression key tour of "common-progressions" with the reason new
     And the progression key tour is at the move rung
 
-  @wip
   Scenario: A session plays at most one progression key tour
     Given "alice" has 10 new progression key tours on guitar, and nothing else
     When "alice" composes a 30-minute session with "guitar" in hand
     Then the session has exactly one progression key tour
 
-  @wip
   Scenario: A progression key tour is sized like a play-along over 3 takes
     Given "alice" has never played the progression key tour of "I-V-vi-IV" on guitar
     When the progression key tour is picked for "alice"'s session with "guitar" in hand
     Then it plays 4 times through in each of at most 3 takes
     And it is estimated at 3 takes of a bar of count-in and 16 bars at 60 BPM, each followed by 10 seconds to rate it
 
-  @wip
   Scenario: A 12-bar blues tour plays the form once a take
     Given "alice" has never played the progression key tour of "12-bar-blues" on guitar
     When the progression key tour is picked for "alice"'s session with "guitar" in hand
     Then it plays 1 time through in each of at most 3 takes
 
-  @wip
   Scenario: On guitar, the tour lists each key's chart in chord symbols with a voicing per chord
     Given "alice" has never played the progression key tour of "I-V-vi-IV" on guitar
     When the progression key tour is picked for "alice"'s session with "guitar" in hand
@@ -546,20 +543,17 @@ Feature: Compose a practice session
     And the key of A has the chart "A E F#m D" and a voicing for each of its chords
     And no key has chord tones
 
-  @wip
   Scenario: On bass, the tour marks each chord's root, third and fifth
     Given "alice" has never played the progression key tour of "I-V-vi-IV" on electric bass
     When the progression key tour is picked for "alice"'s session with "electric-bass" in hand
     Then in the key of G, the chord "Em" has its root on string 4 at fret 0, its third on string 1 at fret 0 and its fifth on string 3 at fret 2
     And in the key of G, the chord "G" has its root on string 1 at fret 0, its third on string 3 at fret 2 and its fifth on string 2 at fret 0
 
-  @wip
   Scenario: A session in the head never plays a progression key tour
     Given "alice" has new progression key tours on guitar
     When "alice" composes a 10-minute session with no instrument in hand
     Then no item in the session is a progression key tour
 
-  @wip
   Scenario: A progression key tour is never the warm-up or the application ending
     Given "alice" has clean takes of the progression key tour of "I-V-vi-IV" on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
