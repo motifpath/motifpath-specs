@@ -43,7 +43,6 @@ Feature: Ingest practice events
     Then the event is accepted and stored in the event log
     And the stored and published practice.item_answered event keeps the tempo of 60 BPM and the note value eighths
 
-  @wip
   Scenario: A progression key tour take keeps the key it was played in
     When "alice" submits a practice.item_answered event rating a take of the progression key tour of "I-V-vi-IV" on guitar "clean" at 85 BPM in A
     Then the event is accepted and stored in the event log
@@ -144,7 +143,6 @@ Feature: Ingest practice events
     Then the submission is rejected as invalid
     And the rejection identifies "note_value" as the source of the error
 
-  @wip
   Scenario: A take rated in a key that isn't one is rejected
     When "alice" submits a practice.item_answered event rating a take of the progression key tour of "I-V-vi-IV" on guitar "clean" at 85 BPM in the key "H"
     Then the submission is rejected as invalid
