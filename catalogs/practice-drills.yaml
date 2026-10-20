@@ -1,6 +1,6 @@
 # MotifPath practice drill catalog v2 — the drill templates, the generated fretboard cells,
-# the diagram shape families, the timed thresholds, the chord drills and the change targets
-# installed in every environment. Rules: practice-drills.md.
+# the diagram shape families, the timed thresholds, the chord drills, the change targets and
+# the progression key tours installed in every environment. Rules: practice-drills.md.
 #
 # IDs are UUID v5 under the catalog namespace, from "drill-template/<key>" and
 # "drill-threshold/<template key>/v<version>" (reference-data.md).
@@ -179,3 +179,23 @@ chord_drills:
 # installed one. IDs are UUID v5 from "change-target/v<version>".
 change_targets:
   - {version: 1, effective_from: "2026-10-18", changes_per_minute: 60, source: default, id: 02685c89-9b1e-5fd8-bd54-a733ce804181}
+
+# Progression key tours (MOT-150): a progression of the progression catalog played along with,
+# key after key around the cycle of fourths, on the guitar and electric-bass layouts. Items are
+# progression_keys:<layout id>:<progression key>, generated from the progression catalog, so
+# they have no rows or IDs of their own.
+progression_keys:
+  layouts: [guitar, electric-bass]
+  # The tour order, the same on every instrument, spelled as the chord catalog spells roots.
+  key_order: [C, F, Bb, Eb, Ab, Db, F#, B, E, A, D, G]
+  # Times through the progression in one take, by its bar count.
+  times_through: {4: 4, 12: 1}
+  max_per_session: 1
+  takes_per_session: 3
+  # The tour tempo, in quarter notes per minute: the target, the first tour's start (a share of
+  # the target, rounded down to a step), the step up after a finished tour and down after a
+  # struggle, and the floor (a share of the target).
+  target_tempo_bpm: 100
+  first_tempo_share: 0.6
+  tempo_step_bpm: 5
+  min_tempo_share: 0.6

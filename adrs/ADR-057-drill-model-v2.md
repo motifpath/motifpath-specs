@@ -11,6 +11,21 @@ drills with no second way, families installed per slice, `fretboard_cell.v2` unc
 PO answers Q1–Q7 of 2026-10-14; MOT-77 decisions D22–D25.
 **Amends:** ADR-046 (session composition, guess correction, distractors). ADR-046 stays in force
 for everything this ADR doesn't change.
+**Amended:** 2026-10-20, planning the play-along in every key (MOT-150, slice P4), by Gilson. The
+next-key drill is not a play-along of a diagram: no diagram holds a progression, and an open-chord
+fingering doesn't move to another key by frets. It is a new generated family, the **progression
+key tour** (`progression_keys:<layout id>:<progression key>`, rung `move`). One progression of
+the progression catalog is played along with, key after key around the cycle of fourths from C,
+self-rated (`self_rating.v1`, the take sending its key):
+- a clean take moves the next take to the next key not yet clean, at the same tempo; an almost
+  or a struggle stays in the key, and a struggle lowers the tour tempo by 5 BPM;
+- when all 12 keys are clean, the tour starts again at C, 5 BPM faster. Keys come first, then
+  tempo: the item has one tempo ladder, not one per key;
+- on guitar the chart is in chord symbols, with chord boxes on demand. On bass the board marks
+  each chord's root, third and fifth, so the line shows the chord's quality;
+- like chords, it is played in hand only, at most once a session.
+
+A play-along of a diagram keeps the fixed rung `play_in_time` and no next-key take.
 
 ---
 
@@ -51,7 +66,8 @@ ADR-046 also decided (2026-10-08) to correct guesses among few choices, charging
   `target`, `use`.
 - **Every drill template declares its rung** in the practice drill catalog. A template is now
   item kind + response type + rung. Kinds without a template take a fixed rung: a play-along is
-  `play_in_time`, a chord change is `play_in_time`, a song chart item is `use`.
+  `play_in_time`, a chord change is `play_in_time`, a progression key tour is `move` (amended
+  2026-10-20), a song chart item is `use`.
 - Authored exercise families are `know`, or `hear` when the student answers what they hear
   (`exercise:audio_recognition`, `exercise:audio_selection`).
 - **Generated drill families are declared in the catalog**: their templates, the reference data

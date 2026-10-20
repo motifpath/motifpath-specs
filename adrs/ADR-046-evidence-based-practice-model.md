@@ -430,8 +430,9 @@ One piece of evidence per observation, the only stored learning state:
   play-along is never the ending (its review belongs in the focus block), and an ending longer than
   a quarter of the session is skipped.
 - **Playing in hand, recall in the head** (amended 2026-10-07, by Gilson, reversing 2026-10-06): a
-  session with the instrument in hand picks play-alongs, authored exercises and (amended
-  2026-10-18) single chords and chord changes, never a fretboard cell or a diagram shape, though
+  session with the instrument in hand picks play-alongs, authored exercises, (amended
+  2026-10-18) single chords and chord changes, and (amended 2026-10-20, ADR-057) progression key
+  tours, never a fretboard cell or a diagram shape, though
   they suit the instrument; those are recalled in the head only.
   With nothing to play, an in-hand session is not found, and the client offers one in the head.
 - **In the head** (amended 2026-10-06): fretboard cells of every layout among the student's
@@ -463,7 +464,7 @@ One piece of evidence per observation, the only stored learning state:
 - **Item time:** a play-along is sized by its takes at its start tempo; an exercise by its authored
   `estimated_duration_seconds`, or 30 seconds without one; a fretboard cell by 8 seconds; a
   diagram shape by 10 seconds; a single chord by 20 seconds and a chord change by 90 (amended
-  2026-10-18).
+  2026-10-18); a progression key tour like a play-along, over 3 takes (amended 2026-10-20).
 - **Focus time:** the session minus the warm-up and the application ending (one play-along at its
   estimated time). The mix shares the focus time. A warm-up
   play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the

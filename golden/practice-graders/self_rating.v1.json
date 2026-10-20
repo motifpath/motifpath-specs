@@ -1,6 +1,6 @@
 {
   "grader": "self_rating.v1",
-  "description": "Takes the student rates themselves: a play-along at a tempo, or one chord voicing or a chord's root and fifth played cleanly; the grader checks the take fits the item and keeps the rating and its measure as they are. A minute of chord or root changes at a tempo, one change on every beat, is rated by its count instead: the share of the beats that changed cleanly.",
+  "description": "Takes the student rates themselves: a play-along at a tempo, a progression in one key of its tour at a tempo, or one chord voicing or a chord's root and fifth played cleanly; the grader checks the take fits the item and keeps the rating and its measure as they are. A minute of chord or root changes at a tempo, one change on every beat, is rated by its count instead: the share of the beats that changed cleanly.",
   "reference": {
     "diagrams": {
       "00000000-0000-4000-8000-0000000000f1": {
@@ -24,6 +24,43 @@
           "A1",
           "D2",
           "G2"
+        ]
+      },
+      "00000000-0000-4000-8000-0000000000a1": {
+        "name": "Guitar (standard tuning)",
+        "tuning": [
+          "E2",
+          "A2",
+          "D3",
+          "G3",
+          "B3",
+          "E4"
+        ]
+      }
+    },
+    "progressions": {
+      "I-V-vi-IV": {
+        "bars": [
+          "I",
+          "V",
+          "vi",
+          "IV"
+        ]
+      },
+      "12-bar-blues": {
+        "bars": [
+          "I7",
+          "I7",
+          "I7",
+          "I7",
+          "IV7",
+          "IV7",
+          "I7",
+          "I7",
+          "V7",
+          "IV7",
+          "I7",
+          "V7"
         ]
       }
     }
@@ -478,6 +515,148 @@
         "rating": "clean",
         "tempo_bpm": 30,
         "changes_per_minute": 31
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "progression key tour: a clean take in A keeps its tempo and key",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000a1:I-V-vi-IV",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 85,
+        "music_key": "A"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "clean",
+          "tempo_bpm": 85,
+          "music_key": "A"
+        }
+      }
+    },
+    {
+      "name": "progression key tour: a take in eighths keeps its note value",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000a1:I-V-vi-IV",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "almost",
+        "tempo_bpm": 60,
+        "note_value": "eighths",
+        "music_key": "Bb"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "almost",
+          "tempo_bpm": 60,
+          "note_value": "eighths",
+          "music_key": "Bb"
+        }
+      }
+    },
+    {
+      "name": "progression key tour: a struggled 12-bar blues on bass",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000b1:12-bar-blues",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "struggled",
+        "tempo_bpm": 70,
+        "music_key": "F#"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "struggled",
+          "tempo_bpm": 70,
+          "music_key": "F#"
+        }
+      }
+    },
+    {
+      "name": "rejected: a progression key tour take without its key",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000a1:I-V-vi-IV",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 85
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a progression key tour take without its tempo",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000a1:I-V-vi-IV",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "music_key": "C"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "measure_missing"
+      }
+    },
+    {
+      "name": "rejected: a progression key tour take with a change count",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000a1:I-V-vi-IV",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 85,
+        "changes_per_minute": 40,
+        "music_key": "C"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a progression key tour of a progression the catalog doesn't have",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000a1:I-II-III",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 85,
+        "music_key": "C"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: a progression key tour on a layout that doesn't exist",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000c9:I-V-vi-IV",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 85,
+        "music_key": "C"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: a play-along rating with a key",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 90,
+        "music_key": "G"
       },
       "expected": {
         "result": "rejected",

@@ -36,6 +36,9 @@ PracticeItemKey:
       each time.
     - fretboard_note:<layout instrument id>:<note> — finding every place of a note within a
       fret window. The window is picked each time.
+    - progression_keys:<layout instrument id>:<progression key> — playing a progression along
+      with its backing, key after key around the cycle of fourths. The key is the tour's next
+      one, sent back with each take.
 
     In these keys, <key> is a major key spelled as one of C Db D Eb E F F# G Ab A Bb B;
     <numeral> is one of I ii iii IV V vi viio (viio is vii°); <chord> is a root spelled the
@@ -45,7 +48,7 @@ PracticeItemKey:
 
     Item kinds are an open set: a new kind adds its own prefix and key scheme here, a
     grader, and its golden cases.
-  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diagram_shape:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diatonic_chord:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chord_function:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chart_progression:[0-9A-Za-z][0-9A-Za-z-]*|heard_chord:(I|ii|iii|IV|V|vi|viio)|heard_progression:[0-9A-Za-z][0-9A-Za-z-]*|chord_voicing:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|root_fifth:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|root_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|guide_tone:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9A-Za-z][0-9A-Za-z-]*|fretboard_note:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|C#|D|D#|E|F|F#|G|G#|A|A#|B))$'
+  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diagram_shape:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diatonic_chord:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chord_function:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chart_progression:[0-9A-Za-z][0-9A-Za-z-]*|heard_chord:(I|ii|iii|IV|V|vi|viio)|heard_progression:[0-9A-Za-z][0-9A-Za-z-]*|chord_voicing:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|root_fifth:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|root_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|guide_tone:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9A-Za-z][0-9A-Za-z-]*|fretboard_note:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|C#|D|D#|E|F|F#|G|G#|A|A#|B)|progression_keys:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9A-Za-z][0-9A-Za-z-]*)$'
   example: 'fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:3'
 
 PracticeResponse:
@@ -201,9 +204,10 @@ SelfRatingResponse:
   type: object
   description: |
     The student's own rating of a take they played: a play-along at a tempo, chord changes
-    counted over a minute, or one chord played cleanly. A play-along rating carries tempo_bpm
-    and no changes_per_minute, and may carry the note_value it was played at (quarters when
-    absent); a chord-change or root-change take carries both tempo_bpm and changes_per_minute,
+    counted over a minute, one chord played cleanly, or a progression in one key of its tour. A
+    play-along rating carries tempo_bpm and no changes_per_minute, and may carry the note_value
+    it was played at (quarters when absent); a progression key tour take carries the same and
+    the music_key it was played in; a chord-change or root-change take carries both tempo_bpm and changes_per_minute,
     and its rating is derived from them (see rating); a single chord voicing or a chord's root
     and fifth (play clean) carries neither.
   properties:
@@ -231,7 +235,8 @@ SelfRatingResponse:
       maximum: 400
       description: |
         The tempo of the take, in beats per minute, as played: the click's tempo. Present for a
-        play-along, and for a chord change or a root change, where the student changes on every
+        play-along and a progression key tour take, and for a chord change or a root change,
+        where the student changes on every
         beat, so it is also the number of changes the minute asked for.
     note_value:
       $ref: '#/NoteValue'
@@ -242,6 +247,8 @@ SelfRatingResponse:
       description: |
         The number of chord changes in one minute that rang clean, counted by the student. Present
         for a chord change and a root change, and never more than tempo_bpm.
+    music_key:
+      $ref: '#/MusicKey'
   additionalProperties: false
   required:
     - response_type
@@ -342,9 +349,10 @@ MusicKey:
   type: string
   enum: [C, Db, D, Eb, E, F, F#, G, Ab, A, Bb, B]
   description: |
-    A major key. In a response, the key a question was asked in when its item doesn't fix one:
-    a chart progression, a heard chord, a heard progression or a guide tone; absent in a
-    response to any other item. A planned question always names its key.
+    A major key. In a response, the key a question was asked in or a take was played in when
+    its item doesn't fix one: a chart progression, a heard chord, a heard progression, a guide
+    tone or a progression key tour; absent in a response to any other item. A planned question
+    always names its key.
 
 TimedTapsResponse:
   type: object
@@ -589,7 +597,7 @@ PracticeRung:
     play_in_time = play it at a tempo; move = play it in another key or place; target = aim at it
     while the music moves; use = play it in a piece of music. A drill template has one rung;
     a play-along and a chord change are play_in_time, a single self-rated chord is play_clean,
-    and a song chart item is use.
+    a progression key tour is move, and a song chart item is use.
 
 PracticeFocusSource:
   type: string
@@ -675,6 +683,7 @@ PracticeItemKind:
     - root_change
     - guide_tone
     - fretboard_note
+    - progression_keys
   description: |
     The kind of a practice item, the prefix of its item key. The set is open: a new kind
     is added with its key scheme, grader and golden cases.
@@ -790,6 +799,8 @@ PracticeEvidence:
       type: integer
       minimum: 0
       description: The chord changes made in a rated minute.
+    music_key:
+      $ref: '#/MusicKey'
     verified:
       type: boolean
       description: |
@@ -1353,3 +1364,144 @@ PlannedRootChange:
       $ref: '#/ChangeMinute'
   additionalProperties: false
   required: [layout_instrument_id, from_chord_symbol, to_chord_symbol, from_root, to_root, minute]
+
+PlannedProgressionKeys:
+  type: object
+  description: |
+    A progression played along with, key after key around the cycle of fourths (kind
+    progression_keys), self-rated take by take. The plan lists the whole tour, so the client
+    moves to the next key without asking again: after a clean take at an effective speed at
+    or above tour_tempo_bpm, the next take is in the next key of keys not yet clean, at the
+    same tempo; after an almost or a struggle it stays in the key, and a struggle lowers the
+    tempo by 5 BPM, never below min_tempo_bpm. When every key is clean, the tour starts again
+    at the first key, 5 BPM faster, never past target_tempo_bpm by itself. The student may
+    choose any tempo for a take; a clean take slower than the tour tempo doesn't make its key
+    clean.
+  properties:
+    layout_instrument_id:
+      type: string
+      format: uuid
+      description: |
+        The instrument whose fretboard layout the tour is played on: guitar (chord symbols, chord
+        boxes on demand) or electric bass (chord symbols and each chord's root, third and fifth
+        on the board).
+    progression:
+      type: object
+      properties:
+        key:
+          type: string
+          pattern: '^[0-9A-Za-z][0-9A-Za-z-]*$'
+          description: The progression's key in the progression catalog, such as I-V-vi-IV.
+        name:
+          type: string
+          description: The progression's name in the student's language, such as "I–V–vi–IV (pop)".
+      additionalProperties: false
+      required: [key, name]
+      description: The progression played.
+    times_through:
+      type: integer
+      minimum: 1
+      description: |
+        How many times one take plays the progression after its bar of count-in: 4 for a
+        four-bar progression, 1 for a 12-bar blues.
+    takes:
+      type: integer
+      minimum: 1
+      description: The most takes of the tour this session plays.
+    start_music_key:
+      $ref: '#/MusicKey'
+    tour_tempo_bpm:
+      type: integer
+      minimum: 20
+      description: |
+        The tour's tempo, in start_note_value: the tempo of the first take, and the one a take
+        must be clean at, or faster than, to make its key clean. 60% of the target, rounded down
+        to 5 BPM, for a tour never played.
+    start_note_value:
+      $ref: '#/NoteValue'
+    target_tempo_bpm:
+      type: integer
+      minimum: 20
+      description: The tempo the tour aims for, in quarters, the same for every progression.
+    min_tempo_bpm:
+      type: integer
+      minimum: 20
+      description: The slowest tempo a struggle lowers the tour to, 60% of the target.
+    keys:
+      type: array
+      minItems: 12
+      maxItems: 12
+      items:
+        type: object
+        properties:
+          music_key:
+            $ref: '#/MusicKey'
+          clean:
+            type: boolean
+            description: Whether the key is clean at the tour tempo.
+          chart:
+            type: array
+            minItems: 4
+            items:
+              type: string
+              pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+            description: |
+              The progression in this key, one chord symbol per bar, spelled as the chord
+              catalog spells roots.
+          voicings:
+            type: array
+            items:
+              type: object
+              properties:
+                chord:
+                  type: string
+                  pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+                  description: The chord symbol, as it appears in chart.
+                diagram_id:
+                  type: string
+                  format: uuid
+                  description: |
+                    The chord catalog voicing the backing sounds, and the box shown on demand on
+                    guitar: the chord's open voicing if the catalog has one, else its
+                    lowest-difficulty voicing.
+              additionalProperties: false
+              required: [chord, diagram_id]
+            description: One voicing per distinct chord of chart.
+          chord_tones:
+            type: array
+            items:
+              type: object
+              properties:
+                chord:
+                  type: string
+                  pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+                  description: The chord symbol, as it appears in chart.
+                root:
+                  $ref: '#/FretPlace'
+                third:
+                  $ref: '#/FretPlace'
+                fifth:
+                  $ref: '#/FretPlace'
+              additionalProperties: false
+              required: [chord, root, third, fifth]
+            description: |
+              On a bass layout, the places of each distinct chord's root, third and fifth, each
+              at its lowest fret, then its lowest string, inside frets 0–5. A dominant seventh
+              keeps its root, third and fifth. Empty on guitar.
+        additionalProperties: false
+        required: [music_key, clean, chart, voicings, chord_tones]
+      description: |
+        The tour's 12 keys in its order, the cycle of fourths from C: C F Bb Eb Ab Db F# B E A D
+        G, each with whether it is clean and the progression drawn in it.
+  additionalProperties: false
+  required:
+    - layout_instrument_id
+    - progression
+    - times_through
+    - takes
+    - start_music_key
+    - tour_tempo_bpm
+    - start_note_value
+    - target_tempo_bpm
+    - min_tempo_bpm
+    - keys
