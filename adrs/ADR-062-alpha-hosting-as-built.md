@@ -6,6 +6,9 @@
 **Supersedes (in part):** ADR-039 (Region `us-east-1`; CI authentication through GitHub OIDC;
 deploys as free-form SSM Run Command; the instance role reading the media buckets)
 
+> **2026-10-20 (amended):** production releases are `vX.Y.Z` git tags on `main`. Pushing a tag
+> starts the production deploy; see *Production releases are tags* below.
+
 ---
 
 ## Context
@@ -97,6 +100,32 @@ When an image is deployed to production, it gets a second tag, **`production-<sh
 lifecycle rules expire `production-*` images only among themselves. Staging builds therefore cannot
 push out an image that production may need to roll back to.
 
+### Production releases are tags
+
+Production deploys a **release**, and a release is a **`vX.Y.Z` git tag on `main`**. This applies
+to each deployable repository separately: `motifpath-core` and `motifpath-web` version
+independently.
+
+- **Releasing.** After the `stage → main` merge (or a hotfix merge), tagging `main` with the next
+  version and pushing the tag starts the production deploy. It still waits for the `production`
+  environment's required reviewers, so a release stays a deliberate human act. Anything without a
+  tag is an intermediate build: a release candidate on `stage`, or a staging-only deploy.
+- **Choosing what runs.** A tag that is not on `main` is refused.
+  - For the services, the images are those of the newest commit the tag contains that was built.
+    For a normal release, that is the `stage` commit staging ran; for a hotfix, it is the hotfix's
+    own build.
+  - The SPA is built from the tagged commit.
+- **Naming the images.** The service images also get the release as an ECR tag, next to
+  `production-<sha>`.
+- **Publishing.** Once production runs the release, a GitHub Release is published with notes
+  generated since the previous tag. The Releases page therefore lists what production actually
+  ran.
+- **Rollback.** A rollback redeploys an earlier tag. In an emergency, a manual deploy still accepts
+  a commit SHA on `main`; that deploy is not a release and publishes none.
+- **Protecting tags.** A tag ruleset on `refs/tags/v*` lets only repository admins create these
+  tags and blocks moving or deleting them. A moved tag would make a release name point at
+  different code. The `production` environment allows the `v*` tag pattern as well as `main`.
+
 ### Promotions use merge commits
 
 `dev → stage` and `stage → main` are merged with a **merge commit**. Squash and rebase merges are
@@ -134,6 +163,12 @@ the host's ability to read production secrets.
 key would then be equivalent to root on the host. The fixed document gives the same outcome, with
 the commit check done on the host instead of only in the workflow.
 
+**Release tags over "deploy the head of `main`".** Deploying whatever is newest on `main` needs no
+input, but a release then has no name: nothing ties "what production ran on Tuesday" to a version,
+and rolling back means finding a SHA. A tag names the release, gives it a Releases page with its
+changes, and makes the rollback target obvious. Tags cost one ruleset and one extra command per
+release.
+
 **Rejected: rebuilding images on `main`.** That would allow squash merges, but production would
 then run an image that staging never ran. The point of `stage` is to deploy to production the exact
 image that staging already ran.
@@ -160,11 +195,19 @@ image that staging already ran.
   credits.
 - **Merge-commit history.** `main` carries a merge commit for every release, and contributors must
   not use GitHub's default squash button on release PRs. The rulesets enforce this.
+- **Pushing a tag deploys production.** Creating a `v*` tag is a release decision, guarded by the
+  tag ruleset and the `production` environment's reviewers. Without reviewers, a tag deploys right
+  away.
+- **Old releases expire.** Release images expire with the rest of the `production-` images, so
+  only the most recent few releases can be rolled back to.
 
 ### Neutral
 
 - **Amends ADR-039.** Its Region, CI authentication, deploy mechanism and instance-role scope are
   replaced as above. Its topology, release flow, hotfix path and cost model stand.
+- **Amends ADR-004's manual production trigger.** Production is no longer started by a
+  `workflow_dispatch` that names a SHA. Pushing a release tag starts it, behind the same approval.
+  The manual run remains for redeploys and rollbacks.
 - The `motifpath-infra` and `motifpath-core` READMEs and the `motifpath-infra` CLAUDE.md already
   describe the system as built.
 - **Revisit if** the account leaves the AWS project (OIDC could then replace the CI keys), or
@@ -180,4 +223,4 @@ image that staging already ran.
 
 ---
 
-*This ADR was decided on 2026-10-20. To revise, create a new ADR with Status: Supersedes ADR-062.*
+*This ADR was decided on 2026-10-20 and amended the same day (release tags). To revise, create a new ADR with Status: Supersedes ADR-062.*

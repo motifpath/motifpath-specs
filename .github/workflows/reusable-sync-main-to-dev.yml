@@ -1,46 +1,64 @@
-name: Reusable — Sync main → dev
+name: Reusable — Sync main → dev (and stage)
+
+# Opens a PR from main into each long-lived branch that main must flow back
+# into: `dev` always, and `stage` in the repositories that have it (the
+# deployable ones). Without the `stage` sync, a hotfix merged to main would be
+# missing from the next release candidate, and promoting that `stage` to main
+# would ship a release without it. Callers stay unchanged; a repository with
+# no `stage` branch skips that target.
 
 on:
   workflow_call:
 
 jobs:
   sync:
-    name: Open sync PR from main to dev
+    name: Open sync PR from main to ${{ matrix.target }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [dev, stage]
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Check if main is ahead of dev
+      - name: Check if main is ahead of ${{ matrix.target }}
         id: check
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
-          git fetch origin dev
-          BEHIND=$(git rev-list origin/dev..origin/main --count)
-          echo "commits_ahead=$BEHIND" >> $GITHUB_OUTPUT
+          if ! git ls-remote --exit-code --heads origin "$TARGET" >/dev/null; then
+            echo "No $TARGET branch in this repository. Skipping."
+            echo "commits_ahead=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git fetch origin "$TARGET"
+          BEHIND=$(git rev-list "origin/$TARGET..origin/main" --count)
+          echo "commits_ahead=$BEHIND" >> "$GITHUB_OUTPUT"
           if [ "$BEHIND" -eq "0" ]; then
-            echo "Dev is already up to date with main. Skipping."
+            echo "$TARGET is already up to date with main. Skipping."
           fi
 
-      - name: Create sync PR (main → dev)
+      - name: Create sync PR (main → ${{ matrix.target }})
         if: steps.check.outputs.commits_ahead != '0'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          base: dev
-          head: main
-          branch: chore/sync-main-to-dev
-          title: "chore: sync main → dev"
+          base: ${{ matrix.target }}
+          branch: chore/sync-main-to-${{ matrix.target }}
+          title: "chore: sync main → ${{ matrix.target }}"
           body: |
-            ## Automated sync — main → dev
+            ## Automated sync — main → ${{ matrix.target }}
 
             This PR was opened automatically after a merge to `main`.
-            It keeps `dev` in sync with any hotfix or release that landed on `main`.
+            It keeps `${{ matrix.target }}` in sync with any hotfix or release that landed on `main`.
 
             **Review before merging:**
             - [ ] No unintended changes included
             - [ ] Conflicts resolved correctly (if any)
             - [ ] CI passes
+            - [ ] Merged with a merge commit, not squash
 
             > This PR was created by the `sync-main-to-dev` reusable workflow
             > defined in `motifpath-specs`.
