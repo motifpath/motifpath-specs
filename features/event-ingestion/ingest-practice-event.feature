@@ -43,6 +43,12 @@ Feature: Ingest practice events
     Then the event is accepted and stored in the event log
     And the stored and published practice.item_answered event keeps the tempo of 60 BPM and the note value eighths
 
+  @wip
+  Scenario: A progression key tour take keeps the key it was played in
+    When "alice" submits a practice.item_answered event rating a take of the progression key tour of "I-V-vi-IV" on guitar "clean" at 85 BPM in A
+    Then the event is accepted and stored in the event log
+    And the stored and published practice.item_answered event keeps the tempo of 85 BPM and the key A
+
   Scenario: A guide-tone take with no taps keeps its empty list of taps
     When "alice" submits a practice.item_answered event for a guide-tone take of "ii-V-I" in C at 120 BPM with no taps
     Then the event is accepted and stored in the event log
@@ -137,6 +143,12 @@ Feature: Ingest practice events
     When "alice" submits a practice.item_answered event rating a take of a play-along "clean" at 60 BPM in the note value "fifths"
     Then the submission is rejected as invalid
     And the rejection identifies "note_value" as the source of the error
+
+  @wip
+  Scenario: A take rated in a key that isn't one is rejected
+    When "alice" submits a practice.item_answered event rating a take of the progression key tour of "I-V-vi-IV" on guitar "clean" at 85 BPM in the key "H"
+    Then the submission is rejected as invalid
+    And the rejection identifies "music_key" as the source of the error
 
   Scenario: A generated question's answer offering a single option is rejected
     When "alice" submits a practice.item_answered event picking "Em" among "Em" for the chord on vi in G

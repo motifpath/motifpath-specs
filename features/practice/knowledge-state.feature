@@ -134,6 +134,20 @@ Feature: Derive a student's knowledge of an item from evidence
     Then "alice"'s best clean tempo on "pentatonic-run" is 100 BPM
     And "pentatonic-run" is verified for "alice"
 
+  # A progression key tour's fluency is a take's effective speed over the tour target, 100 BPM, as
+  # for a play-along's tempo over its target (MOT-150).
+  @wip
+  Scenario: Five clean takes at the target make a progression key tour fluent
+    Given "alice" practises the progression key tour of "I-V-vi-IV" on guitar
+    When "alice" rates 5 takes of it "clean" at 100 BPM on 5 different days, each in another key
+    Then "alice"'s level for the progression key tour is "fluent"
+
+  @wip
+  Scenario: Clean takes far below the target leave a progression key tour accurate, not fluent
+    Given "alice" practises the progression key tour of "I-V-vi-IV" on guitar
+    When "alice" rates 5 takes of it "clean" at 60 BPM on 5 different days, each in another key
+    Then "alice"'s level for the progression key tour is "accurate"
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   Scenario: The same answer delivered twice counts once
