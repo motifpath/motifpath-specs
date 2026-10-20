@@ -16,7 +16,8 @@ questions are per template, never per item.
 
   | Kind | Rung |
   |---|---|
-  | play-along | `play_in_time` (its next-key take, `move`) |
+  | play-along | `play_in_time` |
+  | progression key tour | `move` |
   | chord change | `play_in_time` |
   | single chord, self-rated | `play_clean` |
   | song chart item | `use` |
@@ -90,7 +91,7 @@ on the bass fretboard, at positions computed from the chord's formula and the tu
 | `heard_progression` | a 4-bar progression | `progression_by_number` (hear): four chords in a random key, pick the progression; confusable progressions offered | comes back | `hear-progressions`, `common-progressions` | P2 |
 | `chord_voicing` | a chord voicing (bass: a chord's root and fifth) | none, self-rated (play_clean) | — | `play-open-chords` (bass: `play-root-fifth-lines`) | P3 |
 | `chord_change` | two chords (bass: their roots) | none, changes per minute (play_in_time) | — | `change-chords` (bass: `play-root-notes`) | P3 |
-| `play_along` | a diagram | next key after a clean take (move) | — | the diagram's nodes, `play-shapes-in-any-key` | P4 |
+| `progression_keys` | a progression (`progressions.yaml`) on a layout | none, self-rated at a tempo; the key moves on after a clean take (move) | — | `common-progressions`, `play-shapes-in-any-key` (bass: `play-chord-tone-lines`) | P4 |
 | `guide_tone` | a progression in a key | `tap_the_third` (target): over the playback, tap the 3rd of each chord as it arrives; the 7th at higher levels | — (not asked among options) | `target-chord-tones`, `voice-lead` (bass: `play-chord-tone-lines`) | P5 |
 | `song_chart` | a song chart built on a progression | none, self-rated (use) | — | `common-progressions` | P6 |
 | `fretboard_note` | a note on a layout | `find_every_instance` (know): tap every place of the note in the fret window | — (not asked among options) | `find-octaves` | P7 |
@@ -110,6 +111,7 @@ and for a find every instance's fret window.
 | `chord_voicing` | `chord_voicing:<diagram id>` | — | `self_rating`, no measure | `self_rating.v1` |
 | `root_fifth` (bass) | `root_fifth:<layout id>:<chord>` | — | `self_rating`, no measure | `self_rating.v1` |
 | `root_change` (bass) | `root_change:<layout id>:<from chord>:<to chord>` | — | `self_rating` + changes per minute | `self_rating.v1` |
+| `progression_keys` | `progression_keys:<layout id>:<progression key>` | key (the tour's) | `self_rating` + tempo and key | `self_rating.v1` |
 | `guide_tone` | `guide_tone:<layout id>:<progression key>` | key, tone, tempo | `timed_taps` | `timed_taps.v1` |
 | `fretboard_note` | `fretboard_note:<layout id>:<note>` | fret window | `multi_tap` | `multi_tap.v1` |
 
@@ -261,6 +263,66 @@ instrument in hand and rated, never recalled in the head.
     them, as for a play-along's tempo.
 - **Not asked among options**, so the challenge rules on options and second ways don't apply.
 
+## Progression key tours
+
+`progression_keys` is played with the instrument in hand and rated. The student plays one
+progression of the progression catalog along with its backing, key after key around the cycle of
+fourths, and so learns it by number instead of by one fingering (MOT-150).
+
+- **Items:** every progression of the progression catalog on each of the `guitar` and
+  `electric-bass` layouts, keyed `progression_keys:<layout id>:<progression key>`, 20 items.
+  - Each item rolls up to `common-progressions` and its progression's nodes, plus
+    `play-shapes-in-any-key` on guitar or `play-chord-tone-lines` on bass.
+  - An item suits the instruments of its layout.
+  - Items are offered like any node's: a path skill's as new, with no prerequisite in practice.
+- **In a session**, a tour is a focus item of an in-hand session:
+  - never in the head, never the warm-up and never the application ending. Sessions in the head
+    practise the same progressions through the harmony and ear drills;
+  - at most 1 a session, played over up to 3 takes;
+  - it is sized like a play-along. Each take is a bar of count-in plus its bars at the start
+    tempo, then about 10 seconds to rate it.
+- **A take** plays the progression four times through (16 bars) when it has four bars, and once
+  when it is a 12-bar blues.
+  - It is in 4/4, one chord a bar, after a bar of count-in.
+  - The backing plays the chords in their voicings (the harmony drills' voicing rule) at the
+    take's tempo and note value.
+- **The key order** is the cycle of fourths from C, the same on every instrument: C F B♭ E♭ A♭
+  D♭ F# B E A D G. Keys are spelled as the chord catalog spells roots.
+- **The tour** keeps one tempo for the item, across sessions.
+  - **A clean key:** a key is clean when a take in it is rated clean at an effective speed at or
+    above the tour tempo. A clean take slower than the tour tempo, at a tempo the student chose,
+    doesn't make its key clean.
+  - **The next take:** after a clean take, it is in the next key of the cycle that isn't clean
+    yet, at the same tempo. After an almost or a struggle, it stays in the key.
+  - **A struggle** lowers the tour tempo by 5 BPM, never below 60% of the target. Keys already
+    clean stay clean, since they were clean faster.
+  - **A finished tour:** when all 12 keys are clean, the tour tempo goes up 5 BPM and the tour
+    starts again at C, with no key clean. By itself it never climbs past the target.
+  - **Choosing a tempo:** the student may choose any tempo for a take, as on a play-along.
+  - **The start:** a session starts the item at the first key of the cycle not yet clean, at the
+    tour tempo, in the note value of the last clean take (quarters with none). A tour never
+    played starts at C, at 60% of the target rounded down to 5 BPM.
+  - **The target** is 100 BPM in quarters, the same for every progression and instrument
+    (`progression_keys.target_tempo_bpm`).
+- **How it is drawn** (Figma 17k; bass 18z):
+  - the progression's name; the last clean key and tempo with the key to play ("Clean in G at
+    84 BPM · now in A");
+  - the chart in chord symbols, in the take's key (a 12-bar blues in three lines of four);
+  - the key line: five keys of the cycle around the current one, with the clean ones ticked;
+  - the tempo control.
+  - **On guitar**, each chord's box is shown on demand (the chord card), from the harmony drills'
+    voicing rule, so every client draws the same box.
+  - **On bass**, the board marks each chord's root, third and fifth, so the line says whether
+    the chord is major or minor. Each tone sits at its lowest fret, then its lowest string,
+    inside frets 0–5: the rule of a root and fifth. A dominant seventh keeps root, third and
+    fifth on the board, and its symbol shows the 7.
+- **Rating:** the student rates each take clean, almost or struggled (`self_rating.v1`). The take
+  sends its tempo, its note value and the key it was played in. As for a play-along, a take's
+  fluency is its effective speed ÷ the target.
+- **The summary** says how many keys are clean at the tour tempo: "Clean in 3 of 12 keys at
+  85 BPM".
+- **Not asked among options**, so the challenge rules on options and second ways don't apply.
+
 ## Fretboard cells
 
 - **Cells are generated, never authored.** For each skill, each layout lists the strings and
@@ -386,6 +448,8 @@ instrument in hand and rated, never recalled in the head.
   names two of the chord drills' voicings, and no pair is listed twice in either order.
 - The chord drills' chord symbols are the chords of their voicings.
 - A change target version 1 is installed before chord changes reach students.
+- `progression_keys.key_order` holds each of the 12 major keys once. Its layouts exist, and
+  every bass tour's chord tones fall inside frets 0–5 of the `electric-bass` layout.
 
 - Installing on an empty database twice gives identical template and threshold IDs.
 - The generated cells for a layout are exactly the strings and frets listed. A string the
