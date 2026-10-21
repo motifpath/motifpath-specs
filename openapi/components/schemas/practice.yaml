@@ -39,6 +39,8 @@ PracticeItemKey:
     - progression_keys:<layout instrument id>:<progression key> — playing a progression along
       with its backing, key after key around the cycle of fourths. The key is the tour's next
       one, sent back with each take.
+    - song:<layout instrument id>:<song chart id> — playing a published song chart whole, as
+      written, on an instrument of the layout: its chords on guitar, their roots on bass.
 
     In these keys, <key> is a major key spelled as one of C Db D Eb E F F# G Ab A Bb B;
     <numeral> is one of I ii iii IV V vi viio (viio is vii°); <chord> is a root spelled the
@@ -47,7 +49,7 @@ PracticeItemKey:
 
     Item kinds are an open set: a new kind adds its own prefix and key scheme here, a
     grader, and its golden cases.
-  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diagram_shape:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diatonic_chord:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chord_function:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chart_progression:[0-9A-Za-z][0-9A-Za-z-]*|heard_chord:(I|ii|iii|IV|V|vi|viio)|heard_progression:[0-9A-Za-z][0-9A-Za-z-]*|chord_voicing:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|root_fifth:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|root_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|guide_tone:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9A-Za-z][0-9A-Za-z-]*|progression_keys:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9A-Za-z][0-9A-Za-z-]*)$'
+  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diagram_shape:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diatonic_chord:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chord_function:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chart_progression:[0-9A-Za-z][0-9A-Za-z-]*|heard_chord:(I|ii|iii|IV|V|vi|viio)|heard_progression:[0-9A-Za-z][0-9A-Za-z-]*|chord_voicing:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|root_fifth:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|root_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|guide_tone:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9A-Za-z][0-9A-Za-z-]*|progression_keys:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9A-Za-z][0-9A-Za-z-]*|song:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$'
   example: 'fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:3'
 
 PracticeResponse:
@@ -203,12 +205,13 @@ SelfRatingResponse:
   type: object
   description: |
     The student's own rating of a take they played: a play-along at a tempo, chord changes
-    counted over a minute, one chord played cleanly, or a progression in one key of its tour. A
+    counted over a minute, one chord played cleanly, a progression in one key of its tour, or a
+    whole song. A
     play-along rating carries tempo_bpm and no changes_per_minute, and may carry the note_value
     it was played at (quarters when absent); a progression key tour take carries the same and
     the music_key it was played in; a chord-change or root-change take carries both tempo_bpm and changes_per_minute,
-    and its rating is derived from them (see rating); a single chord voicing or a chord's root
-    and fifth (play clean) carries neither.
+    and its rating is derived from them (see rating); a single chord voicing, a chord's root
+    and fifth (play clean) or a song carries neither.
   properties:
     response_type:
       type: string
@@ -578,9 +581,10 @@ PracticePickReason:
     practised, is not due, and is not yet fluent; new = it has not been practised yet;
     warm_up = something already known, played first with the instrument in hand, below the
     student's edge and outside the evidence: its takes are not sent as practice.item_answered;
-    application = one play-along at the end of a session of 10 minutes or more, applying a
-    skill the session's focus items practised (or, with none, another skill of the student's
-    paths), and evidence like any other take; review_ahead = a known item coming due within the
+    application = one play-along or song at the end of a session of 10 minutes or more,
+    applying a skill the session's focus items practised (or, with none, another skill of the
+    student's paths), and evidence like any other take; it is a song when one of the session's
+    subjects is at the use rung and a song practises it; review_ahead = a known item coming due within the
     week, reviewed before it falls due, when nothing else is due; stretch = an unseen item of a
     node the student is ready to start, the skills of their paths first, when nothing else is due
     or past the new share.
@@ -601,7 +605,7 @@ PracticeRung:
     play_in_time = play it at a tempo; move = play it in another key or place; target = aim at it
     while the music moves; use = play it in a piece of music. A drill template has one rung;
     a play-along and a chord change are play_in_time, a single self-rated chord is play_clean,
-    a progression key tour is move, and a song chart item is use.
+    a progression key tour is move, and a song is use.
 
 PracticeFocusSource:
   type: string
@@ -687,6 +691,7 @@ PracticeItemKind:
     - root_change
     - guide_tone
     - progression_keys
+    - song
   description: |
     The kind of a practice item, the prefix of its item key. The set is open: a new kind
     is added with its key scheme, grader and golden cases.
@@ -1626,3 +1631,42 @@ PlannedGuideTone:
     - fret_window
     - bars
     - voicings
+
+PlannedSong:
+  type: object
+  description: |
+    A published song chart to play whole on the instrument in hand, then rate (kind song). It is
+    always a session's application ending. The chart is played as written, in its concert key
+    with its capo, never transposed; the client loads it as learners read it. The take is rated
+    by the student and has no measure.
+  properties:
+    song_chart_id:
+      type: string
+      format: uuid
+      description: The published song chart to play.
+    layout_instrument_id:
+      type: string
+      format: uuid
+      description: The instrument whose layout the song is practised on.
+    title:
+      type: string
+      description: The song's title, from the chart's latest published revision.
+    artist:
+      type: string
+      description: The performer or composer the song is known by.
+    progression_key:
+      type: string
+      pattern: '^[0-9A-Za-z][0-9A-Za-z-]*$'
+      description: |
+        The key, in the progression catalog, of the progression the chart plays that practises
+        the session's subject, shown as why this song was picked.
+    plays:
+      type: string
+      enum:
+        - chords
+        - roots
+      description: |
+        What the student plays from the chart. chords = the chords as written, on a guitar
+        layout; roots = the root of each chord, on a bass layout.
+  additionalProperties: false
+  required: [song_chart_id, layout_instrument_id, title, artist, progression_key, plays]
