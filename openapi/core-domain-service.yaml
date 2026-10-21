@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.54.0
+  version: 0.55.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -13560,7 +13560,12 @@ components:
           additionalProperties: false
           description: |
             Present when kind is fretboard_cell. The drill is the way of asking the cell has
-            the fewer right answers so far, name_the_note on a tie. The fret window is the one
+            the fewest right answers so far: name_the_note, then find_the_note, then
+            find_every_instance on a tie. No two cells of the same layout and note are asked
+            find_every_instance in one plan; the second is asked the way it has the next fewest
+            right answers. A cell asked
+            find_every_instance is answered under its own key, and its note is the one to find
+            everywhere in the window. The fret window is the one
             the composer picked for this drill and layout: the one holding the most of the
             drill's due cells, then weak, then new, the one nearest the nut on a tie. When the
             student has started an odd number of sessions in the head so far and the drill has

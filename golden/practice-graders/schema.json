@@ -294,6 +294,63 @@
               {
                 "type": "object",
                 "additionalProperties": false,
+                "required": ["result", "evidence_by_item"],
+                "description": "An answer graded on several items: one entry per item, in the grader's order. Each entry's evidence is stored on its own item.",
+                "properties": {
+                  "result": { "const": "graded" },
+                  "evidence_by_item": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["item_key", "evidence"],
+                      "properties": {
+                        "item_key": { "type": "string", "description": "The item this entry's evidence is about." },
+                        "evidence": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "description": "Auto-graded evidence that counts for accuracy only, so it carries no latency.",
+                          "required": ["source", "correct", "answer_key"],
+                          "properties": {
+                            "source": { "const": "auto_graded" },
+                            "correct": { "type": "boolean" },
+                            "answer_key": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "description": "A fretboard cell graded by finding every instance: the cell, the note asked, the window and every place of the note in it.",
+                              "required": ["string", "fret", "note_name", "fret_window", "cells"],
+                              "properties": {
+                                "string": { "type": "integer", "minimum": 1 },
+                                "fret": { "type": "integer", "minimum": 0 },
+                                "note_name": { "enum": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] },
+                                "fret_window": {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "required": ["from_fret"],
+                                  "properties": { "from_fret": { "type": "integer", "minimum": 0 } }
+                                },
+                                "cells": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": ["string", "fret"],
+                                    "properties": { "string": { "type": "integer", "minimum": 1 }, "fret": { "type": "integer", "minimum": 0 } }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
                 "required": ["result", "reason"],
                 "properties": {
                   "result": { "const": "rejected" },

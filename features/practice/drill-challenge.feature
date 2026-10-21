@@ -177,6 +177,13 @@ Feature: Generated drill questions challenge the student
     Then its chart is drawn as chord symbols in three lines of four bars
     And it offers "12-bar-blues" and "12-bar-blues-quick-change"
 
+  @web
+  Scenario: Finding every instance never shows how many places the note has
+    Given the guitar cell on string 6 at fret 3 is planned for "alice" as find_every_instance in frets 3 to 7
+    When "alice" is asked to tap every G
+    Then the board marks no place before "alice" taps it
+    And the question doesn't say how many G's are in the window
+
   # ── Failure cases ──────────────────────────────────────────────────────────
 
   Scenario: A template whose second way asks another kind of item fails the installation

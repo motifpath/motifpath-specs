@@ -125,7 +125,7 @@ for each area; the skills after it have none yet.
 | Area | Item kinds |
 |---|---|
 | Instrument basics | `play_along` (finger strength, capo and tunings, 5-string, fretless, 7-string, open tunings), `exercise` (choosing a capo for a singer) |
-| Fretboard fluency | `fretboard_cell`, `fretboard_note`, `play_along`, `root_fifth` |
+| Fretboard fluency | `fretboard_cell`, `play_along`, `root_fifth` |
 | Fretting-hand, picking and muting technique | `play_along` |
 | Chords and rhythm | `chord_voicing`, `chord_change`, `diagram_shape`, `chart_progression`, `play_along` |
 | Time and groove | `play_along` |

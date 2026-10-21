@@ -42,6 +42,27 @@ sounds, the student taps the asked tone of it on an empty fretboard, graded by `
   target of 90 BPM, as for a play-along. The template isn't timed, so it needs no fluent time,
   and a take's latency is kept but never judged.
 
+**Amended:** 2026-10-21, planning find every instance (MOT-153, slice P7), by Gilson (D43). Find
+every instance is a third way of asking a **fretboard cell**, `fretboard_cell:find_every_instance`
+(rung `know`), not a `fretboard_note` item: the planned cell's note is named, and the student taps
+every place of it in the fret window. One answer is graded on **every cell it covers**, which
+amends ADR-046's one observation per answer:
+- each place of the note in the window gets evidence on its cell: right if tapped, wrong if
+  missed. Each other cell tapped gets wrong evidence. Every cell of the window counts, whichever
+  skill it serves;
+- the answered event names the planned cell. Each cell's evidence id is a name-based UUID (v5)
+  of that cell's item key, under the event id as namespace, so a redelivered event still can't
+  count twice. This amends ADR-046's "the evidence id is the event id" for answers graded on
+  several items; every other answer keeps the event id;
+- it counts for accuracy, never for fluency: one time covers several taps, so the way has no
+  fluent time and its evidence no latency;
+- it isn't asked among options, so it has no second way and never comes back. The composer asks
+  a cell the way with the fewest right answers, as it does for naming and finding the note.
+
+The `fretboard_note` key, never installed, is dropped, and `find-octaves` loses its planned
+drill. Rejected: a `fretboard_note` item with its own level. It would leave untouched the cells
+the drill is meant to make fluent.
+
 ---
 
 ## Context
@@ -266,13 +287,14 @@ pattern catalog is added.
 ## Related ADRs
 
 - **ADR-046** (evidence-based practice): amended here for composition, guess correction and
-  distractors.
+  distractors, and (2026-10-21) for one answer graded on several cells and their evidence ids.
 - **ADR-043** (knowledge graph): subjects are its nodes; `part_of` gives a subject's subtree.
 - **ADR-047** (practice reference snapshot): the new families' reference data reaches graders
   through it.
 - **ADR-050** (chord library and song charts): chord voicings and song charts feed the harmony,
   chord and use drills.
-- **ADR-040** (fretboard cells as answers): find every instance taps several cells.
+- **ADR-040** (fretboard cells as answers): find every instance taps several cells, and grades
+  each of them.
 
 ---
 
