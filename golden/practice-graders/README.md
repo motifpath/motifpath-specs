@@ -195,9 +195,11 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
 
 - The layout in the key and the progression must exist (`unknown_reference`). A tap on a
   string outside the layout's tuning is `invalid_cell`.
-- The progression plays in `music_key` at `tempo_bpm`, four beats to a bar. Bar *i* (from 0)
-  starts at *i* × 240000 / `tempo_bpm` ms, rounded down, and runs to the next bar's start. A
-  tap belongs to the bar it falls in; a tap after the last bar ends is not graded.
+- The progression plays in `music_key` at `tempo_bpm`, four beats to a bar, at the speed of
+  `note_value` (quarters when absent). Bar *i* (from 0) starts at *i* × 240000 / (`tempo_bpm` ×
+  the note value's speed factor) ms, rounded down, and runs to the next bar's start: in eighths
+  a bar lasts half as long. A tap belongs to the bar it falls in; a tap after the last bar ends
+  is not graded.
 - **The asked tone** of each bar's chord: its third for `3` (minor on ii iii vi viio, major
   otherwise); its seventh in the key for `7` (major on I and IV, minor on every other numeral
   and on a dominant seventh).
@@ -208,6 +210,8 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
   tap; a bar not hit counts its full length.
 - The answer key's `bars` list every bar in order, with its `chord`, the asked tone's
   `note_name` and `hit`.
+- The evidence carries no tempo of its own: a right take's fluency is measured from the
+  `tempo_bpm` and `note_value` of the response it keeps (see the drill catalog's "Guide tones").
 
 ### `multi_tap.v1`
 

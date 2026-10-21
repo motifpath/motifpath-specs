@@ -45,6 +45,9 @@ questions are per template, never per item.
   `exercise:<exercise_type>`. They are `know`, or `hear` when the student answers what they hear
   (`audio_recognition`, `audio_selection`). A family's exercises share one threshold, since one exercise
   rarely gathers enough answers to calibrate on its own.
+- **Guide tones** have one template, `guide_tone:tap_the_third`. It isn't timed: a guide tone
+  is measured in tempo, like a play-along (see "Guide tones"), so it has no fluent time and no
+  felt question.
 - **Play-alongs and chord changes** have no template. A play-along is measured in tempo,
   against the target its music sets; a chord change in clean changes per minute, against the
   catalog's change target (see "Chord drills").
@@ -81,7 +84,8 @@ responses in the practice schemas; `golden/practice-graders/`), so each is grade
 the start. Each slice then adds its templates and fluent times to `practice-drills.yaml` (with
 fixed IDs) and its generator; until then a family installs nothing. The P1 harmony families
 and the P2 ear families are installed (see "Harmony drills" and "Ear drills" below), and so
-are the P3 chord families (see "Chord drills"). Every family has a bass version on the
+are the P3 chord families (see "Chord drills"), the P4 key tours ("Progression key tours") and
+the P5 guide tones ("Guide tones"). Every family has a bass version on the
 `electric-bass` layout: chord boxes become chord symbols, or the answer is a chord tone tapped
 on the bass fretboard, at positions computed from the chord's formula and the tuning.
 
@@ -95,7 +99,7 @@ on the bass fretboard, at positions computed from the chord's formula and the tu
 | `chord_voicing` | a chord voicing (bass: a chord's root and fifth) | none, self-rated (play_clean) | — | `play-open-chords` (bass: `play-root-fifth-lines`) | P3 |
 | `chord_change` | two chords (bass: their roots) | none, changes per minute (play_in_time) | — | `change-chords` (bass: `play-root-notes`) | P3 |
 | `progression_keys` | a progression (`progressions.yaml`) on a layout | none, self-rated at a tempo; the key moves on after a clean take (move) | — | `common-progressions`, `play-shapes-in-any-key` (bass: `play-chord-tone-lines`) | P4 |
-| `guide_tone` | a progression in a key | `tap_the_third` (target): over the playback, tap the 3rd of each chord as it arrives; the 7th at higher levels | — (not asked among options) | `target-chord-tones`, `voice-lead` (bass: `play-chord-tone-lines`) | P5 |
+| `guide_tone` | a progression on a layout | `tap_the_third` (target): over the playback, tap the 3rd of each chord as it arrives; the 7th once accurate | — (not asked among options) | `target-chord-tones`, `voice-lead` (bass: `play-chord-tone-lines`) | P5 |
 | `song_chart` | a song chart built on a progression | none, self-rated (use) | — | `common-progressions` | P6 |
 | `fretboard_cell` | a cell (string and fret) on a layout | `find_every_instance` (know): the cell's note is named, tap every place of it in the fret window; graded on every cell in the window | — (not asked among options) | `find-notes-root-strings`, `find-notes-top-strings` (the cells' own) | P7 |
 
@@ -115,7 +119,7 @@ and for a fretboard cell's fret window.
 | `root_fifth` (bass) | `root_fifth:<layout id>:<chord>` | — | `self_rating`, no measure | `self_rating.v1` |
 | `root_change` (bass) | `root_change:<layout id>:<from chord>:<to chord>` | — | `self_rating` + changes per minute | `self_rating.v1` |
 | `progression_keys` | `progression_keys:<layout id>:<progression key>` | key (the tour's) | `self_rating` + tempo and key | `self_rating.v1` |
-| `guide_tone` | `guide_tone:<layout id>:<progression key>` | key, tone, tempo | `timed_taps` | `timed_taps.v1` |
+| `guide_tone` | `guide_tone:<layout id>:<progression key>` | key, tone, tempo and note value | `timed_taps` | `timed_taps.v1` |
 | `fretboard_cell` (find every instance) | `fretboard_cell:<layout id>:<string>:<fret>` | fret window | `multi_tap` | `multi_tap.v2`, on every cell in the window |
 
 The bass versions of the harmony and ear families are the same items: only how an option is
@@ -328,6 +332,61 @@ fourths, and so learns it by number instead of by one fingering (MOT-150).
   85 BPM".
 - **Not asked among options**, so the challenge rules on options and second ways don't apply.
 
+## Guide tones
+
+`guide_tone` is tapped on the screen in time with a progression's playback, and so recalled in
+the head (MOT-151). While each chord sounds, the student taps a chord tone of it on an empty
+fretboard: its third, later its seventh. It connects the harmony to the neck, the first step of
+improvising over changes.
+
+- **Items:** every progression of the progression catalog on each of the `guitar` and
+  `electric-bass` layouts, keyed `guide_tone:<layout id>:<progression key>`, 20 items.
+  - Each item rolls up to `target-chord-tones`, plus `voice-lead` on guitar or
+    `play-chord-tone-lines` on bass.
+  - An item suits the instruments of its layout.
+  - Items are offered like any node's: a path skill's as new, with no prerequisite in practice.
+    A 12-bar blues is planned only once the student is accurate on `target-chord-tones`; until
+    then the four-bar progressions stand in.
+- **In a session**, a guide tone is a focus item of a session in the head, on a layout of the
+  student's instruments:
+  - never in an in-hand session: nothing is played on the instrument;
+  - at most 1 a session, over up to 3 takes. The item ends after a right take, or after its third;
+  - it is sized by its 3 takes at its start tempo: each a bar of count-in and the progression
+    once, then 5 seconds to see the result.
+- **What is asked** is picked each time the item is planned:
+  - **the tone:** each chord's third until the student is accurate on the item, then its seventh
+    in the key (the major seventh of I and IV, the minor seventh of every other chord and of a
+    dominant seventh);
+  - **the key:** one of the 12 major keys at random, never the key of the item's last take. Every
+    take of the item in a session is in the same key;
+  - **the tempo:** by the student's level on the item: 60 BPM while new or learning, 72 once
+    accurate, 90 once fluent. The student may change the tempo and the note value (a speed
+    factor) before a take. A tempo is never graded, but it sets the take's fluency.
+- **A take** is in 4/4, one chord a bar, after a bar of count-in. The progression plays once, in
+  the chords' voicings (the harmony drills' voicing rule); on the `electric-bass` layout, each
+  chord's root also plays under it in the bass voice. In eighths, a chord lasts half a bar, as on
+  a play-along.
+- **How it is drawn** (Figma 17l; bass 18l):
+  - the progression with its numerals and key ("ii – V – I in G") over the playback, and the
+    bars as chord symbols, the sounding one highlighted. The chords are named: tapping their
+    tone is the skill;
+  - the fretboard of frets 0–5 (the open string and frets 1–5), the same window on guitar and
+    on bass. Every pitch class lies inside it on both layouts. Nothing is marked on it: a tap
+    leaves a dot where it landed;
+  - a line naming the layout, the window and the bars hit so far ("Guitar · frets 0–5 · 2 of 2
+    in time so far"). A bar's result shows once the bar has passed, never while it sounds.
+- **The result** of a take shows each bar's chord as hit or missed. It never names the asked
+  notes or draws their places, so the next take in the same key is still asked.
+- **Grading** (`timed_taps.v1`): a bar is hit when a tap within it sounds the asked tone, in any
+  octave, and no tap within it sounds another note. The take is right only when every bar is
+  hit. The take sends its key, tone, tempo, note value and taps.
+- **Fluency:** a right take's fluency is its effective speed over the target, 90 BPM in quarters
+  (`guide_tones.target_tempo_bpm`), capped at 1, as for a play-along's tempo. The take's latency
+  is kept but never judged. So a student accurate at 72 BPM, the tempo the plan gives once
+  accurate, reaches the fluency that `fluent` needs.
+- **The summary** says how many bars the best take hit: "4 of 4 chords in time".
+- **Not asked among options**, so the challenge rules on options and second ways don't apply.
+
 ## Fretboard cells
 
 - **Cells are generated, never authored.** For each skill, each layout lists the strings and
@@ -461,8 +520,8 @@ places the note has is never shown, since it would let a student rule places out
     never takes back a level.
   - An answer given before a template has any version counts for accuracy, never for fluency.
     That's why version 1 must be installed before a timed drill reaches students.
-  - An untimed template has no fluent time, and its answers count for accuracy only
-    (`fretboard_cell:find_every_instance`).
+  - An untimed template has no fluent time. A guide tone is measured in tempo instead (see
+    "Guide tones"); a cell's find every instance answers count for accuracy only.
 
 ## Felt questions
 
@@ -479,6 +538,8 @@ places the note has is never shown, since it would let a student rule places out
   names two of the chord drills' voicings, and no pair is listed twice in either order.
 - The chord drills' chord symbols are the chords of their voicings.
 - A change target version 1 is installed before chord changes reach students.
+- `guide_tones` gives a tempo for every knowledge level, and its fret window holds every pitch
+  class on each of its layouts.
 - `progression_keys.key_order` holds each of the 12 major keys once. Its layouts exist, and
   every bass tour's chord tones fall inside frets 0–5 of the `electric-bass` layout.
 
