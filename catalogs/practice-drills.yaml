@@ -1,6 +1,6 @@
 # MotifPath practice drill catalog v2 — the drill templates, the generated fretboard cells,
 # the diagram shape families, the timed thresholds, the chord drills, the change targets, the
-# progression key tours and the guide tones installed in every environment. Rules:
+# progression key tours, the guide tones and the songs installed in every environment. Rules:
 # practice-drills.md.
 #
 # IDs are UUID v5 under the catalog namespace, from "drill-template/<key>" and
@@ -223,3 +223,14 @@ guide_tones:
   # and the target a right take's effective speed is measured against.
   tempo_bpm: {new: 60, learning: 60, accurate: 72, fluent: 90, retained: 90}
   target_tempo_bpm: 90
+
+# Songs (MOT-152): a published song chart, tagged with the progressions it plays, played whole on
+# the guitar and electric-bass layouts as a session's application ending. Items are
+# song:<layout id>:<song chart id>, generated from the published charts, so they have no rows or
+# IDs of their own.
+songs:
+  layouts: [guitar, electric-bass]
+  max_per_session: 1
+  # The item's estimate: playing the song, then rating it.
+  estimated_seconds: 120
+  rate_seconds: 10
