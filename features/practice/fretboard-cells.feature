@@ -21,6 +21,11 @@ Feature: Generate fretboard cells as practice items
     When a cell of skill "find-notes-root-strings" is picked for practice
     Then it can be asked through "fretboard_cell:name_the_note" or "fretboard_cell:find_the_note"
 
+  @wip
+  Scenario: Every cell can also be asked to find every instance of its note
+    When a cell of skill "find-notes-root-strings" is picked for practice
+    Then it can also be asked through "fretboard_cell:find_every_instance", which has no fluent time
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   Scenario: Electric guitar practises the guitar layout's cells

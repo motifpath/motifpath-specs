@@ -65,6 +65,22 @@ Feature: Derive a student's knowledge of an item from evidence
     Then "alice"'s accuracy on the cell is 0.8
     And "alice"'s level for the cell is "accurate"
 
+  # ── Find every instance (MOT-153) ──────────────────────────────────────────
+  # One find every instance answer gives evidence on every cell of its window, for accuracy only:
+  # its time covers several taps, so it never counts toward a cell's fluency.
+
+  @wip
+  Scenario: Right answers from finding every instance make a cell accurate, never fluent
+    When "alice" finds every instance of the cell's note correctly 5 times on 5 different days, each in 1500 milliseconds
+    Then "alice"'s level for the cell is "accurate"
+
+  @wip
+  Scenario: A cell is fluent from timed answers, whatever finding every instance adds
+    Given "alice"'s tap time is 300 milliseconds
+    And "alice" has found every instance of the cell's note correctly 3 times
+    When "alice" answers the cell correctly 5 times, each in 1900 milliseconds
+    Then "alice"'s level for the cell is "fluent"
+
   # ── Self-rated and teacher-reviewed takes ──────────────────────────────────
 
   Scenario: A self-rating of almost changes nothing
