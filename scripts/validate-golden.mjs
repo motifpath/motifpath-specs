@@ -50,6 +50,9 @@ for (const file of files) {
   for (const c of golden.cases) {
     if (!validateKey(c.item_key)) fail(`${file} / ${c.name}: item_key`, validateKey.errors)
     if (!validateResponse(c.response)) fail(`${file} / ${c.name}: response`, validateResponse.errors)
+    for (const entry of c.expected.evidence_by_item ?? []) {
+      if (!validateKey(entry.item_key)) fail(`${file} / ${c.name}: evidence item_key`, validateKey.errors)
+    }
   }
   console.log(`${file}: ${golden.cases.length} cases`)
 }

@@ -27,13 +27,15 @@ Each file holds:
     bar each. Keys, numerals, chords and chord tones are computed, so they have no reference.
 - `cases`: each case is an `item_key`, a raw `response` (as a client sends it in
   `practice.item_answered`) and the `expected` result. The result is either
-  `{"result": "graded", "evidence": {...}}` or `{"result": "rejected", "reason": "..."}`.
+  `{"result": "graded", "evidence": {...}}`, `{"result": "graded", "evidence_by_item": [...]}`
+  for an answer graded on several items (each entry an `item_key` and the `evidence` stored on
+  it), or `{"result": "rejected", "reason": "..."}`.
 
 ## Rules every grader follows
 
 - **The grader for an item comes from its key's kind:**
   - `fretboard_cell` → `fretboard_cell.v2` (`fretboard_cell.v1` before 2026-10-08; its file stays
-    for the evidence it graded)
+    for the evidence it graded), or `multi_tap.v2` when the response is `multi_tap`
   - `exercise` → `exercise_option.v1`
   - `play_along`, `chord_change`, `chord_voicing`, `root_fifth`, `root_change` and
     `progression_keys` → `self_rating.v1`
@@ -41,7 +43,8 @@ Each file holds:
   - `diatonic_chord`, `chord_function`, `chart_progression`, `heard_chord` and
     `heard_progression` → `generated_choice.v1`
   - `guide_tone` → `timed_taps.v1`
-  - `fretboard_note` → `multi_tap.v1`
+  - `fretboard_note` → `multi_tap.v1`. Retired before it was installed: it never graded an
+    answer, and its file goes once core and web drop it.
 - **Checks run in this order, and the first failure is the rejection:**
   1. The response type fits the item kind (`response_does_not_fit_item`).
   2. What the key points at exists (`unknown_reference`).
@@ -216,6 +219,25 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
 - **Right only when the cells tapped are exactly those places**, in any order. A place missed
   or an extra cell is wrong.
 
+### `multi_tap.v2`
+
+A fretboard cell asked to find every instance: the cell's note is named, and every place of it
+in the window is tapped.
+
+- The layout in the key must exist (`unknown_reference`).
+- The window is the same as in `multi_tap.v1`. The planned cell, a tap outside the window, or a
+  tap on a string outside the tuning is `invalid_cell`.
+- **The note** is the planned cell's note. Its places are found as in `multi_tap.v1`.
+- **Graded on every cell it covers** (`evidence_by_item`), one entry per cell, by string from 1
+  and then fret from the lowest: each place of the note is right when tapped and wrong when
+  missed, and each other cell tapped is wrong. Every cell of the window counts, whatever skill
+  it serves.
+- **Accuracy only:** the evidence has no `latency_ms`, since one time covers several taps.
+- Each entry's answer key is the cell's `string` and `fret`, the asked `note_name` (on an extra
+  tap, not the cell's own), the `fret_window` and the note's places as `cells`.
+- Each entry's evidence id is a name-based UUID (version 5) of its item key under the event id.
+  The cases don't pin ids, since they have no event.
+
 ## Using the cases
 
 The specs repo is read as a sibling checkout (`../motifpath-specs`), the same way core and
@@ -227,5 +249,5 @@ exactly `expected`.
 
 - every file against `schema.json`;
 - each file name against its grader id;
-- every case's `item_key` and `response` against `PracticeItemKey` and `PracticeResponse` in
-  `openapi/components/schemas/practice.yaml`.
+- every case's `item_key` and `response`, and each `evidence_by_item` entry's `item_key`, against
+  `PracticeItemKey` and `PracticeResponse` in `openapi/components/schemas/practice.yaml`.
