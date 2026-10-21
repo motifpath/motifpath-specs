@@ -26,6 +26,21 @@ self-rated (`self_rating.v1`, the take sending its key):
 - like chords, it is played in hand only, at most once a session.
 
 A play-along of a diagram keeps the fixed rung `play_in_time` and no next-key take.
+**Amended:** 2026-10-21, planning guide tones (MOT-151, slice P5), by Gilson. A guide tone
+(`guide_tone:<layout id>:<progression key>`, template `guide_tone:tap_the_third`, rung `target`)
+plays a progression of the progression catalog in a key, one chord a bar. While each chord
+sounds, the student taps the asked tone of it on an empty fretboard, graded by `timed_taps.v1`:
+- **No second way, and it doesn't come back.** It isn't asked among options, and every bar
+  needs the right note in time, so a lucky take is out of reach. The challenge rule "asked
+  twice" doesn't apply to it.
+- **Harder as the level rises:** each chord's third until the student is accurate on the item,
+  then its seventh in the key. The tempo starts by the level: 60, 72 once accurate, 90 once fluent. A 12-bar form is
+  planned only once the student is accurate on `target-chord-tones`.
+- **Recall in the head:** the answer is tapped on the screen, not played, so like fretboard cells
+  it is practised in sessions in the head, at most once a session, on the student's layouts.
+- **Fluency by tempo, not by latency:** a right take's fluency is its effective speed over a
+  target of 90 BPM, as for a play-along. The template isn't timed, so it needs no fluent time,
+  and a take's latency is kept but never judged.
 
 ---
 

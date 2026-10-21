@@ -436,7 +436,9 @@ One piece of evidence per observation, the only stored learning state:
   they suit the instrument; those are recalled in the head only.
   With nothing to play, an in-hand session is not found, and the client offers one in the head.
 - **In the head** (amended 2026-10-06): fretboard cells of every layout among the student's
-  instruments, diagram shapes of their instruments, and exercises; no warm-up and no application ending, since both are play-alongs.
+  instruments, diagram shapes of their instruments, exercises and (amended 2026-10-21, ADR-057)
+  guide tones of their layouts, tapped on the screen in time with a progression; no warm-up and
+  no application ending, since both are play-alongs.
   Each cell pick is asked the way (drill) with the fewer right answers on that cell, name the
   note on a tie. A session may mix layouts; each question then names its instrument.
 - **One fret window per drill** (amended 2026-10-13): for each layout, each fretboard drill takes
@@ -464,7 +466,9 @@ One piece of evidence per observation, the only stored learning state:
 - **Item time:** a play-along is sized by its takes at its start tempo; an exercise by its authored
   `estimated_duration_seconds`, or 30 seconds without one; a fretboard cell by 8 seconds; a
   diagram shape by 10 seconds; a single chord by 20 seconds and a chord change by 90 (amended
-  2026-10-18); a progression key tour like a play-along, over 3 takes (amended 2026-10-20).
+  2026-10-18); a progression key tour like a play-along, over 3 takes (amended 2026-10-20); a
+  guide tone by its 3 takes at its start tempo, each a bar of count-in and the progression once,
+  then 5 seconds to see the result (amended 2026-10-21).
 - **Focus time:** the session minus the warm-up and the application ending (one play-along at its
   estimated time). The mix shares the focus time. A warm-up
   play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the
