@@ -212,6 +212,19 @@ Feature: Grade a practice answer into evidence
     Then the answer is rejected because the reference is unknown
     And "alice" has no evidence for that tour
 
+  # A guide-tone take is graded bar by bar against its tempo and note value (timed_taps.v1, MOT-151).
+  @wip
+  Scenario: A guide-tone take with every third hit is right
+    When "alice" taps the third of each bar of "ii-V-I" in C at 120 BPM within its bar
+    Then "alice" has auto-graded evidence for that guide tone that is right
+    And the evidence's answer key marks all 4 bars hit
+
+  @wip
+  Scenario: A guide-tone take in eighths is graded with bars half as long
+    When "alice" taps the third of "Dm" at 100 milliseconds and of "G" at 2300 milliseconds in a take of "ii-V-I" in C at 120 BPM in eighths
+    Then "alice" has auto-graded evidence for that guide tone that is wrong
+    And the evidence's answer key marks only the first bar hit
+
   @wip
   Scenario: A play-along rating with a key yields no evidence
     Given the play-along diagram "pentatonic-run"
