@@ -285,53 +285,44 @@ Feature: Grade a practice answer into evidence
   # and counts for accuracy only. In frets 3 to 7 on guitar, G is at string 6 fret 3, string 4
   # fret 5 and string 1 fret 3.
 
-  @wip
   Scenario: Tapping every place of the note is right evidence on each of its cells
     When "alice" answers the guitar cell on string 6 at fret 3 by tapping string 6 fret 3, string 1 fret 3 and string 4 fret 5 in frets 3 to 7
     Then "alice" has auto-graded evidence that is correct for each of the guitar cells string 1 fret 3, string 4 fret 5 and string 6 fret 3
     And each of them names the grader "multi_tap.v2"
 
-  @wip
   Scenario: A place missed is wrong evidence on its cell
     When "alice" answers the guitar cell on string 6 at fret 3 by tapping string 6 fret 3 and string 1 fret 3 in frets 3 to 7
     Then "alice" has auto-graded evidence that is wrong for the guitar cell on string 4 at fret 5
     And "alice" has auto-graded evidence that is correct for the guitar cells string 6 fret 3 and string 1 fret 3
 
-  @wip
   Scenario: An extra tap is wrong evidence on the cell tapped
     When "alice" answers the guitar cell on string 6 at fret 3 by tapping string 6 fret 3, string 1 fret 3, string 4 fret 5 and string 5 fret 5 in frets 3 to 7
     Then "alice" has auto-graded evidence that is wrong for the guitar cell on string 5 at fret 5
     And its answer key names the note "G", which is not that cell's note
 
-  @wip
   Scenario: A window across root and top strings gives evidence to cells of both skills
     When "alice" answers the guitar cell on string 5 at fret 7 by tapping string 5 fret 7 and string 2 fret 5 in frets 3 to 7
     Then "alice" has evidence for the guitar cell on string 5 at fret 7, of skill "find-notes-root-strings"
     And "alice" has evidence for the guitar cell on string 2 at fret 5, of skill "find-notes-top-strings"
 
-  @wip
   Scenario: Finding every instance counts for accuracy, never for fluency
     When "alice" answers the guitar cell on string 6 at fret 3 by tapping string 6 fret 3, string 1 fret 3 and string 4 fret 5 in frets 3 to 7 after 5200 milliseconds
     Then none of "alice"'s evidence from that answer has a latency
 
-  @wip
   Scenario: Each cell's evidence from one answer has its own identifier
     When "alice" answers the guitar cell on string 6 at fret 3 by tapping string 6 fret 3, string 1 fret 3 and string 4 fret 5 in frets 3 to 7
     Then each cell's evidence is identified by the name-based UUID of its item key under the practice.item_answered event's identifier
 
-  @wip
   Scenario: A redelivered find every instance answer adds no evidence
     Given "alice" answered the guitar cell on string 6 at fret 3 by tapping every G in frets 3 to 7
     When the same practice.item_answered event is delivered again
     Then "alice" still has one piece of evidence for each of the three cells
 
-  @wip
   Scenario: A tap outside the window yields no evidence on any cell
     When "alice" answers the guitar cell on string 6 at fret 3 by tapping string 6 fret 3 and string 2 fret 8 in frets 3 to 7
     Then the answer is rejected because a cell is invalid
     And "alice" has no evidence for any guitar cell
 
-  @wip
   Scenario: A planned cell outside its window yields no evidence
     When "alice" answers the guitar cell on string 6 at fret 10 by tapping string 6 fret 3 in frets 3 to 7
     Then the answer is rejected because a cell is invalid

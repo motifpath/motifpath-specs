@@ -69,12 +69,10 @@ Feature: Derive a student's knowledge of an item from evidence
   # One find every instance answer gives evidence on every cell of its window, for accuracy only:
   # its time covers several taps, so it never counts toward a cell's fluency.
 
-  @wip
   Scenario: Right answers from finding every instance make a cell accurate, never fluent
     When "alice" finds every instance of the cell's note correctly 5 times on 5 different days, each in 1500 milliseconds
     Then "alice"'s level for the cell is "accurate"
 
-  @wip
   Scenario: A cell is fluent from timed answers, whatever finding every instance adds
     Given "alice"'s tap time is 300 milliseconds
     And "alice" has found every instance of the cell's note correctly 3 times
