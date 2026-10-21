@@ -26,6 +26,7 @@ Each file holds:
   - `shape_families`: each shape family's members, in the order they are offered.
   - `progressions`: progressions of the progression catalog by key, with their numerals one
     bar each. Keys, numerals, chords and chord tones are computed, so they have no reference.
+  - `song_charts`: the song charts that exist, by id.
 - `cases`: each case is an `item_key`, a raw `response` (as a client sends it in
   `practice.item_answered`) and the `expected` result. The result is either
   `{"result": "graded", "evidence": {...}}`, `{"result": "graded", "evidence_by_item": [...]}`
@@ -38,8 +39,8 @@ Each file holds:
   - `fretboard_cell` → `fretboard_cell.v2` (`fretboard_cell.v1` before 2026-10-08; its file stays
     for the evidence it graded), or `multi_tap.v2` when the response is `multi_tap`
   - `exercise` → `exercise_option.v1`
-  - `play_along`, `chord_change`, `chord_voicing`, `root_fifth`, `root_change` and
-    `progression_keys` → `self_rating.v1`
+  - `play_along`, `chord_change`, `chord_voicing`, `root_fifth`, `root_change`,
+    `progression_keys` and `song` → `self_rating.v1`
   - `diagram_shape` → `diagram_shape.v1`
   - `diatonic_chord`, `chord_function`, `chart_progression`, `heard_chord` and
     `heard_progression` → `generated_choice.v1`
