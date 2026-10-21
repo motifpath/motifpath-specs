@@ -359,8 +359,9 @@ TimedTapsResponse:
   description: |
     A take of tapping a chord tone of each chord of a progression in time with its playback,
     on the fretboard of the item's layout. The progression is played in the key and at the
-    tempo sent, four beats to a bar, one chord per bar. Each tap is kept with the time it
-    was made, so every bar can be graded.
+    tempo and note value sent, one chord per bar of four beats: in quarters a bar lasts
+    240000 / tempo_bpm milliseconds, and a faster note value shortens it by its speed factor.
+    Each tap is kept with the time it was made, so every bar can be graded.
   properties:
     response_type:
       type: string
@@ -380,6 +381,8 @@ TimedTapsResponse:
       minimum: 1
       maximum: 400
       description: The tempo the progression played at, in beats per minute.
+    note_value:
+      $ref: '#/NoteValue'
     taps:
       type: array
       maxItems: 400
@@ -1505,3 +1508,112 @@ PlannedProgressionKeys:
     - target_tempo_bpm
     - min_tempo_bpm
     - keys
+
+PlannedGuideTone:
+  type: object
+  description: |
+    A progression played once in a key, one chord a bar after a bar of count-in, while the
+    student taps the asked tone of each chord on an empty fretboard as it sounds (kind
+    guide_tone), graded by timed_taps.v1. It names the chords, the key and the tone, never the
+    notes to tap or their places. The item ends after a right take or after takes takes, all in
+    music_key; each take is answered with a timed_taps response sending music_key, tone, the
+    tempo and note value it played at, and the taps.
+  properties:
+    layout_instrument_id:
+      type: string
+      format: uuid
+      description: |
+        The instrument whose fretboard layout is tapped on: guitar or electric bass. On electric
+        bass each chord's root also plays under it in the bass voice.
+    progression:
+      type: object
+      properties:
+        key:
+          type: string
+          pattern: '^[0-9A-Za-z][0-9A-Za-z-]*$'
+          description: The progression's key in the progression catalog, such as ii-V-I.
+        name:
+          type: string
+          description: The progression's name in the student's language, such as "ii–V–I".
+      additionalProperties: false
+      required: [key, name]
+      description: The progression played.
+    music_key:
+      $ref: '#/MusicKey'
+    tone:
+      type: string
+      enum: ['3', '7']
+      description: |
+        The chord tone asked of every chord: 3 = its third, until the student is accurate on the
+        item; 7 = its seventh in the key from then on (the major seventh of I and IV, the minor
+        seventh of every other chord and of a dominant seventh).
+    tempo_bpm:
+      type: integer
+      minimum: 20
+      maximum: 240
+      description: |
+        The tempo the first take starts at, in quarter notes per minute, by the student's level
+        on the item: 60 while new or learning, 72 once accurate, 90 once fluent. The student may
+        change it, and the note value, before any take.
+    target_tempo_bpm:
+      type: integer
+      minimum: 20
+      description: |
+        The tempo a right take's effective speed is measured against for fluency, in quarters,
+        the same for every progression and layout.
+    takes:
+      type: integer
+      minimum: 1
+      description: The most takes of the item this session plays.
+    fret_window:
+      $ref: '#/FretWindow'
+    bars:
+      type: array
+      minItems: 4
+      maxItems: 12
+      items:
+        type: object
+        properties:
+          numeral:
+            type: string
+            pattern: '^(I|ii|iii|IV|V|vi|viio)7?$'
+            description: The bar's numeral in the progression catalog; a 7 marks a dominant seventh.
+          chord:
+            type: string
+            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+            description: |
+              The bar's chord symbol in music_key, spelled as the chord catalog spells roots. It
+              is shown and sounded.
+        additionalProperties: false
+        required: [numeral, chord]
+      description: Every bar of the progression, in order, played once a take.
+    voicings:
+      type: array
+      items:
+        type: object
+        properties:
+          chord:
+            type: string
+            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+            description: The chord symbol, as it appears in bars.
+          diagram_id:
+            type: string
+            format: uuid
+            description: |
+              The chord catalog voicing the playback sounds: the chord's open voicing if the
+              catalog has one, else its lowest-difficulty voicing.
+        additionalProperties: false
+        required: [chord, diagram_id]
+      description: One voicing per distinct chord of bars.
+  additionalProperties: false
+  required:
+    - layout_instrument_id
+    - progression
+    - music_key
+    - tone
+    - tempo_bpm
+    - target_tempo_bpm
+    - takes
+    - fret_window
+    - bars
+    - voicings
