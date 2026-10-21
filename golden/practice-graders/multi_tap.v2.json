@@ -1,0 +1,1091 @@
+{
+  "grader": "multi_tap.v2",
+  "description": "Find every instance: a fretboard cell's note is named and the student taps every place of it within a fret window. Graded on every cell it covers, one entry per cell, strings from 1 and then frets from the lowest: each place of the note in the window is right when tapped and wrong when missed, and each other cell tapped is wrong. The evidence counts for accuracy only, so it carries no latency. A tap outside the window or on a string the layout doesn't have, or a planned cell outside the window, is rejected.",
+  "reference": {
+    "instruments": {
+      "6ea2d087-ab9c-59dc-9657-8546025414d2": {
+        "name": "Acoustic guitar (standard tuning)",
+        "tuning": [
+          "E2",
+          "A2",
+          "D3",
+          "G3",
+          "B3",
+          "E4"
+        ]
+      },
+      "00000000-0000-4000-8000-0000000000b1": {
+        "name": "Electric bass (standard tuning)",
+        "tuning": [
+          "E1",
+          "A1",
+          "D2",
+          "G2"
+        ]
+      }
+    }
+  },
+  "cases": [
+    {
+      "name": "every place, in any order",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:3",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 3
+        },
+        "cells": [
+          {
+            "string": 6,
+            "fret": 3
+          },
+          {
+            "string": 1,
+            "fret": 3
+          },
+          {
+            "string": 4,
+            "fret": 5
+          }
+        ],
+        "latency_ms": 5200
+      },
+      "expected": {
+        "result": "graded",
+        "evidence_by_item": [
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:1:3",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 1,
+                "fret": 3,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:4:5",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 4,
+                "fret": 5,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:3",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 6,
+                "fret": 3,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "a place missed is wrong on its cell, the others right",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:3",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 3
+        },
+        "cells": [
+          {
+            "string": 6,
+            "fret": 3
+          },
+          {
+            "string": 1,
+            "fret": 3
+          }
+        ],
+        "latency_ms": 4100
+      },
+      "expected": {
+        "result": "graded",
+        "evidence_by_item": [
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:1:3",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 1,
+                "fret": 3,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:4:5",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": false,
+              "answer_key": {
+                "string": 4,
+                "fret": 5,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:3",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 6,
+                "fret": 3,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "the planned cell missed is wrong on it, the places found right",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:3",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 3
+        },
+        "cells": [
+          {
+            "string": 1,
+            "fret": 3
+          },
+          {
+            "string": 4,
+            "fret": 5
+          }
+        ],
+        "latency_ms": 4300
+      },
+      "expected": {
+        "result": "graded",
+        "evidence_by_item": [
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:1:3",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 1,
+                "fret": 3,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:4:5",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 4,
+                "fret": 5,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:3",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": false,
+              "answer_key": {
+                "string": 6,
+                "fret": 3,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "an extra tap is wrong on the cell tapped",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:3",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 3
+        },
+        "cells": [
+          {
+            "string": 6,
+            "fret": 3
+          },
+          {
+            "string": 1,
+            "fret": 3
+          },
+          {
+            "string": 4,
+            "fret": 5
+          },
+          {
+            "string": 5,
+            "fret": 5
+          }
+        ],
+        "latency_ms": 6000
+      },
+      "expected": {
+        "result": "graded",
+        "evidence_by_item": [
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:1:3",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 1,
+                "fret": 3,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:4:5",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 4,
+                "fret": 5,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:5",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": false,
+              "answer_key": {
+                "string": 5,
+                "fret": 5,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:3",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 6,
+                "fret": 3,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "no place tapped is wrong on every place",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:3",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 3
+        },
+        "cells": [],
+        "latency_ms": 3000
+      },
+      "expected": {
+        "result": "graded",
+        "evidence_by_item": [
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:1:3",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": false,
+              "answer_key": {
+                "string": 1,
+                "fret": 3,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:4:5",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": false,
+              "answer_key": {
+                "string": 4,
+                "fret": 5,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:3",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": false,
+              "answer_key": {
+                "string": 6,
+                "fret": 3,
+                "note_name": "G",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 3
+                  },
+                  {
+                    "string": 4,
+                    "fret": 5
+                  },
+                  {
+                    "string": 6,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "a window at the nut includes the open strings",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:0",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 0
+        },
+        "cells": [
+          {
+            "string": 6,
+            "fret": 0
+          },
+          {
+            "string": 4,
+            "fret": 2
+          },
+          {
+            "string": 2,
+            "fret": 5
+          },
+          {
+            "string": 1,
+            "fret": 0
+          }
+        ],
+        "latency_ms": 5800
+      },
+      "expected": {
+        "result": "graded",
+        "evidence_by_item": [
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:1:0",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 1,
+                "fret": 0,
+                "note_name": "E",
+                "fret_window": {
+                  "from_fret": 0
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 0
+                  },
+                  {
+                    "string": 2,
+                    "fret": 5
+                  },
+                  {
+                    "string": 4,
+                    "fret": 2
+                  },
+                  {
+                    "string": 6,
+                    "fret": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:2:5",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 2,
+                "fret": 5,
+                "note_name": "E",
+                "fret_window": {
+                  "from_fret": 0
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 0
+                  },
+                  {
+                    "string": 2,
+                    "fret": 5
+                  },
+                  {
+                    "string": 4,
+                    "fret": 2
+                  },
+                  {
+                    "string": 6,
+                    "fret": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:4:2",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 4,
+                "fret": 2,
+                "note_name": "E",
+                "fret_window": {
+                  "from_fret": 0
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 0
+                  },
+                  {
+                    "string": 2,
+                    "fret": 5
+                  },
+                  {
+                    "string": 4,
+                    "fret": 2
+                  },
+                  {
+                    "string": 6,
+                    "fret": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:0",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 6,
+                "fret": 0,
+                "note_name": "E",
+                "fret_window": {
+                  "from_fret": 0
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 0
+                  },
+                  {
+                    "string": 2,
+                    "fret": 5
+                  },
+                  {
+                    "string": 4,
+                    "fret": 2
+                  },
+                  {
+                    "string": 6,
+                    "fret": 0
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "a window spanning root and top strings grades the cells of both",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:7",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 3
+        },
+        "cells": [
+          {
+            "string": 5,
+            "fret": 7
+          },
+          {
+            "string": 3,
+            "fret": 4
+          }
+        ],
+        "latency_ms": 4500
+      },
+      "expected": {
+        "result": "graded",
+        "evidence_by_item": [
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:2:5",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": false,
+              "answer_key": {
+                "string": 2,
+                "fret": 5,
+                "note_name": "E",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 2,
+                    "fret": 5
+                  },
+                  {
+                    "string": 5,
+                    "fret": 7
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:3:4",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": false,
+              "answer_key": {
+                "string": 3,
+                "fret": 4,
+                "note_name": "E",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 2,
+                    "fret": 5
+                  },
+                  {
+                    "string": 5,
+                    "fret": 7
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:7",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 5,
+                "fret": 7,
+                "note_name": "E",
+                "fret_window": {
+                  "from_fret": 3
+                },
+                "cells": [
+                  {
+                    "string": 2,
+                    "fret": 5
+                  },
+                  {
+                    "string": 5,
+                    "fret": 7
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "bass: the note's places on four strings",
+      "item_key": "fretboard_cell:00000000-0000-4000-8000-0000000000b1:3:3",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 2
+        },
+        "cells": [
+          {
+            "string": 3,
+            "fret": 3
+          },
+          {
+            "string": 1,
+            "fret": 5
+          }
+        ],
+        "latency_ms": 3500
+      },
+      "expected": {
+        "result": "graded",
+        "evidence_by_item": [
+          {
+            "item_key": "fretboard_cell:00000000-0000-4000-8000-0000000000b1:1:5",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 1,
+                "fret": 5,
+                "note_name": "C",
+                "fret_window": {
+                  "from_fret": 2
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 5
+                  },
+                  {
+                    "string": 3,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "item_key": "fretboard_cell:00000000-0000-4000-8000-0000000000b1:3:3",
+            "evidence": {
+              "source": "auto_graded",
+              "correct": true,
+              "answer_key": {
+                "string": 3,
+                "fret": 3,
+                "note_name": "C",
+                "fret_window": {
+                  "from_fret": 2
+                },
+                "cells": [
+                  {
+                    "string": 1,
+                    "fret": 5
+                  },
+                  {
+                    "string": 3,
+                    "fret": 3
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "rejected: a place outside the window",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:3",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 3
+        },
+        "cells": [
+          {
+            "string": 6,
+            "fret": 3
+          },
+          {
+            "string": 1,
+            "fret": 3
+          },
+          {
+            "string": 4,
+            "fret": 5
+          },
+          {
+            "string": 2,
+            "fret": 8
+          }
+        ],
+        "latency_ms": 5000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_cell"
+      }
+    },
+    {
+      "name": "rejected: a string the layout doesn't have",
+      "item_key": "fretboard_cell:00000000-0000-4000-8000-0000000000b1:3:3",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 2
+        },
+        "cells": [
+          {
+            "string": 3,
+            "fret": 3
+          },
+          {
+            "string": 5,
+            "fret": 3
+          }
+        ],
+        "latency_ms": 3000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_cell"
+      }
+    },
+    {
+      "name": "rejected: the planned cell is outside the window",
+      "item_key": "fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:6:10",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 3
+        },
+        "cells": [
+          {
+            "string": 6,
+            "fret": 3
+          }
+        ],
+        "latency_ms": 3000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_cell"
+      }
+    },
+    {
+      "name": "rejected: a layout that doesn't exist",
+      "item_key": "fretboard_cell:00000000-0000-4000-8000-0000000000ff:6:3",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 3
+        },
+        "cells": [
+          {
+            "string": 6,
+            "fret": 3
+          }
+        ],
+        "latency_ms": 3000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: an exercise isn't answered by finding every place",
+      "item_key": "exercise:3f1c2a4b-5d6e-4f70-8a9b-0c1d2e3f4a5b",
+      "response": {
+        "response_type": "multi_tap",
+        "fret_window": {
+          "from_fret": 3
+        },
+        "cells": [
+          {
+            "string": 6,
+            "fret": 3
+          }
+        ],
+        "latency_ms": 3000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    }
+  ]
+}

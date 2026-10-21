@@ -220,7 +220,8 @@ practice; time-only threshold calibration; the map's calibration level for ranki
 ## Decision
 
 MotifPath will record practice as **evidence about items**: one observation per answer, rating or
-review, graded on the server from the raw response. A student's knowledge state for each item, the
+review, graded on the server from the raw response (one answer may cover several fretboard
+cells: amended 2026-10-21 by ADR-057). A student's knowledge state for each item, the
 level of each knowledge node and the next session are all **derived from that evidence by versioned
 rules**. Nothing about mastery is stored except the evidence itself and teacher notes.
 
@@ -303,6 +304,8 @@ One piece of evidence per observation, the only stored learning state:
   so a student's complaint about one answer can be checked from the evidence alone, even after
   the exercise changed.
 - The evidence id is the event id that produced it, so a redelivered event can't count twice.
+  *(Amended 2026-10-21 by ADR-057, MOT-153: an answer graded on several fretboard cells gives each
+  cell's evidence a name-based UUID (v5) of the cell's item key under the event id.)*
 - Evidence and teacher notes live in MongoDB. An archive to object storage is deferred until a
   measured trigger (volume or cost) calls for it.
 

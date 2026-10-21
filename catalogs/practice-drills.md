@@ -29,10 +29,13 @@ questions are per template, never per item.
   three other items. A template marked `comes_back` does both: an ear drill's second way is
   seen, not heard, so the item also comes back by ear in the same session.
 
-- **Fretboard cells** have two templates, one for each way of asking about a cell:
+- **Fretboard cells** have three templates, one for each way of asking about a cell:
   - `fretboard_cell:name_the_note`: the cell is shown, and the student names its note.
   - `fretboard_cell:find_the_note`: a note and string are named, and the student taps the
     cell.
+  - `fretboard_cell:find_every_instance`: the cell's note is named, and the student taps every
+    place of it in the fret window. One answer is graded on every cell it covers (see
+    "Find every instance").
 - **Diagram shapes** have two templates:
   - `diagram_shape:name_the_shape`: the shape is shown without its name, and the student
     picks which member of its family it is.
@@ -98,12 +101,12 @@ on the bass fretboard, at positions computed from the chord's formula and the tu
 | `progression_keys` | a progression (`progressions.yaml`) on a layout | none, self-rated at a tempo; the key moves on after a clean take (move) | — | `common-progressions`, `play-shapes-in-any-key` (bass: `play-chord-tone-lines`) | P4 |
 | `guide_tone` | a progression on a layout | `tap_the_third` (target): over the playback, tap the 3rd of each chord as it arrives; the 7th once accurate | — (not asked among options) | `target-chord-tones`, `voice-lead` (bass: `play-chord-tone-lines`) | P5 |
 | `song_chart` | a song chart built on a progression | none, self-rated (use) | — | `common-progressions` | P6 |
-| `fretboard_note` | a note on a layout | `find_every_instance` (know): tap every place of the note in the fret window | — (not asked among options) | `find-octaves` | P7 |
+| `fretboard_cell` | a cell (string and fret) on a layout | `find_every_instance` (know): the cell's note is named, tap every place of it in the fret window; graded on every cell in the window | — (not asked among options) | `find-notes-root-strings`, `find-notes-top-strings` (the cells' own) | P7 |
 
 **Item keys and graders.** A key is part of the item when the fact differs per key (the vi of
 G is not the vi of E♭); a relative skill is one item in every key, and the key is picked each
 time it is asked and sent back with the answer. The same goes for a guide tone's tone and tempo,
-and for a find every instance's fret window.
+and for a fretboard cell's fret window.
 
 | Kind | Item key | Picked each time | Response | Grader |
 |---|---|---|---|---|
@@ -117,7 +120,7 @@ and for a find every instance's fret window.
 | `root_change` (bass) | `root_change:<layout id>:<from chord>:<to chord>` | — | `self_rating` + changes per minute | `self_rating.v1` |
 | `progression_keys` | `progression_keys:<layout id>:<progression key>` | key (the tour's) | `self_rating` + tempo and key | `self_rating.v1` |
 | `guide_tone` | `guide_tone:<layout id>:<progression key>` | key, tone, tempo and note value | `timed_taps` | `timed_taps.v1` |
-| `fretboard_note` | `fretboard_note:<layout id>:<note>` | fret window | `multi_tap` | `multi_tap.v1` |
+| `fretboard_cell` (find every instance) | `fretboard_cell:<layout id>:<string>:<fret>` | fret window | `multi_tap` | `multi_tap.v2`, on every cell in the window |
 
 The bass versions of the harmony and ear families are the same items: only how an option is
 drawn changes (a chord symbol instead of a chord box). `play_along` keeps its key and grader.
@@ -405,6 +408,30 @@ improvising over changes.
   | `guitar` | 24 | 48 | 72 |
   | `electric-bass` | 24 | 24 | 48 |
 
+### Find every instance
+
+`fretboard_cell:find_every_instance` asks a cell by its note: "Tap every A", in the drill's fret
+window, on a board with nothing marked. The student taps and untaps places, then checks. How many
+places the note has is never shown, since it would let a student rule places out.
+
+- **One answer, graded on every cell it covers** (`multi_tap.v2`). The note is the planned cell's
+  note. Each place of the note in the window is right on its cell when tapped and wrong when
+  missed. Each other place tapped is wrong on its cell. Every cell of the window counts, whatever
+  skill it serves, so an answer can move cells of both `find-notes-root-strings` and
+  `find-notes-top-strings`.
+- **Accuracy only.** One time covers several taps, so the way has no fluent time, its evidence
+  carries no latency, and it never counts toward fluency. Naming and finding the note measure a
+  cell's speed. The answer still counts as a right answer of this way on each cell it was right
+  on, for choosing the way next time.
+- **Asked like the other two ways.** A cell is asked the way it has the fewest right answers,
+  `name_the_note`, then `find_the_note`, then `find_every_instance` on a tie. The way has its own
+  fret window, picked by the same rules. It isn't asked among options, so it has no second way
+  and never comes back.
+- **One question per note.** In a session, no two cells of the same layout and note are asked this
+  way, since one answer already covers both. The second cell is asked the way it has the next
+  fewest right answers instead.
+- **About 15 seconds** of the session, against 8 for naming or finding the note.
+
 ## Diagram shapes
 
 - **Shapes come from the diagram catalog, never authored.** A family takes the catalog
@@ -493,6 +520,8 @@ improvising over changes.
     never takes back a level.
   - An answer given before a template has any version counts for accuracy, never for fluency.
     That's why version 1 must be installed before a timed drill reaches students.
+  - An untimed template has no fluent time. A guide tone is measured in tempo instead (see
+    "Guide tones"); a cell's find every instance answers count for accuracy only.
 
 ## Felt questions
 
