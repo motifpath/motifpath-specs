@@ -235,33 +235,28 @@ Feature: Compose a practice session
   # tapped. A cell is asked the way it has the fewest right answers, name_the_note, then
   # find_the_note, then find_every_instance on a tie. The way has its own fret window.
 
-  @wip
   Scenario: A cell found and named more often than found everywhere is asked to find every instance
     Given "alice" has named the note of the "guitar" cell on string 6, fret 3 correctly twice, found it correctly twice and found every instance of it correctly once
     When the cell is picked for "alice"'s session in the head
     Then it is asked as find_every_instance
 
-  @wip
   Scenario: A tie between finding the note and finding every instance asks find_the_note
     Given "alice" has named the note of the "guitar" cell on string 6, fret 3 correctly twice, found it correctly once and found every instance of it correctly once
     When the cell is picked for "alice"'s session in the head
     Then it is asked as find_the_note
 
-  @wip
   Scenario: Two cells of the same note are never both asked to find every instance
     Given the "guitar" cells on string 6, fret 3 and string 1, fret 3 are both due, to be asked as find_every_instance
     When "alice" composes a 10-minute session with no instrument in hand
     Then at most one of them is asked as find_every_instance
     And the other one, if picked, is asked as name_the_note or find_the_note
 
-  @wip
   Scenario: Every find every instance cell carries its drill's window
     Given "alice" has nothing due on guitar
     And 6 weak "guitar" cells at frets 3 to 7, to be asked as find_every_instance
     When "alice" composes a 10-minute session with no instrument in hand
     Then the "guitar" find_every_instance cells carry the fret window 3 to 7
 
-  @wip
   Scenario: A cell asked to find every instance takes about 15 seconds of the session
     Given 6 weak "guitar" cells at frets 3 to 7, to be asked as find_every_instance
     When "alice" composes a 10-minute session with no instrument in hand
