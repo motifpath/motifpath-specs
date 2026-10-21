@@ -140,6 +140,13 @@ Feature: Derive a student's knowledge of an item from evidence
     When "alice" rates 5 takes of it "clean" on 5 different days
     Then "alice"'s level for the single chord is "fluent"
 
+  # A song has no measure either: a clean rating is fully fluent (MOT-152).
+  @wip
+  Scenario: Five clean ratings make a song fluent
+    Given "alice" practises the song "Amazing Grace" on guitar
+    When "alice" rates it "clean" on 5 different days
+    Then "alice"'s level for the song is "fluent"
+
   # Parked until ADR-046 follow-up slice 5 (teacher notes): no teacher review exists yet.
   @wip
   Scenario: A teacher review resets the student's own best clean tempo
