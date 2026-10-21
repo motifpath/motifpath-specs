@@ -139,7 +139,7 @@ Feature: Compose a practice session
     Then no item in the session has the reason warm_up or application
 
   Scenario: A fretboard cell is asked the way it has fewer right answers
-    Given "alice" has named the note of the "guitar" cell on string 6, fret 3 correctly 4 times and found it correctly once
+    Given "alice" has named the note of the "guitar" cell on string 6, fret 3 correctly 4 times, found it correctly once and found every instance of it correctly 2 times
     When the cell is picked for "alice"'s session in the head
     Then it is asked as find_the_note
 
