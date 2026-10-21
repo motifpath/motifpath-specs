@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.53.0
+  version: 0.54.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -6357,8 +6357,8 @@ paths:
 
         With an instrument in hand, only items that suit that instrument (or every
         instrument) are picked, fretboard cells of its layout included. Without one (a session in the head), only items that need no
-        instrument in hand are picked: fretboard cells of every fretboard layout among the
-        student's instruments, and exercises; never a play-along, so such a session has no
+        instrument in hand are picked: fretboard cells and guide tones of every fretboard
+        layout among the student's instruments, and exercises; never a play-along, so such a session has no
         application ending. Any instrument may be named, not only the ones the student is
         enrolled for.
 
@@ -13509,8 +13509,8 @@ components:
       description: |
         One item of a composed session, with what the client needs to present it. Exactly
         one of fretboard_cell, exercise, play_along, diagram_shape, generated_choice,
-        chord_voicing, chord_change, root_fifth, root_change and progression_keys is present,
-        matching kind:
+        chord_voicing, chord_change, root_fifth, root_change, progression_keys and guide_tone is
+        present, matching kind:
         generated_choice for a diatonic chord, a chord function, a chart progression, a heard
         chord or a heard progression.
       properties:
@@ -13698,6 +13698,8 @@ components:
           $ref: './components/schemas/practice.yaml#/PlannedRootChange'
         progression_keys:
           $ref: './components/schemas/practice.yaml#/PlannedProgressionKeys'
+        guide_tone:
+          $ref: './components/schemas/practice.yaml#/PlannedGuideTone'
       required:
         - item_key
         - kind

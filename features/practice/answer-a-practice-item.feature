@@ -238,6 +238,64 @@ Feature: Answer a practice item the way it can be graded honestly
     Then no rating of the take is sent
     And the take doesn't count among the tour's takes
 
+  # ── Guide tones ────────────────────────────────────────────────────────────
+  # The student taps the asked tone of each chord on an empty fretboard as the progression plays
+  # (Figma 17l; bass 18l). What the plan asks is in guide-tones.feature.
+
+  @web
+  Scenario: A guide tone shows the progression in its key, the window and an empty board
+    Given "alice"'s session plans the guide tone of "ii-V-I" on guitar in G, tone 3, at 60 BPM
+    When the item is shown
+    Then it reads "Tap the 3rd of each chord" over "ii – V – I in G" with the chords "Am D G G"
+    And the fretboard shows frets 0 to 5 with nothing marked
+    And the line under the player reads "Guitar · frets 0–5"
+
+  @web
+  Scenario: A tap leaves a dot where it landed, and a bar's result shows once it has passed
+    Given "alice" is playing a take of the guide tone of "ii-V-I" in G
+    When "alice" taps a place during the first bar
+    Then a dot shows where the tap landed, with no sign of right or wrong
+    And when the second bar starts, the line reads "1 of 1 in time so far" if the first bar was hit
+
+  @web
+  Scenario: A take is a bar of count-in, then the progression once, and is sent when it ends
+    Given "alice" starts a take of the guide tone of "ii-V-I" in G at 60 BPM in quarters
+    When the count-in bar and the 4 bars have played
+    Then a practice.item_answered event is sent with a timed_taps response in G, tone 3, at 60 BPM in quarters
+    And each tap's time is counted from the downbeat of the first bar after the count-in
+
+  @web
+  Scenario: The result of a take never names the notes to tap
+    Given "alice" missed the second bar of a take of the guide tone of "ii-V-I" in G
+    When the take's result is shown
+    Then the second bar shows as missed and the others as hit
+    And no note name or place on the fretboard is shown
+
+  @web
+  Scenario: A missed take offers another take in the same key, up to 3
+    Given "alice" missed a bar in the first take of the guide tone of "ii-V-I" in G
+    When the take's result is shown
+    Then "alice" can start a second take, again in G
+    And after a third take the item ends, right or not
+
+  @web
+  Scenario: A right take ends the item
+    Given "alice" hit every bar in the first take of the guide tone of "ii-V-I" in G
+    When the take's result is shown
+    Then the next action moves on to the next item
+
+  @web
+  Scenario: The summary says how many bars the best take hit
+    Given "alice"'s takes of the guide tone of "ii-V-I" hit 2, then 4 of its 4 bars
+    When the session ends
+    Then the session summary says "4 of 4 chords in time" for the guide tone
+
+  @web
+  Scenario: Leaving in the middle of a take sends nothing for it
+    Given "alice" is playing a take of the guide tone of "ii-V-I" in G
+    When "alice" leaves the session
+    Then no practice.item_answered event is sent for the take
+
   # ── Not answered ───────────────────────────────────────────────────────────
 
   @web

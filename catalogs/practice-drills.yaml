@@ -1,6 +1,7 @@
 # MotifPath practice drill catalog v2 — the drill templates, the generated fretboard cells,
-# the diagram shape families, the timed thresholds, the chord drills, the change targets and
-# the progression key tours installed in every environment. Rules: practice-drills.md.
+# the diagram shape families, the timed thresholds, the chord drills, the change targets, the
+# progression key tours and the guide tones installed in every environment. Rules:
+# practice-drills.md.
 #
 # IDs are UUID v5 under the catalog namespace, from "drill-template/<key>" and
 # "drill-threshold/<template key>/v<version>" (reference-data.md).
@@ -29,6 +30,7 @@ templates:
   - {key: "heard_chord:cadence_then_chord", rung: hear, second_way: "heard_chord:see_then_name", comes_back: true, item_kind: heard_chord, response_type: generated_choice, timed: true, names: {en: "Hear the chord", pt_BR: "Ouça o acorde"}, id: 001c9d1a-6bcb-5d1b-8656-b65a9a8dddfb}
   - {key: "heard_chord:see_then_name", rung: hear, second_way: "heard_chord:cadence_then_chord", item_kind: heard_chord, response_type: generated_choice, timed: true, names: {en: "See the chord", pt_BR: "Veja o acorde"}, id: 91209c2d-71e8-52b2-a19b-f286d85f1c07}
   - {key: "heard_progression:progression_by_number", rung: hear, comes_back: true, item_kind: heard_progression, response_type: generated_choice, timed: true, names: {en: "Hear the progression", pt_BR: "Ouça a progressão"}, id: c236ecad-5bd5-5755-b012-fd1999ee46b8}
+  - {key: "guide_tone:tap_the_third", rung: target, item_kind: guide_tone, response_type: timed_taps, timed: false, names: {en: "Guide tones", pt_BR: "Notas-guia"}, id: 448900eb-6410-554f-9e2e-dd96621008f6}
 
 # Which generated fretboard cells serve which skill, per fretboard layout. A layout is
 # named by its layout instrument; instruments with the same geometry share it (guitar and
@@ -199,3 +201,22 @@ progression_keys:
   first_tempo_share: 0.6
   tempo_step_bpm: 5
   min_tempo_share: 0.6
+
+# Guide tones (MOT-151): a progression of the progression catalog played once in a key, the
+# student tapping a chord tone of each chord on the fretboard as it sounds, on the guitar and
+# electric-bass layouts. Items are guide_tone:<layout id>:<progression key>, generated from the
+# progression catalog, so they have no rows or IDs of their own.
+guide_tones:
+  layouts: [guitar, electric-bass]
+  # The window tapped in, on every layout: the open string and frets 1-5.
+  fret_window: {from_fret: 0}
+  max_per_session: 1
+  takes_per_session: 3
+  # The tone asked: the third, then the seventh from this level on the item.
+  seventh_from_level: accurate
+  # A 12-bar form is planned only from this level on target-chord-tones.
+  twelve_bar_from_level: accurate
+  # The tempo a take starts at, in quarter notes per minute, by the student's level on the item,
+  # and the target a right take's effective speed is measured against.
+  tempo_bpm: {new: 60, learning: 60, accurate: 72, fluent: 90, retained: 90}
+  target_tempo_bpm: 90
