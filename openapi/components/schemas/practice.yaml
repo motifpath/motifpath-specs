@@ -7,7 +7,9 @@ PracticeItemKey:
     - fretboard_cell:<layout instrument id>:<string>:<fret> — a generated fretboard cell.
       The instrument is the one whose fretboard layout the cell belongs to, so instruments
       that share a layout share the cell. Strings are numbered from 1, the highest-pitched;
-      fret 0 is the open string.
+      fret 0 is the open string. A cell asked to find every place of its note in a fret
+      window is answered under its own key, and that answer is graded on every cell of the
+      window.
     - exercise:<exercise id> — an authored exercise.
     - play_along:<diagram id> — playing a diagram along with its playback, at a tempo.
     - chord_change:<from diagram id>:<to diagram id> — changing between two chord diagrams.
@@ -34,8 +36,9 @@ PracticeItemKey:
     - guide_tone:<layout instrument id>:<progression key> — tapping a chord tone of each chord
       of a progression in time with its playback. The key, the tone and the tempo are picked
       each time.
-    - fretboard_note:<layout instrument id>:<note> — finding every place of a note within a
-      fret window. The window is picked each time.
+    - fretboard_note:<layout instrument id>:<note> — retired before it was installed: finding
+      every place of a note is a way of asking a fretboard cell. No item has this key; it
+      stays only until the multi_tap.v1 golden cases that use it are removed.
     - progression_keys:<layout instrument id>:<progression key> — playing a progression along
       with its backing, key after key around the cycle of fourths. The key is the tour's next
       one, sent back with each take.
@@ -420,9 +423,11 @@ TimedTap:
 MultiTapResponse:
   type: object
   description: |
-    Answer to a note asked within a fret window: the student taps every place of the note in
-    the window, then says they are done. It is right only when the places tapped are exactly
-    the note's places in the window.
+    Answer to a fretboard cell asked to find every instance: the cell's note is named, and the
+    student taps every place of it in the fret window, then says they are done. It is graded on
+    every cell it covers: each place of the note in the window is right when tapped and wrong
+    when missed, and each other place tapped is wrong. Its time covers several taps, so it
+    counts for accuracy only, never for fluency.
   properties:
     response_type:
       type: string
@@ -686,7 +691,8 @@ PracticeItemKind:
     - progression_keys
   description: |
     The kind of a practice item, the prefix of its item key. The set is open: a new kind
-    is added with its key scheme, grader and golden cases.
+    is added with its key scheme, grader and golden cases. fretboard_note is retired and has
+    no items.
 
 KnowledgeLevel:
   type: string
@@ -728,7 +734,10 @@ PracticeEvidence:
       format: uuid
       description: |
         The identifier of the event that produced this evidence, so the same event can never
-        count twice.
+        count twice. When one answer is graded on several items (a fretboard cell asked to find
+        every instance gives evidence on every cell of its window), each item's evidence id is
+        the name-based UUID (version 5) of that item's key under the event's identifier as
+        namespace.
     student_id:
       type: string
       format: uuid
@@ -766,8 +775,9 @@ PracticeEvidence:
       type: integer
       minimum: 0
       description: |
-        Milliseconds the student took to answer. Present for auto_graded evidence. For a
-        guide-tone take, the latest any bar was hit after its downbeat, a bar not hit counting
+        Milliseconds the student took to answer. Present for auto_graded evidence, except a
+        fretboard cell's evidence from finding every instance, which counts for accuracy only.
+        For a guide-tone take, the latest any bar was hit after its downbeat, a bar not hit counting
         as its full length.
     audio_ms:
       type: integer
@@ -832,23 +842,25 @@ AnswerKey:
     shape: the asked interval and every position of the shape that is that interval. For a
     generated question: the way it was asked, its key when the item doesn't fix one, the right
     answer and the options offered. For a guide-tone take: its key, the tone asked and every
-    bar with its chord, the tone's note and whether it was hit. For a note found everywhere in
-    a fret window: the note, the window and every place of the note in it.
+    bar with its chord, the tone's note and whether it was hit. For a fretboard cell graded by
+    finding every instance: the cell's string and fret, the note asked, the window and every
+    place of the note in it, so the cell was a place of the note when it is among them.
   properties:
     string:
       type: integer
       minimum: 1
-      description: The asked cell's string, 1 being the highest-pitched. Fretboard cells only.
+      description: |
+        The graded cell's string, 1 being the highest-pitched. Fretboard cells only.
     fret:
       type: integer
       minimum: 0
-      description: The asked cell's fret. Fretboard cells only.
+      description: The graded cell's fret. Fretboard cells only.
     note_name:
       type: string
       enum: [C, C#, D, D#, E, F, F#, G, G#, A, A#, B]
       description: |
-        The asked note, spelled with sharps: a fretboard cell's note, or the note found
-        everywhere in a fret window.
+        The asked note, spelled with sharps: a fretboard cell's note, or, when finding every
+        instance, the note named, which is not the graded cell's own on an extra tap.
     choices:
       type: array
       minItems: 2
@@ -895,8 +907,8 @@ AnswerKey:
       description: |
         Every position of the shape that is the asked interval, in the diagram's position
         order, for a degree found on a diagram shape; every place of the asked note in the
-        fret window, strings from 1 and then frets from the lowest, for a note found
-        everywhere.
+        fret window, strings from 1 and then frets from the lowest, for a fretboard cell graded
+        by finding every instance.
     fret_window:
       $ref: '#/FretWindow'
     way:
@@ -949,9 +961,12 @@ FretboardDrill:
   enum:
     - name_the_note
     - find_the_note
+    - find_every_instance
   description: |
     How a fretboard cell is asked. name_the_note = the cell is shown and the student names
-    its note; find_the_note = the note and string are named and the student taps the cell.
+    its note; find_the_note = the note and string are named and the student taps the cell;
+    find_every_instance = the cell's note is named and the student taps every place of it in
+    the fret window, on a board with nothing marked and without being told how many there are.
 
 FretWindow:
   type: object
