@@ -298,8 +298,10 @@ fourths, and so learns it by number instead of by one fingering (MOT-150).
     doesn't make its key clean.
   - **The next take:** after a clean take, it is in the next key of the cycle that isn't clean
     yet, at the same tempo. After an almost or a struggle, it stays in the key.
-  - **A struggle** lowers the tour tempo by 5 BPM, never below 60% of the target. Keys already
-    clean stay clean, since they were clean faster.
+  - **A struggle** at or below the tour tempo lowers it by 5 BPM, never below 60% of the target.
+    Keys already clean stay clean, since they were clean faster. A struggle above the tour tempo,
+    at a tempo the student chose, is exploring and changes nothing, as for a play-along's best
+    clean tempo.
   - **A finished tour:** when all 12 keys are clean, the tour tempo goes up 5 BPM and the tour
     starts again at C, with no key clean. By itself it never climbs past the target.
   - **Choosing a tempo:** the student may choose any tempo for a take, as on a play-along.
