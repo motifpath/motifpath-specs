@@ -39,7 +39,6 @@ Feature: Grade a practice answer into evidence
 
   # A progression key tour take is rated like a play-along, and also sends the key it was played
   # in (MOT-150).
-  @wip
   Scenario: A self-rated take of a progression key tour is kept with its rating, tempo and key
     When "alice" rates a take of the progression key tour of "I-V-vi-IV" on guitar as "clean" at 85 BPM in A
     Then "alice" has self-assessed evidence for that tour rated "clean" at 85 BPM in A
@@ -200,19 +199,16 @@ Feature: Grade a practice answer into evidence
     Then the answer is rejected because the option is unknown
     And "alice" has no evidence for exercise "c-major-triad"
 
-  @wip
   Scenario: A progression key tour take without its key yields no evidence
     When "alice" rates a take of the progression key tour of "I-V-vi-IV" on guitar as "clean" at 85 BPM without a key
     Then the answer is rejected because the response does not fit the item
     And "alice" has no evidence for that tour
 
-  @wip
   Scenario: A progression key tour take of a progression the catalog doesn't have yields no evidence
     When "alice" rates a take of the progression key tour of "I-II-III" on guitar as "clean" at 85 BPM in C
     Then the answer is rejected because the reference is unknown
     And "alice" has no evidence for that tour
 
-  @wip
   Scenario: A play-along rating with a key yields no evidence
     Given the play-along diagram "pentatonic-run"
     When "alice" rates a take of play-along "pentatonic-run" as "clean" at 90 BPM in G
