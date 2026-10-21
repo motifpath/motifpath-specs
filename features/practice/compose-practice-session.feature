@@ -565,32 +565,27 @@ Feature: Compose a practice session
   # so it is a focus item of a session in the head only, at most one a session, sized by its 3
   # takes at the start tempo. What it asks is in guide-tones.feature.
 
-  @wip
   Scenario: A session in the head plans a guide tone of a path skill
     Given "alice"'s path skill "target-chord-tones" has new guide tones on guitar
     When "alice" composes a 20-minute session with no instrument in hand
     Then the session includes a guide tone of "target-chord-tones" with the reason new
     And the guide tone is at the target rung
 
-  @wip
   Scenario: A session plans at most one guide tone
     Given "alice" has 10 new guide tones on guitar, and nothing else
     When "alice" composes a 30-minute session with no instrument in hand
     Then the session has exactly one guide tone
 
-  @wip
   Scenario: A guide tone is sized by its 3 takes at its start tempo
     Given "alice" has never practised the guide tone of "ii-V-I" on guitar
     When the guide tone is picked for "alice"'s session with no instrument in hand
     Then it is estimated at 3 takes of a bar of count-in and 4 bars at 60 BPM, each followed by 5 seconds to see the result
 
-  @wip
   Scenario: A bass student's guide tones are on the electric-bass layout
     Given "bob" plays only "electric-bass" and has new guide tones
     When "bob" composes a 20-minute session with no instrument in hand
     Then every guide tone in the session is on the "electric-bass" layout
 
-  @wip
   Scenario: An in-hand session never plans a guide tone
     Given "alice" has new guide tones on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
