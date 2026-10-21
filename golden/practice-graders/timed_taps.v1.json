@@ -454,6 +454,130 @@
       }
     },
     {
+      "name": "in eighths a bar lasts half as long: 60 BPM in eighths grades like 120 in quarters",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:ii-V-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 60,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 1,
+            "fret": 1
+          },
+          {
+            "at_ms": 2300,
+            "string": 2,
+            "fret": 0
+          },
+          {
+            "at_ms": 4050,
+            "string": 1,
+            "fret": 0
+          },
+          {
+            "at_ms": 6400,
+            "string": 4,
+            "fret": 2
+          }
+        ],
+        "note_value": "eighths"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "Dm",
+                "note_name": "F",
+                "hit": true
+              },
+              {
+                "chord": "G",
+                "note_name": "B",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "in eighths, a tap timed for quarters lands a bar late",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:ii-V-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 1,
+            "fret": 1
+          },
+          {
+            "at_ms": 2300,
+            "string": 2,
+            "fret": 0
+          }
+        ],
+        "note_value": "eighths"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 1000,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "Dm",
+                "note_name": "F",
+                "hit": true
+              },
+              {
+                "chord": "G",
+                "note_name": "B",
+                "hit": false
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": false
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": false
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
       "name": "sevenths on bass: the major seventh of I, minor of ii and V",
       "item_key": "guide_tone:00000000-0000-4000-8000-0000000000b1:ii-V-I",
       "response": {
