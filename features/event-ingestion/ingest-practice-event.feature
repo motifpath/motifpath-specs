@@ -48,7 +48,6 @@ Feature: Ingest practice events
     Then the event is accepted and stored in the event log
     And the stored and published practice.item_answered event keeps the tempo of 85 BPM and the key A
 
-  @wip
   Scenario: A guide-tone take keeps its note value
     When "alice" submits a practice.item_answered event for a guide-tone take of "ii-V-I" in C at 60 BPM in eighths with no taps
     Then the event is accepted and stored in the event log
