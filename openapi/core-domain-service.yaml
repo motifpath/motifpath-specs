@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.56.0
+  version: 0.57.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -13358,8 +13358,9 @@ components:
         tap_check_due:
           type: boolean
           description: |
-            True when the plan has a fretboard cell or a diagram shape and the student has
-            done no tap check in the last 30 days, or never. The client then offers the tap
+            True when the plan has a timed fretboard drill (a fretboard cell named or found,
+            or a diagram shape) and the student has done no tap check in the last 30 days, or
+            never. A cell asked to find every instance isn't timed, so it needs none. The client then offers the tap
             check before the first item; the student may skip it, and their answers are then
             judged on the whole latency.
       required:
