@@ -44,7 +44,6 @@ Feature: Ask for a tap check before fretboard drills
     When "alice" composes a 5-minute session with no instrument in hand
     Then the plan asks for a tap check
 
-  @wip
   Scenario: A session whose only fretboard cells find every instance doesn't ask for a tap check
     Given "alice" has never done a tap check
     And "alice"'s next session will practise only fretboard cells asked to find every instance
