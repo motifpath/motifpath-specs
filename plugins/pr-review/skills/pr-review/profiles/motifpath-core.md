@@ -33,6 +33,7 @@
 | JWT validation goes through one `clerk.Client` per service via `clerk-sdk-go/v2` — no custom JWKS fetch/cache logic (ADR-009) | `motifpath-core/CLAUDE.md` — Auth |
 | Errors are always handled explicitly — never a blank `_` on an error return; no `interface{}`/`any` | `motifpath-core/CLAUDE.md` — Code Quality |
 | No request-validator middleware runs, and oapi-codegen 2.4 generates no enum checks, so an enum query parameter reaches the handler unchecked. When the spec answers an unknown enum value with 400, does the application layer (or the domain filter) reject it, or does the query just return an empty list? | `cmd/main.go` wires no OpenAPI validator; the generated `BindQueryParameter` only checks the format. Found in core#66 (`?kind=`, `?type=`); `exercise_type` on `/exercises` still had the gap |
+| An ent field's `Default()` is applied in Go only, so `make migrate:diff` writes a new column as `ADD COLUMN … NOT NULL` with no `DEFAULT`, which fails on any table that already has rows. Does each generated `ALTER` that adds a NOT NULL column to an existing table carry a database default (`entsql.Default`/`DefaultExpr` on the field), or is the column nullable? | The first generated `song_chart_progressions` migration had none (fixed with `entsql.Default("[]")`, core#178); precedent `20261006223929_diagram_purpose.up.sql` adds `NOT NULL DEFAULT 'general'` |
 
 ## Boundaries
 
