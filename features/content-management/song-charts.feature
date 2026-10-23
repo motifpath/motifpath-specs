@@ -141,70 +141,59 @@ Feature: Author and publish song charts
   # in a row counted once. The concert key must be stated and major. An unplayed tag blocks
   # publication.
 
-  @wip
   Scenario: An admin tags the progressions a chart plays
     Given "ana" has a song chart "Amazing Grace" in the concert key "G" with the chords "G C G D G"
     When "ana" tags "Amazing Grace" with the progression "I-IV-I-V"
     Then the draft's progressions are "I-IV-I-V"
     And the draft lists no unplayed progression
 
-  @wip
   Scenario: A chart is untagged until its author tags it
     When "ana" creates a song chart "Amazing Grace" in "en" with the line "[G]Amazing [C]grace"
     Then the draft's progressions are empty
 
-  @wip
   Scenario: A progression the catalog doesn't have can't be tagged
     Given "ana" has a song chart "Amazing Grace" in the concert key "G" with the chords "G C G D G"
     When "ana" tags "Amazing Grace" with the progression "I-II-III"
     Then the change is refused as invalid
     And the draft's progressions are empty
 
-  @wip
   Scenario: A tag the chart doesn't play is saved and listed as unplayed
     Given "ana" has a song chart "Amazing Grace" in the concert key "G" with the chords "G C G D G"
     When "ana" tags "Amazing Grace" with the progressions "I-IV-I-V" and "I-V-vi-IV"
     Then the draft's progressions are "I-IV-I-V" and "I-V-vi-IV"
     And the draft lists "I-V-vi-IV" as unplayed
 
-  @wip
   Scenario: The chords are compared as they sound, with the capo
     Given "ana" has a song chart "Amazing Grace" in the concert key "A", capo on fret 2, with the chords "G C G D"
     When "ana" tags "Amazing Grace" with the progression "I-IV-I-V"
     Then the draft lists no unplayed progression
 
-  @wip
   Scenario: A seventh or a slash bass doesn't change the chord it counts as
     Given the chord catalog also has the chord "G7"
     And "ana" has a song chart "Amazing Grace" in the concert key "G" with the chords "G7 C D/F# G"
     When "ana" tags "Amazing Grace" with the progression "I-IV-V-I"
     Then the draft lists no unplayed progression
 
-  @wip
   Scenario: A chord repeated in a row counts once
     Given "ana" has a song chart "Amazing Grace" in the concert key "G" with the chords "G G C C D D G"
     When "ana" tags "Amazing Grace" with the progression "I-IV-V-I"
     Then the draft lists no unplayed progression
 
-  @wip
   Scenario: The chords must come in a row, not just in order
     Given "ana" has a song chart "Amazing Grace" in the concert key "G" with the chords "G C G D G"
     When "ana" tags "Amazing Grace" with the progression "I-IV-V-I"
     Then the draft lists "I-IV-V-I" as unplayed
 
-  @wip
   Scenario: A chart in a minor key plays no progression of the catalog
     Given "ana" has a song chart "Asa Branca" in the concert key "Em" with the chords "Em C G D"
     When "ana" tags "Asa Branca" with the progression "vi-IV-I-V"
     Then the draft lists "vi-IV-I-V" as unplayed
 
-  @wip
   Scenario: A chart with no concert key plays no progression
     Given "ana" has a song chart "Amazing Grace" with no concert key and the chords "G C G D G"
     When "ana" tags "Amazing Grace" with the progression "I-IV-I-V"
     Then the draft lists "I-IV-I-V" as unplayed
 
-  @wip
   Scenario: A chart with an unplayed progression cannot be published
     Given "ana" has a song chart "Amazing Grace" whose rights are confirmed, in the concert key "G" with the chords "G C G D G"
     And "Amazing Grace" is tagged with the progression "I-V-vi-IV"
@@ -212,7 +201,6 @@ Feature: Author and publish song charts
     Then publishing is refused as not publishable, because "progressions_not_played"
     And the refusal lists the unplayed progression "I-V-vi-IV"
 
-  @wip
   Scenario: A revision keeps the progressions it was published with
     Given "ana" published "Amazing Grace" as revision 1, tagged with the progression "I-IV-I-V"
     When "ana" removes the tag "I-IV-I-V" from the draft of "Amazing Grace"
