@@ -24,26 +24,22 @@ Feature: End a session on a progression with a song built on it
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A subject at the use rung ends the session with a song that plays it
     Given "alice" is accurate on every rung of "common-progressions" with material on guitar below use
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
     Then the last item is the song "Amazing Grace" on guitar with the reason application
     And the song is at the use rung, for the progression "I-IV-I-V"
 
-  @wip
   Scenario: A subject whose next rung with material is use can end with a song
     Given "alice"'s current rung on "common-progressions" on guitar is "move", and "common-progressions" has no target items in hand
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
     Then the last item is the song "Amazing Grace" with the reason application
 
-  @wip
   Scenario: Today's mix ends with a song of its main subject
     Given "alice"'s main subject in Today's mix is "common-progressions", at the use rung on guitar
     When "alice" composes a 20-minute session with "guitar" in hand
     Then the last item is the song "Amazing Grace" with the reason application
 
-  @wip
   Scenario: A song's nodes are its progressions' nodes
     Given the published song chart "Oh! Susanna" is tagged with the progression "I-IV-V-I"
     And "I-IV-V-I" rolls up to "common-progressions" and "cadences"
@@ -52,7 +48,6 @@ Feature: End a session on a progression with a song built on it
     Then the last item is the song "Oh! Susanna"
     And "Amazing Grace", whose progression doesn't roll up to "cadences", is not in the session
 
-  @wip
   Scenario: A song is sized at 2 minutes and 10 seconds to rate it
     Given "alice" is at the use rung on "common-progressions" on guitar
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
@@ -60,7 +55,6 @@ Feature: End a session on a progression with a song built on it
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A subject below the use rung ends with a play-along, not a song
     Given "alice"'s current rung on "common-progressions" on guitar is "know", with play_in_time material next
     And "common-progressions" has the play-along "pop-progression" on guitar
@@ -68,27 +62,23 @@ Feature: End a session on a progression with a song built on it
     Then the last item is "pop-progression" with the reason application
     And no item in the session is a song
 
-  @wip
   Scenario: A chosen session with a song but no play-along has an application ending
     Given no item of "common-progressions" or its subtree is a play-along on guitar
     And "alice" is at the use rung on "common-progressions" on guitar
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
     Then the last item is the song "Amazing Grace" with the reason application
 
-  @wip
   Scenario: A session plays at most one song
     Given 5 published song charts are tagged with "I-IV-I-V"
     And "alice" is at the use rung on "common-progressions" on guitar
     When "alice" composes a 30-minute session with "guitar" in hand, choosing "common-progressions"
     Then the session has exactly one song, and it is the last item
 
-  @wip
   Scenario: A song is never a focus item, the warm-up or in the review block
     Given "alice" rated the song "Amazing Grace" on guitar and it is due
     When "alice" composes a 20-minute session with "guitar" in hand
     Then no song in the session has a reason other than application
 
-  @wip
   Scenario: A song never rated on the layout comes before one rated before
     Given the published song chart "Oh! Susanna" is tagged with "I-IV-I-V" too
     And "alice" rated "Amazing Grace" on guitar, and never "Oh! Susanna"
@@ -96,7 +86,6 @@ Feature: End a session on a progression with a song built on it
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
     Then the last item is the song "Oh! Susanna"
 
-  @wip
   Scenario: Among songs rated before, the one rated longest ago comes first
     Given the published song charts "Oh! Susanna" and "Home on the Range" are tagged with "I-IV-I-V" too
     And "alice" rated "Amazing Grace" on guitar 2 days ago, "Oh! Susanna" 9 days ago and "Home on the Range" 5 days ago
@@ -104,7 +93,6 @@ Feature: End a session on a progression with a song built on it
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
     Then the last item is the song "Oh! Susanna"
 
-  @wip
   Scenario: The song of the last in-hand session is not played again while another fits
     Given the published song chart "Oh! Susanna" is tagged with "I-IV-I-V" too
     And "alice" rated "Amazing Grace" on guitar 3 days ago
@@ -113,7 +101,6 @@ Feature: End a session on a progression with a song built on it
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
     Then the last item is the song "Amazing Grace"
 
-  @wip
   Scenario: The song of the last in-hand session comes back when it is the only one
     Given "alice"'s last in-hand session ended with "Amazing Grace"
     And no other published song chart plays a progression of "common-progressions"
@@ -127,13 +114,11 @@ Feature: End a session on a progression with a song built on it
     Then "alice" has self-assessed evidence for the song "Amazing Grace" on the guitar layout
     And "alice" has no evidence for the song "Amazing Grace" on the electric-bass layout
 
-  @wip
   Scenario: On bass, the song is played as the roots of its chords
     Given "alice" is at the use rung on "common-progressions" on electric bass
     When "alice" composes a 20-minute session with "electric-bass" in hand, choosing "common-progressions"
     Then the last item is the song "Amazing Grace" on the electric-bass layout, playing its roots
 
-  @wip
   Scenario: On guitar, the song is played as its chords
     Given "alice" is at the use rung on "common-progressions" on guitar
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
@@ -141,14 +126,12 @@ Feature: End a session on a progression with a song built on it
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
-  @wip
   Scenario: An untagged chart is never a song in a session
     Given the published song chart "Ciranda, Cirandinha" has no progressions
     And "alice" is at the use rung on "common-progressions" on guitar
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
     Then no item in the session is the song "Ciranda, Cirandinha"
 
-  @wip
   Scenario: A withdrawn chart is no longer planned
     Given "Amazing Grace" was withdrawn after "alice" rated it on guitar
     And "alice" is at the use rung on "common-progressions" on guitar
@@ -156,13 +139,11 @@ Feature: End a session on a progression with a song built on it
     Then no item in the session is the song "Amazing Grace"
     And "alice" still has the evidence of the song "Amazing Grace" on guitar
 
-  @wip
   Scenario: A session in the head never plays a song
     Given "alice" is at the use rung on "common-progressions" on guitar
     When "alice" composes a 20-minute session with no instrument in hand, choosing "common-progressions"
     Then no item in the session is a song
 
-  @wip
   Scenario: A session under 10 minutes has no song
     Given "alice" is at the use rung on "common-progressions" on guitar
     When "alice" composes a 5-minute session with "guitar" in hand, choosing "common-progressions"
