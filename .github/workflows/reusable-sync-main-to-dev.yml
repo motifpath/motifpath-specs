@@ -14,6 +14,9 @@ jobs:
   sync:
     name: Open sync PR from main to ${{ matrix.target }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -40,29 +43,45 @@ jobs:
             echo "$TARGET is already up to date with main. Skipping."
           fi
 
-      - name: Create sync PR (main → ${{ matrix.target }})
+      # The PR's head is a branch at main's head, not main itself: merging it
+      # (and the automatic deletion of a merged PR's branch) never touches
+      # main. While its PR is open the branch only moves forward, so conflict
+      # fixes pushed to it are kept.
+      - name: Open or update the sync PR (main → ${{ matrix.target }})
         if: steps.check.outputs.commits_ahead != '0'
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: ${{ matrix.target }}
-          branch: chore/sync-main-to-${{ matrix.target }}
-          title: "chore: sync main → ${{ matrix.target }}"
-          body: |
-            ## Automated sync — main → ${{ matrix.target }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          branch="chore/sync-main-to-$TARGET"
+          existing=$(gh pr list --base "$TARGET" --head "$branch" --state open --json url --jq '.[0].url // empty')
+          if [[ -n "$existing" ]]; then
+            git push origin "origin/main:refs/heads/$branch" \
+              || echo "::warning::$branch has commits main does not (a conflict fix?); left as it is"
+            echo "Sync PR already open: $existing"
+            exit 0
+          fi
+          # No open PR uses the branch, so any copy left from an earlier sync is spent.
+          git push --force origin "origin/main:refs/heads/$branch"
+          url=$(gh pr create --base "$TARGET" --head "$branch" \
+            --title "chore: sync main → $TARGET" \
+            --body "$(cat <<EOF
+          ## Automated sync — main → $TARGET
 
-            This PR was opened automatically after a merge to `main`.
-            It keeps `${{ matrix.target }}` in sync with any hotfix or release that landed on `main`.
+          This PR was opened automatically after a merge to \`main\`.
+          It keeps \`$TARGET\` in sync with any hotfix or release that landed on \`main\`.
 
-            **Review before merging:**
-            - [ ] No unintended changes included
-            - [ ] Conflicts resolved correctly (if any)
-            - [ ] CI passes
-            - [ ] Merged with a merge commit, not squash
+          **Review before merging:**
+          - [ ] No unintended changes included
+          - [ ] Conflicts resolved correctly (if any)
+          - [ ] CI passes
+          - [ ] Merged with a merge commit, not squash
 
-            > This PR was created by the `sync-main-to-dev` reusable workflow
-            > defined in `motifpath-specs`.
-          labels: |
-            automated
-            sync
-          draft: false
+          > This PR was created by the \`sync-main-to-dev\` reusable workflow
+          > defined in \`motifpath-specs\`.
+          EOF
+          )")
+          echo "Opened $url"
+          gh pr edit "$url" --add-label automated --add-label sync >/dev/null 2>&1 \
+            || echo "::notice::labels automated/sync not added (missing in this repository?)"
