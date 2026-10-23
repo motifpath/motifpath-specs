@@ -48,7 +48,6 @@ Feature: Ingest practice events
     Then the event is accepted and stored in the event log
     And the stored and published practice.item_answered event keeps the tempo of 85 BPM and the key A
 
-  @wip
   Scenario: A rating of a song is accepted under its song key
     When "alice" submits a practice.item_answered event rating the song "Amazing Grace" on guitar "clean"
     Then the event is accepted and stored in the event log

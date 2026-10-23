@@ -141,7 +141,6 @@ Feature: Derive a student's knowledge of an item from evidence
     Then "alice"'s level for the single chord is "fluent"
 
   # A song has no measure either: a clean rating is fully fluent (MOT-152).
-  @wip
   Scenario: Five clean ratings make a song fluent
     Given "alice" practises the song "Amazing Grace" on guitar
     When "alice" rates it "clean" on 5 different days
