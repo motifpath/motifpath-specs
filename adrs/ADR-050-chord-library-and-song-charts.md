@@ -34,6 +34,22 @@ shared component placed wherever content is shown, that opens the reader; lesson
 place. It is allowed in an article's body and rich expanded content, not in exercise prompts.
 Teachers find charts to embed by listing the song charts with `status=published`, the one status
 they may list, since authoring charts stays with admins.
+**Amended:** 2026-10-21, by Gilson (MOT-152, the use rung of ADR-057): a chart names the
+**progressions it plays**, from the progression catalog, so practice can end a session on a
+progression with a song built on it. The author picks them in the editor; none is the default,
+and an untagged chart is never practised. A progression is **played** by the chart when its chords
+appear in a row in the chart, in the chart's concert key:
+- the chart's chords are taken in document order, as they sound: each written chord moved up by
+  the capo. A chord counts by its root and triad (major, minor or diminished), so a seventh, an
+  extension or a slash bass doesn't change it (G7 is G, Am7/G is Am). N.C. is skipped, and a chord
+  repeated in a row counts once;
+- the progression's numerals are spelled in the concert key, a dominant seventh counting as major,
+  and a numeral repeated in a row counts once (ii–V–I–I is Dm G C in C);
+- the concert key must be stated and major, since the catalog's progressions are in a major key.
+
+A tag the chart doesn't play **blocks publication**, listed with the other blockers in the editor.
+Rejected: finding the progressions automatically. A chart has chord order but no bars, so a
+match would be a guess, and the author knows what the song is built on.
 
 ---
 

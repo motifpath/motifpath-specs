@@ -107,6 +107,19 @@
               "bars": { "type": "array", "minItems": 1, "items": { "enum": ["I", "ii", "iii", "IV", "V", "vi", "viio", "I7", "IV7", "V7"] } }
             }
           }
+        },
+        "song_charts": {
+          "type": "object",
+          "description": "Song charts by id. A song item names one; a chart missing here is unknown.",
+          "propertyNames": { "format": "uuid" },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" }
+            }
+          }
         }
       }
     },

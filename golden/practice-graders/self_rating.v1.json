@@ -1,6 +1,6 @@
 {
   "grader": "self_rating.v1",
-  "description": "Takes the student rates themselves: a play-along at a tempo, a progression in one key of its tour at a tempo, or one chord voicing or a chord's root and fifth played cleanly; the grader checks the take fits the item and keeps the rating and its measure as they are. A minute of chord or root changes at a tempo, one change on every beat, is rated by its count instead: the share of the beats that changed cleanly.",
+  "description": "Takes the student rates themselves: a play-along at a tempo, a progression in one key of its tour at a tempo, one chord voicing or a chord's root and fifth played cleanly, or a whole song; the grader checks the take fits the item and keeps the rating and its measure as they are. A minute of chord or root changes at a tempo, one change on every beat, is rated by its count instead: the share of the beats that changed cleanly.",
   "reference": {
     "diagrams": {
       "00000000-0000-4000-8000-0000000000f1": {
@@ -62,6 +62,11 @@
           "I7",
           "V7"
         ]
+      }
+    },
+    "song_charts": {
+      "00000000-0000-4000-8000-0000000000c1": {
+        "name": "Amazing Grace"
       }
     }
   },
@@ -661,6 +666,99 @@
       "expected": {
         "result": "rejected",
         "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "song: a clean take of the whole song on guitar, with no measure",
+      "item_key": "song:00000000-0000-4000-8000-0000000000a1:00000000-0000-4000-8000-0000000000c1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "clean"
+        }
+      }
+    },
+    {
+      "name": "song: an almost-clean take of the song's roots on bass",
+      "item_key": "song:00000000-0000-4000-8000-0000000000b1:00000000-0000-4000-8000-0000000000c1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "almost"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "almost"
+        }
+      }
+    },
+    {
+      "name": "rejected: a song rated with a tempo",
+      "item_key": "song:00000000-0000-4000-8000-0000000000a1:00000000-0000-4000-8000-0000000000c1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 80
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a song rated with a key",
+      "item_key": "song:00000000-0000-4000-8000-0000000000a1:00000000-0000-4000-8000-0000000000c1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "music_key": "G"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a song rated with a change count",
+      "item_key": "song:00000000-0000-4000-8000-0000000000a1:00000000-0000-4000-8000-0000000000c1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "changes_per_minute": 20
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a song chart that doesn't exist",
+      "item_key": "song:00000000-0000-4000-8000-0000000000a1:00000000-0000-4000-8000-0000000000cf",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: a song on a layout that doesn't exist",
+      "item_key": "song:00000000-0000-4000-8000-0000000000ff:00000000-0000-4000-8000-0000000000c1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
       }
     }
   ]

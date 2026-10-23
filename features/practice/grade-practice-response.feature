@@ -222,6 +222,24 @@ Feature: Grade a practice answer into evidence
     Then "alice" has auto-graded evidence for that guide tone that is wrong
     And the evidence's answer key marks only the first bar hit
 
+  # A song is rated once, whole, with no measure (MOT-152).
+  @wip
+  Scenario: A self-rated song is kept with its rating alone
+    When "alice" rates the song "Amazing Grace" on guitar as "almost"
+    Then "alice" has self-assessed evidence for that song rated "almost", with no tempo
+
+  @wip
+  Scenario: A song rated with a tempo yields no evidence
+    When "alice" rates the song "Amazing Grace" on guitar as "clean" at 80 BPM
+    Then the answer is rejected because the response does not fit the item
+    And "alice" has no evidence for that song
+
+  @wip
+  Scenario: A song whose chart doesn't exist yields no evidence
+    When "alice" rates the song of a song chart that doesn't exist on guitar as "clean"
+    Then the answer is rejected because the reference is unknown
+    And "alice" has no evidence for that song
+
   Scenario: A play-along rating with a key yields no evidence
     Given the play-along diagram "pentatonic-run"
     When "alice" rates a take of play-along "pentatonic-run" as "clean" at 90 BPM in G

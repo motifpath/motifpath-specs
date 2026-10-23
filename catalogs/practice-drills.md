@@ -20,7 +20,7 @@ questions are per template, never per item.
   | progression key tour | `move` |
   | chord change | `play_in_time` |
   | single chord, self-rated | `play_clean` |
-  | song chart item | `use` |
+  | song | `use` |
 
 - **Second way.** A generated template that asks among options names its `second_way`: another
   template of the same item kind that asks the same item another way. The composer asks an item
@@ -84,8 +84,8 @@ responses in the practice schemas; `golden/practice-graders/`), so each is grade
 the start. Each slice then adds its templates and fluent times to `practice-drills.yaml` (with
 fixed IDs) and its generator; until then a family installs nothing. The P1 harmony families
 and the P2 ear families are installed (see "Harmony drills" and "Ear drills" below), and so
-are the P3 chord families (see "Chord drills"), the P4 key tours ("Progression key tours") and
-the P5 guide tones ("Guide tones"). Every family has a bass version on the
+are the P3 chord families (see "Chord drills"), the P4 key tours ("Progression key tours"),
+the P5 guide tones ("Guide tones") and the P6 songs ("Songs"). Every family has a bass version on the
 `electric-bass` layout: chord boxes become chord symbols, or the answer is a chord tone tapped
 on the bass fretboard, at positions computed from the chord's formula and the tuning.
 
@@ -100,7 +100,7 @@ on the bass fretboard, at positions computed from the chord's formula and the tu
 | `chord_change` | two chords (bass: their roots) | none, changes per minute (play_in_time) | — | `change-chords` (bass: `play-root-notes`) | P3 |
 | `progression_keys` | a progression (`progressions.yaml`) on a layout | none, self-rated at a tempo; the key moves on after a clean take (move) | — | `common-progressions`, `play-shapes-in-any-key` (bass: `play-chord-tone-lines`) | P4 |
 | `guide_tone` | a progression on a layout | `tap_the_third` (target): over the playback, tap the 3rd of each chord as it arrives; the 7th once accurate | — (not asked among options) | `target-chord-tones`, `voice-lead` (bass: `play-chord-tone-lines`) | P5 |
-| `song_chart` | a song chart built on a progression | none, self-rated (use) | — | `common-progressions` | P6 |
+| `song` | a published song chart tagged with the progressions it plays, on a layout | none, self-rated (use) | — | its progressions' nodes (`common-progressions`, and `cadences` or `blues-form`) | P6 |
 | `fretboard_cell` | a cell (string and fret) on a layout | `find_every_instance` (know): the cell's note is named, tap every place of it in the fret window; graded on every cell in the window | — (not asked among options) | `find-notes-root-strings`, `find-notes-top-strings` (the cells' own) | P7 |
 
 **Item keys and graders.** A key is part of the item when the fact differs per key (the vi of
@@ -120,6 +120,7 @@ and for a fretboard cell's fret window.
 | `root_change` (bass) | `root_change:<layout id>:<from chord>:<to chord>` | — | `self_rating` + changes per minute | `self_rating.v1` |
 | `progression_keys` | `progression_keys:<layout id>:<progression key>` | key (the tour's) | `self_rating` + tempo and key | `self_rating.v1` |
 | `guide_tone` | `guide_tone:<layout id>:<progression key>` | key, tone, tempo and note value | `timed_taps` | `timed_taps.v1` |
+| `song` | `song:<layout id>:<song chart id>` | — | `self_rating`, no measure | `self_rating.v1` |
 | `fretboard_cell` (find every instance) | `fretboard_cell:<layout id>:<string>:<fret>` | fret window | `multi_tap` | `multi_tap.v2`, on every cell in the window |
 
 The bass versions of the harmony and ear families are the same items: only how an option is
@@ -386,6 +387,41 @@ improvising over changes.
   accurate, reaches the fluency that `fluent` needs.
 - **The summary** says how many bars the best take hit: "4 of 4 chords in time".
 - **Not asked among options**, so the challenge rules on options and second ways don't apply.
+
+## Songs
+
+A `song` is a published song chart played whole on the instrument in hand: the `use` rung, where
+a progression is applied in music (MOT-152). Teachers spend about half of practice on songs.
+
+- **Items:** every published song chart tagged with at least one progression (ADR-050), on each
+  of the `guitar` and `electric-bass` layouts, keyed `song:<layout id>:<song chart id>`. A song
+  on guitar and the same song on bass are two items.
+  - Its nodes are the nodes of its progressions in `progressions.yaml`: a chart tagged
+    `I-IV-V-I` rolls up to `common-progressions` and `cadences`.
+  - A chart withdrawn later is no longer planned; its evidence stays.
+- **In a session**, a song is only ever the **application ending** of an in-hand session:
+  - the ending plays a subject, main first. For each, when the subject takes new items from the
+    `use` rung (its current rung, or the next one with material) and a song practises it, the
+    ending is that song; otherwise it is a play-along of the subject, as before;
+  - so a session plays at most one song, always last, never as the warm-up, a focus item or the
+    review block, and never in a session in the head;
+  - a chosen session has an ending when its subtree has a play-along or a song;
+  - it is sized at 2 minutes, then 10 seconds to rate it. Like any ending, it is skipped when
+    longer than a quarter of the session, so it ends sessions of 10 minutes or more.
+- **Which song**, among those that practise the subject: one never rated on the layout first,
+  then the one rated longest ago, at random among equals. The song of the student's last in-hand
+  session is taken only when no other fits.
+- **How it is played** (Figma row 11, MOT-55): the chart as written, in its concert key with its
+  capo, never transposed. The chart's tempo, when stated, is the metronome's target, an aid only
+  (`design/patterns/self-rating.md`). On `guitar` the student strums the chords; on
+  `electric-bass` the item says "Play the root of each chord", over the same chart.
+- **Grading** (`self_rating.v1`): the whole song is rated once, struggled, almost or clean, with
+  no tempo, note value or key. Like a single chord, a clean rating is fully fluent: five clean
+  ratings on five days make a song fluent.
+- **Not asked among options**, so the challenge rules on options and second ways don't apply.
+
+Repertoire statuses, keep-alive reviews, the Songs tile and songs in challenges belong to MOT-76,
+which keeps this item and its key.
 
 ## Fretboard cells
 
