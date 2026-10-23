@@ -237,6 +237,13 @@ Feature: Grade a practice answer into evidence
     Then the answer is rejected because the reference is unknown
     And "alice" has no evidence for that song
 
+  # A song on guitar and the same song on bass are two skills, so two items: the key takes the layout.
+  @wip
+  Scenario: A song on guitar and the same song on bass are two items
+    When "alice" rates the song "Amazing Grace" on guitar as "clean"
+    Then "alice" has self-assessed evidence for that song rated "clean", with no tempo
+    And "alice" has no evidence for the song "Amazing Grace" on the electric-bass layout
+
   Scenario: A play-along rating with a key yields no evidence
     Given the play-along diagram "pentatonic-run"
     When "alice" rates a take of play-along "pentatonic-run" as "clean" at 90 BPM in G
