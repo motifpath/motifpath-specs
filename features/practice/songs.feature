@@ -108,12 +108,6 @@ Feature: End a session on a progression with a song built on it
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
     Then the last item is the song "Amazing Grace"
 
-  @wip
-  Scenario: A song on guitar and the same song on bass are two items
-    When "alice" rates the song "Amazing Grace" on guitar "clean"
-    Then "alice" has self-assessed evidence for the song "Amazing Grace" on the guitar layout
-    And "alice" has no evidence for the song "Amazing Grace" on the electric-bass layout
-
   Scenario: On bass, the song is played as the roots of its chords
     Given "alice" is at the use rung on "common-progressions" on electric bass
     When "alice" composes a 20-minute session with "electric-bass" in hand, choosing "common-progressions"
