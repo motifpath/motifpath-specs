@@ -168,25 +168,21 @@ Feature: Derive a student's knowledge of an item from evidence
 
   # A guide tone's fluency is a right take's effective speed over 90 BPM, as for a play-along's
   # tempo over its target; its latency is kept but never judged (MOT-151).
-  @wip
   Scenario: Five right guide-tone takes at 72 BPM make the guide tone fluent
     Given "alice" practises the guide tone of "ii-V-I" on guitar
     When "alice" makes 5 right takes of it at 72 BPM on 5 different days
     Then "alice"'s level for the guide tone is "fluent"
 
-  @wip
   Scenario: Right guide-tone takes at 60 BPM leave the guide tone accurate, not fluent
     Given "alice" practises the guide tone of "ii-V-I" on guitar
     When "alice" makes 5 right takes of it at 60 BPM on 5 different days
     Then "alice"'s level for the guide tone is "accurate"
 
-  @wip
   Scenario: A guide-tone take in eighths counts at its effective speed
     Given "alice" practises the guide tone of "ii-V-I" on guitar
     When "alice" makes 5 right takes of it at 45 BPM in eighths on 5 different days
     Then "alice"'s level for the guide tone is "fluent"
 
-  @wip
   Scenario: A slow right take with a late hit is not held against the student
     Given "alice" practises the guide tone of "ii-V-I" on guitar
     When "alice" makes 5 right takes of it at 90 BPM on 5 different days, each hitting a bar 2000 milliseconds after its downbeat
