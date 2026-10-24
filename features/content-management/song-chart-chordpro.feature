@@ -48,7 +48,6 @@ Feature: Import and export a song chart as ChordPro
 
   # ChordPro has no way to say which progressions a section plays (ADR-050 amendment 2026-10-21,
   # revised 2026-10-24), and an import replaces the body that holds them.
-  @wip
   Scenario: An import brings untagged sections
     Given the verse of "Draft" is tagged with the progression "I-IV-I-V"
     When "ana" imports into "Draft" a line "[G]Quando olhei a [C]terra ardendo"
