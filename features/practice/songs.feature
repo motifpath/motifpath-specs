@@ -120,7 +120,6 @@ Feature: End a session on a progression with a song built on it
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
     Then the song "Amazing Grace" on guitar plays its chords
 
-  @wip
   Scenario: The song names the section that plays the progression
     Given the published song chart "Home on the Range" has its chorus tagged with the progression "I-IV-I-V"
     And "alice" rated "Amazing Grace" on guitar 2 days ago
