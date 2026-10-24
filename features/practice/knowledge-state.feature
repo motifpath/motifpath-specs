@@ -69,12 +69,10 @@ Feature: Derive a student's knowledge of an item from evidence
   # One find every instance answer gives evidence on every cell of its window, for accuracy only:
   # its time covers several taps, so it never counts toward a cell's fluency.
 
-  @wip
   Scenario: Right answers from finding every instance make a cell accurate, never fluent
     When "alice" finds every instance of the cell's note correctly 5 times on 5 different days, each in 1500 milliseconds
     Then "alice"'s level for the cell is "accurate"
 
-  @wip
   Scenario: A cell is fluent from timed answers, whatever finding every instance adds
     Given "alice"'s tap time is 300 milliseconds
     And "alice" has found every instance of the cell's note correctly 3 times
@@ -141,6 +139,12 @@ Feature: Derive a student's knowledge of an item from evidence
     Given "alice" practises the single chord "a-minor-open"
     When "alice" rates 5 takes of it "clean" on 5 different days
     Then "alice"'s level for the single chord is "fluent"
+
+  # A song has no measure either: a clean rating is fully fluent (MOT-152).
+  Scenario: Five clean ratings make a song fluent
+    Given "alice" practises the song "Amazing Grace" on guitar
+    When "alice" rates it "clean" on 5 different days
+    Then "alice"'s level for the song is "fluent"
 
   # Parked until ADR-046 follow-up slice 5 (teacher notes): no teacher review exists yet.
   @wip

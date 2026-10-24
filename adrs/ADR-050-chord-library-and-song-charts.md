@@ -34,6 +34,27 @@ shared component placed wherever content is shown, that opens the reader; lesson
 place. It is allowed in an article's body and rich expanded content, not in exercise prompts.
 Teachers find charts to embed by listing the song charts with `status=published`, the one status
 they may list, since authoring charts stays with admins.
+**Amended:** 2026-10-21, by Gilson (MOT-152, the use rung of ADR-057), **revised 2026-10-24 by
+Gilson (PO): progressions are tagged by section**. A chart's **sections** name the progressions they
+play, from the progression catalog, so practice can end a session on a progression with a song built
+on it. The author tags a section in the editor (on the section's header); none is the default, and a
+chart with no tagged section is never practised. The chart plays the progressions of its sections,
+each once, and the song is still played whole. A progression is **played** by a section when its
+chords appear in a row in that section, in the chart's concert key:
+- the section's chords are taken in document order, as they sound: each written chord moved up by
+  the capo. A chord counts by its root and triad (major, minor or diminished), so a seventh, an
+  extension or a slash bass doesn't change it (G7 is G, Am7/G is Am). N.C. is skipped, and a chord
+  repeated in a row counts once. The chords of another section never count;
+- the progression's numerals are spelled in the concert key, a dominant seventh counting as major,
+  and a numeral repeated in a row counts once (ii–V–I–I is Dm G C in C);
+- the concert key must be stated and major, since the catalog's progressions are in a major key.
+
+A tag a section doesn't play **blocks publication**, listed, naming the section, with the other
+blockers in the editor. The tags live in the chart's body, so a ChordPro import, which replaces the
+body, brings untagged sections. Rejected: finding the progressions automatically. A chart has chord
+order but no bars, so a match would be a guess, and the author knows what each section is built on.
+Rejected (2026-10-24): tagging the whole chart. A song's sections are built on different
+progressions, and a whole-chart check would accept chords that only meet across a section break.
 
 ---
 

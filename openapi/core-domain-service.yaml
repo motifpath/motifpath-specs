@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.55.0
+  version: 0.58.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -9103,6 +9103,8 @@ components:
               description: |
                 The section's heading as the author wrote it (e.g. "Verse 2",
                 "Refrão"); null shows no heading.
+            progression_keys:
+              $ref: '#/components/schemas/SongChartProgressionKeys'
           required:
             - kind
             - label
@@ -9254,6 +9256,22 @@ components:
         - type
         - attrs
 
+    SongChartProgressionKeys:
+      type: array
+      maxItems: 10
+      uniqueItems: true
+      items:
+        type: string
+        pattern: '^[0-9A-Za-z][0-9A-Za-z-]*$'
+      description: |
+        The progressions a section plays, by their key in the progression
+        catalog (e.g. "I-IV-V-I"), as its author tagged them. A chart with
+        a tagged section is practised as a song on those progressions'
+        knowledge nodes, played whole; an untagged chart never is. On
+        input, absent means none, and a key the catalog doesn't have is
+        refused. The server always writes it, empty for an untagged
+        section.
+
     SongChartDraftInput:
       type: object
       description: The fields of a song chart's draft that authors write.
@@ -9335,6 +9353,23 @@ components:
               description: |
                 Every chord anchor the server couldn't fully resolve, in
                 document order; empty when every anchor resolved.
+            unplayed_progressions:
+              type: array
+              items:
+                $ref: '#/components/schemas/SongChartUnplayedProgression'
+              description: |
+                The sections' tagged progressions the section doesn't play, by
+                section in document order, then in the order they were tagged;
+                empty when every section plays its tags. A progression is played
+                by a section when its chords appear in a row in that section, in
+                the chart's concert key: the section's chords as they sound
+                (each written chord moved up by the capo), each counted by its
+                root and triad (major, minor or diminished), N.C. skipped and a
+                chord repeated in a row counted once, against the progression's
+                numerals spelled in the concert key, a dominant seventh counting
+                as major and a repeated numeral counted once. The chords of
+                another section never count. With no stated major concert key,
+                every tag is unplayed. Any entry blocks publication.
             updated_by:
               $ref: '#/components/schemas/UserRef'
             updated_at:
@@ -9344,6 +9379,7 @@ components:
           required:
             - rights_confirmation
             - warnings
+            - unplayed_progressions
             - updated_by
             - updated_at
 
@@ -9598,6 +9634,13 @@ components:
           description: |
             The open-string pitches the chords are written for, lowest
             string first (e.g. "E2-A2-D3-G3-B3-E4", standard guitar tuning).
+        progression_keys:
+          type: array
+          items:
+            type: string
+          description: |
+            Every progression the revision's sections are tagged with, each
+            once, in document order: read from the body, never written.
         body:
           $ref: '#/components/schemas/SongChartDocument'
         rights_confirmation:
@@ -9619,6 +9662,7 @@ components:
         - tempo_bpm
         - time_signature
         - tuning_fingerprint
+        - progression_keys
         - body
         - rights_confirmation
         - published_by
@@ -9717,19 +9761,43 @@ components:
             enum:
               - rights_not_confirmed
               - unresolved_chords
+              - progressions_not_played
           description: |
             rights_not_confirmed: no admin has confirmed the song's rights
             were checked. unresolved_chords: at least one anchor has a
             warning that blocks publication (see anchor_warnings).
+            progressions_not_played: a section doesn't play at least one
+            progression it is tagged with (see unplayed_progressions).
         anchor_warnings:
           type: array
           items:
             $ref: '#/components/schemas/SongChartAnchorWarning'
           description: The anchors whose warnings block publication; empty unless reasons has unresolved_chords.
+        unplayed_progressions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SongChartUnplayedProgression'
+          description: The sections' tags the section doesn't play; empty unless reasons has progressions_not_played.
       required:
         - message
         - reasons
         - anchor_warnings
+        - unplayed_progressions
+
+    SongChartUnplayedProgression:
+      type: object
+      description: A progression a section is tagged with but doesn't play.
+      properties:
+        section_index:
+          type: integer
+          minimum: 0
+          description: The section, numbered from 0 in document order.
+        progression_key:
+          type: string
+          description: The tagged progression, by its key in the progression catalog.
+      required:
+        - section_index
+        - progression_key
 
     SongChartChordProImport:
       type: object
@@ -13358,8 +13426,9 @@ components:
         tap_check_due:
           type: boolean
           description: |
-            True when the plan has a fretboard cell or a diagram shape and the student has
-            done no tap check in the last 30 days, or never. The client then offers the tap
+            True when the plan has a timed fretboard drill (a fretboard cell named or found,
+            or a diagram shape) and the student has done no tap check in the last 30 days, or
+            never. A cell asked to find every instance isn't timed, so it needs none. The client then offers the tap
             check before the first item; the student may skip it, and their answers are then
             judged on the whole latency.
       required:
@@ -13509,8 +13578,8 @@ components:
       description: |
         One item of a composed session, with what the client needs to present it. Exactly
         one of fretboard_cell, exercise, play_along, diagram_shape, generated_choice,
-        chord_voicing, chord_change, root_fifth, root_change, progression_keys and guide_tone is
-        present, matching kind:
+        chord_voicing, chord_change, root_fifth, root_change, progression_keys, guide_tone and
+        song is present, matching kind:
         generated_choice for a diatonic chord, a chord function, a chart progression, a heard
         chord or a heard progression.
       properties:
@@ -13705,6 +13774,8 @@ components:
           $ref: './components/schemas/practice.yaml#/PlannedProgressionKeys'
         guide_tone:
           $ref: './components/schemas/practice.yaml#/PlannedGuideTone'
+        song:
+          $ref: './components/schemas/practice.yaml#/PlannedSong'
       required:
         - item_key
         - kind

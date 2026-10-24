@@ -10,7 +10,8 @@ contradicts.
 - `<grader>.v<version>.json`: one file per grader version, for example
   `fretboard_cell.v1.json`. A file is never edited once a consumer ships that version,
   except to add cases. A rule change is a new version in a new file, and the old file stays
-  for the evidence it graded.
+  for the evidence it graded. (`multi_tap.v1` is the one file removed: it graded the
+  `fretboard_note` item, retired before it was installed, so it never graded an answer.)
 - `schema.json`: the JSON Schema every case file follows.
 
 Each file holds:
@@ -25,6 +26,7 @@ Each file holds:
   - `shape_families`: each shape family's members, in the order they are offered.
   - `progressions`: progressions of the progression catalog by key, with their numerals one
     bar each. Keys, numerals, chords and chord tones are computed, so they have no reference.
+  - `song_charts`: the song charts that exist, by id.
 - `cases`: each case is an `item_key`, a raw `response` (as a client sends it in
   `practice.item_answered`) and the `expected` result. The result is either
   `{"result": "graded", "evidence": {...}}`, `{"result": "graded", "evidence_by_item": [...]}`
@@ -37,14 +39,12 @@ Each file holds:
   - `fretboard_cell` → `fretboard_cell.v2` (`fretboard_cell.v1` before 2026-10-08; its file stays
     for the evidence it graded), or `multi_tap.v2` when the response is `multi_tap`
   - `exercise` → `exercise_option.v1`
-  - `play_along`, `chord_change`, `chord_voicing`, `root_fifth`, `root_change` and
-    `progression_keys` → `self_rating.v1`
+  - `play_along`, `chord_change`, `chord_voicing`, `root_fifth`, `root_change`,
+    `progression_keys` and `song` → `self_rating.v1`
   - `diagram_shape` → `diagram_shape.v1`
   - `diatonic_chord`, `chord_function`, `chart_progression`, `heard_chord` and
     `heard_progression` → `generated_choice.v1`
   - `guide_tone` → `timed_taps.v1`
-  - `fretboard_note` → `multi_tap.v1`. Retired before it was installed: it never graded an
-    answer, and its file goes once core and web drop it.
 - **Checks run in this order, and the first failure is the rejection:**
   1. The response type fits the item kind (`response_does_not_fit_item`).
   2. What the key points at exists (`unknown_reference`).
@@ -213,25 +213,17 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
 - The evidence carries no tempo of its own: a right take's fluency is measured from the
   `tempo_bpm` and `note_value` of the response it keeps (see the drill catalog's "Guide tones").
 
-### `multi_tap.v1`
-
-- The layout in the key must exist (`unknown_reference`).
-- The window covers `from_fret` to `from_fret` + 4, or the open string to fret 5 when
-  `from_fret` is 0. A tap outside it, or on a string outside the tuning, is `invalid_cell`.
-- **The note's places** are every cell of the window, on every string, that sounds the note in
-  any octave; the answer key lists them by string from 1, then fret from the lowest.
-- **Right only when the cells tapped are exactly those places**, in any order. A place missed
-  or an extra cell is wrong.
-
 ### `multi_tap.v2`
 
 A fretboard cell asked to find every instance: the cell's note is named, and every place of it
 in the window is tapped.
 
 - The layout in the key must exist (`unknown_reference`).
-- The window is the same as in `multi_tap.v1`. The planned cell, a tap outside the window, or a
-  tap on a string outside the tuning is `invalid_cell`.
-- **The note** is the planned cell's note. Its places are found as in `multi_tap.v1`.
+- The window covers `from_fret` to `from_fret` + 4, or the open string to fret 5 when
+  `from_fret` is 0. The planned cell, a tap outside the window, or a tap on a string outside
+  the tuning is `invalid_cell`.
+- **The note** is the planned cell's note. Its places are every cell of the window, on every
+  string, that sounds it in any octave, by string from 1, then fret from the lowest.
 - **Graded on every cell it covers** (`evidence_by_item`), one entry per cell, by string from 1
   and then fret from the lowest: each place of the note is right when tapped and wrong when
   missed, and each other cell tapped is wrong. Every cell of the window counts, whatever skill

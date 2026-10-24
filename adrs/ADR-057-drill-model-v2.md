@@ -63,6 +63,31 @@ The `fretboard_note` key, never installed, is dropped, and `find-octaves` loses 
 drill. Rejected: a `fretboard_note` item with its own level. It would leave untouched the cells
 the drill is meant to make fluent.
 
+**Amended:** 2026-10-21, planning the use rung (MOT-152, slice P6), by Gilson (Q1–Q9). A **song**
+(`song:<layout id>:<song chart id>`, rung `use`) is a published song chart played whole on the
+instrument in hand, self-rated with no measure (`self_rating.v1`), like a single chord:
+- **A chart's sections say which progressions they play.** Its author tags them on each section
+  (ADR-050 amendment of the same date, revised 2026-10-24); a song's nodes are the nodes, in the
+  progression catalog, of every progression its sections are tagged with. A chart with no tagged
+  section is never a practice item. The song is played whole; the section that plays the
+  subject's progression is shown as why it was picked.
+- **It is only ever the application ending.** A song ends a session when one of the session's
+  subjects, main first, takes new items from the `use` rung (its current rung, or the next one
+  with material) and a song practises it; otherwise the ending is a play-along, as before. So a
+  session plays at most one song, always last. A chosen session has an ending when its subtree
+  has a play-along or a song.
+- **Which song:** one never rated on the layout first, then the one rated longest ago; the song of
+  the student's last in-hand session only when no other fits.
+- **As written:** the chart's concert key and capo, never transposed. On bass the student plays
+  the root of each chord from the same chart; no bass line is generated.
+- **Per layout:** a song on guitar and the same song on bass are two items, since they are two
+  skills. The key takes the layout, like a chord's root and fifth.
+
+Repertoire statuses, keep-alive reviews, the Songs tile, "I played it" as practice and songs in
+challenges stay with MOT-76, which builds on this item and keeps its key. Rejected: finding a
+chart's progressions from its chords. A chart has chord order but no bars, so a match would be a
+guess, and a wrong match would send a student to a song that doesn't practise their subject.
+
 ---
 
 ## Context

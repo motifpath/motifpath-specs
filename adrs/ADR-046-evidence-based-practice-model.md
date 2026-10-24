@@ -431,11 +431,12 @@ One piece of evidence per observation, the only stored learning state:
   focus skill it applies another skill of the student's paths. With none on the instrument at all,
   the session has no ending and the time stays with the focus block. Like the warm-up, a due
   play-along is never the ending (its review belongs in the focus block), and an ending longer than
-  a quarter of the session is skipped.
+  a quarter of the session is skipped. Amended 2026-10-21 (ADR-057, MOT-152): the ending is a song
+  instead when a subject is at the `use` rung and a song practises it.
 - **Playing in hand, recall in the head** (amended 2026-10-07, by Gilson, reversing 2026-10-06): a
   session with the instrument in hand picks play-alongs, authored exercises, (amended
-  2026-10-18) single chords and chord changes, and (amended 2026-10-20, ADR-057) progression key
-  tours, never a fretboard cell or a diagram shape, though
+  2026-10-18) single chords and chord changes, (amended 2026-10-20, ADR-057) progression key
+  tours and (amended 2026-10-21) songs, never a fretboard cell or a diagram shape, though
   they suit the instrument; those are recalled in the head only.
   With nothing to play, an in-hand session is not found, and the client offers one in the head.
 - **In the head** (amended 2026-10-06): fretboard cells of every layout among the student's
@@ -471,7 +472,8 @@ One piece of evidence per observation, the only stored learning state:
   diagram shape by 10 seconds; a single chord by 20 seconds and a chord change by 90 (amended
   2026-10-18); a progression key tour like a play-along, over 3 takes (amended 2026-10-20); a
   guide tone by its 3 takes at its start tempo, each a bar of count-in and the progression once,
-  then 5 seconds to see the result (amended 2026-10-21).
+  then 5 seconds to see the result (amended 2026-10-21); a song by 2 minutes, then 10 seconds to
+  rate it (amended 2026-10-21).
 - **Focus time:** the session minus the warm-up and the application ending (one play-along at its
   estimated time). The mix shares the focus time. A warm-up
   play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the
