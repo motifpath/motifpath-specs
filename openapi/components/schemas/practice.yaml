@@ -1660,6 +1660,12 @@ PlannedSong:
       description: |
         The key, in the progression catalog, of the progression the chart plays that practises
         the session's subject, shown as why this song was picked.
+    section_index:
+      type: integer
+      minimum: 0
+      description: |
+        The first section, numbered from 0 in document order, tagged with progression_key: the
+        section shown as playing it ("Its verse plays I–IV–I–V"). The whole song is played.
     plays:
       type: string
       enum:
@@ -1669,4 +1675,4 @@ PlannedSong:
         What the student plays from the chart. chords = the chords as written, on a guitar
         layout; roots = the root of each chord, on a bass layout.
   additionalProperties: false
-  required: [song_chart_id, layout_instrument_id, title, artist, progression_key, plays]
+  required: [song_chart_id, layout_instrument_id, title, artist, progression_key, section_index, plays]

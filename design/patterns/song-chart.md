@@ -57,6 +57,12 @@ rights obvious before anything reaches learners.
   chart isn't available" without a reason (withdrawn, never published or missing) and offers Go home;
   a load error offers Try again.
 
+- **Progressions it plays (MOT-152 D9):** under Chords in this song, PROGRESSIONS IN THIS SONG lists
+  every progression the sections are tagged with, each once (two verses on one progression show it
+  once), in the order they first appear, as chips by catalog name; each section shows its own beside
+  its heading. A chart with no tagged section shows neither. Read from the sections' tags, nothing
+  sent.
+
 ### Size classes (D5)
 
 | Size class | Chart | Chord card | Metronome |
@@ -133,6 +139,43 @@ lesson's challenge, next to the exercises.
 - **Withdrawn later (D16):** the chart drops out of the run; the editor shows it with a warning and
   Remove, and the challenge can still be saved.
 
+### Progressions a section plays (MOT-152, "Song charts" row 8)
+
+A chart's sections name the progressions they play, so practice can end a session on a progression
+with a song built on it (ADR-050 amendment 2026-10-21, revised 2026-10-24).
+
+- **On the section (D5):** each section header in the lyrics editor carries its tags as chips (the
+  catalog name, × to remove) and **+ Progression**, on every section, tagged or not. None by default.
+  The chart-level details have no progression field.
+- **The picker (D5):** + Progression opens a popover of the whole progression catalog by its names
+  (the names learners see, unchanged), with a search and a check on the section's tags; a fixed
+  height that scrolls. Nothing is suggested from the chords — the author knows what each section is
+  built on.
+- **A tag the section doesn't play (D6):** saved; its chip turns warning, the reason sits under the
+  section's header ("Not played in this verse: its chords never come I–IV–V–I in a row in C"), and the
+  status panel lists it with the other blockers, naming the section ("Verse: play I–IV–V–I in a row,
+  or remove the tag"). Publish stays disabled, as for chord problems (D8).
+- **On Compact (D7):** chords wait for a larger screen, but a section's tags don't — the chip and
+  + Progression sit on the section heading of the read-only chart; the picker is a bottom sheet.
+- **ChordPro:** an import replaces the body, so it brings untagged sections.
+
+### A song ending a practice session (MOT-152, "Practice Shell — flows" 11g–11k)
+
+A song is the `use` rung's item: the whole chart, as written, as the application ending of an
+in-hand session (`catalogs/practice-drills.md`, Songs).
+
+- **Why it was picked (D1):** the plan row reads "Put it into music · I–IV–I–V"; before playing, the
+  header chip says "Put it into music" and the line under the chords "Its verse plays I–IV–I–V, the
+  progression you practised today" — the first section tagged with it.
+- **On bass (D3):** "Play the root of each chord" under the meta chips, and under the title while
+  playing. Before playing, the song's chords are a chart of chord symbols (`ChartBar/Symbol`, as bass
+  reads a chart in Practice 18d), wrapping on a phone: the symbol says the chord's quality (Em minor,
+  G7 seventh), its first letter the root; a tap plays the root.
+- **After rating (D4):** the ending is the last item — the result shows today's rating only, and the
+  button reads Finish, to the session summary.
+- **Repertoire frames (D2):** 11a, 11b and 11f (a song among the items, "Keep it in your repertoire",
+  repertoire status, a next item) stay for MOT-76's repertoire reviews.
+
 ### Your songs: growth on Home (D17–D19)
 
 - **Statuses:** Learning → In your repertoire (Clean on two separate days) → Review due (its
@@ -152,7 +195,9 @@ lesson's challenge, next to the exercises.
 - Send any event from the metronome or the tempo, from an admin preview, or for showing a card.
 - Say why a chart isn't available.
 - Show a chart's draft, or a withdrawn chart, to learners or in the teacher picker.
-- Publish while a chord or the rights block it, or hide why Publish is disabled.
+- Publish while a chord, a section's unplayed tag or the rights block it, or hide why Publish is
+  disabled.
+- Suggest a section's progressions from its chords, or tag the chart as a whole.
 - Use licensed lyrics in designs, stories or tests.
 - Put a song chart in an exercise prompt, or let a song's rating count toward a challenge's pass mark.
 

@@ -100,7 +100,7 @@ on the bass fretboard, at positions computed from the chord's formula and the tu
 | `chord_change` | two chords (bass: their roots) | none, changes per minute (play_in_time) | — | `change-chords` (bass: `play-root-notes`) | P3 |
 | `progression_keys` | a progression (`progressions.yaml`) on a layout | none, self-rated at a tempo; the key moves on after a clean take (move) | — | `common-progressions`, `play-shapes-in-any-key` (bass: `play-chord-tone-lines`) | P4 |
 | `guide_tone` | a progression on a layout | `tap_the_third` (target): over the playback, tap the 3rd of each chord as it arrives; the 7th once accurate | — (not asked among options) | `target-chord-tones`, `voice-lead` (bass: `play-chord-tone-lines`) | P5 |
-| `song` | a published song chart tagged with the progressions it plays, on a layout | none, self-rated (use) | — | its progressions' nodes (`common-progressions`, and `cadences` or `blues-form`) | P6 |
+| `song` | a published song chart whose sections are tagged with the progressions they play, on a layout | none, self-rated (use) | — | its sections' progressions' nodes (`common-progressions`, and `cadences` or `blues-form`) | P6 |
 | `fretboard_cell` | a cell (string and fret) on a layout | `find_every_instance` (know): the cell's note is named, tap every place of it in the fret window; graded on every cell in the window | — (not asked among options) | `find-notes-root-strings`, `find-notes-top-strings` (the cells' own) | P7 |
 
 **Item keys and graders.** A key is part of the item when the fact differs per key (the vi of
@@ -393,11 +393,13 @@ improvising over changes.
 A `song` is a published song chart played whole on the instrument in hand: the `use` rung, where
 a progression is applied in music (MOT-152). Teachers spend about half of practice on songs.
 
-- **Items:** every published song chart tagged with at least one progression (ADR-050), on each
+- **Items:** every published song chart with at least one section tagged with a progression
+  (ADR-050, tagged by section since 2026-10-24), on each
   of the `guitar` and `electric-bass` layouts, keyed `song:<layout id>:<song chart id>`. A song
   on guitar and the same song on bass are two items.
-  - Its nodes are the nodes of its progressions in `progressions.yaml`: a chart tagged
-    `I-IV-V-I` rolls up to `common-progressions` and `cadences`.
+  - Its nodes are the nodes, in `progressions.yaml`, of every progression its sections are tagged
+    with: a chart whose verse is tagged `I-IV-V-I` rolls up to `common-progressions` and
+    `cadences`.
   - A chart withdrawn later is no longer planned; its evidence stays.
 - **In a session**, a song is only ever the **application ending** of an in-hand session:
   - the ending plays a subject, main first. For each, when the subject takes new items from the
@@ -411,10 +413,12 @@ a progression is applied in music (MOT-152). Teachers spend about half of practi
 - **Which song**, among those that practise the subject: one never rated on the layout first,
   then the one rated longest ago, at random among equals. The song of the student's last in-hand
   session is taken only when no other fits.
-- **How it is played** (Figma row 11, MOT-55): the chart as written, in its concert key with its
-  capo, never transposed. The chart's tempo, when stated, is the metronome's target, an aid only
-  (`design/patterns/self-rating.md`). On `guitar` the student strums the chords; on
-  `electric-bass` the item says "Play the root of each chord", over the same chart.
+- **How it is played** (Figma row 11, frames 11g–11k): the whole chart as written, in its concert
+  key with its capo, never transposed. The item names the section that plays the subject's
+  progression ("Its verse plays I–IV–I–V"), its first such section. The chart's tempo, when
+  stated, is the metronome's target, an aid only (`design/patterns/self-rating.md`). On `guitar`
+  the student strums the chords; on `electric-bass` the item says "Play the root of each chord",
+  over the same chart, its chord symbols showing each chord's quality.
 - **Grading** (`self_rating.v1`): the whole song is rated once, struggled, almost or clean, with
   no tempo, note value or key. Like a single chord, a clean rating is fully fluent: five clean
   ratings on five days make a song fluent.

@@ -3,10 +3,12 @@ Feature: End a session on a progression with a song built on it
   I want a session on a progression to end with a song that plays it
   So that I use what I practised in music, not only in drills
 
-  # A song (MOT-152, rung use; ADR-057 amendment 2026-10-21) is a published song chart tagged with
-  # the progressions it plays (song-charts.feature), played whole on the instrument in hand and
-  # rated once, with no measure. Its key is song:<layout id>:<song chart id>, on the guitar and
-  # electric-bass layouts; its nodes are its progressions' nodes in the progression catalog.
+  # A song (MOT-152, rung use; ADR-057 amendment 2026-10-21) is a published song chart whose sections
+  # are tagged with the progressions they play (song-charts.feature; by section since 2026-10-24),
+  # played whole on the instrument in hand and rated once, with no measure. Its key is
+  # song:<layout id>:<song chart id>, on the guitar and electric-bass layouts; its nodes are the
+  # nodes of every progression its sections are tagged with. A chart "tagged with" a progression
+  # below has its first section tagged with it.
   # - It is only ever the application ending of an in-hand session of 10 minutes or more. The
   #   ending plays a subject, main first: when the subject takes new items from the use rung (its
   #   current rung, or the next one with material) and a song practises it, the ending is that
@@ -118,6 +120,15 @@ Feature: End a session on a progression with a song built on it
     When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
     Then the song "Amazing Grace" on guitar plays its chords
 
+  @wip
+  Scenario: The song names the section that plays the progression
+    Given the published song chart "Home on the Range" has its chorus tagged with the progression "I-IV-I-V"
+    And "alice" rated "Amazing Grace" on guitar 2 days ago
+    And "alice" is at the use rung on "common-progressions" on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand, choosing "common-progressions"
+    Then the last item is the song "Home on the Range"
+    And the song names its chorus as the section that plays "I-IV-I-V"
+
   # ── Failure cases ──────────────────────────────────────────────────────────
 
   Scenario: An untagged chart is never a song in a session
@@ -147,16 +158,17 @@ Feature: End a session on a progression with a song built on it
 
   @web
   Scenario: The song shows its chart as written, with why it was picked
-    Given "alice"'s session ends with the song "Amazing Grace" on guitar, for the progression "I-IV-I-V"
+    Given "alice"'s session ends with the song "Amazing Grace" on guitar, for the progression "I-IV-I-V" in its verse
     When the song is shown
     Then the chart of the latest published revision is shown in its concert key, with its capo, never transposed
-    And the item names the progression "I–IV–I–V" it practises
+    And the item reads "Its verse plays I–IV–I–V, the progression you practised today"
 
   @web
   Scenario: On bass, the song asks for the root of each chord
     Given "alice"'s session ends with the song "Amazing Grace" on the electric-bass layout
     When the song is shown
     Then the item reads "Play the root of each chord" above the chart
+    And the song's chords are shown as a chart of chord symbols, each saying the chord's quality
 
   @web
   Scenario: Rating the song sends the rating alone
