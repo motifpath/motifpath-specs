@@ -66,9 +66,11 @@ the drill is meant to make fluent.
 **Amended:** 2026-10-21, planning the use rung (MOT-152, slice P6), by Gilson (Q1–Q9). A **song**
 (`song:<layout id>:<song chart id>`, rung `use`) is a published song chart played whole on the
 instrument in hand, self-rated with no measure (`self_rating.v1`), like a single chord:
-- **A chart says which progressions it plays.** Its author tags them (ADR-050 amendment of the
-  same date); a song's nodes are its progressions' nodes in the progression catalog. An untagged
-  chart is never a practice item.
+- **A chart's sections say which progressions they play.** Its author tags them on each section
+  (ADR-050 amendment of the same date, revised 2026-10-24); a song's nodes are the nodes, in the
+  progression catalog, of every progression its sections are tagged with. A chart with no tagged
+  section is never a practice item. The song is played whole; the section that plays the
+  subject's progression is shown as why it was picked.
 - **It is only ever the application ending.** A song ends a session when one of the session's
   subjects, main first, takes new items from the `use` rung (its current rung, or the next one
   with material) and a song practises it; otherwise the ending is a play-along, as before. So a
