@@ -57,6 +57,12 @@ rights obvious before anything reaches learners.
   chart isn't available" without a reason (withdrawn, never published or missing) and offers Go home;
   a load error offers Try again.
 
+- **Progressions it plays (MOT-152 D9):** under Chords in this song, PROGRESSIONS IN THIS SONG lists
+  every progression the sections are tagged with, each once (two verses on one progression show it
+  once), in the order they first appear, as chips by catalog name; each section shows its own beside
+  its heading. A chart with no tagged section shows neither. Read from the sections' tags, nothing
+  sent.
+
 ### Size classes (D5)
 
 | Size class | Chart | Chord card | Metronome |
