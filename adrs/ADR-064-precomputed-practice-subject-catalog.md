@@ -42,22 +42,25 @@ deduplicate the pending signals and rebuild the catalog once for all of them.**
 
 - **The catalog** (`practice_subject_catalogs`) has one row per scope. A scope is an instrument id,
   or the empty scope used for a student with no instruments. Each row holds:
-  - the scope's knowledge nodes in catalog order, with each node's area and the item keys in its
-    subtree;
-  - each item's key and the facts its subjects are tallied from that don't depend on the student:
+  - the scope's classified items, each with its key, the knowledge nodes it is classified under,
+    and the facts its subjects are tallied from that don't depend on the student:
     - whether it suits an in-hand session and whether it suits a session in the head;
     - its rung: one fixed rung, or, for a drill item, its ways in order with the rung of each. At
       request time the rung is the one for the way the student would be asked next, which depends
       on their state;
   - `built_at` and a `format_version`.
 
-  No names, prompts or media; the API's existing node names still come from the nodes the row
-  lists.
+  Only items. The knowledge nodes are read live at request time, in one query, and each node's
+  subtree is worked out from them and the items' node ids. A node renamed, added, moved or retired
+  shows at once, and knowledge graph edits don't touch the catalog. No names, prompts or media.
 - **The queue** (`practice_catalog_signals`) is a table with one row per signal: an id, a reason
-  (`diagram`, `exercise`, `song_chart`, `knowledge_graph`, `instrument`, `start`) and `created_at`.
-  Each authoring write inserts a signal after its own transaction commits, at the same points that
-  already upsert the practice reference snapshot (ADR-047). It also does so for knowledge graph and
-  song chart writes, which ADR-047 doesn't cover.
+  (`diagram`, `exercise`, `song_chart`, `instrument`, `start`) and `created_at`. A signal is
+  queued after the authoring write commits, at the points that already upsert the practice reference
+  snapshot (ADR-047):
+  - Every diagram, exercise, instrument and published song chart has its reference written there,
+    so the writer core uses for those upserts also queues a signal. A new write path that keeps the
+    snapshot current keeps the catalog current too.
+  - A song chart's withdrawal writes no reference, so it queues its own signal.
 - **The consumer** is a goroutine in the Core Domain Service:
   - it wakes on a signal from the same process, or by polling every 30 s;
   - it waits 2 s so a burst of edits settles;
@@ -69,9 +72,9 @@ deduplicate the pending signals and rebuild the catalog once for all of them.**
   stays queued and causes exactly one more.
 - **On start**, core queues a `start` signal. That covers reference data installed by migrations
   and any signal lost between a commit and a crash.
-- **Reading:** `ListSubjects` reads the catalog rows for the session's scopes in one query. It reads
-  the student's states for those items in one MongoDB query, and the skills on their path, then
-  tallies in memory. A scope with no row, or with a row of an older `format_version`, is computed
+- **Reading:** `ListSubjects` reads the catalog rows for the session's scopes in one query, and the
+  knowledge nodes in one more. It reads the student's states for those items in one MongoDB query
+  per scope, and the skills on their path, then tallies in memory. A scope with no row, or with a row of an older `format_version`, is computed
   live, as core#181 does, and a rebuild is queued. The list is never missing or wrong, only slower,
   until the catalog is built.
 - **A change to how subjects are tallied bumps `format_version`.** That covers suitability, rung
@@ -85,8 +88,8 @@ deduplicate the pending signals and rebuild the catalog once for all of them.**
 ## Rationale
 
 - **Precomputing, over computing per request.** Per request, the shared content is re-derived for
-  every student every time. The catalog turns 93 statements into about six: the user, the
-  instrument check, the path, the catalog rows and one MongoDB read. The cost moves from every
+  every student every time. The catalog turns 93 statements into about ten: the user, the
+  instrument check, the knowledge nodes, the path, the catalog rows and one MongoDB read. The cost moves from every
   student's request to the rare authoring write.
 - **A persisted catalog, over an in-memory cache with a time-to-live.**
   - A time-to-live is either stale for its whole length or rebuilt often for nothing.
@@ -105,6 +108,8 @@ deduplicate the pending signals and rebuild the catalog once for all of them.**
   - A table gives the same queue semantics with the database core already owns. "Take everything up
     to the highest id" is the deduplication.
   - This is the call to revisit if the catalog is ever built outside core.
+- **Items only, with nodes read live, over precomputing the nodes too.** Nodes are one cheap query.
+  Reading them live keeps names and structure current without signalling on knowledge graph edits.
 - **Per-scope rows with student-independent facts, over precomputing per student.** States change
   with every answer, so a per-student list would be stale the moment a student practises. Only the
   shared part is precomputed. The rung for the next way, the levels and on-path are applied at
@@ -117,7 +122,7 @@ deduplicate the pending signals and rebuild the catalog once for all of them.**
 
 ### Positive
 
-- The practice setup lists subjects in about six queries, however much content exists, for every
+- The practice setup lists subjects in about ten queries, however much content exists, for every
   student.
 - An authoring burst costs one rebuild. Nothing authors more slowly.
 - The catalog survives restarts and is shared by every core process on the same database.
@@ -128,8 +133,9 @@ deduplicate the pending signals and rebuild the catalog once for all of them.**
   Tests must build both from the same content and compare them, and the live path stays as the
   fallback.
 - **Every authoring write path must queue a signal.** Missing one is a silent bug: the list keeps
-  showing the old content until the next start. Each path needs a test asserting that a signal was
-  queued, as ADR-047 requires for the practice reference snapshot.
+  showing the old content until the next start. Tying signals to the practice reference writer
+  covers every path that already keeps that snapshot. A path that changes items without writing a
+  reference, like a withdrawal, needs its own signal and a test asserting it.
 - **The list lags authoring by seconds,** up to the 30 s poll if the in-process wake-up is missed
   (for example, a write handled by another instance).
 - **A format change shows slower lists until the start rebuild finishes.** The fallback keeps them
