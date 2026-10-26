@@ -17,7 +17,9 @@ silent switch, storage persistence, and the stores' payment rules.
 
 The alpha now runs in production, and the product owner decided to build the iOS and Android apps
 now rather than after the PWA. MOT-164 ran the spike on a throwaway branch of `motifpath-web`:
-Capacitor 8 with the production web build, on the iOS Simulator and a real iPhone 14.
+Capacitor 8 with the production web build, on the iOS Simulator, a real iPhone 14 and a real
+Android phone. The Android emulator could not run on the Intel Mac, so Android was tested from an
+Ubuntu machine.
 
 Most of the web app ran unchanged: navigation, the API clients, practice with Web Audio samples,
 the metronome, timed taps and lesson video. **Signing in and staying signed in did not.** Three
@@ -39,7 +41,9 @@ problems appeared one after another:
 The spike also found:
 - With the silent switch on, iOS mutes web audio on the built-in speaker. Bluetooth output still
   plays.
-- The page draws under the status bar, because safe areas are not handled.
+- The page draws under the status bar and the home indicator, because safe areas are not
+  handled. On the iPhone, the header sits under the clock, and a close ("×") button outside the
+  safe area cannot be tapped.
 - Debug builds log the Google ID token.
 - ADR-058 plans digital subscriptions and teacher-path purchases through Stripe. Both stores
   restrict selling digital content inside an app.
@@ -87,7 +91,8 @@ with the silent switch on. This is the "audio session" port ADR-049 §9 anticipa
 - Release builds allow no cleartext or local-network traffic. Those settings exist only in
   development builds.
 - Native projects target JDK 21 for Gradle; the JDK 25 that Android Studio bundles fails.
-- The page handles safe areas (`viewport-fit=cover`, `env(safe-area-inset-*)`).
+- The page handles safe areas (`viewport-fit=cover`, `env(safe-area-inset-*)`). No interactive
+  control may sit outside them.
 - The app id is `com.motifpath.app`, confirmed before the first store upload. It cannot change
   afterwards.
 
@@ -105,9 +110,10 @@ with the silent switch on. This is the "audio session" port ADR-049 §9 anticipa
   Billing. Alternatives such as external purchase links depend on the region and must be checked
   for Brazil. Until that decision is recorded in its own ADR, the store apps neither sell nor link
   to purchases.
-- **Android audio latency must be measured on a real mid-range phone** before the Android app is
-  submitted. Android is the main market. If WebView latency breaks timed grading, a native audio
-  path will be needed.
+- **Timing is re-checked on a mid-range Android phone before each Android submission.** Android
+  is the main market, and WebView audio and touch latency vary by device. The spike's Android run
+  passed. The release checklist records the tap check's `median_tap_ms` and the metronome feel
+  for the test phone. If latency ever breaks timed grading, a native audio path will be needed.
 
 ## Rationale
 
@@ -161,8 +167,8 @@ with the silent switch on. This is the "audio session" port ADR-049 §9 anticipa
 
 - **ADR-049: Practice-first experience language, mobile-first UI, PWA built for Capacitor.** This
   ADR amends §9: delivery order, the auth redirect port, and the spike's outcome.
-- **ADR-046: Practice evidence.** Its latency-based grading is why Android audio latency is a
-  release gate.
+- **ADR-046: Practice evidence.** Its latency-based grading is why Android timing is a release
+  gate.
 - **ADR-058: Stripe as the payment provider.** Its in-app sales are subject to the store payment
   gate.
 
