@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.58.0
+  version: 0.59.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -42,6 +42,13 @@ paths:
         stored name is refreshed when the claim differs from it; a missing
         or blank claim on a later request leaves the stored name unchanged.
 
+        The user's email address is taken from the "email" claim of the same
+        token (trimmed), never from the request body. A token without an email
+        claim that is a valid address is rejected with 400 on field "email". It
+        is refreshed the same way as the name: when a later token carries a
+        different valid address, the stored one is replaced; a missing, blank or
+        invalid claim leaves it unchanged.
+
         This endpoint must be called once per Clerk identity before any other
         authenticated operation. Subsequent calls with the same JWT sub return 409.
 
@@ -76,8 +83,9 @@ paths:
         "400":
           description: |
             The request is invalid. The role field is missing or contains an
-            unrecognised value (field "role"), or the session token carries no
-            non-blank name claim (field "name").
+            unrecognised value (field "role"), the session token carries no
+            non-blank name claim (field "name"), or it carries no email claim
+            that is a valid address (field "email").
           content:
             application/json:
               schema:
@@ -6667,13 +6675,20 @@ paths:
                 $ref: '#/components/schemas/NotFoundError'
 
     patch:
-      operationId: updateMyLocale
-      summary: Set the authenticated user's locale preference
+      operationId: updateMyProfile
+      summary: Update the authenticated user's preferences
       description: |
-        Updates the locale preference on the MotifPath user record associated
-        with the authenticated Clerk identity. This is the authenticated
-        counterpart to the Accept-Language-header/localStorage preference
-        used for anonymous visitors.
+        Updates the locale, the time zone and the email preferences on the
+        MotifPath user record associated with the authenticated identity. A
+        request changes any of them and must change at least one; a field that
+        is left out keeps its value. Within email_preferences, a switch that is
+        left out keeps its value too.
+
+        The locale is the authenticated counterpart to the
+        Accept-Language-header/localStorage preference used for anonymous
+        visitors. The time zone decides the local time at which the platform's
+        emails are sent; the web client sets it to the browser's zone when the
+        two differ.
       tags:
         - Identity
       requestBody:
@@ -6681,7 +6696,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateMyLocaleRequest'
+              $ref: '#/components/schemas/UpdateMyProfileRequest'
+            examples:
+              set_time_zone:
+                summary: The web reports the browser's time zone
+                value:
+                  time_zone: America/Sao_Paulo
+              turn_progress_reports_off:
+                summary: A student turns progress reports off in settings
+                value:
+                  email_preferences:
+                    progress_report: false
       responses:
         "200":
           description: The updated user profile.
@@ -6691,8 +6716,10 @@ paths:
                 $ref: '#/components/schemas/UserProfile'
         "400":
           description: |
-            The request body failed schema validation, or locale is not a
-            known language code.
+            The request body failed schema validation or changes nothing, locale
+            is not a known language code (field "locale"), time_zone is not a
+            known IANA time zone (field "time_zone"), or email_preferences names
+            an unknown switch (field "email_preferences").
           content:
             application/json:
               schema:
@@ -6712,6 +6739,65 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+
+  /email-unsubscribes:
+    post:
+      operationId: unsubscribeFromEmails
+      summary: Turn off one kind of email with an unsubscribe token
+      description: |
+        Turns off the email preference named by an unsubscribe token, for the
+        user the token was issued to. Every progress report and reminder
+        carries such a token, both in its List-Unsubscribe header (RFC 8058
+        one-click unsubscribe, which mail clients send as a form POST with the
+        body "List-Unsubscribe=One-Click") and in the unsubscribe link in its
+        footer, which opens a web page that calls this endpoint.
+
+        No sign-in is needed: the token is the authorization. It names exactly
+        one user and one kind of email, it is signed by the platform so it
+        cannot be altered or made up, and it does not expire. Using it when
+        that kind is already off still succeeds. The user can turn the kind
+        back on in their settings; an old token still turns it off again.
+      tags:
+        - Identity
+      security: []
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+          description: The unsubscribe token from the email.
+      requestBody:
+        required: false
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              description: The body mail clients send for a one-click unsubscribe. Its content is not used.
+              properties:
+                List-Unsubscribe:
+                  type: string
+                  description: Always "One-Click".
+          application/json:
+            schema:
+              type: object
+              description: The web page sends an empty object. Its content is not used.
+      responses:
+        "200":
+          description: The kind of email named by the token is off.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailUnsubscribeResult'
+        "400":
+          description: |
+            The token is missing, malformed, altered, or names a user that no
+            longer exists. Nothing is changed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
 
   /healthz:
     get:
@@ -14360,7 +14446,7 @@ components:
           description: |
             Stable identifier for this language (e.g. "en", "pt_BR"), or the
             literal value "any" for language-agnostic content. Used as the
-            value of UpdateMyLocaleRequest.locale and of
+            value of UpdateMyProfileRequest.locale and of
             ContentNode.languages / Exercise.languages entries.
         name:
           type: string
@@ -14369,10 +14455,22 @@ components:
         - code
         - name
 
-    UpdateMyLocaleRequest:
+    UpdateMyProfileRequest:
       type: object
-      description: Payload for setting the authenticated user's locale preference.
+      description: |
+        Payload for updating the authenticated user's preferences. At least one
+        field is required; a field that is left out keeps its value.
+      minProperties: 1
+      additionalProperties: false
       properties:
+        time_zone:
+          type: string
+          minLength: 1
+          description: |
+            The IANA time zone to store for this user, such as
+            "America/Sao_Paulo". Must be a known IANA time zone.
+        email_preferences:
+          $ref: '#/components/schemas/EmailPreferencesUpdate'
         locale:
           type: string
           not:
@@ -14382,8 +14480,50 @@ components:
             be an existing language code; "any" is not a valid locale for a
             user, since it names language-agnostic content, not a language
             a person reads or speaks.
+
+    EmailPreferences:
+      type: object
+      description: |
+        Which of the platform's emails this user wants, one switch per kind.
+        Both are on for every new user. Only students are sent these emails.
+      properties:
+        progress_report:
+          type: boolean
+          description: Whether the user gets the weekly progress report.
+        reminders:
+          type: boolean
+          description: Whether the user gets reminders after days without learning activity.
       required:
-        - locale
+        - progress_report
+        - reminders
+
+    EmailPreferencesUpdate:
+      type: object
+      description: |
+        The email preference switches to change. At least one is required; a
+        switch that is left out keeps its value.
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        progress_report:
+          type: boolean
+          description: Whether the user gets the weekly progress report.
+        reminders:
+          type: boolean
+          description: Whether the user gets reminders after days without learning activity.
+
+    EmailUnsubscribeResult:
+      type: object
+      description: The email kind that was turned off by an unsubscribe link.
+      properties:
+        kind:
+          type: string
+          enum:
+            - progress_report
+            - reminders
+          description: The kind of email the user will no longer get.
+      required:
+        - kind
 
     UserRef:
       type: object
@@ -14463,6 +14603,28 @@ components:
             what other users see wherever this user is referenced (UserRef).
         locale:
           $ref: '#/components/schemas/Language'
+        email:
+          type:
+            - string
+            - "null"
+          format: email
+          maxLength: 254
+          description: |
+            The user's email address, taken from the "email" claim of the
+            session token and refreshed whenever that claim changes to another
+            valid address. Null for a user registered before addresses were
+            stored, until their next signed-in request. Shown only to its
+            owner; never part of a UserRef.
+        time_zone:
+          type:
+            - string
+            - "null"
+          description: |
+            The user's IANA time zone, such as "America/Sao_Paulo", or null when
+            none was ever set. The platform's emails use "America/Sao_Paulo"
+            when it is null.
+        email_preferences:
+          $ref: '#/components/schemas/EmailPreferences'
         registered_at:
           type: string
           format: date-time
@@ -14472,6 +14634,9 @@ components:
         - display_name
         - role
         - locale
+        - email
+        - time_zone
+        - email_preferences
         - registered_at
 
     ValidationError:
