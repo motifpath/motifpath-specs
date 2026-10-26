@@ -8,6 +8,11 @@
 part of the architecture must stay replaceable.
 **Accepted:** 2026-10-26, by Gilson.
 
+> **2026-10-26 (amended):** the SES sandbox covers the whole AWS account, and staging and
+> production share one account. So staging can't stay in the sandbox once production has
+> production access. Instead, staging's mail user may send only to an allow-list of recipients.
+> Each environment also gets its own sending subdomain. See decision 1.
+
 ---
 
 ## Context
@@ -32,7 +37,7 @@ today. Four facts about the current system shape this decision:
    practice days and the day streak from the worker's aggregates. It needs the student's time
    zone, which the client sends on every request. That zone is never stored, so no server-side
    job knows it.
-4. **The hosting is one VM per AWS account in `us-east-2`** (ADR-039, ADR-062). Containers cannot
+4. **One VM in one AWS account in `us-east-2` hosts both environments** (ADR-039, ADR-062). Containers cannot
    use the instance role. Each needs an IAM user whose key is stored in the environment's
    parameters. `motifpath.com` sits in Route 53 with `_dmarc` at `p=reject`. Business mail at
    GoDaddy and Clerk's mail records already use the root domain.
@@ -45,14 +50,17 @@ job as the trigger.
 MotifPath will send engagement emails through **Amazon SES's SMTP interface**. A **scheduled job
 in `motifpath-core`** decides who gets which email.
 
-1. **Provider: Amazon SES in `us-east-2`.** Mail is sent from the subdomain `mail.motifpath.com`.
-   That subdomain has its own Easy DKIM records and a custom MAIL FROM domain,
-   `bounce.mail.motifpath.com`, so SPF and DKIM both align under `p=reject`. The root domain's
-   GoDaddy and Clerk records stay as they are. Each environment has its own **mail IAM user**,
-   allowed only `ses:SendRawEmail` from that identity. Its SMTP credentials go in the
-   environment's parameters. Staging's SES account stays in the **sandbox**, so staging can only
-   mail verified addresses. Production requests production access. Bounces and complaints rely on
-   SES's account-level suppression list. There is no SNS feedback pipeline in this slice.
+1. **Provider: Amazon SES in `us-east-2`.** Each environment sends from its own subdomain:
+   production from `mail.motifpath.com`, staging from `mail.staging.motifpath.com`. Each one has
+   its own Easy DKIM records and a custom MAIL FROM domain (`bounce.mail.…`), so SPF and DKIM both
+   align under `p=reject`. The root domain's GoDaddy and Clerk records stay as they are. Each
+   environment has its own **mail IAM user**, allowed only `ses:SendRawEmail` from its own
+   identity. Its SMTP credentials go in the environment's parameters. The account requests
+   production access, which production needs. The sandbox covers the whole account, so it can't
+   guard staging. Instead, **staging's mail user may only send to an allow-list of recipients**
+   (the team's domain and named test addresses), enforced by an IAM condition on the recipients.
+   Bounces and complaints rely on SES's account-level suppression list. There is no SNS feedback
+   pipeline in this slice.
 2. **One SMTP adapter everywhere.** Core sends through an `EmailSender` port with a single SMTP
    adapter. Locally it points at **Mailpit**, which joins the local stack (ADR-016, ADR-048). In
    staging and production it points at SES SMTP. Tests and local runs exercise the same code path
@@ -99,8 +107,9 @@ tier (3,000 emails a month) that covers the alpha. But it is one more vendor, wi
 processing agreement for LGPD, its own account and its own API key outside Terraform. SES is in
 the AWS account that already holds DNS, IAM and the parameters (ADR-062). Its domain identity,
 DKIM records and IAM user are Terraform resources next to the existing ones. It costs $0.10 per
-1,000 emails at any volume. SES's weaker parts are the sandbox, the production-access request and
-a rawer API. Using SMTP hides the raw API. The sandbox is a useful guard for staging.
+1,000 emails at any volume. SES's weaker parts are the production-access request and a rawer API.
+Using SMTP hides the raw API. Staging's recipient allow-list does what the sandbox would have done,
+and keeps doing it after the account leaves the sandbox.
 
 **SMTP over the SES API.** The SES v2 API would need an AWS SDK adapter for production and a
 second adapter for Mailpit. SMTP is one adapter for every environment, set by configuration only.
