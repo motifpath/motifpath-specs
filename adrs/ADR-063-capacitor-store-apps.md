@@ -1,6 +1,6 @@
 # ADR-063: Store apps with Capacitor — native sign-in, native HTTP, and the release gates
 
-**Status:** Proposed
+**Status:** Accepted — 2026-10-26
 **Date:** 2026-10-25
 **Deciders:** Gilson (PO), Claude Code
 **Task:** MOT-164
