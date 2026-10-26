@@ -1,11 +1,12 @@
 # ADR-064: Core precomputes the practice subject catalog, invalidated by a content version stamp
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-26
 **Deciders:** Gilson (Product Owner)
 **Input:** MOT-166 (practice subjects slowness), MOT-167. PO direction, 2026-10-26: content
 changes are rare, so the catalog needn't be rebuilt asynchronously. Rebuild it on the first read
 after a change, invalidated by a version stamp.
+**Accepted:** 2026-10-26, by Gilson.
 
 ---
 
@@ -158,4 +159,4 @@ stores it.**
 
 ---
 
-*This ADR was proposed on 2026-10-26. To revise, create a new ADR with Status: Supersedes ADR-064.*
+*This ADR was accepted on 2026-10-26. To revise, create a new ADR with Status: Supersedes ADR-064.*
