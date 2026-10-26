@@ -58,6 +58,37 @@ after every migration and never create any of these rows.
 Until production exists, these migrations are regenerated in place and development databases
 are recreated from empty. From the first production install, they are append-only.
 
+## After the first production install
+
+Production was first installed with the release of 2026-10-20: every migration up to
+`20261018235357_chord_drills_reference_data`, including all five reference-data migrations.
+Atlas never runs an applied migration again, so an edit to one never reaches an installed
+database. It is skipped without an error.
+
+- **Applied migrations are frozen.** A migration on core's `main` is never changed or deleted.
+  Core's CI fails a branch that does either.
+- **A catalog change ships as a new migration**, `<timestamp>_<catalog>_reference_data.up.sql`,
+  written by the generator that owns the catalog. The generator still builds the whole catalog.
+  It compares it, row by fixed ID, with the rows the installed migrations already insert, and
+  writes only the difference:
+  - a row with a new ID: a plain `INSERT`, so installing aborts if the ID already holds a row;
+  - a row whose columns changed: an `UPDATE` of those columns, by ID;
+  - a row the catalog no longer has: the generator refuses. Reference rows are never deleted,
+    because practice states, evidence and content point at them. Retire the row in its catalog
+    instead (for example a `retired` or `status` field), which is then an update.
+  - no difference: no migration.
+- **Drill threshold and change target versions** only ever add versions, as before.
+- **A fresh install and an upgraded install end with the same rows.** Core's tests check both.
+- Development databases migrate forward like production. Recreating one from empty
+  (`make db:reset`) is still fine locally.
+
+**One-time exception (MOT-168).** Two drill templates, `fretboard_cell:find_every_instance` and
+`guide_tone:tap_the_third`, were added on 2026-10-21 by editing `baseline_reference_data` after
+production had applied it. The baseline is put back as production applied it, and
+`20261026193000_drill_templates_after_first_install` inserts both with
+`ON CONFLICT ("id") DO NOTHING`. Development databases installed from the edited baseline
+already hold them, with the same data.
+
 ## Languages
 
 | Code | Name | ID |
