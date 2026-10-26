@@ -6,8 +6,8 @@ Feature: Derive a student's knowledge of an item from evidence
   # Rules: counted evidence becomes a hit, a miss or a hold. Sources weigh auto-graded 0.3,
   # self-assessed 0.3, teacher-reviewed 0.6. Leitner boxes wait 1, 2, 4, 8, 16, 32 days.
   # accurate = 3+ counted attempts and accuracy >= 0.8; fluent = 5+ attempts, accuracy >= 0.9
-  # and fluency >= 0.8; retained = fluent in box 5 or higher. A wrong note picked among k
-  # choices counts -1/(k-1) toward accuracy (amended 2026-10-08).
+  # and fluency >= 0.8; retained = fluent in box 5 or higher. A pick among choices counts like
+  # any answer: right 1, wrong 0 (the -1/(k-1) guess rule of 2026-10-08 was withdrawn on 2026-10-14).
 
   Background:
     Given student "alice" practises the guitar fretboard cell on string 5 at fret 3
@@ -59,11 +59,10 @@ Feature: Derive a student's knowledge of an item from evidence
   # pick among choices counts 0 like any wrong answer. A lucky guess is caught by asking the item
   # again, the other way or later in the session.
 
-  @wip
   Scenario: A wrong pick among four note choices counts as a plain miss
-    When "alice" names the cell among four choices, right 4 times and wrong once
-    Then "alice"'s accuracy on the cell is 0.8
-    And "alice"'s level for the cell is "accurate"
+    When "alice" names the cell among four choices, right 3 times and then wrong once
+    Then "alice"'s accuracy on the cell is 0.7, as after any wrong answer
+    And "alice"'s level for the cell is "learning"
 
   # ── Find every instance (MOT-153) ──────────────────────────────────────────
   # One find every instance answer gives evidence on every cell of its window, for accuracy only:

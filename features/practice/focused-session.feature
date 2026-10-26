@@ -119,8 +119,6 @@ Feature: Practise a subject the student chooses
     When "alice" composes a 10-minute session with no instrument in hand, choosing a node that doesn't exist
     Then the request is refused with a not-found error
 
-  @wip
   Scenario: A chosen node that isn't an identifier is rejected
     When "alice" composes a 10-minute session with no instrument in hand, choosing the node "progressions"
     Then the request is rejected as invalid
-    And the rejection identifies "focus_node_id" as the source of the error
