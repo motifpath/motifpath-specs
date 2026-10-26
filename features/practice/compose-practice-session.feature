@@ -399,13 +399,11 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the plan's focus nodes are "chord-tones" and "notes-on-high-strings", in that order
 
-  @wip
   Scenario: A student new to a subject gets new items from its first two rungs
     Given "alice" has never practised "diatonic-chords", which has items at the know, hear and play_clean rungs on guitar
     When "alice" composes a 10-minute session with "guitar" in hand and "diatonic-chords" is a focus node
     Then every new item of "diatonic-chords" in the session is at the know or hear rung
 
-  @wip
   Scenario: Once a rung is accurate, new items climb to the next two rungs
     Given "alice" is accurate on every know item of "diatonic-chords" on guitar
     And "diatonic-chords" has items at the know, hear and play_clean rungs on guitar
@@ -418,7 +416,6 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with "guitar" in hand and "diatonic-chords" is a focus node
     Then the 3 due know items are in the session with the reason due
 
-  @wip
   Scenario: Rungs with no material for the session are skipped
     Given "alice" is accurate on every know item of "diatonic-chords" on guitar
     And "diatonic-chords" has items at the know, hear and play_clean rungs, and only its know and hear items need no instrument in hand
