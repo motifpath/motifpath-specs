@@ -14644,7 +14644,7 @@ components:
           description: Whether the user gets the weekly progress report.
         reminders:
           type: boolean
-          description: Whether the user gets reminders after days without learning activity.
+          description: Whether the user gets reminders, both on the first days without learning activity and after 3 and 10 days without it.
       required:
         - progress_report
         - reminders
@@ -14662,7 +14662,7 @@ components:
           description: Whether the user gets the weekly progress report.
         reminders:
           type: boolean
-          description: Whether the user gets reminders after days without learning activity.
+          description: Whether the user gets reminders, both on the first days without learning activity and after 3 and 10 days without it.
 
     EmailUnsubscribeResult:
       type: object
