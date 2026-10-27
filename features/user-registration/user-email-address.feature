@@ -16,7 +16,6 @@ Feature: Keep each user's email address in their user record
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: Registration records the email address carried by the identity token
     Given a Clerk identity "alice" has not yet been registered
     And "alice" is named "Alice Martins"
@@ -24,7 +23,6 @@ Feature: Keep each user's email address in their user record
     When "alice" registers with role "student"
     Then the response includes the email address "alice@example.com"
 
-  @wip
   Scenario: A registered user's profile includes their email address
     Given "alice" has already registered as a student
     And "alice"'s email address is "alice@example.com"
@@ -33,7 +31,6 @@ Feature: Keep each user's email address in their user record
 
   # ── Keeping the address current ────────────────────────────────────────────
 
-  @wip
   Scenario: An email address changed at the identity provider is stored on the user's next request
     Given "alice" has already registered as a student
     And "alice"'s email address is "alice@example.com"
@@ -41,7 +38,6 @@ Feature: Keep each user's email address in their user record
     When "alice" requests their own profile
     Then the response includes the email address "alice.martins@example.com"
 
-  @wip
   Scenario: A user registered before addresses were stored gets one on their next request
     Given "alice" registered as a student before email addresses were stored
     And "alice"'s identity token carries the email address "alice@example.com"
@@ -50,7 +46,6 @@ Feature: Keep each user's email address in their user record
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: Surrounding whitespace is trimmed from the email address
     Given a Clerk identity "alice" has not yet been registered
     And "alice" is named "Alice Martins"
@@ -58,7 +53,6 @@ Feature: Keep each user's email address in their user record
     When "alice" registers with role "student"
     Then the response includes the email address "alice@example.com"
 
-  @wip
   Scenario: An identity token without an email address leaves the stored address unchanged
     Given "alice" has already registered as a student
     And "alice"'s email address is "alice@example.com"
@@ -66,7 +60,6 @@ Feature: Keep each user's email address in their user record
     When "alice" requests their own profile
     Then the response includes the email address "alice@example.com"
 
-  @wip
   Scenario: An identity token whose email is not a valid address leaves the stored address unchanged
     Given "alice" has already registered as a student
     And "alice"'s email address is "alice@example.com"
@@ -74,7 +67,6 @@ Feature: Keep each user's email address in their user record
     When "alice" requests their own profile
     Then the response includes the email address "alice@example.com"
 
-  @wip
   Scenario: A user registered before addresses were stored and still without one shows no address
     Given "alice" registered as a student before email addresses were stored
     And the identity token of "alice" now carries no email address
@@ -83,7 +75,6 @@ Feature: Keep each user's email address in their user record
 
   # ── Validation failures ────────────────────────────────────────────────────
 
-  @wip
   Scenario: Registration without an email address in the identity token is rejected
     Given a Clerk identity "alice" has not yet been registered
     And "alice" is named "Alice Martins"
@@ -92,7 +83,6 @@ Feature: Keep each user's email address in their user record
     Then the request is rejected as invalid
     And the rejection identifies "email" as the source of the error
 
-  @wip
   Scenario: Registration with an email that is not a valid address is rejected
     Given a Clerk identity "alice" has not yet been registered
     And "alice" is named "Alice Martins"

@@ -17,19 +17,16 @@ Feature: Unsubscribe from an email kind with one click
 
   # ── Happy path ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: An unsubscribe link from a progress report turns progress reports off
     Given "alice" holds the unsubscribe link from their progress report
     When the unsubscribe link is used without signing in
     Then "alice" has the email preference "progress_report" off
 
-  @wip
   Scenario: An unsubscribe link turns off only its own kind of email
     Given "alice" holds the unsubscribe link from their progress report
     When the unsubscribe link is used without signing in
     Then "alice" has the email preference "reminders" on
 
-  @wip
   Scenario: An unsubscribe link from a reminder turns reminders off
     Given "alice" holds the unsubscribe link from their inactivity reminder
     When the unsubscribe link is used without signing in
@@ -37,7 +34,6 @@ Feature: Unsubscribe from an email kind with one click
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: Using an unsubscribe link again still succeeds
     Given "alice" holds the unsubscribe link from their progress report
     And the unsubscribe link has already been used
@@ -45,7 +41,6 @@ Feature: Unsubscribe from an email kind with one click
     Then the unsubscribe succeeds
     And "alice" has the email preference "progress_report" off
 
-  @wip
   Scenario: An old unsubscribe link still works after the kind was turned back on
     Given "alice" holds the unsubscribe link from a progress report sent 6 months ago
     And "alice" used it to turn progress reports off, then turned them back on in settings
@@ -54,14 +49,12 @@ Feature: Unsubscribe from an email kind with one click
 
   # ── Failures ───────────────────────────────────────────────────────────────
 
-  @wip
   Scenario: An altered unsubscribe token is refused and changes nothing
     Given "alice" holds the unsubscribe link from their progress report
     When the unsubscribe link is used with one character of its token changed
     Then the request is rejected as invalid
     And "alice" has the email preference "progress_report" on
 
-  @wip
   Scenario: An unsubscribe request without a token is refused
     When an unsubscribe request is sent with no token
     Then the request is rejected as invalid
