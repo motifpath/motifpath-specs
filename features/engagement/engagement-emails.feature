@@ -1,4 +1,4 @@
-Feature: Send students a weekly progress report and inactivity reminders, and the concierge a weekly summary
+Feature: Send students a weekly progress report and reminders, and the concierge a weekly summary
   As the MotifPath platform
   I want to remind students of their progress and nudge them kindly when they stop
   So that more of them come back within a week and keep learning past their first months
@@ -27,16 +27,24 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
   # current and best day streak, skills up and songs played. No email ever says a streak was
   # lost or broken (ADR-051).
   #
+  # Reminders: one switch, "reminders", covers two kinds. A daily reminder goes out on the 1st
+  # and the 2nd day without activity, so a student who hasn't been active yet that day is
+  # reminded in the evening. An inactivity reminder goes out on the 3rd day, and a second one on
+  # the 10th. The daily reminders stop once the inactivity reminders start, and nothing goes out
+  # after the 10th day, so a student who has stopped isn't emailed every day. A student gets at
+  # most one reminder a day.
+  #
   # Each email is sent at most once. A report is sent once per student per week. A reminder is
-  # sent once per student per day threshold within the same inactive spell. If the mailer can't
-  # run for a whole Monday, that week's report is skipped, not sent late.
+  # sent once per student per day of the same inactive spell. A reminder whose evening the
+  # mailer missed is skipped, not sent the next day. If the mailer can't run for a whole Monday,
+  # that week's report is skipped, not sent late.
   #
   # Emails are written in the student's locale: "pt_BR" in Portuguese (Brazil), and every other
   # locale in English.
   #
-  # PO thresholds (proposed): the report from Monday 09:00; reminders from 18:00 on the 3rd and
-  # the 10th day without activity; the concierge summary from Monday 08:00 in
-  # "America/Sao_Paulo".
+  # PO thresholds: the report from Monday 09:00; every reminder from 18:00, daily reminders on
+  # the 1st and the 2nd day without activity and inactivity reminders on the 3rd and the 10th;
+  # the concierge summary from Monday 08:00 in "America/Sao_Paulo".
 
   Background:
     Given the Core Domain Service is operational and ready to accept requests
@@ -132,6 +140,92 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice"'s progress report carries an unsubscribe link for progress reports
 
+  # ── Daily reminders ────────────────────────────────────────────────────────
+
+  @wip
+  Scenario: A student not yet active today gets a daily reminder that evening
+    Given "alice"'s last activity was on Sunday
+    And it is Monday 18:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "alice" is sent a daily reminder at "alice@example.com"
+
+  @wip
+  Scenario: No daily reminder before 18:00
+    Given "alice"'s last activity was on Sunday
+    And it is Monday 17:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "alice" is not sent a daily reminder
+
+  @wip
+  Scenario: A student already active today gets no daily reminder
+    Given "alice"'s last activity was on Monday at 12:00
+    And it is Monday 18:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "alice" is not sent a daily reminder
+
+  @wip
+  Scenario: A student with 2 days without activity gets a daily reminder
+    Given "alice"'s last activity was on Saturday
+    And it is Monday 18:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "alice" is sent a daily reminder
+    And "alice" is not sent an inactivity reminder
+
+  @wip
+  Scenario: The 3rd day gets an inactivity reminder instead of a daily one
+    Given "alice"'s last activity was on Friday
+    And it is Monday 18:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "alice" is sent an inactivity reminder
+    And "alice" is not sent a daily reminder
+
+  @wip
+  Scenario: No daily reminder between the 3rd and the 10th day
+    Given "alice"'s last activity was 5 days ago
+    And it is 18:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "alice" is not sent a daily reminder
+    And "alice" is not sent an inactivity reminder
+
+  @wip
+  Scenario: A student gets one daily reminder a day however often the mailer runs
+    Given "alice"'s last activity was on Sunday
+    And "alice" was sent a daily reminder at Monday 18:00 in "America/Sao_Paulo"
+    And it is Monday 19:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "alice" is not sent another daily reminder
+
+  @wip
+  Scenario: A student who turned reminders off gets no daily reminder
+    Given "alice" has the email preference "reminders" off
+    And "alice"'s last activity was on Sunday
+    And it is Monday 18:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "alice" is not sent a daily reminder
+
+  @wip
+  Scenario: A daily reminder is written in the student's locale
+    Given "alice" has locale "pt_BR"
+    And "alice"'s last activity was on Sunday
+    And it is Monday 18:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "alice"'s daily reminder is written in Portuguese (Brazil)
+
+  @wip
+  Scenario: A daily reminder doesn't mention a streak
+    Given "alice" had a day streak of 6 that ended on Sunday
+    And "alice"'s last activity was on Sunday
+    And it is Monday 18:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "alice"'s daily reminder doesn't mention a day streak
+
+  @wip
+  Scenario: A daily reminder offers a one-click unsubscribe from reminders
+    Given "alice"'s last activity was on Sunday
+    And it is Monday 18:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "alice"'s daily reminder carries an unsubscribe link for reminders
+
   # ── Inactivity reminders ───────────────────────────────────────────────────
 
   Scenario: A student with 3 days without activity gets a reminder that evening
@@ -153,12 +247,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is not sent an inactivity reminder
 
-  Scenario: A student with 2 days without activity gets no reminder
-    Given "alice"'s last activity was on Saturday
-    And it is Monday 18:00 in "America/Sao_Paulo"
-    When the engagement mailer runs
-    Then "alice" is not sent an inactivity reminder
-
   Scenario: A student still inactive on the 10th day gets a second reminder
     Given "alice"'s last activity was 10 days ago
     And "alice" was sent an inactivity reminder on the 3rd day
@@ -166,7 +254,7 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is sent a second inactivity reminder
 
-  Scenario: A student gets no third reminder in the same inactive spell
+  Scenario: A student gets no reminder after the 10th day of an inactive spell
     Given "alice"'s last activity was 20 days ago
     And "alice" was sent inactivity reminders on the 3rd and the 10th day
     And it is 18:00 in "America/Sao_Paulo"

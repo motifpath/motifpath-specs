@@ -12,6 +12,12 @@ part of the architecture must stay replaceable.
 > production share one account. So staging can't stay in the sandbox once production has
 > production access. Instead, staging's mail user may send only to an allow-list of recipients.
 > Each environment also gets its own sending subdomain. See decision 1.
+>
+> **2026-10-27 (amended):** the PO brought a daily reminder into this slice, by email. It goes out
+> on the first days without activity, before the inactivity reminders start, under the same
+> `reminders` preference. It sends no daily email to a student who has stopped. It reuses the
+> job, the stored time zone and the send claim unchanged. Push (MOT-177) can take the daily
+> reminder over later. See Consequences → Neutral.
 
 ---
 
@@ -21,7 +27,8 @@ MOT-35 tests whether emails sent by the platform raise 7-day return and reduce c
 to month 6. The first slice has three emails:
 
 - a **weekly progress report** to each student;
-- an **inactivity nudge** to a student who has stopped practising;
+- an **inactivity nudge** to a student who has stopped practising, and (amended 2026-10-27) a
+  **daily reminder** on the first days without activity;
 - a **weekly student summary** to the concierge, the team that coaches alpha students over
   WhatsApp (PB-78).
 
@@ -177,9 +184,10 @@ recorded here for review.
 - WhatsApp templates for nudges remain a possible later test. They would be a second
   `EmailSender`-like port, not a change to the trigger.
 - The settings page needs a design for the two preferences before any UI work.
-- A daily practice reminder at a time the student chooses is out of this slice (MOT-177). It will
-  go out by push, not email. It can reuse this job, the stored time zone, the per-kind
-  preferences and the send claim.
+- The daily reminder goes out by email, at a fixed local time, on the first days without
+  activity only (thresholds in the feature spec). A reminder at a time the student chooses, and
+  moving the daily reminder to push, stay with MOT-177. Email then keeps only the inactivity
+  reminders.
 
 ## Related ADRs
 

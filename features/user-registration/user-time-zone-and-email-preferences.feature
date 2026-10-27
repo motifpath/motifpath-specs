@@ -11,8 +11,9 @@ Feature: Set a user's time zone and email preferences
   # profile. The platform's emails then use "America/Sao_Paulo".
   #
   # Email preferences: one switch per kind of email a student can get, "progress_report" and
-  # "reminders". Both are on for every new user. The concierge's weekly summary goes to the
-  # team, not to the student, so it has no switch.
+  # "reminders" (the daily reminders and the inactivity reminders alike). Both are on for every
+  # new user. The concierge's weekly summary goes to the team, not to the student, so it has no
+  # switch.
 
   Background:
     Given the Core Domain Service is operational and ready to accept requests
