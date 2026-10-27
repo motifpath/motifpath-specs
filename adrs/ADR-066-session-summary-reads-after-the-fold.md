@@ -1,11 +1,12 @@
 # ADR-066: The session summary reads each subject's rung level once the session's end is folded
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-26
 **Deciders:** Gilson (Product Owner)
 **Input:** MOT-163 (the session summary shows each subject's level change and the next rung),
 Figma "Practice Shell — flows" 13h and 16b (D32). PO answers, 2026-10-26: wait for the fold; name
 the next rung only when the student reaches it.
+**Accepted:** 2026-10-27, by Gilson.
 
 ---
 
