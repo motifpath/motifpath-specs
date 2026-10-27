@@ -56,12 +56,13 @@ Feature: Show how a session moved the student on each of its subjects
     When "alice" reads the subject progress of session "s1" with "guitar" in hand, for "find-notes-root-strings" and "diatonic-chords"
     Then the subjects are "find-notes-root-strings" then "diatonic-chords"
 
-  Scenario: In the head, a rung's level is the best of the student's instruments
+  Scenario: In the head, a rung's level is over every instrument's items together, as its current rung is
     Given "find-notes-root-strings" is practised only by fretboard cells, recalled in the head
     And "alice" is accurate on every know item of "find-notes-root-strings" on guitar, and learning on electric-bass
     And the session "s1" of "alice" with no instrument in hand has its end recorded
     When "alice" reads the subject progress of session "s1" with no instrument in hand, for "find-notes-root-strings"
-    Then "find-notes-root-strings" is accurate at the know rung
+    Then "find-notes-root-strings" is learning at the know rung
+    And "find-notes-root-strings"'s current rung is know
 
   Scenario: Reading the progress changes nothing
     Given the session "s1" of "alice" with "guitar" in hand has its end recorded
