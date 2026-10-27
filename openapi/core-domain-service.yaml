@@ -6435,8 +6435,9 @@ paths:
         For the session summary: each subject's current rung and the student's level on every
         rung of it with material for the session, read now, and whether the session is caught
         up. Levels are rolled up as in the plan's rung_level: over the items of the subject's
-        part_of subtree at that rung that suit the session, with the instrument in hand, or in
-        the head the best of the student's instruments.
+        part_of subtree at that rung that suit the session: with the instrument in hand, or in
+        the head every instrument's items together, as the current rung and the composer take
+        them.
 
         caught_up is true once the Aggregation Worker has recorded the session's
         practice.session_ended. A student's events are folded in order, and an answer is folded
