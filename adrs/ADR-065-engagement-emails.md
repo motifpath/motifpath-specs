@@ -18,6 +18,10 @@ part of the architecture must stay replaceable.
 > `reminders` preference. It sends no daily email to a student who has stopped. It reuses the
 > job, the stored time zone and the send claim unchanged. Push (MOT-177) can take the daily
 > reminder over later. See Consequences → Neutral.
+>
+> **2026-10-27 (amended again):** the student emails go to anyone who is learning, whatever their
+> role. A teacher or an admin who has started a course or a path gets them too, and every role
+> has the email settings. "Students" in decision 3 means these learners.
 
 ---
 
