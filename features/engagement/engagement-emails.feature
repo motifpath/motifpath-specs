@@ -48,14 +48,12 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
 
   # ── Weekly progress report ─────────────────────────────────────────────────
 
-  @wip
   Scenario: A student who learned last week gets a progress report on Monday morning
     Given "alice" practised on 4 days of the week that ended on Sunday
     And it is Monday 09:00 in "America/Sao_Paulo"
     When the engagement mailer runs
     Then "alice" is sent a progress report at "alice@example.com"
 
-  @wip
   Scenario: The progress report shows the week's figures
     Given "alice" practised on 4 days of the week that ended on Sunday, for 75 minutes in all
     And "alice" practised for 50 minutes the week before
@@ -65,7 +63,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     Then "alice"'s progress report shows 4 practice days and 75 minutes, up from 50
     And "alice"'s progress report shows a current day streak of 2 and a best of 6
 
-  @wip
   Scenario: A progress report with no current streak invites the student to start one
     Given "alice" practised on 2 days of the week that ended on Sunday, but not on Saturday or Sunday
     And "alice"'s best day streak is 6
@@ -74,7 +71,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     Then "alice"'s progress report invites them to start a day streak and shows their best of 6
     And "alice"'s progress report doesn't say a streak was lost or broken
 
-  @wip
   Scenario: The progress report arrives on Monday morning in the student's own time zone
     Given "alice"'s time zone is "Europe/Lisbon"
     And "alice" practised on 3 days of the week that ended on Sunday
@@ -83,7 +79,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     Then "alice" is not sent a progress report
     And at Monday 09:00 in "Europe/Lisbon" the next run sends "alice" a progress report
 
-  @wip
   Scenario: A student with no time zone gets the progress report on Monday morning in São Paulo
     Given "alice" has no time zone set
     And "alice" practised on 3 days of the week that ended on Sunday
@@ -91,7 +86,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is sent a progress report
 
-  @wip
   Scenario: A student gets one progress report per week however often the mailer runs
     Given "alice" practised on 3 days of the week that ended on Sunday
     And "alice" was sent a progress report at Monday 09:00 in "America/Sao_Paulo"
@@ -99,21 +93,18 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is not sent another progress report
 
-  @wip
   Scenario: A week with nothing to show gets no progress report
     Given "alice" started no practice session, completed no lesson and played no song in the week that ended on Sunday
     And it is Monday 09:00 in "America/Sao_Paulo"
     When the engagement mailer runs
     Then "alice" is not sent a progress report
 
-  @wip
   Scenario: A week with only a completed lesson still gets a progress report
     Given "alice" completed a lesson on Wednesday of the week that ended on Sunday and didn't practise
     And it is Monday 09:00 in "America/Sao_Paulo"
     When the engagement mailer runs
     Then "alice" is sent a progress report
 
-  @wip
   Scenario: A student who turned progress reports off gets none
     Given "alice" has the email preference "progress_report" off
     And "alice" practised on 3 days of the week that ended on Sunday
@@ -121,7 +112,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is not sent a progress report
 
-  @wip
   Scenario: A week whose Monday the mailer missed gets no late report
     Given "alice" practised on 3 days of the week that ended on Sunday
     And the engagement mailer didn't run on Monday
@@ -129,7 +119,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is not sent a progress report
 
-  @wip
   Scenario: A progress report is written in the student's locale
     Given "alice" has locale "pt_BR"
     And "alice" practised on 3 days of the week that ended on Sunday
@@ -137,7 +126,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice"'s progress report is written in Portuguese (Brazil)
 
-  @wip
   Scenario: A progress report offers a one-click unsubscribe from progress reports
     Given "alice" practised on 3 days of the week that ended on Sunday
     And it is Monday 09:00 in "America/Sao_Paulo"
@@ -146,21 +134,18 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
 
   # ── Inactivity reminders ───────────────────────────────────────────────────
 
-  @wip
   Scenario: A student with 3 days without activity gets a reminder that evening
     Given "alice"'s last activity was on Friday
     And it is Monday 18:00 in "America/Sao_Paulo"
     When the engagement mailer runs
     Then "alice" is sent an inactivity reminder at "alice@example.com"
 
-  @wip
   Scenario: No reminder before 18:00 on the 3rd day
     Given "alice"'s last activity was on Friday
     And it is Monday 17:00 in "America/Sao_Paulo"
     When the engagement mailer runs
     Then "alice" is not sent an inactivity reminder
 
-  @wip
   Scenario: Using a song chart counts as activity
     Given "alice"'s last practice session was on Friday
     And "alice" opened a song chart on Sunday
@@ -168,14 +153,12 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is not sent an inactivity reminder
 
-  @wip
   Scenario: A student with 2 days without activity gets no reminder
     Given "alice"'s last activity was on Saturday
     And it is Monday 18:00 in "America/Sao_Paulo"
     When the engagement mailer runs
     Then "alice" is not sent an inactivity reminder
 
-  @wip
   Scenario: A student still inactive on the 10th day gets a second reminder
     Given "alice"'s last activity was 10 days ago
     And "alice" was sent an inactivity reminder on the 3rd day
@@ -183,7 +166,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is sent a second inactivity reminder
 
-  @wip
   Scenario: A student gets no third reminder in the same inactive spell
     Given "alice"'s last activity was 20 days ago
     And "alice" was sent inactivity reminders on the 3rd and the 10th day
@@ -191,7 +173,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is not sent an inactivity reminder
 
-  @wip
   Scenario: A student who comes back starts a new spell and can be reminded again
     Given "alice" was sent inactivity reminders on the 3rd and the 10th day of an earlier spell
     And "alice" practised 3 days ago and had no activity since
@@ -199,7 +180,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is sent an inactivity reminder
 
-  @wip
   Scenario: A student gets one reminder per threshold however often the mailer runs
     Given "alice"'s last activity was on Friday
     And "alice" was sent an inactivity reminder at Monday 18:00 in "America/Sao_Paulo"
@@ -207,7 +187,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is not sent another inactivity reminder
 
-  @wip
   Scenario: A student who has finished their courses is still reminded
     Given "alice"'s only course enrolment is completed
     And "alice"'s last activity was on Friday
@@ -215,7 +194,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is sent an inactivity reminder
 
-  @wip
   Scenario: A student who has never started a course or a path gets no reminder
     Given "bruno" has already registered as a student
     And "bruno" has never started a course or a path
@@ -224,7 +202,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "bruno" is not sent an inactivity reminder
 
-  @wip
   Scenario: A student who turned reminders off gets none
     Given "alice" has the email preference "reminders" off
     And "alice"'s last activity was on Friday
@@ -232,7 +209,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice" is not sent an inactivity reminder
 
-  @wip
   Scenario: A reminder doesn't mention a streak
     Given "alice" had a day streak of 6 that ended on Friday
     And "alice"'s last activity was on Friday
@@ -240,7 +216,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "alice"'s inactivity reminder doesn't mention a day streak
 
-  @wip
   Scenario: A reminder offers a one-click unsubscribe from reminders
     Given "alice"'s last activity was on Friday
     And it is Monday 18:00 in "America/Sao_Paulo"
@@ -249,7 +224,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
 
   # ── Students the mailer can't reach ────────────────────────────────────────
 
-  @wip
   Scenario: A student with no email address on record gets no email
     Given "carla" registered as a student before email addresses were stored and hasn't signed in since
     And "carla" is enrolled in the course "fingerstyle-journey"
@@ -258,7 +232,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then "carla" is not sent an inactivity reminder
 
-  @wip
   Scenario: Only students get engagement emails
     Given "bob" has already registered as a teacher
     And "bob"'s email address is "bob@example.com"
@@ -268,14 +241,12 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
 
   # ── Weekly summary for the concierge ───────────────────────────────────────
 
-  @wip
   Scenario: The concierge gets a weekly summary on Monday morning
     Given the concierge's email address is "concierge@motifpath.com"
     And it is Monday 08:00 in "America/Sao_Paulo"
     When the engagement mailer runs
     Then a student summary is sent to "concierge@motifpath.com"
 
-  @wip
   Scenario: The concierge summary has a row for each student who has started learning
     Given the concierge's email address is "concierge@motifpath.com"
     And "alice" practised on 4 days of the week that ended on Sunday, for 75 minutes in all
@@ -284,7 +255,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then the student summary's row for "alice" shows their name, 4 practice days, 75 minutes and their last activity on Sunday
 
-  @wip
   Scenario: The concierge summary lists the students inactive longest first
     Given the concierge's email address is "concierge@motifpath.com"
     And "alice"'s last activity was 1 day ago
@@ -293,7 +263,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then the student summary lists "dani" before "alice"
 
-  @wip
   Scenario: The concierge summary includes students who turned their own emails off
     Given the concierge's email address is "concierge@motifpath.com"
     And "alice" has the email preferences "progress_report" off and "reminders" off
@@ -301,7 +270,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then the student summary has a row for "alice"
 
-  @wip
   Scenario: The concierge gets one summary per week
     Given the concierge's email address is "concierge@motifpath.com"
     And a student summary was sent at Monday 08:00 in "America/Sao_Paulo"
@@ -309,7 +277,6 @@ Feature: Send students a weekly progress report and inactivity reminders, and th
     When the engagement mailer runs
     Then no other student summary is sent
 
-  @wip
   Scenario: No concierge summary is sent when no concierge address is configured
     Given no concierge email address is configured
     And it is Monday 08:00 in "America/Sao_Paulo"
