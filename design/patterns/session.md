@@ -71,8 +71,15 @@ like the same product.
   summary follows instead, with no card. Exercises and fretboard cells move on as before: they are
   short, and their title names the change.
 - **Summary:** what the run did — minutes, instrument, items — then one result per subject: its
-  score, the level change on the rung practised and the next rung ("Know it: Learning → Accurate
-  · next: Hear it") (D32). In Today's mix, one line sums up the review block, and each item with
+  score and the level change on the rung practised (D32, ADR-066):
+  - reached accurate or better from below: "Know it: Learning → Accurate · next: Hear it", where
+    next is the subject's current rung now; no next on its top rung;
+  - unchanged: "Know it: Accurate · steady";
+  - otherwise (moved without reaching it, or fell): "Hear it: New → Learning".
+
+  The before is the plan's rung and rung level. The after is read once the session is caught up
+  (its end folded), again every second for up to 5 s. Until then the score shows and the line
+  waits in place; if it doesn't catch up, the line names the rungs practised instead. In Today's mix, one line sums up the review block, and each item with
   its result ("up to 76 BPM · Clean", "6 of 8 right", "Not quite") moves behind **Every item
   (n)**. A chosen session has one subject, so its items stay listed under it. Then the This week
   tiles of ADR-051. The

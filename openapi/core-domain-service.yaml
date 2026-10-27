@@ -6427,6 +6427,85 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+  /students/me/practice-sessions/{practice_session_id}/subject-progress:
+    get:
+      operationId: getPracticeSessionSubjectProgress
+      summary: Read where the authenticated student stands on a session's subjects, and whether the session is folded
+      description: |
+        For the session summary: each subject's current rung and the student's level on every
+        rung of it with material for the session, read now, and whether the session is caught
+        up. Levels are rolled up as in the plan's rung_level: over the items of the subject's
+        part_of subtree at that rung that suit the session, with the instrument in hand, or in
+        the head the best of the student's instruments.
+
+        caught_up is true once the Aggregation Worker has recorded the session's
+        practice.session_ended. A student's events are folded in order, and an answer is folded
+        before it is recorded in its session, so from then on the levels include every answer
+        that arrived before the end. Until then they may not, and the client reads again.
+        A session that isn't the student's, or isn't known, is never caught up.
+
+        Derived from the student's evidence; reading it changes nothing.
+
+        Any authenticated user may read their own sessions.
+      tags:
+        - Practice
+      parameters:
+        - name: practice_session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The session, as composed by createPracticeSessionPlan.
+        - name: instrument_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: |
+            The instrument the session was practised with. Absent means a session in the head.
+        - name: node_id
+          in: query
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 3
+            items:
+              type: string
+              format: uuid
+          description: The session's subjects, the plan's focus_nodes, in order.
+      responses:
+        "200":
+          description: The subjects' rung levels now, in the order asked, and whether the session is caught up.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeSessionSubjectProgress'
+        "400":
+          description: |
+            practice_session_id, instrument_id or a node_id is not a valid uuid, or there is no
+            node_id or more than three.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No instrument exists with the given instrument_id, or no knowledge node with a given node_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /students/me/practice-subjects:
     get:
       operationId: listPracticeSubjects
@@ -13529,7 +13608,14 @@ components:
 
     PracticeFocusNode:
       type: object
-      description: One subject of a practice session.
+      description: |
+        One subject of a practice session, with where the student stood on it when the session
+        was composed: rung is its current rung for the session (the lowest rung with material
+        for the session whose items are not yet accurate; with every rung accurate, the top
+        one), and rung_level the student's level on it, the highest level at least 80% of the
+        subtree's items at that rung that suit the session reach. The session summary compares
+        rung_level with the level read from getPracticeSessionSubjectProgress once the session
+        is caught up.
       properties:
         node_id:
           type: string
@@ -13537,10 +13623,75 @@ components:
           description: The knowledge node practised.
         names:
           $ref: '#/components/schemas/LocalizedNames'
+        rung:
+          $ref: './components/schemas/practice.yaml#/PracticeRung'
+        rung_level:
+          $ref: './components/schemas/practice.yaml#/KnowledgeLevel'
       additionalProperties: false
       required:
         - node_id
         - names
+        - rung
+        - rung_level
+
+    PracticeSessionSubjectProgress:
+      type: object
+      description: Where the student stands on a session's subjects now, for its summary.
+      properties:
+        caught_up:
+          type: boolean
+          description: |
+            True once the session's end has been folded, so the levels include its answers.
+        subjects:
+          type: array
+          minItems: 1
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/PracticeSubjectProgress'
+          description: One per node_id asked, in the same order.
+      additionalProperties: false
+      required:
+        - caught_up
+        - subjects
+
+    PracticeSubjectProgress:
+      type: object
+      description: One subject's rungs, read now.
+      properties:
+        node_id:
+          type: string
+          format: uuid
+          description: The knowledge node.
+        current_rung:
+          oneOf:
+            - $ref: './components/schemas/practice.yaml#/PracticeRung'
+            - type: 'null'
+          description: |
+            Its current rung now, as in the plan's rung. Null when it has no material for the
+            session any more.
+        rungs:
+          type: array
+          items:
+            $ref: '#/components/schemas/PracticeRungLevel'
+          description: Every rung with material for the session, lowest first.
+      additionalProperties: false
+      required:
+        - node_id
+        - current_rung
+        - rungs
+
+    PracticeRungLevel:
+      type: object
+      description: The student's level on one rung of a subject.
+      properties:
+        rung:
+          $ref: './components/schemas/practice.yaml#/PracticeRung'
+        level:
+          $ref: './components/schemas/practice.yaml#/KnowledgeLevel'
+      additionalProperties: false
+      required:
+        - rung
+        - level
 
     PracticeSubjectList:
       type: object
