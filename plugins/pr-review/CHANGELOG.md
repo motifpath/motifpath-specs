@@ -1,5 +1,15 @@
 # PR Review — Changelog
 
+## [1.17.0] — 2026-10-27
+
+### Changed
+- `HEURISTICS.md` item 7 (absence, transition, and interruption) now also covers steps that can't
+  be undone: is such a step reported as failed only when the other side is known not to have done
+  it, and does the clean-up after a failure still run when the work was cancelled? From the review
+  of motifpath-core#189, where a failed SMTP `QUIT` after the server accepted the message released
+  the send's claim and resent the email, and a claim released on the pass's cancelled context
+  failed, so that email was never sent (fixed in motifpath-core#191).
+
 ## [1.16.0] — 2026-10-16
 
 ### Changed

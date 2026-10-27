@@ -87,15 +87,20 @@ plus the five always-on items.
    trips with no limit.
 
 7. **Absence, transition, and interruption.** Every state has to be right when inputs are missing,
-   when the system is half-migrated, and when a process ends any way other than success. Is empty
-   "not set yet" or a deliberate value ("every", "no limit"), and does a default tell them apart?
-   What holds during rollout (unmigrated rows, unreprocessed events, older clients in flight)? Does
-   an in-progress state (playing, loading, connected) clear on every way it can end — failure,
-   outside interruption, the owner moving on — or only on success? Does a test pin the exact
+   when the system is half-migrated, and when a process ends any way other than success, including
+   after a step that can't be undone. Is empty "not set yet" or a deliberate value ("every", "no
+   limit"), and does a default tell them apart? What holds during rollout (unmigrated rows,
+   unreprocessed events, older clients in flight)? Does an in-progress state (playing, loading,
+   connected) clear on every way it can end — failure, outside interruption, the owner moving on —
+   or only on success? When a step can't be undone (a message sent, a payment taken), is it
+   reported as failed only when the other side is known not to have done it, and does the clean-up
+   after a failure still run when the work itself was cancelled? Does a test pin the exact
    contents of a source that grows on its own schedule (another repo, a shared catalog, an external
    API), so its next addition breaks unrelated changes? — *Smell:* only the happy path covered; a
    default applied to a value someone set on purpose; a "started" flag cleared by one success
-   event; an exact count asserted on data someone else keeps growing.
+   event; an error after the point of no return treated as "not done"; clean-up run on the same
+   cancelled context it cleans up after; an exact count asserted on data someone else keeps
+   growing.
 
 8. **Normalization changes identity.** Transforming a value (shortening, hashing, converting a unit
    or scale) changes what counts as equal. What guaranteed uniqueness before, and what guarantees it
