@@ -1,4 +1,3 @@
-@wip
 Feature: Show how a session moved the student on each of its subjects
   As a student
   I want the session summary to show my level change on the rung I practised, and the next rung once I reach it
