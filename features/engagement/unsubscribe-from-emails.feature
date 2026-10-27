@@ -60,6 +60,10 @@ Feature: Unsubscribe from an email kind with one click
     Then the request is rejected as invalid
 
   # ── The web confirms the change ────────────────────────────────────────────
+  #
+  # The footer link opens a public page, which needs no sign-in. Its link to the email
+  # settings opens the app, signing in first if needed, with the account menu open on its
+  # email settings.
 
   @web
   Scenario: Opening the footer link shows which emails stopped and links to the settings

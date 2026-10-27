@@ -120,3 +120,47 @@ Feature: Set a user's time zone and email preferences
     And "alice"'s browser is in time zone "America/Sao_Paulo"
     When "alice" opens the app
     Then the web sends no time zone update
+
+  # ── The web's email settings ───────────────────────────────────────────────
+  #
+  # The account menu has an "Emails" row, shown to students only, since only students get
+  # the platform's emails. It opens a view with one switch per preference, the way the
+  # Language row opens the language list. A switch saves as soon as it is flipped. The row's
+  # value says which emails are on: "On" (both), "Off" (neither), or the one kind that is on.
+
+  @web
+  Scenario: A student turns progress reports off from the account menu
+    Given "alice" has already registered as a student
+    When "alice" opens the account menu's email settings
+    And "alice" switches off the weekly progress report
+    Then the web turns the email preference "progress_report" off
+    And the reminders switch is still on
+
+  @web
+  Scenario: The Emails row says which emails a student gets
+    Given "alice" has already registered as a student
+    And "alice" has the email preference "reminders" off
+    When "alice" opens the account menu
+    Then the Emails row says only progress reports are on
+
+  @web
+  Scenario: A switch that couldn't be saved goes back and says so
+    Given "alice" has already registered as a student
+    And the profile update will fail
+    When "alice" opens the account menu's email settings
+    And "alice" switches off the weekly progress report
+    Then the progress report switch is on again
+    And the web says the change wasn't saved
+
+  @web
+  Scenario: A teacher's account menu has no email settings
+    Given "bob" has already registered as a teacher
+    When "bob" opens the account menu
+    Then the account menu has no Emails row
+
+  @web
+  Scenario: The email settings link opens the account menu on the email settings
+    Given "alice" has already registered as a student
+    When "alice" opens the app through the email settings link
+    Then the account menu opens on its email settings
+    And the address of the page no longer asks for the email settings
