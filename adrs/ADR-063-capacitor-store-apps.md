@@ -82,8 +82,17 @@ installable PWA (MOT-91) stays planned but is no longer a prerequisite. In the a
 
 ### 3. Audio plays through the silent switch
 
-At launch the iOS app sets the audio session category to `playback`, so practice sound is heard
+Inside the iOS app, the page declares its sound as playback (`navigator.audioSession.type =
+'playback'`, WebKit's Audio Session API) before any sound plays. Practice sound is then heard
 with the silent switch on. This is the "audio session" port ADR-049 §9 anticipated.
+
+Setting the native audio session category to `playback` at launch is not enough on its own. The
+WebView sets the session itself from what the page plays. It treats Web Audio alone as ambient
+sound, which the silent switch mutes, and that overrides the app's category. The iPhone test
+confirmed this: with only the native category set, the speaker stayed muted. The native category
+stays as a launch default.
+
+In a mobile browser the site does not declare playback: there, the silent switch still mutes it.
 
 ### 4. Release builds
 
