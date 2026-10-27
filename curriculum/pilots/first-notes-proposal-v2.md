@@ -2,8 +2,9 @@
 
 **MOT-160 · Plan · 2026-10-18 · awaiting PO draft/diagram review.** Supersedes the
 v1 guitar-only application and generated-audio requirements in first-notes.md.
-Source revision: 98905d4. No full lesson, deck, video or audio production authorized
-by this proposal. The older files are retained as historical drafts, not current assets.
+Historical source revision: 98905d4. No full lesson, deck, video or audio production
+is authorized by this proposal. Superseded production files are excluded from this
+PR; the earlier experiment remains recoverable in Git history at that revision.
 
 ## Working agreement for future iterations
 
