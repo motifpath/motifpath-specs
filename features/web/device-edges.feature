@@ -4,7 +4,7 @@
 # last row) that pads by the device's inset: the status bar, the notch or Dynamic Island, the home
 # indicator, Android's gesture bar, and the sides of a phone in landscape. No control sits inside
 # an inset. Android's back closes the top layer first, like the browser's Back. The store apps
-# launch on a splash that stays until the first screen can render.
+# launch on a splash that stays until sign-in and the student's account are known.
 #
 # Pattern: design/patterns/device-edges.md.
 # Designs: Figma "MotifPath — Experience Language", page "Device edges — MOT-174".
@@ -88,12 +88,12 @@ Feature: Keep every control clear of the device's edges
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
-  Scenario: A slow first screen gives way to its loading state
-    Given the first screen's data takes longer than 10 seconds to load
+  Scenario: A slow sign-in gives way to the loading state
+    Given signing "alice" in takes longer than 10 seconds
     When "alice" launches the app
     Then after 10 seconds the splash gives way to Home's loading state
 
-  Scenario: The first screen fails to load
-    Given the first screen's data fails to load
+  Scenario: The account fails to load
+    Given "alice"'s account fails to load
     When "alice" launches the app
-    Then the splash gives way to Home's error state, with a way to try again
+    Then the splash gives way to the screen that says so, with a way to try again
