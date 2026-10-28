@@ -21,7 +21,7 @@ student can go.
 - **The container follows the size class, never the content:**
   - Compact (< 600 px): a bottom navigation bar. Every item shows its icon and its label; the
     current one gets an indicator pill behind the icon and a bolder label. Touch targets are at
-    least 48 px, and the bar sits above the home-indicator safe area.
+    least 48 px, and the bar sits above the home indicator (`device-edges.md`).
   - Medium (600–839 px): a navigation rail on the left, with the same items.
   - Expanded (≥ 840 px): a sidebar with icon and label rows.
 - **Account and settings** sit behind the avatar (MOT-60, D1–D4):

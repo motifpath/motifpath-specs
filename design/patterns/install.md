@@ -78,8 +78,7 @@ to come at the right moment and fit the phone.
   states as the website (`states.md`).
 - **Updates:** a new version applies the next time the app is launched. Never reload during a run,
   and no "update available" prompt.
-- **Safe areas:** `viewport-fit=cover`; bars pad with `env(safe-area-inset-*)` (`session.md` already
-  does it for the action bar).
+- **Safe areas, status bar and Back:** `device-edges.md`, the same as in the store apps.
 
 ### Size classes
 
