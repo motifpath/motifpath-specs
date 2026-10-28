@@ -63,9 +63,12 @@ plus the five always-on items.
    new kind are picked up by readers that never expected them? Does new code assume something
    ("one current row per key," "rows here are live") that another flow (update, archive,
    re-versioning) quietly breaks? Does it create a dependency across a boundary the architecture
-   keeps separate? — *Smell:* "just optimized," "just swapped a parameter," "just added more
-   reference data," with no map of who depends on it; a new discriminator only the new code path
-   filters on; a read by parent id with no filter for children a lifecycle elsewhere superseded.
+   keeps separate? When a container takes space for itself (padding, an inset, a bar), does
+   anything inside it still size itself to the whole outer area, or set aside the same space
+   again? — *Smell:* "just optimized," "just swapped a parameter," "just added more reference
+   data," with no map of who depends on it; a new discriminator only the new code path filters on;
+   a read by parent id with no filter for children a lifecycle elsewhere superseded; a wrapper
+   that gains padding while what it holds keeps a size taken from the screen or window.
 
 23. **A pointer into a collection someone else can change.** State that refers to an item must
     survive the collection changing under it. Does a selection, cursor, focus, "current" item, or

@@ -1,5 +1,16 @@
 # PR Review — Changelog
 
+## [1.18.0] — 2026-10-28
+
+### Changed
+- `HEURISTICS.md` item 4 (second-order effects on shared invariants) now also asks about space a
+  container takes for itself: when it gains padding, an inset or a bar, does anything inside still
+  size itself to the whole outer area, or set aside the same space again? From the review of
+  motifpath-web#195, where layouts gained safe-area padding while the landing column kept a
+  screen-height minimum, full-screen pickers and a fitted lesson kept screen-height panels, and a
+  lesson's bar and a reader's foot padded for the home indicator a second time.
+- `SKILL.md`'s `version` caught up with `plugin.json` (it still said 1.16.0).
+
 ## [1.17.0] — 2026-10-27
 
 ### Changed
