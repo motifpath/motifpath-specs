@@ -142,28 +142,24 @@ Feature: Send students a weekly progress report and reminders, and the concierge
 
   # ── Daily reminders ────────────────────────────────────────────────────────
 
-  @wip
   Scenario: A student not yet active today gets a daily reminder that evening
     Given "alice"'s last activity was on Sunday
     And it is Monday 18:00 in "America/Sao_Paulo"
     When the engagement mailer runs
     Then "alice" is sent a daily reminder at "alice@example.com"
 
-  @wip
   Scenario: No daily reminder before 18:00
     Given "alice"'s last activity was on Sunday
     And it is Monday 17:00 in "America/Sao_Paulo"
     When the engagement mailer runs
     Then "alice" is not sent a daily reminder
 
-  @wip
   Scenario: A student already active today gets no daily reminder
     Given "alice"'s last activity was on Monday at 12:00
     And it is Monday 18:00 in "America/Sao_Paulo"
     When the engagement mailer runs
     Then "alice" is not sent a daily reminder
 
-  @wip
   Scenario: A student with 2 days without activity gets a daily reminder
     Given "alice"'s last activity was on Saturday
     And it is Monday 18:00 in "America/Sao_Paulo"
@@ -171,7 +167,6 @@ Feature: Send students a weekly progress report and reminders, and the concierge
     Then "alice" is sent a daily reminder
     And "alice" is not sent an inactivity reminder
 
-  @wip
   Scenario: The 3rd day gets an inactivity reminder instead of a daily one
     Given "alice"'s last activity was on Friday
     And it is Monday 18:00 in "America/Sao_Paulo"
@@ -179,7 +174,6 @@ Feature: Send students a weekly progress report and reminders, and the concierge
     Then "alice" is sent an inactivity reminder
     And "alice" is not sent a daily reminder
 
-  @wip
   Scenario: No daily reminder between the 3rd and the 10th day
     Given "alice"'s last activity was 5 days ago
     And it is 18:00 in "America/Sao_Paulo"
@@ -187,7 +181,6 @@ Feature: Send students a weekly progress report and reminders, and the concierge
     Then "alice" is not sent a daily reminder
     And "alice" is not sent an inactivity reminder
 
-  @wip
   Scenario: A student gets one daily reminder a day however often the mailer runs
     Given "alice"'s last activity was on Sunday
     And "alice" was sent a daily reminder at Monday 18:00 in "America/Sao_Paulo"
@@ -195,7 +188,6 @@ Feature: Send students a weekly progress report and reminders, and the concierge
     When the engagement mailer runs
     Then "alice" is not sent another daily reminder
 
-  @wip
   Scenario: A student who turned reminders off gets no daily reminder
     Given "alice" has the email preference "reminders" off
     And "alice"'s last activity was on Sunday
@@ -203,7 +195,6 @@ Feature: Send students a weekly progress report and reminders, and the concierge
     When the engagement mailer runs
     Then "alice" is not sent a daily reminder
 
-  @wip
   Scenario: A daily reminder is written in the student's locale
     Given "alice" has locale "pt_BR"
     And "alice"'s last activity was on Sunday
@@ -211,7 +202,6 @@ Feature: Send students a weekly progress report and reminders, and the concierge
     When the engagement mailer runs
     Then "alice"'s daily reminder is written in Portuguese (Brazil)
 
-  @wip
   Scenario: A daily reminder doesn't mention a streak
     Given "alice" had a day streak of 6 that ended on Sunday
     And "alice"'s last activity was on Sunday
@@ -219,7 +209,6 @@ Feature: Send students a weekly progress report and reminders, and the concierge
     When the engagement mailer runs
     Then "alice"'s daily reminder doesn't mention a day streak
 
-  @wip
   Scenario: A daily reminder offers a one-click unsubscribe from reminders
     Given "alice"'s last activity was on Sunday
     And it is Monday 18:00 in "America/Sao_Paulo"
