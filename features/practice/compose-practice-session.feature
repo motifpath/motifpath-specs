@@ -158,7 +158,6 @@ Feature: Compose a practice session
   # picked only when it is available in the student's locale or tagged "any". Generated drills
   # and play-alongs are shown in the student's locale, so the rule doesn't affect them.
 
-  @wip
   Scenario: Only exercises in the student's language are picked
     Given "alice" has locale "pt_BR"
     And "alice"'s path skill "chord-tones" has the exercise "name-the-third" in English only
@@ -167,7 +166,6 @@ Feature: Compose a practice session
     Then the session includes "nomeie-a-terca" with the reason new
     And "name-the-third" is not in the session
 
-  @wip
   Scenario: An exercise for any language is picked whatever the student's locale
     Given "alice" has locale "pt_BR"
     And "alice"'s path skill "chord-tones" has the exercise "hear-the-third" for any language
@@ -175,7 +173,6 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the session includes "hear-the-third" with the reason new
 
-  @wip
   Scenario: A due exercise not in the student's language is not reviewed
     Given "alice"'s path skill "chord-tones" has the exercise "name-the-third" in English only
     And the review of "name-the-third" is due for "alice"
