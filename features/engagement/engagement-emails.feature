@@ -318,7 +318,6 @@ Feature: Send students a weekly progress report and reminders, and the concierge
     When the engagement mailer runs
     Then "bob" is not sent any email
 
-  @wip
   Scenario: A teacher who has started learning gets the same emails as a student
     Given "bob" has already registered as a teacher
     And "bob"'s email address is "bob@example.com"
@@ -328,7 +327,6 @@ Feature: Send students a weekly progress report and reminders, and the concierge
     When the engagement mailer runs
     Then "bob" is sent an inactivity reminder at "bob@example.com"
 
-  @wip
   Scenario: An admin who has started learning gets the same emails as a student
     Given "marina" has already registered as an admin
     And "marina"'s email address is "marina@example.com"
@@ -354,7 +352,6 @@ Feature: Send students a weekly progress report and reminders, and the concierge
     When the engagement mailer runs
     Then the student summary's row for "alice" shows their name, 4 practice days, 75 minutes and their last activity on Sunday
 
-  @wip
   Scenario: The concierge summary includes a teacher who has started learning
     Given the concierge's email address is "concierge@motifpath.com"
     And "bob" has already registered as a teacher
