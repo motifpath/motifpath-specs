@@ -66,9 +66,11 @@ control they can't hit is worse than a control they can't see.
 - **Splash:** `Brand/Mark` centred on the surface colour, in the device's appearance (light or
   dark). It has no wordmark: Android 12 and later draw only the icon on their launch screen, so
   both platforms match. The installed PWA keeps its own launch screen (`install.md`, screen 3f).
-- **The splash stays until the first screen can render** (sign-in is known and the first data has
-  loaded or failed). The student never sees a blank page. If that takes longer than 10 s, the
-  splash gives way to the screen's own loading state (`states.md`).
+- **The splash stays until the first screen can render**: sign-in is known and, for a signed-in
+  student, so is their account (or that it failed to load). The student never sees a blank page.
+  The screen's own data then loads in place, with its loading and error states (`states.md`). If
+  sign-in or the account takes longer than 10 s, the splash gives way to the screen's loading
+  state.
 
 ## Do not
 
