@@ -124,9 +124,9 @@ Feature: Set a user's time zone and email preferences
 
   # ── The web's email settings ───────────────────────────────────────────────
   #
-  # The account menu has an "Emails" row, shown to students only, since only students get
-  # the platform's emails. It opens a view with one switch per preference, the way the
-  # Language row opens the language list. A switch saves as soon as it is flipped. The row's
+  # The account menu has an "Emails" row for every role: teachers and admins learn too, and
+  # get the same emails once they have started a course or a path. It opens a view with one
+  # switch per preference, the way the Language row opens the language list. A switch saves as soon as it is flipped. The row's
   # value says which emails are on: "On" (both), "Off" (neither), or the one kind that is on.
 
   @web
@@ -154,10 +154,10 @@ Feature: Set a user's time zone and email preferences
     And the web says the change wasn't saved
 
   @web
-  Scenario: A teacher's account menu has no email settings
+  Scenario: A teacher's account menu has the email settings too
     Given "bob" has already registered as a teacher
     When "bob" opens the account menu
-    Then the account menu has no Emails row
+    Then the account menu has an Emails row
 
   @web
   Scenario: The email settings link opens the account menu on the email settings

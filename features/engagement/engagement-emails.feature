@@ -7,9 +7,11 @@ Feature: Send students a weekly progress report and reminders, and the concierge
   # the rules below, in the student's own time zone. A student with no time zone set is taken
   # to be in "America/Sao_Paulo".
   #
-  # Who can get a student email: a student who has started a course or a path (a course
-  # enrolment or a standalone path, active or not) and whose user record holds an email
-  # address. A student who has never started anything is in the first run, and gets no email.
+  # Who can get a student email: anyone who is learning, whatever their role. Teachers and
+  # admins learn too, so "student" in these rules means any user, of any role, who has started
+  # a course or a path (a course enrolment or a standalone path, active or not) and whose user
+  # record holds an email address. A user who has never started anything is in the first run,
+  # or only authors, and gets no email.
   # Each kind also needs its email preference on: "progress_report" for the report,
   # "reminders" for a reminder.
   #
@@ -309,12 +311,32 @@ Feature: Send students a weekly progress report and reminders, and the concierge
     When the engagement mailer runs
     Then "carla" is not sent an inactivity reminder
 
-  Scenario: Only students get engagement emails
+  Scenario: A teacher who has never started learning gets no engagement email
     Given "bob" has already registered as a teacher
     And "bob"'s email address is "bob@example.com"
     And it is Monday 09:00 in "America/Sao_Paulo"
     When the engagement mailer runs
     Then "bob" is not sent any email
+
+  @wip
+  Scenario: A teacher who has started learning gets the same emails as a student
+    Given "bob" has already registered as a teacher
+    And "bob"'s email address is "bob@example.com"
+    And "bob" is enrolled in the course "fingerstyle-journey"
+    And "bob"'s last activity was on Friday
+    And it is Monday 18:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "bob" is sent an inactivity reminder at "bob@example.com"
+
+  @wip
+  Scenario: An admin who has started learning gets the same emails as a student
+    Given "marina" has already registered as an admin
+    And "marina"'s email address is "marina@example.com"
+    And "marina" is enrolled in the course "fingerstyle-journey"
+    And "marina" practised on 3 days of the week that ended on Sunday
+    And it is Monday 09:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then "marina" is sent a progress report at "marina@example.com"
 
   # ── Weekly summary for the concierge ───────────────────────────────────────
 
@@ -331,6 +353,15 @@ Feature: Send students a weekly progress report and reminders, and the concierge
     And it is Monday 08:00 in "America/Sao_Paulo"
     When the engagement mailer runs
     Then the student summary's row for "alice" shows their name, 4 practice days, 75 minutes and their last activity on Sunday
+
+  @wip
+  Scenario: The concierge summary includes a teacher who has started learning
+    Given the concierge's email address is "concierge@motifpath.com"
+    And "bob" has already registered as a teacher
+    And "bob" is enrolled in the course "fingerstyle-journey"
+    And it is Monday 08:00 in "America/Sao_Paulo"
+    When the engagement mailer runs
+    Then the student summary has a row for "bob"
 
   Scenario: The concierge summary lists the students inactive longest first
     Given the concierge's email address is "concierge@motifpath.com"
