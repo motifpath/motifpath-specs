@@ -152,6 +152,36 @@ Feature: Compose a practice session
     When "alice" composes a 5-minute session with no instrument in hand
     Then every fretboard cell in the session is estimated at 8 seconds
 
+  # ── Language ───────────────────────────────────────────────────────────────
+
+  # ADR-024: content is never silently offered in another language. An authored exercise is
+  # picked only when it is available in the student's locale or tagged "any". Generated drills
+  # and play-alongs are shown in the student's locale, so the rule doesn't affect them.
+
+  @wip
+  Scenario: Only exercises in the student's language are picked
+    Given "alice"'s locale is pt-BR
+    And "alice"'s path skill "chord-tones" has the exercise "name-the-third" in English only and the exercise "nomeie-a-terca" in Portuguese
+    And "alice" has answered neither
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the session includes "nomeie-a-terca"
+    And the session doesn't include "name-the-third"
+
+  @wip
+  Scenario: An exercise for any language is picked whatever the student's locale
+    Given "alice"'s locale is pt-BR
+    And "alice"'s path skill "chord-tones" has the exercise "hear-the-third" tagged any language
+    And "alice" has never answered "hear-the-third"
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the session includes "hear-the-third" with the reason new
+
+  @wip
+  Scenario: A due exercise not in the student's language is not reviewed
+    Given "alice" answered the English-only exercise "name-the-third" and its review is due
+    And "alice"'s locale is now pt-BR
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the session doesn't include "name-the-third"
+
   # ── Fret windows ───────────────────────────────────────────────────────────
   # A fretboard drill never scrolls sideways: each drill of each layout is asked inside one window
   # of five frets the composer picks, plus the open string when it starts at the nut (frets 0–5).
