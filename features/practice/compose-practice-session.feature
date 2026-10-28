@@ -160,27 +160,28 @@ Feature: Compose a practice session
 
   @wip
   Scenario: Only exercises in the student's language are picked
-    Given "alice"'s locale is pt-BR
-    And "alice"'s path skill "chord-tones" has the exercise "name-the-third" in English only and the exercise "nomeie-a-terca" in Portuguese
-    And "alice" has answered neither
+    Given "alice" has locale "pt_BR"
+    And "alice"'s path skill "chord-tones" has the exercise "name-the-third" in English only
+    And "alice"'s path skill "chord-tones" has the exercise "nomeie-a-terca" in Portuguese
     When "alice" composes a 10-minute session with "guitar" in hand
-    Then the session includes "nomeie-a-terca"
-    And the session doesn't include "name-the-third"
+    Then the session includes "nomeie-a-terca" with the reason new
+    And "name-the-third" is not in the session
 
   @wip
   Scenario: An exercise for any language is picked whatever the student's locale
-    Given "alice"'s locale is pt-BR
-    And "alice"'s path skill "chord-tones" has the exercise "hear-the-third" tagged any language
+    Given "alice" has locale "pt_BR"
+    And "alice"'s path skill "chord-tones" has the exercise "hear-the-third" for any language
     And "alice" has never answered "hear-the-third"
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the session includes "hear-the-third" with the reason new
 
   @wip
   Scenario: A due exercise not in the student's language is not reviewed
-    Given "alice" answered the English-only exercise "name-the-third" and its review is due
-    And "alice"'s locale is now pt-BR
+    Given "alice"'s path skill "chord-tones" has the exercise "name-the-third" in English only
+    And the review of "name-the-third" is due for "alice"
+    And "alice" has locale "pt_BR"
     When "alice" composes a 10-minute session with "guitar" in hand
-    Then the session doesn't include "name-the-third"
+    Then "name-the-third" is not in the session
 
   # ── Fret windows ───────────────────────────────────────────────────────────
   # A fretboard drill never scrolls sideways: each drill of each layout is asked inside one window

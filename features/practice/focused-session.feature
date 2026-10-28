@@ -110,17 +110,17 @@ Feature: Practise a subject the student chooses
 
   @wip
   Scenario: The subjects list leaves out a node whose only material isn't in the student's language
-    Given "alice"'s locale is pt-BR
-    And the concept "minor-triads" has only English-only exercises on guitar
-    When "alice" lists the subjects to practise with "guitar" in hand
-    Then "minor-triads" is not offered
+    Given "alice" has locale "pt_BR"
+    And the skill "minor-triads" has only English-only exercises on guitar
+    When "alice" lists the subjects they can practise with "guitar" in hand
+    Then "minor-triads" is not listed
 
   @wip
   Scenario: A chosen session holds only exercises in the student's language
-    Given "alice"'s locale is pt-BR
-    And "common-progressions" has the exercise "name-the-progression" in English only and the exercise "nomeie-a-progressao" in Portuguese
+    Given "alice" has locale "pt_BR"
+    And the review of the English-only exercise "name-the-progression" of "common-progressions" is due for "alice"
     When "alice" composes a 10-minute session with "guitar" in hand, choosing "common-progressions"
-    Then the session doesn't include "name-the-progression"
+    Then "name-the-progression" is not in the session
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
