@@ -102,30 +102,6 @@ Feature: Commercial rollout preserves rights and records each operation
     When Alice starts a Plus checkout using an eligible core-managed offer
     Then the checkout can be authorized without enabling teacher commerce or CMS
 
-  Scenario: The first embedding license does not require an already licensed sale
-    Given teacher "Bea" owns draft path "Guitar foundations"
-    And the path contains premium exercises but has no embedding license
-    And Bea has an eligible permanent license offer and approved license acquisition readiness
-    And Bea is admitted to the license acquisition cohort
-    And no teacher payout account or validated sale manifest exists
-    When Bea starts checkout for the path's first embedding license
-    Then license checkout can be authorized using the reviewed ownership revision
-
-  Scenario: An existing license remains usable when new license acquisition is disabled
-    Given teacher "Bea" holds a valid permanent embedding license for "Guitar foundations"
-    And new license acquisition is disabled
-    And paid sale activation is enabled for Bea with all other readiness approved
-    When Bea validates the path's premium dependencies for a new paid offer
-    Then the existing license satisfies the commercial permission requirement
-
-  Scenario: Owned content does not require an unrelated premium license
-    Given teacher "Bea" owns every dependency of path "Guitar foundations"
-    And the path contains no premium dependencies
-    And paid sale activation is enabled for Bea with all other readiness approved
-    And new premium license acquisition is disabled
-    When Bea validates the path for a new paid offer
-    Then validation does not require a premium embedding license
-
   Scenario: Staging admission cannot authorize a production purchase
     Given learner "Alice" is admitted only to the staging purchase cohort
     And production purchase cohorts are empty

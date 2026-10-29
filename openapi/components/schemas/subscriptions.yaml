@@ -1,24 +1,13 @@
 SubscriptionScope:
   type: object
   additionalProperties: false
-  description: Commercial subscription coverage; unrelated scopes have independent prices and refund history.
+  description: Commercial subscription coverage. The only scope is the platform subscription, which covers MotifPath-owned content and never teacher-priced content.
   required: [kind]
   properties:
     kind:
       type: string
-      enum: [platform, course, path]
-      description: Platform-wide coverage or one identified course or path.
-    content_id:
-      type: string
-      format: uuid
-      description: Stable course or path identifier; required for content scopes and forbidden for platform coverage.
-  oneOf:
-    - properties:
-        kind: {const: platform, description: Platform-wide coverage has no content identifier.}
-      not: {required: [content_id]}
-    - properties:
-        kind: {enum: [course, path], description: Content-specific coverage requires its course or path identifier.}
-      required: [content_id]
+      enum: [platform]
+      description: Platform-wide coverage of MotifPath-owned courses, paths, premium exercises and premium tools.
 
 SubscriptionOffer:
   type: object
@@ -36,7 +25,7 @@ SubscriptionOffer:
     billing_period:
       type: string
       enum: [monthly, annual]
-      description: Automatically renewing paid period; annual discounts are configured independently by scope.
+      description: Automatically renewing paid period; the annual discount is configured independently of the monthly price.
     amount_minor:
       type: integer
       minimum: 1

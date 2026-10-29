@@ -1,8 +1,8 @@
 @wip
 Feature: Teacher commercial rights and retained purchases
-  Teacher creation tools remain free, licenses are permanent per path,
+  Teacher creation tools remain free, teachers sell without buying anything first,
   and existing buyers retain content when new sales are withdrawn.
-  # MOT-117; ADR-059. Consolidated contracts define license coverage and immutable commercial manifests.
+  # MOT-117; ADR-059, ADR-067. Consolidated contracts define premium coverage and immutable commercial manifests.
 
   Scenario: Teacher creation tools do not require a paid teacher subscription
     Given Bea is a teacher without a paid subscription
@@ -19,20 +19,11 @@ Feature: Teacher commercial rights and retained purchases
     When Bea sets a paid path price to 50 BRL
     Then the price passes the configured range check
 
-  Scenario: A teacher embedding license remains valid over time
-    Given Bea holds a permanent premium embedding license for path "Guitar foundations"
-    When a year passes without another license payment
-    Then that license does not expire merely because time passed
-
-  Scenario: A license for one path does not authorize another
-    Given Bea holds an embedding license only for path "Guitar foundations"
-    When Bea tries to sell path "Jazz foundations" embedding platform premium exercises
-    Then the operation is refused for lack of that path's embedding license
-
-  Scenario: Student Plus does not replace a teacher embedding license
-    Given Bea has a student Plus subscription but no commercial embedding license
-    When Bea tries to sell a path embedding platform premium exercises
-    Then the operation is refused for lack of a commercial embedding license
+  Scenario: A teacher sells a path with premium exercises without buying a license
+    Given Bea's path "Guitar foundations" embeds platform premium exercises
+    And Bea has no platform subscription and has bought nothing from MotifPath
+    When Bea sells "Guitar foundations" at a valid configured price
+    Then the sale is allowed and MotifPath keeps only the configured platform commission
 
   Scenario: Permanent purchases survive teacher subscription cancellation
     Given Alice permanently purchased Bea's path "Guitar foundations"

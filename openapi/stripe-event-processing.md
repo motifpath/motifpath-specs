@@ -53,9 +53,9 @@ alone cannot issue a grant. Notifications outside the allowlist are retained wit
 | `charge.dispute.closed` | Verify the actual final outcome. Closed is not synonymous with lost or won. Apply verified won/lost outcomes under the consolidated commercial contract; no expired or refunded grant is revived. |
 | `charge.dispute.funds_withdrawn`, `charge.dispute.funds_reinstated` | Record financial movements with their own provider references. They neither refund automatically nor decide content access by themselves. |
 
-One-time path/license checkouts use payment mode with the same durable receipt/operation
+One-time path purchase checkouts use payment mode with the same durable receipt/operation
 boundary. Verify PaymentIntent/captured charge against the accepted offer/customer and apply
-one purchase/license grant. Add `payment_intent.succeeded` and `payment_intent.payment_failed`
+one purchase grant. Add `payment_intent.succeeded` and `payment_intent.payment_failed`
 as reconciliation triggers, never independent fulfillment paths. `transfer.created`,
 `transfer.updated` and `transfer.reversed` reconcile the recorded settlement obligation;
 `payout.created`, `payout.updated`, `payout.paid`, `payout.failed` and `payout.canceled` reconcile

@@ -3,17 +3,42 @@ Feature: Resolve commercial lesson access in a learner's copy
   Commercial rights are evaluated together without changing progress or copied content.
   An access indication does not bypass the existing learning prerequisites.
 
-  Scenario: A paid subscription covers a lesson in its course
-    Given Alice holds a copy of course "First chords"
-    And her paid subscription covers that course
+  Scenario: The platform subscription covers a lesson in a MotifPath course
+    Given Alice holds a copy of MotifPath-owned course "First chords"
+    And she has a paid platform subscription
     When Alice checks commercial access to a lesson in that copy
     Then the result allows commercial access through the paid subscription
 
-  Scenario: A subscription for another course does not cover the lesson
-    Given Alice's only subscription covers course "Jazz harmony"
-    And an unfinished restricted lesson belongs to her copy of course "First chords"
+  Scenario: The platform subscription does not cover a teacher-priced path
+    Given Alice has a paid platform subscription
+    And an unfinished lesson belongs to her copy of Bea's paid path "Jazz foundations"
+    And Alice has not bought "Jazz foundations"
     When Alice checks commercial access to that lesson
     Then commercial access is blocked for lack of a valid grant
+
+  Scenario: A purchase covers the premium exercises its path embeds
+    Given Bea's paid path "Guitar foundations" embeds platform premium exercise "Shell voicings"
+    And Alice bought "Guitar foundations" and has no platform subscription
+    When Alice checks commercial access to "Shell voicings" in her copy of that path
+    Then the result allows commercial access through the path purchase
+
+  Scenario: A purchase does not cover the same premium exercise elsewhere
+    Given Alice bought Bea's path "Guitar foundations", which embeds premium exercise "Shell voicings"
+    And Alice has no platform subscription
+    When Alice checks commercial access to "Shell voicings" in her copy of another path
+    Then commercial access is blocked for lack of a valid grant
+
+  Scenario: A premium exercise in a free teacher path needs the platform subscription
+    Given Bea's free path "Open strings" embeds platform premium exercise "Shell voicings"
+    And Alice has no platform subscription
+    When Alice checks commercial access to "Shell voicings" in her copy of that path
+    Then commercial access is blocked for lack of a valid grant
+
+  Scenario: The platform subscription covers a premium exercise in a free teacher path
+    Given Bea's free path "Open strings" embeds platform premium exercise "Shell voicings"
+    And Alice has a paid platform subscription
+    When Alice checks commercial access to "Shell voicings" in her copy of that path
+    Then the result allows commercial access through the paid subscription
 
   Scenario: Cancelling renewal preserves the paid grant
     Given Alice cancelled renewal but her current paid period has not ended

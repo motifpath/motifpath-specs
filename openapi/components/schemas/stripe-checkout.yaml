@@ -7,7 +7,7 @@ CreateSubscriptionCheckout:
     offer_id:
       type: string
       format: uuid
-      description: Current eligible monthly/annual offer revision for the requested platform, course or path scope.
+      description: Current eligible monthly/annual offer revision for the platform subscription.
 
 SubscriptionCheckout:
   type: object

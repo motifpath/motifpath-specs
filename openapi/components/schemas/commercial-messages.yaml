@@ -84,7 +84,6 @@ CommercialMessage:
         - payment.verified
         - grant.changed
         - purchase.fulfilled
-        - license.changed
         - refund.confirmed
         - dispute.resolved
         - settlement.changed
@@ -115,13 +114,6 @@ CommercialMessage:
         payload:
           $ref: ./commerce.yaml#/Purchase
           description: Sanitized purchase.fulfilled payload.
-    - properties:
-        type:
-          const: license.changed
-          description: Select matching typed payload.
-        payload:
-          $ref: ./commerce.yaml#/License
-          description: Sanitized license.changed payload.
     - properties:
         type:
           const: refund.confirmed

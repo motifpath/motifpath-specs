@@ -3,11 +3,13 @@
 Status: consolidated specification for review, 2026-10-15. Business bundle approved by Gilson
 in chat on this date. ADR-060 was approved by Gilson on 2026-10-15; API additions still require PR review. This is a durable contract,
 not an implementation plan. No runtime readiness or Figma/flag approval is implied.
+Revised 2026-10-29 for ADR-067: two commercial products; course/path-scoped subscriptions and
+the teacher embedding license are removed.
 
 ## Authority and identifiers
 
 Core-domain owns commercial content provenance, immutable sale manifests, product/offer revisions,
-accepted terms, customer mappings, operations, receipts, money, grants, purchases, licenses and
+accepted terms, customer mappings, operations, receipts, money, grants, purchases and
 settlement. Aggregation-worker owns derived progress; core reads its authoritative completion
 records. Vue and CMS mirror backend decisions. Neither a Stripe email nor editable metadata
 proves ownership. Each environment maps authenticated core users to verified provider customers.
@@ -17,28 +19,32 @@ qualified by environment, authenticated actor/integration, action and resource. 
 receipt and decision IDs are globally unique server IDs. External IDs are always qualified by
 trusted environment/account. Never match by a bare provider ID across accounts or modes.
 
-Products distinguish subscription (platform/course/path), permanent teacher-path purchase and
-permanent teacher/path embedding license. Subscription periods are monthly and annual, both
-automatically renewing. Prices, annual discounts, teacher bounds, license prices, commission
-and fee allocation are configurable. New sales require complete validated configuration and
+There are exactly two commercial products: the platform subscription and the permanent
+teacher-path purchase. The platform subscription has one platform-wide scope and covers
+MotifPath-owned content (team-authored courses and paths, premium exercises and premium tools);
+it never covers teacher-priced content. There are no course- or path-scoped subscriptions and no
+teacher embedding license. Subscription periods are monthly and annual, both automatically
+renewing. Prices, annual discounts, teacher bounds, commission and fee allocation are
+configurable. MotifPath-owned content is not sold individually, and subscribers get no discount
+on teacher purchases. New sales require complete validated configuration and
 eligible offers. Free-to-paid changes must explicitly preserve previously granted free access
 through durable grandfather grants; an existing learner is never silently charged or converted. Initial activation is **BRL only**; USD requires a separate explicit market/cost
 approval. Currency syntax alone enables nothing. A yearly offer must be cheaper than twelve
-monthly periods for the same scope/currency. No launch prices are invented by example values.
+monthly periods in the same currency. No launch prices are invented by example values.
 
 Offer IDs name immutable accepted price revisions. Admin configuration promotion is revision-checked and serialized; concurrent stale changes are
 rejected. Subscription price promotion additionally requires expected_offer_id for the exact
-scope/billing period/currency, including explicit null before the first offer. A shared platform
+billing period/currency, including explicit null before the first offer. A shared platform
 configuration_id is not an offer-version precondition. Admin GET /admin/subscription-offers
 returns the promoted offer even when acquisition is OFF; 404 means no offer has been promoted.
-Serialize promotion by scope/currency, compare-and-replace the observed offer, validate discount
+Serialize promotion by currency, compare-and-replace the observed offer, validate discount
 relationships and append evidence atomically. Two distinct commands observing the same old offer
 cannot both replace it: after the first promotion, the second returns conflict. Known same-intent
 replays return their original result before the stale-offer check. Changing a monthly baseline
 revalidates new annual offers against the discount rule;
 existing accepted snapshots stay unchanged. Changing a price creates a new ID; history,
 in-flight checkout snapshots and ledger allocations retain the original terms. Existing
-subscriptions adopt changes at next renewal only. One platform scope never implicitly covers
+subscriptions adopt changes at next renewal only. The platform subscription never covers
 independent teacher commerce; eligible product/dependency manifests define actual coverage.
 
 ## Ownership, commercial manifests and learner copies
@@ -67,31 +73,16 @@ withdrawal is a sale-state change, not deletion or an automatic learner update.
 
 Validate the complete dependency graph when creating/changing a paid offer, commercial release
 or affected update. Reject cycles, missing resources, stale/unresolved rights, unsupported third-
-party rights and premium dependencies without the owning teacher/path license. A direct API
-call has the same boundary as the UI. Own and explicitly reusable free content is permitted;
-free visibility alone is not a redistribution license. Premium exercises nested through lessons
-or paths require the same check. Updating dependencies invalidates new-sale validation until
-rechecked. Student Plus is never commercial embedding permission.
+party rights. A direct API call has the same boundary as the UI. Own and explicitly reusable free
+content is permitted; free visibility alone is not redistribution permission. MotifPath premium
+exercises embedded in a paid teacher path, directly or nested through lessons, are recorded as
+platform_premium dependencies. The single platform commission on each sale covers them; there
+is no separate license, surcharge or prerequisite purchase for the teacher. Updating dependencies
+invalidates new-sale validation until rechecked.
 
-First-license acquisition is independent of sale-manifest validation. An admin-issued license
-**offer** binds path_id, licensed_teacher_id, ownership_revision, immutable price/configuration
-and release_id=null. Require a reviewed path-owning teacher and valid platform payment capability;
-do not require an already active embedding license, validated dependency graph or teacher payout
-account. This remains valid for a draft already containing premium exercises. Creating a license
-offer grants no rights. Verified payment issues one license referencing its accepted offer_id,
-not a sale manifest. Only then may the teacher validate the complete premium dependency graph
-and enable path sales; path-purchase offers always require a non-null validated release_id.
-Content edits do not invalidate a license offer solely by changing its dependency graph, but
-changed ownership/ownership revision invalidates it for a new checkout. Recheck caller ownership
-before accepting the acquisition; never transfer a license through a change of path owner.
-
-Embedding licenses are permanent per teacher/path and cover platform premium exercises used by
-that path, including later dependency additions after revalidation. They cannot be transferred
-by copying a path to another teacher/path. No expiry or recurring license fee is introduced.
-License refunds/lost disputes end only that payment-linked license; stop new paid publication
-using it, preserve already-sold buyer obligations and quarantine new unsupported dependencies.
-Do not charge existing buyers or silently revoke their permanent purchase because a teacher
-loses a license. Existing immutable sale manifests retain their validated rights evidence.
+A purchase grants the buyer every exercise the purchased path contains, premium ones included,
+for that path only; it never unlocks those exercises elsewhere. A premium exercise in a free
+teacher path stays locked for learners without the platform subscription.
 
 Permanent buyers retain existing copies after sale withdrawal, including unfinished lessons.
 Course copies keep their existing published version reference; path copies keep their current
@@ -188,7 +179,7 @@ reconcile competing outcomes before initiating any additional financial return.
 
 ## Refund review and notifications
 
-Refund eligibility is first subscription per holder/scope, never reset by rejoin, renewal or
+Refund eligibility is first platform subscription per holder, never reset by rejoin, renewal or
 period switch. Paid path purchase refunds use the original acquisition payment. The commercial
 window starts at max(verified paid_at, first access_available_at), only when both exist, and
 ends **inclusively 168 hours later in UTC**. Use original durable request time, not admin handling
@@ -217,14 +208,14 @@ provider delivery deduplication or reconciliation; never promise exactly-once em
 
 Use the transactional boundary in ADR-060. Uniqueness keys include operation namespace/fingerprint,
 provider receipt, payment/refund movement, invoice grant, holder/product acquisition reservation,
-license holder/path, sale allocation and settlement earning reservation. Review canonical intent
+sale allocation and settlement earning reservation. Review canonical intent
 before expected_revision for known same-intent retries; always recheck caller authorization.
 Canonicalization uses stable action/version/target/body fields; missing and explicit null remain
 distinct unless the endpoint explicitly equates them. Never include secrets in a fingerprint log.
 
 Outbound tasks and internal events carry message_id, operation namespace, correlation/causation,
 environment, aggregate identity/revision, type/version, occurred_at and a minimal typed payload.
-Supported v1 kinds are payment.verified, grant.changed, purchase.fulfilled, license.changed,
+Supported v1 kinds are payment.verified, grant.changed, purchase.fulfilled,
 refund.confirmed, dispute.resolved, settlement.changed, commercial_content.changed and cms.sync_requested.
 Consumers use current authoritative aggregate state, not arrival time. The envelope/schema is in
 [commercial messages](components/schemas/commercial-messages.yaml). It is private service traffic,
@@ -240,7 +231,7 @@ Verify chained/digested checkpoint completeness on restore and alert on gaps. A 
 alone is not independent tamper protection. Secrets/raw payment credentials never enter audit evidence. Resource/action state allowlists are: content owner,
 creator/provenance, sale state, release/offer/config references; grant scope/source/status/validity;
 subscription scope/offer/period/renewal; payment/refund amount/currency/status/provider-safe refs;
-license teacher/path/status; settlement allocation/movement/status. All other fields require
+settlement allocation/movement/status. All other fields require
 explicit schema review; unknown sensitive fields are rejected, not blindly serialized.
 
 ### Hot audit TTL and asynchronous archival
@@ -250,7 +241,7 @@ the evidence is committed, not when a financial operation closes or when export/
 Retries, reads and export attempts never reset it. A row is eligible for removal at
 now >= recorded_at + 720 hours, only with verified archive evidence and no retention hold.
 This TTL applies solely to full audit payload rows. It does not expire financial journals,
-payment/refund records, operation fingerprints, deduplication tombstones, grants, licenses,
+payment/refund records, operation fingerprints, deduplication tombstones, grants,
 purchases, pending inbox/outbox work or archive-catalog metadata. No database-wide TTL is implied.
 
 The **asynchronous audit exporter** is a background worker consuming durable committed work:
@@ -366,7 +357,7 @@ core content_id/kind + locale maps to a registered source document; adapter stor
 observed digest, last successful core revision and event receipt. CMS-managed fields are localized
 commercial display title/summary/artwork and editorial visibility. Owner/provenance references,
 core release/offer IDs and rights declarations are validated references only. Prices, grant state,
-licenses, payments, teacher allocation and commercial flag decisions are core-owned and reject
+payments, teacher allocation and commercial flag decisions are core-owned and reject
 CMS writes. Source deletion hides new editorial presentation; it cannot delete financial evidence
 or an existing purchased copy. No source fallback may make a paid resource free.
 

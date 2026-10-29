@@ -3,11 +3,10 @@ Offers:
     operationId: listSubscriptionOffers
     summary: List available offers for one subscription scope
     description: |
-      Return backend-approved offer revisions for one scope and enabled currency.
-      content_id is required for course/path and forbidden for platform. Unknown content
-      returns 404; a disabled currency or invalid combination returns 400.
+      Return backend-approved offer revisions for the platform subscription in one enabled
+      currency. A disabled currency or invalid combination returns 400.
       Acquisition OFF returns no new offers, without hiding existing subscriptions.
-      Scope/currency/period prices are configured independently; client and CMS values
+      Currency/period prices are configured independently; client and CMS values
       never override authoritative monetary terms. This read does not start checkout.
     tags: [Subscriptions]
     parameters:
@@ -15,11 +14,7 @@ Offers:
         in: query
         required: true
         description: Coverage of the requested subscription offers.
-        schema: {type: string, enum: [platform, course, path]}
-      - name: content_id
-        in: query
-        description: Course or path identity; required only for those content scopes.
-        schema: {type: string, format: uuid}
+        schema: {type: string, enum: [platform]}
       - name: currency
         in: query
         required: true
@@ -33,7 +28,6 @@ Offers:
             schema: {$ref: '../schemas/subscriptions.yaml#/OfferList'}
       '400': {$ref: '#/InvalidRequest'}
       '401': {$ref: '#/Unauthenticated'}
-      '404': {$ref: '#/NotFound'}
       '503': {$ref: '#/Unavailable'}
 
 Subscriptions:
@@ -111,7 +105,7 @@ ScheduleAnnual:
       before reconciliation. A conflicting pending lifecycle command returns 409.
       Known same-intent retries return their recorded operation before evaluating new
       acquisition gates or the originally observed revision; rollback cannot lose them.
-      Scope-based first-subscription refund history is unchanged by this operation.
+      First-subscription refund history is unchanged by this operation.
     tags: [Subscriptions]
     parameters:
       - $ref: '#/IdempotencyKey'

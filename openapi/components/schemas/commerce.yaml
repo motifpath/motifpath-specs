@@ -125,7 +125,7 @@ Release:
       format: uuid
     content:
       $ref: "#/ContentRef"
-      description: Stable sale/license scope.
+      description: Stable sale scope.
     revision:
       type: integer
       description: Monotonic manifest revision for this content.
@@ -229,24 +229,20 @@ Offer:
       format: uuid
     kind:
       type: string
-      description: One-time commercial product family.
+      description: One-time commercial product family; a teacher path purchase is the only one.
       enum:
         - path_purchase
-        - embedding_license
     content:
       allOf:
         - $ref: "#/ContentRef"
         - properties:
             kind:
               const: path
-              description: One-time purchases and embedding licenses cover one path.
+              description: A one-time purchase covers one path.
       description: Only the target path covered by this one-time product.
     release_id:
-      type:
-        - string
-        - "null"
-      description: Validated sale manifest for path_purchase; null for embedding_license, whose
-        acquisition must not depend on a pre-existing licensed sale manifest.
+      type: string
+      description: Fully validated sale manifest; a buyer purchase requires validated redistribution rights.
       format: uuid
     price:
       $ref: "#/PositiveMoney"
@@ -257,43 +253,8 @@ Offer:
       minLength: 1
     seller_id:
       type: string
-      description: Authoritative seller; platform steward for a platform license.
+      description: Authoritative seller, the path-owning teacher.
       format: uuid
-    licensed_teacher_id:
-      type: string
-      format: uuid
-      description: Core path-owning teacher bound to an embedding-license offer; absent for path purchases.
-    ownership_revision:
-      type: integer
-      minimum: 1
-      description: Observed authoritative path ownership revision for a license offer; content edits do
-        not require an already-licensed sale manifest.
-  allOf:
-    - if:
-        properties:
-          kind:
-            const: path_purchase
-            description: A buyer purchase requires validated redistribution rights.
-      then:
-        properties:
-          release_id:
-            type: string
-            format: uuid
-            description: Fully validated sale manifest.
-        not:
-          anyOf:
-            - required:
-                - licensed_teacher_id
-            - required:
-                - ownership_revision
-      else:
-        required:
-          - licensed_teacher_id
-          - ownership_revision
-        properties:
-          release_id:
-            type: "null"
-            description: License acquisition is independent of sale-manifest validation.
 OfferList:
   type: object
   description: Enabled eligible one-time offers; no offers when acquisition or valid configuration is absent.
@@ -399,6 +360,42 @@ Checkout:
           fulfillment_status:
             const: not_started
             description: Constraint for fulfillment status.
+GrantScope:
+  type: object
+  additionalProperties: false
+  description: Content a grant covers. Subscription grants cover the platform; purchase, free and
+    retention grants cover one identified course or path.
+  required:
+    - kind
+  properties:
+    kind:
+      type: string
+      enum:
+        - platform
+        - course
+        - path
+      description: Platform-wide coverage or one identified course or path.
+    content_id:
+      type: string
+      format: uuid
+      description: Stable course or path identifier; required for content scopes and forbidden for
+        platform coverage.
+  oneOf:
+    - properties:
+        kind:
+          const: platform
+          description: Platform-wide coverage has no content identifier.
+      not:
+        required:
+          - content_id
+    - properties:
+        kind:
+          enum:
+            - course
+            - path
+          description: Content-specific coverage requires its course or path identifier.
+      required:
+        - content_id
 Grant:
   type: object
   description: Immutable grant identity with attributable lifecycle transitions; independent rights
@@ -424,7 +421,7 @@ Grant:
       description: Authoritative learner identity.
       format: uuid
     scope:
-      $ref: ./subscriptions.yaml#/SubscriptionScope
+      $ref: "#/GrantScope"
       description: Coverage resolved from trusted product and learner-copy relationships.
     basis:
       type: string
@@ -466,6 +463,11 @@ Grant:
             description: Constraint for basis.
       then:
         properties:
+          scope:
+            properties:
+              kind:
+                const: platform
+                description: A subscription grant always covers the platform scope.
           valid_until:
             type: string
             format: date-time
@@ -483,50 +485,6 @@ Grant:
           valid_until:
             type: "null"
             description: Active permanent rights have no time expiry.
-License:
-  type: object
-  description: Permanent per-path commercial embedding permission; student Plus is not this license.
-  additionalProperties: false
-  required:
-    - license_id
-    - teacher_id
-    - path_id
-    - offer_id
-    - status
-    - payment_id
-    - evidence_entry_id
-  properties:
-    license_id:
-      type: string
-      description: Stable teacher license identity.
-      format: uuid
-    teacher_id:
-      type: string
-      description: Licensed teacher identity.
-      format: uuid
-    path_id:
-      type: string
-      description: Only licensed path identity.
-      format: uuid
-    status:
-      type: string
-      description: State changed only by explicit attributable payment/rights policy.
-      enum:
-        - active
-        - ended
-    payment_id:
-      type: string
-      description: Successful acquisition payment.
-      format: uuid
-    evidence_entry_id:
-      type: string
-      description: Latest license evidence.
-      format: uuid
-    offer_id:
-      type: string
-      format: uuid
-      description: Immutable paid license offer, binding the teacher/path and accepted terms without
-        requiring a sale manifest.
 Purchase:
   type: object
   description: Permanent path acquisition independent of learner/teacher subscription; refunded
@@ -578,12 +536,8 @@ Purchase:
       description: Latest evidence; retained learner copy follows existing update rules.
       format: uuid
 Holding:
-  oneOf:
-    - $ref: "#/Purchase"
-      description: Permanent path purchase.
-    - $ref: "#/License"
-      description: Teacher embedding license.
-  description: One caller-owned purchase or teacher license.
+  $ref: "#/Purchase"
+  description: One caller-owned permanent path purchase.
 HoldingsPage:
   type: object
   description: Caller-owned acquisitions, including ended records, ordered by identity.
@@ -599,7 +553,7 @@ HoldingsPage:
       description: Only caller-owned holdings.
       items:
         $ref: "#/Holding"
-        description: Purchase or license.
+        description: Permanent path purchase.
     total:
       type: integer
       description: Total caller-owned records.
@@ -686,7 +640,6 @@ CreateOffer:
       description: Authorized offer family.
       enum:
         - path_purchase
-        - embedding_license
     price:
       $ref: "#/PositiveMoney"
       description: Strictly positive configured offer price.
@@ -911,7 +864,7 @@ SubscriptionOfferConfig:
   properties:
     scope:
       $ref: ./subscriptions.yaml#/SubscriptionScope
-      description: Independent platform, course or path offer scope.
+      description: Platform subscription offer scope.
     billing_period:
       type: string
       description: Recurring billing interval.
@@ -1242,29 +1195,14 @@ Dependency:
       enum:
         - own
         - free_reuse
-        - premium_license
-      description: Reviewed permission; free display alone is not free redistribution.
-    license_id:
-      type: string
-      format: uuid
-      description: Owning teacher/path license, required only for premium_license.
+        - platform_premium
+      description: Reviewed permission; free display alone is not free redistribution. platform_premium
+        is MotifPath premium content embedded in a paid teacher path, covered by the platform commission
+        on each sale without a separate license.
     evidence_entry_id:
       type: string
       format: uuid
-      description: Validated ownership/reuse/license evidence.
-  allOf:
-    - if:
-        properties:
-          permission:
-            const: premium_license
-            description: Platform premium embedding requires the owning teacher/path license.
-      then:
-        required:
-          - license_id
-      else:
-        not:
-          required:
-            - license_id
+      description: Validated ownership/reuse evidence.
 PaymentPage:
   type: object
   additionalProperties: false

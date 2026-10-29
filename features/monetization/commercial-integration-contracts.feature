@@ -13,9 +13,9 @@ Feature: CMS, protected delivery and durable commercial recovery
     Then synchronization reads current source metadata instead of overwriting from the old hint
 
   Scenario: CMS cannot assign paid rights
-    Given a CMS payload claims Alice owns an embedding license
+    Given a CMS payload claims Alice owns a purchase of path "Guitar foundations"
     When the CMS integration validates that payload
-    Then no license or commercial access is created from that claim
+    Then no purchase or commercial access is created from that claim
 
   Scenario: A missing CMS mapping is quarantined
     Given a CMS document has no registered core identity mapping

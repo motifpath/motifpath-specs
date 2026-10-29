@@ -117,13 +117,9 @@ Publish:
     operationId: createCommercialOffer
     summary: Create an immutable one-time offer revision
     description: Registered content owner or admin only; matching expected_revision and positive
-      enabled-currency price under current configuration. For path_purchase, validate the complete
-      current sale manifest and transitive dependency/license rights. For embedding_license, admin
-      creates an offer bound to the target path, its owning teacher and current ownership revision;
-      validate ownership and configured license price independently of content dependencies. A path
-      already containing unlicensed premium exercises can acquire its first license without a
-      validated sale manifest. License offers have release_id null; they neither publish nor
-      authorize a path sale. New offer revisions never rewrite accepted checkout snapshots. Record
+      enabled-currency price under current configuration and teacher price bounds. Validate the
+      complete current sale manifest and transitive dependency rights. New offer revisions never
+      rewrite accepted checkout snapshots. Record
       durable attributable evidence and enforce idempotent commands before revision checks.
       Acquisition flags gate new actions, not existing obligations.
     tags:
@@ -188,13 +184,10 @@ Offers:
   get:
     operationId: listCommercialOffers
     summary: List eligible one-time acquisition offers
-    description: Require kind and path_id. kind must be path_purchase or embedding_license. Resolve
-      caller eligibility and approved offers server-side; return empty items if
-      acquisition/configuration/prerequisites are unavailable. A disabled currency or malformed kind
-      returns 400. A missing path returns 404. Do not expose a teacher license offer as student
-      content access. Path-purchase offers require sale_state paid; withdrawn/free paths are not
-      sold. A teacher may acquire an eligible path embedding license before enabling that path for
-      paid sales.
+    description: Require kind and path_id. kind must be path_purchase. Resolve caller eligibility and
+      approved offers server-side; return empty items if acquisition/configuration/prerequisites are
+      unavailable. A disabled currency or malformed kind returns 400. A missing path returns 404.
+      Path-purchase offers require sale_state paid; withdrawn/free paths are not sold.
     tags:
       - Commerce
     parameters:
@@ -207,7 +200,6 @@ Offers:
           minLength: 1
           enum:
             - path_purchase
-            - embedding_license
       - name: path_id
         in: query
         required: true
@@ -240,17 +232,11 @@ Offers:
 Checkouts:
   post:
     operationId: createMyCommercialCheckout
-    summary: Start a permanent purchase or teacher-license checkout
-    description: Use eligible current offer_id; reject stale terms with 409. For path_purchase, require
-      the current validated sale manifest, valid dependency licenses, verified seller/Connect
-      capability and refund liquidity; reserve one active holder/path acquisition across operation
-      keys and reject an already active purchase. For embedding_license, require the caller to match
-      the recorded owning teacher, path and ownership revision, valid platform payment capability
-      and configured license offer; no previously licensed sale manifest or teacher payout account
-      is required. Reserve one active teacher/path license acquisition across keys and reject an
-      existing active license. Verify payment before issuing one permanent teacher/path license
-      bound to its immutable offer. Subsequent paid publication and path-purchase checkout still
-      require full licensed dependency validation. Bind accepted terms, customer and applicable
+    summary: Start a permanent path purchase checkout
+    description: Use eligible current offer_id; reject stale terms with 409. Require the current
+      validated sale manifest, verified seller/Connect capability and refund liquidity; reserve one
+      active holder/path acquisition across operation keys and reject an already active purchase.
+      Bind accepted terms, customer and applicable
       commission revision before provider work; browser return never proves payment. Durable
       intent/audit precede provider calls; unknown outcomes remain pending and reconcile before any
       new attempt. Acquisition OFF never stops existing obligations.
@@ -331,8 +317,8 @@ Checkout:
 Holdings:
   get:
     operationId: listMyCommercialHoldings
-    summary: List permanent purchases and teacher licenses
-    description: Return caller-owned purchase and teacher-license records including ended records.
+    summary: List permanent purchases
+    description: Return caller-owned purchase records including ended records.
       Stable identity ordering, total/limit/offset; acquisition OFF never hides history. These
       records do not bypass delivery-time access checks.
     tags:
@@ -446,7 +432,7 @@ CMS:
     description: Require the environment-specific CMS adapter bearer credential over TLS, isolated from
       user authentication. Authenticate before storing. Deduplicate trusted source/environment/event
       identity and reject changed payload for that identity with 409. Resolve only registered source
-      mappings; never trust a CMS owner, price, license or grant claim. Persist receipt and audit
+      mappings; never trust a CMS owner, price or grant claim. Persist receipt and audit
       before 200. Worker pulls canonical metadata through a read-only CMS credential, validates core
       revision/rights and reconciles; source timestamps do not establish ordering. Unprovisioned or
       disabled CMS integration cannot expand rights. Native Strapi payloads must pass through the
@@ -552,14 +538,13 @@ Release:
     summary: Freeze validated commercial dependency references
     description: Registered owner or admin only. Validate existing content revision and complete
       transitive dependency graph, reject cycles, missing rights, stale critical metadata and
-      unsupported third-party dependencies. Platform premium exercises in a paid teacher path
-      require its teacher/path permanent license; a student subscription is insufficient. Check each
+      unsupported third-party dependencies. Platform premium exercises in a paid teacher path are
+      recorded as platform_premium dependencies, covered by the platform commission on each sale
+      without a separate license. Check each
       referenced revision. Concurrent same-intent publication creates one immutable manifest. This
       operation does not publish a path, alter course checkpoints or update learner copies; existing
       authoring/update endpoints retain their semantics. A changed manifest invalidates new-sale
-      validation until rechecked. License acquisition is a separate prerequisite; it validates path
-      ownership without requiring this sale manifest. Only after the license is active may a
-      manifest containing its premium dependency be validated for sale.
+      validation until rechecked.
     tags:
       - Commerce
     parameters:
@@ -685,7 +670,7 @@ SubscriptionOfferConfig:
     summary: Read the promoted subscription offer as an administrator
     description: Backend-resolved administrator only. Return the promoted offer for exactly one scope,
       billing period and currency, independently of acquisition flags or learner cohort eligibility.
-      content_id is required for course/path and forbidden for platform. Missing configured offer
+      Missing configured offer
       returns 404; the caller then uses expected_offer_id null for first creation. Existing offer_id
       is the precondition for replacement. Malformed or disabled currency/scope returns 400. No
       credentials are exposed.
@@ -700,14 +685,6 @@ SubscriptionOfferConfig:
           type: string
           enum:
             - platform
-            - course
-            - path
-      - name: content_id
-        in: query
-        description: Required only for course/path scope.
-        schema:
-          type: string
-          format: uuid
       - name: billing_period
         in: query
         required: true
@@ -905,8 +882,8 @@ Payments:
   get:
     operationId: listMyCommercialPayments
     summary: List successful payments for refund/support references
-    description: Return only authenticated caller-owned verified payments across subscription, purchase
-      and license acquisitions, including refunded payments whose original facts remain unchanged.
+    description: Return only authenticated caller-owned verified payments across subscription and purchase
+      acquisitions, including refunded payments whose original facts remain unchanged.
       Refund status is read from its case; a refund does not delete the original payment. No
       payer-controlled owner filter. Acquisition OFF never hides receipts. Safe provider references
       are not payment credentials. This read does not create grants or refunds.

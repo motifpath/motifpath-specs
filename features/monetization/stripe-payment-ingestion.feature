@@ -35,10 +35,10 @@ Feature: Subscription checkout and verified payment ingestion
     When Alice reuses "checkout-1" with "offer-2"
     Then the conflicting intent is refused
 
-  Scenario: Concurrent requests cannot create two open checkouts for the same scope
-    Given Alice has no subscription for course "First chords"
-    When two new checkout operations for that course arrive concurrently
-    Then at most one open checkout is authorized for Alice and that scope
+  Scenario: Concurrent requests cannot create two open subscription checkouts
+    Given Alice has no platform subscription
+    When two new platform subscription checkout operations arrive concurrently
+    Then at most one open checkout is authorized for Alice's platform subscription
 
   Scenario: A current subscription uses plan change rather than another acquisition
     Given Alice has a paid monthly platform-wide subscription
