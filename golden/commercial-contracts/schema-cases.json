@@ -596,21 +596,6 @@
     "valid": true
   },
   {
-    "name": "license with time expiry",
-    "schema": "commerce.yaml#/License",
-    "value": {
-      "license_id": "12345678-1234-4234-8234-123456789012",
-      "teacher_id": "12345678-1234-4234-8234-123456789012",
-      "path_id": "12345678-1234-4234-8234-123456789012",
-      "offer_id": "12345678-1234-4234-8234-123456789012",
-      "status": "active",
-      "payment_id": "12345678-1234-4234-8234-123456789012",
-      "evidence_entry_id": "12345678-1234-4234-8234-123456789012",
-      "expires_at": "2027-10-15T12:00:00Z"
-    },
-    "valid": false
-  },
-  {
     "name": "active permanent grant cannot expire",
     "schema": "commerce.yaml#/Grant",
     "value": {
@@ -636,6 +621,24 @@
       "grant_id": "12345678-1234-4234-8234-123456789012",
       "holder_id": "12345678-1234-4234-8234-123456789012",
       "scope": {
+        "kind": "platform"
+      },
+      "basis": "subscription_period",
+      "status": "active",
+      "source_id": "12345678-1234-4234-8234-123456789012",
+      "valid_from": "2026-10-15T12:00:00Z",
+      "valid_until": null,
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "subscription grant cannot cover one path",
+    "schema": "commerce.yaml#/Grant",
+    "value": {
+      "grant_id": "12345678-1234-4234-8234-123456789012",
+      "holder_id": "12345678-1234-4234-8234-123456789012",
+      "scope": {
         "kind": "path",
         "content_id": "12345678-1234-4234-8234-123456789012"
       },
@@ -643,7 +646,7 @@
       "status": "active",
       "source_id": "12345678-1234-4234-8234-123456789012",
       "valid_from": "2026-10-15T12:00:00Z",
-      "valid_until": null,
+      "valid_until": "2026-11-15T12:00:00Z",
       "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
     },
     "valid": false
@@ -687,71 +690,6 @@
       }
     },
     "valid": true
-  },
-  {
-    "name": "license acquisition without licensed manifest",
-    "schema": "commerce.yaml#/Offer",
-    "value": {
-      "offer_id": "12345678-1234-4234-8234-123456789012",
-      "kind": "embedding_license",
-      "content": {
-        "kind": "path",
-        "content_id": "12345678-1234-4234-8234-123456789012"
-      },
-      "release_id": null,
-      "price": {
-        "amount_minor": 100,
-        "currency": "BRL"
-      },
-      "configuration_revision": "1",
-      "seller_id": "12345678-1234-4234-8234-123456789012",
-      "licensed_teacher_id": "12345678-1234-4234-8234-123456789012",
-      "ownership_revision": 1
-    },
-    "valid": true
-  },
-  {
-    "name": "license offer must not require a sale manifest",
-    "schema": "commerce.yaml#/Offer",
-    "value": {
-      "offer_id": "12345678-1234-4234-8234-123456789012",
-      "kind": "embedding_license",
-      "content": {
-        "kind": "path",
-        "content_id": "12345678-1234-4234-8234-123456789012"
-      },
-      "release_id": "12345678-1234-4234-8234-123456789012",
-      "price": {
-        "amount_minor": 100,
-        "currency": "BRL"
-      },
-      "configuration_revision": "1",
-      "seller_id": "12345678-1234-4234-8234-123456789012",
-      "licensed_teacher_id": "12345678-1234-4234-8234-123456789012",
-      "ownership_revision": 1
-    },
-    "valid": false
-  },
-  {
-    "name": "license offer binds teacher ownership",
-    "schema": "commerce.yaml#/Offer",
-    "value": {
-      "offer_id": "12345678-1234-4234-8234-123456789012",
-      "kind": "embedding_license",
-      "content": {
-        "kind": "path",
-        "content_id": "12345678-1234-4234-8234-123456789012"
-      },
-      "release_id": null,
-      "price": {
-        "amount_minor": 100,
-        "currency": "BRL"
-      },
-      "configuration_revision": "1",
-      "seller_id": "12345678-1234-4234-8234-123456789012",
-      "ownership_revision": 1
-    },
-    "valid": false
   },
   {
     "name": "path purchase still requires validated manifest",
@@ -845,20 +783,6 @@
     "valid": false
   },
   {
-    "name": "issued first license binds offer not sale manifest",
-    "schema": "commerce.yaml#/License",
-    "value": {
-      "license_id": "12345678-1234-4234-8234-123456789012",
-      "teacher_id": "12345678-1234-4234-8234-123456789012",
-      "path_id": "12345678-1234-4234-8234-123456789012",
-      "offer_id": "12345678-1234-4234-8234-123456789012",
-      "status": "active",
-      "payment_id": "12345678-1234-4234-8234-123456789012",
-      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
-    },
-    "valid": true
-  },
-  {
     "name": "compact archive locator",
     "schema": "commercial-audit.yaml#/AuditArchiveLocator",
     "value": {
@@ -903,6 +827,76 @@
       "archive_batch_id": "12345678-1234-4234-8234-123456789012",
       "entry_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "before_state": {}
+    },
+    "valid": false
+  },
+  {
+    "name": "embedding license is not an offer kind",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "embedding_license",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "subscription offer cannot be scoped to a course",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 2000,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "Course price",
+      "expected_offer_id": null
+    },
+    "valid": false
+  },
+  {
+    "name": "embedded platform premium dependency needs no license",
+    "schema": "commerce.yaml#/Dependency",
+    "value": {
+      "content": {
+        "kind": "content_node",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "permission": "platform_premium",
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "dependency cannot carry a license",
+    "schema": "commerce.yaml#/Dependency",
+    "value": {
+      "content": {
+        "kind": "content_node",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "permission": "platform_premium",
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012",
+      "license_id": "12345678-1234-4234-8234-123456789012"
     },
     "valid": false
   }

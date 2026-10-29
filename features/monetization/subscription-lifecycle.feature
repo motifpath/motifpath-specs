@@ -1,24 +1,30 @@
 @wip
-Feature: Subscription scope and paid-period lifecycle
-  Platform-wide and content-specific subscriptions have independently configured offers.
+Feature: Platform subscription and paid-period lifecycle
+  One platform subscription covers MotifPath-owned content; it never covers teacher-priced content.
   Cancellation preserves paid-period access; commercial expiry preserves learning history.
-  # MOT-117; ADR-059. Stripe is selected; monetary values are configured through approved offer revisions.
+  # MOT-117; ADR-059, ADR-067. Stripe is selected; monetary values are configured through approved offer revisions.
 
-  Scenario: Configure prices independently for each subscription scope
-    Given the monthly platform-wide offer costs 40 BRL
-    And the monthly subscription offer for course "First chords" costs 20 BRL
-    When a learner chooses a monthly subscription for "First chords"
-    Then the checkout uses the course offer price of 20 BRL
-
-  Scenario Outline: Both billing periods are available for either subscription scope
-    Given a monthly offer and a discounted annual offer are configured for <scope>
-    When a learner views subscription offers for <scope>
+  Scenario: Both billing periods are available for the platform subscription
+    Given a monthly offer and a discounted annual offer are configured for the platform subscription
+    When a learner views platform subscription offers
     Then both configured billing periods and their prices are shown
-    Examples:
-      | scope                         |
-      | the platform                  |
-      | course "First chords"         |
-      | path "Guitar foundations"     |
+
+  Scenario: The platform subscription covers MotifPath-owned content
+    Given Alice has a paid platform subscription
+    When she opens an unfinished lesson in MotifPath-owned course "First chords"
+    Then the lesson is accessible through her subscription
+
+  Scenario: The platform subscription does not cover a teacher-priced path
+    Given Alice has a paid platform subscription
+    And she has not bought Bea's paid path "Jazz foundations"
+    When she opens an unfinished lesson in "Jazz foundations"
+    Then that lesson is blocked until she buys the path
+
+  Scenario: Subscribers pay the full teacher price
+    Given Alice has a paid platform subscription
+    And Bea's path "Jazz foundations" is offered at 50 BRL
+    When Alice starts a purchase of "Jazz foundations"
+    Then the checkout uses the full 50 BRL offer price without a subscriber discount
 
   Scenario Outline: Both billing periods renew automatically
     Given Alice has a <period> subscription with automatic renewal enabled
@@ -87,8 +93,8 @@ Feature: Subscription scope and paid-period lifecycle
     Then the lesson remains accessible through her permanent purchase
 
   Scenario: Subscription expiry preserves progress
-    Given Alice has recorded progress in course "First chords"
-    When her subscription to that course expires
+    Given Alice has recorded progress in MotifPath-owned course "First chords"
+    When her platform subscription expires
     Then her recorded progress remains intact
 
   Scenario: Monthly to annual switching waits for the next renewal
@@ -100,12 +106,6 @@ Feature: Subscription scope and paid-period lifecycle
     Given Alice has an annual subscription
     When she requests a switch to monthly billing
     Then the switch is refused without changing her paid access
-
-  Scenario: A content subscription does not grant unrelated content
-    Given Alice subscribes only to course "First chords"
-    And she has no access grant for course "Jazz harmony"
-    When she opens an unfinished restricted lesson in "Jazz harmony"
-    Then that lesson is blocked
 
   Scenario: Plus beta does not require teacher commerce beta
     Given Plus rollout prerequisites are satisfied for an approved cohort

@@ -76,8 +76,8 @@ RefundRequest:
       type: string
       enum: [commercially_eligible, requires_review, review_approved]
       description: |
-        Commercial seven-day eligibility at requested_at: only first subscriptions per
-        learner/scope and paid teacher-path purchases qualify. Start only after payment
+        Commercial seven-day eligibility at requested_at: only first platform subscriptions per
+        learner and paid teacher-path purchases qualify. Start only after payment
         succeeds and access is available. Renewals/rejoining never reset eligibility.
         Other cases await audited admin review. review_approved requires a documented
         approved policy/statutory basis and current case revision. Approval does not

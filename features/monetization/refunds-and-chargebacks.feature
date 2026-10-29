@@ -1,7 +1,7 @@
 @wip
 Feature: Refund eligibility and disputed payment access
   Full refunds are handled by an admin and return the full customer payment.
-  Refund eligibility is remembered per learner and subscription scope.
+  Refund eligibility is remembered per learner for the platform subscription.
   # MOT-117; ADR-059. Examples describe the commercial policy, not exceptions to statutory rights.
 
   Scenario: First subscription refund eligibility begins when paid access becomes available
@@ -20,10 +20,10 @@ Feature: Refund eligibility and disputed payment access
     When that subscription renews successfully
     Then the renewal does not create another seven-day commercial refund window
 
-  Scenario: Rejoining the same subscription scope does not restart refund eligibility
-    Given Alice previously subscribed to course "First chords"
+  Scenario: Rejoining the platform subscription does not restart refund eligibility
+    Given Alice previously subscribed to the platform
     And its first-subscription refund window ended before she cancelled
-    When Alice subscribes to "First chords" again
+    When Alice subscribes to the platform again
     Then no new seven-day commercial refund window is created
 
   Scenario: Changing billing period does not restart refund eligibility
@@ -31,11 +31,11 @@ Feature: Refund eligibility and disputed payment access
     When her monthly platform-wide subscription changes to annual at renewal
     Then no new seven-day commercial refund window is created
 
-  Scenario: First subscriptions to different scopes have independent eligibility
-    Given Alice previously subscribed to the platform
-    And she has never subscribed to course "First chords"
-    When her first paid subscription access to "First chords" becomes available
-    Then that course subscription receives its own seven-day commercial refund window
+  Scenario: A path purchase has refund eligibility independent of the subscription
+    Given Alice's first platform subscription refund window has ended
+    And she has never bought Bea's path "Guitar foundations"
+    When her paid access to "Guitar foundations" becomes available
+    Then that purchase receives its own seven-day commercial refund window
 
   Scenario: A request outside the window is not automatically eligible
     Given Alice's first paid subscription access became available on "2026-10-01T12:00:00Z"

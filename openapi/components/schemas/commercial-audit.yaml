@@ -130,7 +130,7 @@ CommercialState:
     credentials, payment instrument data, raw provider envelopes or unrelated personal data.
     Resource/action allowlists cover only commercial provenance/owner, sale/release/offer/config
     references, grant scope/source/status/validity, subscription billing/renewal, safe payment/refund
-    facts, teacher/path license state and settlement allocations/movements. Unknown fields require
+    facts and settlement allocations/movements. Unknown fields require
     schema review rather than blind serialization.
   additionalProperties: true
 

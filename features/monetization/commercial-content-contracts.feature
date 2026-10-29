@@ -22,16 +22,18 @@ Feature: Ownership, manifests and commercial dependencies
     When identical commercial release requests arrive concurrently
     Then one immutable commercial manifest is created with attributable attempts
 
-  Scenario: A nested premium dependency requires a license
+  Scenario: A nested premium dependency needs no teacher purchase
     Given Bea owns a path containing a lesson that embeds a platform premium exercise
-    And Bea has student Plus but no embedding license for that path
+    And Bea has bought nothing from MotifPath
     When Bea requests paid availability for that path
-    Then the new paid availability is refused for the unlicensed nested dependency
+    Then the commercial manifest records that exercise as a platform premium dependency
+    And paid availability is not refused for lack of a license
 
-  Scenario: A permanent path license covers revalidated additions
-    Given Bea holds a permanent embedding license for her path
-    When she adds a platform premium exercise and requests a new validated commercial manifest
-    Then the path license permits that premium dependency after revalidation without a recurring license fee
+  Scenario: Embedded premium exercises add no charge beyond the commission
+    Given Bea's paid path embeds a platform premium exercise
+    When Alice buys that path
+    Then MotifPath keeps the one configured platform commission on that sale
+    And no separate premium charge is added to the price or to Bea's earnings
 
   Scenario: A changed dependency invalidates new-sale validation
     Given a path offer was validated against dependency revision 3
@@ -53,12 +55,6 @@ Feature: Ownership, manifests and commercial dependencies
     And published course revision 4 exists
     When the course is withdrawn from new sales
     Then Alice retains her existing published copy without an automatic update
-
-  Scenario: Refunding a teacher license preserves prior buyer obligations
-    Given Bea sold a path while holding a valid embedding license
-    And Alice permanently bought that path
-    When the license payment is successfully refunded
-    Then new paid publication requiring that license is blocked while Alice retains her purchased rights
 
   Scenario: Free-to-paid conversion preserves previously granted access
     Given Alice already holds an explicit free grant for a path

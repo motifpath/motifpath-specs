@@ -3,7 +3,7 @@ Feature: Financial journal, refunds, disputes and settlement
   Consolidated MOT-117 behavior contracts; runtime implementation remains gated.
 
   Scenario: Refund eligibility includes the exact deadline
-    Given Alice first paid for her course subscription at "2026-10-01T10:00:00Z"
+    Given Alice first paid for her platform subscription at "2026-10-01T10:00:00Z"
     And usable access first became available at "2026-10-01T12:00:00Z"
     When her refund request is durably received at "2026-10-08T12:00:00Z"
     Then it is commercially eligible at the inclusive 168-hour deadline

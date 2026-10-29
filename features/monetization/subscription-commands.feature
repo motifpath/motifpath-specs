@@ -30,9 +30,9 @@ Feature: Caller-owned subscription commands are auditable and repeatable
     When Alice requests platform-wide offers priced in USD
     Then the request is refused rather than converting a configured BRL price
 
-  Scenario: Platform-wide offers cannot be requested for a content identity
-    When Alice requests platform-wide offers with a specific course identity
-    Then the inconsistent scope request is refused
+  Scenario: Subscription offers cannot be requested for a course
+    When Alice requests subscription offers scoped to course "First chords"
+    Then the request is refused because the platform is the only subscription scope
 
   Scenario: Cancellation remains available during acquisition rollback
     Given Alice has a subscription scheduled to renew
@@ -78,14 +78,14 @@ Feature: Caller-owned subscription commands are auditable and repeatable
     When Alice submits a new cancellation operation using its current revision
     Then an applied no-op command is recorded without another external cancellation
 
-  Scenario: A course offer cannot be used to switch a platform subscription
+  Scenario: A teacher path offer cannot be used to switch a platform subscription
     Given Alice has a monthly platform-wide subscription
-    When she requests annual switching using an offer for course "First chords"
-    Then the scope mismatch is refused without scheduling the change
+    When she requests annual switching using Bea's path purchase offer for "Guitar foundations"
+    Then the mismatched offer is refused without scheduling the change
 
   Scenario: Switching cannot change the subscription currency
     Given Alice has a monthly subscription priced in BRL
-    And an annual offer for the same scope is priced in another enabled currency
+    And an annual platform subscription offer is priced in another enabled currency
     When Alice requests switching to that annual offer
     Then the currency mismatch is refused
 

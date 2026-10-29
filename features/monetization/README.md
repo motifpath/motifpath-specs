@@ -9,7 +9,8 @@ implementation passes TDD. PR approval accepts proposed API details, not a deplo
 - [ADR-059: commercial authority, audit and idempotency](../../adrs/ADR-059-commercial-authority-audit-and-idempotency.md), accepted; renumbered from the colliding ADR-057 without changing the decision.
 - [ADR-058: Stripe](../../adrs/ADR-058-stripe-payment-provider.md), accepted.
 - [ADR-060: transactional records and recovery](../../adrs/ADR-060-commercial-records-and-recovery.md), accepted by Gilson Yamada on 2026-10-15.
-- [Commercial architecture and policies](../../openapi/commerce-contract.md): ownership, manifests, licenses, grants, ledger/rounding, settlement, refunds/disputes, CMS, delivery, retention and recovery.
+- [ADR-067: two commercial products](../../adrs/ADR-067-two-commercial-products.md), accepted 2026-10-29: one platform subscription plus permanent teacher-path purchases; content-scoped subscriptions and the teacher embedding license are removed.
+- [Commercial architecture and policies](../../openapi/commerce-contract.md): ownership, manifests, grants, ledger/rounding, settlement, refunds/disputes, CMS, delivery, retention and recovery.
 - [Core-domain API](../../openapi/core-domain-service.yaml): existing subscription/refund/Stripe/audit/access operations plus consolidated commerce operations.
 - [Commercial domain schemas](../../openapi/components/schemas/commerce.yaml) and [private message schemas](../../openapi/components/schemas/commercial-messages.yaml).
 - [Stripe processing profile](../../openapi/stripe-event-processing.md): verified receipts, account/mode isolation, uniqueness and recovery.
@@ -18,24 +19,24 @@ implementation passes TDD. PR approval accepts proposed API details, not a deplo
 
 | Contract | Coverage |
 |---|---|
-| [Subscription lifecycle](subscription-lifecycle.feature) | Platform/course/path monthly and annual billing, renewal, cancellation, grace and retained completion |
+| [Subscription lifecycle](subscription-lifecycle.feature) | Platform monthly and annual billing, renewal, cancellation, grace and retained completion |
 | [Subscription commands](subscription-commands.feature) | Caller ownership, revisions, rollback and durable idempotency |
 | [Refunds and chargebacks](refunds-and-chargebacks.feature) | Refund scope, paid-access window, independent grants and pending disputes |
 | [Refund commands](refund-commands.feature) | Caller cases, admin execution and per-payment uniqueness |
-| [Teacher commercial rights](teacher-commercial-rights.feature) | Permanent purchases/licenses, retained copies, free updates and future-earnings recovery |
+| [Teacher commercial rights](teacher-commercial-rights.feature) | Permanent purchases, retained copies, free updates and future-earnings recovery |
 | [Stripe ingestion](stripe-payment-ingestion.feature) | Verified payment receipts and acquisition intent |
 | [Payment reconciliation](payment-reconciliation.feature) | Duplicate/out-of-order recovery, unknown outcomes and notices |
 | [Commercial audit](commercial-audit.feature) | Immutable evidence, attempts, causality and admin inspection |
 | [Commercial access](commercial-access.feature) | Caller copy, independent rights, privacy and delivery-time checks |
-| [Content contracts](commercial-content-contracts.feature) | Provenance, immutable manifests, dependency licensing and withdrawal |
-| [Acquisition contracts](commercial-acquisition-contracts.feature) | Configured offers, path/license checkout and holdings |
+| [Content contracts](commercial-content-contracts.feature) | Provenance, immutable manifests, platform premium dependencies and withdrawal |
+| [Acquisition contracts](commercial-acquisition-contracts.feature) | Configured offers, path checkout and holdings |
 | [Financial contracts](commercial-financial-contracts.feature) | Exact refund deadline, admin review/retry, final disputes, rounding and settlement |
 | [Integration contracts](commercial-integration-contracts.feature) | CMS hints, private messages, audit coupling, media bypass and restore fencing |
 
 ## Rollout controls
 
 [Commercial activation registry](../../openapi/commercial-rollout-contract.md) defines proposed
-MOT-115-r3 names, ownership, default-OFF targeting, independent readiness tracks and audited
+MOT-115-r4 names, ownership, default-OFF targeting, independent readiness tracks and audited
 rollback. [Commercial control scenarios](commercial-controls.feature) cover activation boundaries;
 registry and Figma approvals remain separate from contract integration.
 
@@ -51,20 +52,19 @@ or settlement obligations. UI mirrors decisions. Plus and teacher commerce have 
 | MOT-118 | content_ownership | Commerce ownership read/correction; content contracts |
 | MOT-119 | content_versions | Immutable commercial release manifests; preserve existing course/path copies and ADR-055 |
 | MOT-120 | strapi_rights | CMS hint API, field authority/mapping/reconciliation; integration contracts |
-| MOT-121 | commercial_validation | Release and sale-state commands, transitive dependency/license validation; content contracts |
+| MOT-121 | commercial_validation | Release and sale-state commands, transitive dependency validation; content contracts |
 | MOT-122 | entitlement_resolution | Commercial access API and grant schema; access scenarios |
-| MOT-123 | access_grants | Typed grant/payment/purchase/license facts; acquisition, refund and reconciliation scenarios |
+| MOT-123 | access_grants | Typed grant/payment/purchase facts; acquisition, refund and reconciliation scenarios |
 | MOT-124 | progress_retention | Existing worker-owned progress, completed-lesson retention; lifecycle/access scenarios |
 | MOT-125 | authorization_enforcement | Protected lesson/exercise/media/export boundaries; integration/access failure scenarios |
 | MOT-127 | plus_catalog, plus_checkout | Subscription offer configuration/list and checkout; subscription/acquisition scenarios |
 | MOT-128 | plus_webhooks, plus_checkout | Stripe receipt and verified payment processing; ingestion/reconciliation scenarios |
 | MOT-129 | plus_billing | Cancellation/switch, renewal grace and notices; lifecycle/command/recovery scenarios |
 | MOT-131 | teacher_paid_paths, path_purchase | Sale-state/offer, checkout and permanent holdings; acquisition/content scenarios |
-| MOT-132 | premium_embedding_license | Path-license offers, acquisition and dependency checks; content/acquisition scenarios |
 | MOT-133 | teacher_settlement | Full refund review/retry, journal, balances/settlement history and internal transfer obligations; financial scenarios |
 | MOT-134 | each affected flag | End-to-end acquisition, refund, expiry, retained purchase and failed delivery scenarios across this directory |
 | MOT-135 | each affected flag | OFF/restart/replay scenarios; no lost existing obligation or unrestricted protected content |
-| MOT-136 | plus_webhooks, access_grants, strapi_rights, premium_embedding_license, teacher_settlement, private_beta | Recovery/alerts, journal/inbox/outbox/evidence integrity and CMS reconciliation |
+| MOT-136 | plus_webhooks, access_grants, strapi_rights, teacher_settlement, private_beta | Recovery/alerts, journal/inbox/outbox/evidence integrity and CMS reconciliation |
 | MOT-137 | private_beta | Independent Plus-first and teacher readiness; scoped cohorts with all existing-right safeguards |
 
 MOT-114/115/116/117 and MOT-126/130 are audit, registry, design or contract gates, not separate
@@ -73,9 +73,9 @@ commercial manifests do not replace live path editing with a new publication/ver
 
 ## Reviewed acquisition and pricing boundaries
 
-License acquisition validates the owning teacher/path and ownership revision without requiring
-an already-licensed sale manifest. License offers use release_id=null; the issued license binds
-the accepted offer. Buyer path offers still require full manifest/dependency validation.
+Buyer path offers require full manifest/dependency validation. MotifPath premium exercises in a
+paid teacher path are covered by the platform commission; the teacher buys nothing first. MOT-132
+(embedding licenses) closed with ADR-067.
 Subscription price replacements require expected_offer_id (null for first creation), with
 atomic comparison/promotion. Admin current-offer reads work even when acquisition is OFF.
 
