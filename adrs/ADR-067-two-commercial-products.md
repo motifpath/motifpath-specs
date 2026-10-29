@@ -1,9 +1,10 @@
 # ADR-067: Two commercial products — a platform subscription and teacher purchases
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-28
 **Deciders:** Gilson Yamada (Product Owner and engineering lead)
 **Task:** MOT-116, under MOT-107 / MOT-108
+**Accepted:** 2026-10-29, by Gilson, as proposed (specs#413).
 
 ## Context
 
@@ -125,4 +126,4 @@ dependency accounting the license needed.
 
 ---
 
-*Proposed on 2026-10-28. To revise, create a new ADR with Status: Supersedes ADR-067.*
+*This ADR was accepted on 2026-10-29. To revise, create a new ADR with Status: Supersedes ADR-067.*
