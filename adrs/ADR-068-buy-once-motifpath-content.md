@@ -1,6 +1,6 @@
 # ADR-068: MotifPath content can be bought once or unlocked with Plus
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-30
 **Deciders:** Gilson Yamada (Product Owner and engineering lead)
 **Task:** MOT-116, under MOT-107 / MOT-108
@@ -114,4 +114,4 @@ be reconsidered if subscribers ask for it.
 
 ---
 
-*This ADR was proposed on 2026-10-30. To revise, create a new ADR with Status: Supersedes ADR-068.*
+*This ADR was proposed on 2026-10-30 and accepted on 2026-11-01 after the product owner approved the MOT-116 r5 Figma storyboard. To revise, create a new ADR with Status: Supersedes ADR-068.*

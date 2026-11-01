@@ -1,6 +1,6 @@
 # ADR-067: Two commercial products — a platform subscription and teacher purchases
 
-**Status:** Accepted
+**Status:** Accepted (partially superseded by ADR-068)
 **Date:** 2026-10-28
 **Deciders:** Gilson Yamada (Product Owner and engineering lead)
 **Task:** MOT-116, under MOT-107 / MOT-108
