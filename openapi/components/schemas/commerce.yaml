@@ -212,8 +212,8 @@ CommercialContent:
 Offer:
   type: object
   description: Immutable backend-approved one-time offer revision; configurable terms never come from
-    checkout input. A teacher sells a path; MotifPath sells an owned course or path it chose to
-    offer (ADR-068).
+    checkout input. A teacher sells an owned course or path (ADR-067); MotifPath sells an owned
+    course or path it chose to offer (ADR-068).
   additionalProperties: false
   required:
     - offer_id
@@ -279,7 +279,7 @@ Offer:
         properties:
           kind:
             const: course_purchase
-            description: A course purchase covers one MotifPath course.
+            description: A course purchase covers one course.
       then:
         properties:
           content:
@@ -287,9 +287,6 @@ Offer:
               kind:
                 const: course
                 description: Course purchase content.
-          seller_kind:
-            const: platform
-            description: Only MotifPath sells courses individually.
     - if:
         properties:
           seller_kind:
@@ -300,7 +297,7 @@ Offer:
           seller_id:
             type: string
             format: uuid
-            description: The path-owning teacher.
+            description: The teacher who owns the course or path.
       else:
         properties:
           seller_id:
@@ -695,7 +692,7 @@ CreateOffer:
       minimum: 1
     kind:
       type: string
-      description: Authorized offer family; course_purchase only for MotifPath-owned courses.
+      description: Authorized offer family, matching the content kind.
       enum:
         - path_purchase
         - course_purchase

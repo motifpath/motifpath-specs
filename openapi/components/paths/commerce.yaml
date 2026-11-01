@@ -117,8 +117,8 @@ Publish:
     operationId: createCommercialOffer
     summary: Create an immutable one-time offer revision
     description: Registered content owner or admin only; matching expected_revision and positive
-      enabled-currency price under current configuration. Teacher-owned paths stay within teacher
-      price bounds. MotifPath-owned courses and paths are offered only by an administrator, per item,
+      enabled-currency price under current configuration. Teacher-owned courses and paths stay within
+      teacher price bounds. MotifPath-owned courses and paths are offered only by an administrator, per item,
       with no commission (ADR-068); an item without an offer stays Plus-only. Validate the
       complete current sale manifest and transitive dependency rights. New offer revisions never
       rewrite accepted checkout snapshots. Record

@@ -61,7 +61,7 @@ or settlement obligations. UI mirrors decisions. Plus and teacher commerce have 
 | MOT-127 | plus_catalog, plus_checkout | Subscription offer configuration/list and checkout; subscription/acquisition scenarios |
 | MOT-128 | plus_webhooks, plus_checkout | Stripe receipt and verified payment processing; ingestion/reconciliation scenarios |
 | MOT-129 | plus_billing | Cancellation/switch, renewal grace and notices; lifecycle/command/recovery scenarios |
-| MOT-131 | teacher_paid_paths, path_purchase, motifpath_purchase | Sale-state/offer, checkout and permanent holdings for teacher paths and MotifPath-owned courses/paths; acquisition/content/access scenarios |
+| MOT-131 | teacher_paid_paths, path_purchase, motifpath_purchase | Sale-state/offer, checkout and permanent holdings for teacher and MotifPath-owned courses/paths; acquisition/content/access scenarios |
 | MOT-133 | teacher_settlement | Full refund review/retry, journal, balances/settlement history and internal transfer obligations; financial scenarios |
 | MOT-134 | each affected flag | End-to-end acquisition, refund, expiry, retained purchase and failed delivery scenarios across this directory |
 | MOT-135 | each affected flag | OFF/restart/replay scenarios; no lost existing obligation or unrestricted protected content |
