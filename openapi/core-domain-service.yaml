@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.52.0
+  version: 0.53.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -86,6 +86,10 @@ paths:
     $ref: './components/paths/subscriptions.yaml#/Subscriptions'
   /users/me/subscriptions/{subscription_id}/cancel-renewal:
     $ref: './components/paths/subscriptions.yaml#/CancelRenewal'
+  /users/me/subscriptions/{subscription_id}/resume-renewal:
+    $ref: './components/paths/subscriptions.yaml#/ResumeRenewal'
+  /users/me/subscriptions/{subscription_id}/payment-method-session:
+    $ref: './components/paths/subscriptions.yaml#/PaymentMethodSession'
   /users/me/subscriptions/{subscription_id}/schedule-annual:
     $ref: './components/paths/subscriptions.yaml#/ScheduleAnnual'
   /users:

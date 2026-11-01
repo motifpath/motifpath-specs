@@ -136,6 +136,32 @@ CancelSubscriptionRequest:
       minimum: 1
       description: Subscription revision observed by the caller before requesting cancellation.
 
+ResumeRenewalRequest:
+  type: object
+  additionalProperties: false
+  description: Turn the caller's stopped renewal back on before paid_until; nothing is charged now.
+  required: [expected_revision]
+  properties:
+    expected_revision:
+      type: integer
+      minimum: 1
+      description: Subscription revision observed by the caller before resuming renewal.
+
+PaymentMethodSession:
+  type: object
+  additionalProperties: false
+  description: Short-lived provider-hosted page for updating the payment method only; not proof of payment.
+  required: [session_url, expires_at]
+  properties:
+    session_url:
+      type: string
+      format: uri
+      description: Provider-hosted URL to open; never stored or reused after expires_at.
+    expires_at:
+      type: string
+      format: date-time
+      description: Instant after which the session can no longer be opened.
+
 ScheduleAnnualRequest:
   type: object
   additionalProperties: false
@@ -167,7 +193,7 @@ SubscriptionCommand:
       description: Caller-owned subscription targeted by the command.
     action:
       type: string
-      enum: [cancel_renewal, schedule_annual]
+      enum: [cancel_renewal, resume_renewal, schedule_annual]
       description: Commercial action recorded for this operation.
     status:
       type: string

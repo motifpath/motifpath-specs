@@ -113,7 +113,10 @@ not revive a successfully refunded or lost-dispute grant. Independent free/paid/
 are evaluated together. Refund/chargeback transitions never delete completion evidence.
 
 Use trusted UTC instants and half-open paid/grace intervals: valid_from <= now < valid_until.
-Cancellation only disables the next renewal, preserving the paid interval. A failed renewal
+Cancellation only disables the next renewal, preserving the paid interval. Before paid_until
+the learner may resume renewal, which charges nothing now; afterwards they subscribe again. During
+paid or renewal_grace status the learner may update the payment method on a provider-hosted page
+limited to that action; returning from it never proves payment (MOT-126). A failed renewal
 gets exactly 168 hours of grace from prior paid_until; initial payment failure gets none. An
 unpaid lesson blocks at grace_until, remains visible and keeps progress. Payment recovered
 later grants only its verified billed interval; no extra days arise from delayed notification.
