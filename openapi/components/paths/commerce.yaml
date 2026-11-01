@@ -4,6 +4,8 @@ Content:
     summary: Read authoritative commercial content
     description: Registered content owner or admin only; other callers receive 404. content_kind must be
       course, path, content_node or exercise. Public editorial metadata is not ownership proof.
+      sale_blockers lists, for the caller, why a paid change or new sale would be refused now,
+      including new_sales_paused when the rollout denies it; the teacher UI mirrors it (MOT-130).
     tags:
       - Commerce
     parameters:
@@ -49,7 +51,9 @@ Sale:
       is course or path. Free-to-paid and price/withdrawal changes retain actor, prior/resulting
       state and immutable references. Paid requires validated transitive rights and valid configured
       offers. Do not modify existing buyer grants/copies or auto-update learners. CMS hints cannot
-      invoke this authority. Every commercial mutation is durably coupled to audit evidence;
+      invoke this authority. Paid also requires an admin-published version learners can get and,
+      for a teacher-owned item, the owner's verified payout account (MOT-130); refusals are listed
+      as sale_blockers on the content read. Every commercial mutation is durably coupled to audit evidence;
       uncertain external outcomes remain pending. Acquisition OFF never disables existing
       obligations.  Existing free grants are grandfathered explicitly; paid conversion never creates
       an unrequested charge or silently removes their granted access.
@@ -968,6 +972,143 @@ CurrentConfiguration:
         $ref: ./subscriptions.yaml#/Unauthenticated
       "403":
         description: Caller lacks the authoritative role/ownership or new action is disabled.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+TeacherTerms:
+  get:
+    operationId: getMyTeacherSellingTerms
+    summary: Read the current selling terms
+    description: Backend-resolved teacher only. Return price bounds, commission and teacher fee share from
+      the promoted configuration, without its reason, identity or history (MOT-130). Before first
+      configuration return 404; new sales remain disabled.
+    tags:
+      - Commerce
+    parameters: []
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/TeacherSellingTerms
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller is not a backend-resolved teacher.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+TeacherSales:
+  get:
+    operationId: listMyTeacherSales
+    summary: List the caller's own sales
+    description: Backend-resolved teacher only; newest first. Each sale gives the price, the teacher's
+      posted earnings and its status. Never return buyer identity, contact or payment method.
+      New-acquisition OFF never hides past sales or refunds (MOT-130).
+    tags:
+      - Commerce
+    parameters:
+      - $ref: ../../core-domain-service.yaml#/components/parameters/Limit
+      - $ref: ../../core-domain-service.yaml#/components/parameters/Offset
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/TeacherSalePage
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller is not a backend-resolved teacher.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+PayoutAccount:
+  get:
+    operationId: getMyPayoutAccount
+    summary: Read the caller's payout account readiness
+    description: Backend-resolved teacher only. A teacher who never onboarded gets not_started, not 404.
+      Status comes from reconciled provider state; unknown outcomes stay checking. No bank details,
+      identity documents or provider identifiers (MOT-130).
+    tags:
+      - Commerce
+    parameters: []
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/PayoutAccount
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller is not a backend-resolved teacher.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+PayoutOnboarding:
+  post:
+    operationId: createMyPayoutOnboardingLink
+    summary: Create a provider-hosted payout onboarding link
+    description: Backend-resolved teacher only. Return a short-lived provider-hosted onboarding link with
+      server-configured return URLs; MotifPath never collects bank details. Refused with 403 while
+      teacher_settlement denies new onboarding for the caller; existing balances, settlements and
+      recovery continue (MOT-130).
+    tags:
+      - Commerce
+    parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, actor and action. A replay within the link's
+          lifetime returns the same link.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/PayoutOnboardingLink
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller is not a backend-resolved teacher.
         content:
           application/json:
             schema:

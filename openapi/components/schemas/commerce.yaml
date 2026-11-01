@@ -178,6 +178,7 @@ CommercialContent:
     - revision
     - sale_state
     - release
+    - sale_blockers
   properties:
     ownership:
       $ref: "#/Ownership"
@@ -198,6 +199,13 @@ CommercialContent:
         - $ref: "#/Release"
         - type: "null"
       description: Latest validated manifest, or null before first commercial validation.
+    sale_blockers:
+      type: array
+      description: Current reasons a paid change or new sale would be refused, evaluated by core for the
+        caller; empty when nothing blocks. A UI hint only; the command re-evaluates them.
+      items:
+        $ref: "#/SaleBlocker"
+        description: One reason.
   allOf:
     - if:
         properties:
@@ -1289,3 +1297,208 @@ PaymentPage:
       type: integer
       minimum: 0
       description: Skipped records.
+SaleBlocker:
+  type: object
+  description: One reason core would refuse a paid sale state or new sale now (MOT-130). Never offers a
+    license or purchase as the resolution (ADR-067).
+  additionalProperties: false
+  required:
+    - code
+    - content
+  properties:
+    code:
+      type: string
+      description: unpublished = no admin-published version learners can get; payout_account_not_verified
+        = the owning teacher's payout account is not verified; unresolved_ownership = no reviewed rights
+        holder; dependency_rights = a dependency the owner may not resell; dependency_missing and
+        dependency_cycle = invalid dependency graph; configuration_missing = no complete selling
+        configuration; new_sales_paused = the applicable rollout flag denies new sale actions.
+      enum:
+        - unpublished
+        - payout_account_not_verified
+        - unresolved_ownership
+        - dependency_rights
+        - dependency_missing
+        - dependency_cycle
+        - configuration_missing
+        - new_sales_paused
+    content:
+      oneOf:
+        - $ref: "#/ContentRef"
+        - type: "null"
+      description: The dependency concerned, or null when the blocker is about the item or the seller.
+TeacherSellingTerms:
+  type: object
+  description: The current selling terms a teacher prices against (MOT-130). Derived from the promoted
+    configuration without its reason, identity or history.
+  additionalProperties: false
+  required:
+    - configuration_revision
+    - currency
+    - teacher_minimum
+    - teacher_maximum
+    - commission_basis_points
+    - teacher_fee_basis_points
+  properties:
+    configuration_revision:
+      type: integer
+      minimum: 1
+      description: Promoted configuration revision these terms come from.
+    currency:
+      type: string
+      pattern: ^[A-Z]{3}$
+      description: Enabled selling currency.
+    teacher_minimum:
+      $ref: "#/PositiveMoney"
+      description: Lowest teacher price.
+    teacher_maximum:
+      $ref: "#/PositiveMoney"
+      description: Highest teacher price.
+    commission_basis_points:
+      type: integer
+      minimum: 0
+      maximum: 10000
+      description: Platform commission on each sale; it also covers embedded MotifPath premium exercises.
+    teacher_fee_basis_points:
+      type: integer
+      minimum: 0
+      maximum: 10000
+      description: Teacher share of actual provider sale fees; the exact fee is known only per sale.
+TeacherSale:
+  type: object
+  description: One sale of the caller's own course or path (MOT-130). Never identifies the buyer or
+    their payment method.
+  additionalProperties: false
+  required:
+    - sale_payment_id
+    - content
+    - sold_at
+    - price
+    - earnings
+    - status
+    - refunded_at
+    - settlement_id
+  properties:
+    sale_payment_id:
+      type: string
+      format: uuid
+      description: Original sale payment, as referenced by settlements.
+    content:
+      $ref: "#/ContentRef"
+      description: The course or path sold.
+    sold_at:
+      type: string
+      format: date-time
+      description: Verified payment time.
+    price:
+      $ref: "#/PositiveMoney"
+      description: Accepted offer price the buyer paid.
+    earnings:
+      $ref: "#/Money"
+      description: Teacher earnings after commission and the allocated fee share, as originally posted.
+    status:
+      type: string
+      description: pending = earned, not yet available; available = settled by the provider and payable;
+        transferred = included in a settlement; refunded = fully refunded, with recovery shown on the
+        balance when already paid.
+      enum:
+        - pending
+        - available
+        - transferred
+        - refunded
+    refunded_at:
+      oneOf:
+        - type: string
+          format: date-time
+        - type: "null"
+      description: Time the full refund succeeded; required when refunded.
+    settlement_id:
+      oneOf:
+        - type: string
+          format: uuid
+        - type: "null"
+      description: Settlement that included these earnings, if any.
+  allOf:
+    - if:
+        properties:
+          status:
+            const: refunded
+            description: A refunded sale.
+      then:
+        properties:
+          refunded_at:
+            type: string
+            format: date-time
+            description: Required refund time.
+TeacherSalePage:
+  type: object
+  description: Caller's own sales, newest first.
+  additionalProperties: false
+  required:
+    - items
+    - total
+    - limit
+    - offset
+  properties:
+    items:
+      type: array
+      description: Sales.
+      items:
+        $ref: "#/TeacherSale"
+        description: Sale.
+    total:
+      type: integer
+      minimum: 0
+      description: Matching records.
+    limit:
+      type: integer
+      minimum: 1
+      maximum: 100
+      description: Requested page size.
+    offset:
+      type: integer
+      minimum: 0
+      description: Skipped records.
+PayoutAccount:
+  type: object
+  description: The caller's payout account readiness (MOT-130). No bank details, identity documents or
+    provider identifiers.
+  additionalProperties: false
+  required:
+    - status
+    - onboarding_available
+    - updated_at
+  properties:
+    status:
+      type: string
+      description: not_started = never onboarded; checking = submitted, provider not yet verified;
+        verified = transfers and new sales allowed; action_required = the provider needs more from the
+        teacher. Unknown provider outcomes stay checking.
+      enum:
+        - not_started
+        - checking
+        - verified
+        - action_required
+    onboarding_available:
+      type: boolean
+      description: False when teacher_settlement denies new onboarding for the caller.
+    updated_at:
+      type: string
+      format: date-time
+      description: Last reconciled provider state.
+PayoutOnboardingLink:
+  type: object
+  description: Short-lived link to provider-hosted onboarding; return URLs are configured server-side.
+  additionalProperties: false
+  required:
+    - url
+    - expires_at
+  properties:
+    url:
+      type: string
+      format: uri
+      description: Provider-hosted onboarding page.
+    expires_at:
+      type: string
+      format: date-time
+      description: When the link stops working.

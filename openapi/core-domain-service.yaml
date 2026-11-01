@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.52.0
+  version: 0.53.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -60,6 +60,14 @@ paths:
     $ref: './components/paths/commerce.yaml#/Holdings'
   /teachers/me/commercial-balances:
     $ref: './components/paths/commerce.yaml#/Balances'
+  /teachers/me/commercial-terms:
+    $ref: './components/paths/commerce.yaml#/TeacherTerms'
+  /teachers/me/commercial-sales:
+    $ref: './components/paths/commerce.yaml#/TeacherSales'
+  /teachers/me/payout-account:
+    $ref: './components/paths/commerce.yaml#/PayoutAccount'
+  /teachers/me/payout-account/onboarding-links:
+    $ref: './components/paths/commerce.yaml#/PayoutOnboarding'
   /admin/commercial-configurations:
     $ref: './components/paths/commerce.yaml#/Configuration'
   /integrations/cms/commercial-hints:

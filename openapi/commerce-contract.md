@@ -187,6 +187,19 @@ initial profile. Pending disputes record actual provider balance movements separ
 not issue a second customer refund. Track returned amounts per payment across refunds/disputes;
 reconcile competing outcomes before initiating any additional financial return.
 
+### Teacher selling surfaces (MOT-130)
+
+A teacher reads, for their own items only: current selling terms (price bounds, commission and
+fee share, without configuration reason or history); their sales with price, posted earnings and
+status, never the buyer's identity or payment method; and their payout account readiness
+(not_started, checking, verified, action_required), never bank details or provider identifiers.
+Payout onboarding is provider-hosted through a short-lived link with server-configured return
+URLs; teacher_settlement OFF refuses new links but never hides balances, sales, settlements or
+recovery. A paid sale state needs an admin-published version learners can get and, for a
+teacher-owned item, a verified payout account. The content read lists current sale blockers for
+the caller, including new_sales_paused under rollout, so the UI mirrors core without deciding;
+no blocker is ever resolved by a license or purchase.
+
 ## Refund review and notifications
 
 Refund eligibility is first platform subscription per holder, never reset by rejoin, renewal or
