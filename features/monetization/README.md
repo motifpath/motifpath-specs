@@ -10,6 +10,7 @@ implementation passes TDD. PR approval accepts proposed API details, not a deplo
 - [ADR-058: Stripe](../../adrs/ADR-058-stripe-payment-provider.md), accepted.
 - [ADR-060: transactional records and recovery](../../adrs/ADR-060-commercial-records-and-recovery.md), accepted by Gilson Yamada on 2026-10-15.
 - [ADR-067: two commercial products](../../adrs/ADR-067-two-commercial-products.md), accepted 2026-10-29: one platform subscription plus permanent teacher-path purchases; content-scoped subscriptions and the teacher embedding license are removed.
+- [ADR-068: buy once or Plus on MotifPath content](../../adrs/ADR-068-buy-once-motifpath-content.md), accepted 2026-11-01: an administrator may add a one-time offer, with no commission, to a MotifPath-owned course or path; subscribers are not offered it, and owned stays owned.
 - [Commercial architecture and policies](../../openapi/commerce-contract.md): ownership, manifests, grants, ledger/rounding, settlement, refunds/disputes, CMS, delivery, retention and recovery.
 - [Core-domain API](../../openapi/core-domain-service.yaml): existing subscription/refund/Stripe/audit/access operations plus consolidated commerce operations.
 - [Commercial domain schemas](../../openapi/components/schemas/commerce.yaml) and [private message schemas](../../openapi/components/schemas/commercial-messages.yaml).
@@ -60,7 +61,7 @@ or settlement obligations. UI mirrors decisions. Plus and teacher commerce have 
 | MOT-127 | plus_catalog, plus_checkout | Subscription offer configuration/list and checkout; subscription/acquisition scenarios |
 | MOT-128 | plus_webhooks, plus_checkout | Stripe receipt and verified payment processing; ingestion/reconciliation scenarios |
 | MOT-129 | plus_billing | Cancellation/switch, renewal grace and notices; lifecycle/command/recovery scenarios |
-| MOT-131 | teacher_paid_paths, path_purchase | Sale-state/offer, checkout and permanent holdings; acquisition/content scenarios |
+| MOT-131 | teacher_paid_paths, path_purchase, motifpath_purchase | Sale-state/offer, checkout and permanent holdings for teacher paths and MotifPath-owned courses/paths; acquisition/content/access scenarios |
 | MOT-133 | teacher_settlement | Full refund review/retry, journal, balances/settlement history and internal transfer obligations; financial scenarios |
 | MOT-134 | each affected flag | End-to-end acquisition, refund, expiry, retained purchase and failed delivery scenarios across this directory |
 | MOT-135 | each affected flag | OFF/restart/replay scenarios; no lost existing obligation or unrestricted protected content |

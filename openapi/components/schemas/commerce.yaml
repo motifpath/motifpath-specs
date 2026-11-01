@@ -212,7 +212,8 @@ CommercialContent:
 Offer:
   type: object
   description: Immutable backend-approved one-time offer revision; configurable terms never come from
-    checkout input.
+    checkout input. A teacher sells a path; MotifPath sells an owned course or path it chose to
+    offer (ADR-068).
   additionalProperties: false
   required:
     - offer_id
@@ -221,6 +222,7 @@ Offer:
     - release_id
     - price
     - configuration_revision
+    - seller_kind
     - seller_id
   properties:
     offer_id:
@@ -229,17 +231,13 @@ Offer:
       format: uuid
     kind:
       type: string
-      description: One-time commercial product family; a teacher path purchase is the only one.
+      description: One-time commercial product family; its content kind matches.
       enum:
         - path_purchase
+        - course_purchase
     content:
-      allOf:
-        - $ref: "#/ContentRef"
-        - properties:
-            kind:
-              const: path
-              description: A one-time purchase covers one path.
-      description: Only the target path covered by this one-time product.
+      $ref: "#/ContentRef"
+      description: The one course or path this purchase covers.
     release_id:
       type: string
       description: Fully validated sale manifest; a buyer purchase requires validated redistribution rights.
@@ -251,10 +249,63 @@ Offer:
       type: string
       description: Approved immutable pricing/commission configuration.
       minLength: 1
-    seller_id:
+    seller_kind:
       type: string
-      description: Authoritative seller, the path-owning teacher.
+      description: Trusted rights holder that sells the item. A platform sale carries no commission,
+        teacher earnings or settlement.
+      enum:
+        - platform
+        - teacher
+    seller_id:
+      type:
+        - string
+        - "null"
+      description: The owning teacher; null when MotifPath sells its own item.
       format: uuid
+  allOf:
+    - if:
+        properties:
+          kind:
+            const: path_purchase
+            description: A path purchase covers one path.
+      then:
+        properties:
+          content:
+            properties:
+              kind:
+                const: path
+                description: Path purchase content.
+    - if:
+        properties:
+          kind:
+            const: course_purchase
+            description: A course purchase covers one MotifPath course.
+      then:
+        properties:
+          content:
+            properties:
+              kind:
+                const: course
+                description: Course purchase content.
+          seller_kind:
+            const: platform
+            description: Only MotifPath sells courses individually.
+    - if:
+        properties:
+          seller_kind:
+            const: teacher
+            description: Teacher sales name the owning teacher.
+      then:
+        properties:
+          seller_id:
+            type: string
+            format: uuid
+            description: The path-owning teacher.
+      else:
+        properties:
+          seller_id:
+            type: "null"
+            description: MotifPath sales have no teacher seller.
 OfferList:
   type: object
   description: Enabled eligible one-time offers; no offers when acquisition or valid configuration is absent.
@@ -487,13 +538,13 @@ Grant:
             description: Active permanent rights have no time expiry.
 Purchase:
   type: object
-  description: Permanent path acquisition independent of learner/teacher subscription; refunded
-    payment rights end separately.
+  description: Permanent course or path acquisition independent of learner/teacher subscription;
+    refunded payment rights end separately. A later platform subscription, or its end, never changes it.
   additionalProperties: false
   required:
     - purchase_id
     - holder_id
-    - path_id
+    - content
     - release_id
     - payment_id
     - grant_id
@@ -508,10 +559,16 @@ Purchase:
       type: string
       description: Buyer identity.
       format: uuid
-    path_id:
-      type: string
+    content:
+      allOf:
+        - $ref: "#/ContentRef"
+        - properties:
+            kind:
+              enum:
+                - course
+                - path
+              description: A purchase covers one course or path.
       description: Purchased template scope.
-      format: uuid
     release_id:
       type: string
       description: Immutable accepted sale manifest.
@@ -537,7 +594,7 @@ Purchase:
       format: uuid
 Holding:
   $ref: "#/Purchase"
-  description: One caller-owned permanent path purchase.
+  description: One caller-owned permanent course or path purchase.
 HoldingsPage:
   type: object
   description: Caller-owned acquisitions, including ended records, ordered by identity.
@@ -553,7 +610,7 @@ HoldingsPage:
       description: Only caller-owned holdings.
       items:
         $ref: "#/Holding"
-        description: Permanent path purchase.
+        description: Permanent course or path purchase.
     total:
       type: integer
       description: Total caller-owned records.
@@ -623,7 +680,8 @@ ChangeSale:
 CreateOffer:
   type: object
   description: Authorized owner chooses terms within approved configuration; backend owns resulting
-    immutable offer.
+    immutable offer. Teacher prices stay within teacher bounds; an administrator sets the price of a
+    MotifPath-owned item, which no teacher bound limits.
   additionalProperties: false
   required:
     - expected_revision
@@ -637,9 +695,10 @@ CreateOffer:
       minimum: 1
     kind:
       type: string
-      description: Authorized offer family.
+      description: Authorized offer family; course_purchase only for MotifPath-owned courses.
       enum:
         - path_purchase
+        - course_purchase
     price:
       $ref: "#/PositiveMoney"
       description: Strictly positive configured offer price.
@@ -1061,6 +1120,7 @@ JournalLine:
         - provider_clearing
         - customer_refund
         - platform_commission
+        - platform_sales
         - provider_fees
         - teacher_earnings
         - teacher_recovery

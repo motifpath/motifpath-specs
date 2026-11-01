@@ -87,3 +87,49 @@ Feature: Authoritative offers and one-time acquisition
     Given course "First chords" is MotifPath-owned
     When an administrator configures a monthly subscription offer scoped to that course
     Then the offer is refused because the platform subscription is the only subscription scope
+
+  # ADR-068: a MotifPath-owned course or path may be bought once or covered by Plus.
+  Scenario: A MotifPath item without a purchase offer stays Plus-only
+    Given MotifPath-owned course "First chords" has no one-time offer
+    And Alice has no platform subscription
+    When Alice requests course purchase offers for "First chords"
+    Then no purchase offer is returned
+
+  Scenario: A learner without Plus can buy a MotifPath course once
+    Given an administrator added a 90 BRL one-time offer to MotifPath-owned course "First chords"
+    And Alice has no platform subscription
+    When Alice requests course purchase offers for "First chords"
+    Then the 90 BRL offer is returned with MotifPath as the seller and no teacher seller
+
+  Scenario: An active subscriber is not offered the purchase
+    Given MotifPath-owned course "First chords" has a one-time offer
+    And Alice has a paid platform subscription
+    When Alice requests course purchase offers for "First chords"
+    Then no purchase offer is returned because her subscription already covers the course
+
+  Scenario: An active subscriber cannot check out a MotifPath item
+    Given MotifPath-owned course "First chords" has a one-time offer
+    And Alice has a paid platform subscription
+    When Alice starts a checkout with that offer
+    Then the checkout is refused without initiating a payment
+
+  Scenario: The purchase offer returns when the subscription ends
+    Given MotifPath-owned course "First chords" has a one-time offer
+    And Alice's platform subscription and renewal grace have ended
+    When Alice requests course purchase offers for "First chords"
+    Then the one-time offer is returned
+
+  Scenario: Only an administrator adds a purchase offer to MotifPath content
+    Given teacher "Bea" does not own MotifPath-owned path "Rhythm basics"
+    When Bea creates a one-time offer for "Rhythm basics"
+    Then the offer is refused for lack of authority
+
+  Scenario: Teacher price bounds do not limit a MotifPath offer
+    Given the teacher price bounds are 20 BRL to 80 BRL
+    When an administrator creates a 120 BRL one-time offer for MotifPath-owned course "First chords"
+    Then the offer is accepted
+
+  Scenario: A teacher course is not sold individually
+    Given teacher "Bea" owns course "Blues phrasing"
+    When Bea creates a one-time course offer for "Blues phrasing"
+    Then the offer is refused because only MotifPath sells courses individually

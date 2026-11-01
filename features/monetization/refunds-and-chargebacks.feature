@@ -15,6 +15,11 @@ Feature: Refund eligibility and disputed payment access
     When she requests a refund on "2026-10-06T12:00:00Z"
     Then the request is within the seven-day commercial refund window
 
+  Scenario: A MotifPath course purchase has a seven-day refund window
+    Given Alice paid for MotifPath-owned course "First chords" and received access on "2026-10-01T12:00:00Z"
+    When she requests a refund on "2026-10-06T12:00:00Z"
+    Then the request is within the seven-day commercial refund window
+
   Scenario: Automatic renewal does not restart refund eligibility
     Given Alice's first subscription refund window has ended
     When that subscription renews successfully
