@@ -4,7 +4,8 @@ Status: consolidated specification for review, 2026-10-15. Business bundle appro
 in chat on this date. ADR-060 was approved by Gilson on 2026-10-15; API additions still require PR review. This is a durable contract,
 not an implementation plan. No runtime readiness or Figma/flag approval is implied.
 Revised 2026-10-29 for ADR-067: two commercial products; course/path-scoped subscriptions and
-the teacher embedding license are removed.
+the teacher embedding license are removed. Revised 2026-11-01 for ADR-068: a MotifPath-owned
+course or path may also be bought once.
 
 ## Authority and identifiers
 
@@ -20,13 +21,17 @@ receipt and decision IDs are globally unique server IDs. External IDs are always
 trusted environment/account. Never match by a bare provider ID across accounts or modes.
 
 There are exactly two commercial products: the platform subscription and the permanent
-teacher-path purchase. The platform subscription has one platform-wide scope and covers
+individual purchase. The platform subscription has one platform-wide scope and covers
 MotifPath-owned content (team-authored courses and paths, premium exercises and premium tools);
 it never covers teacher-priced content. There are no course- or path-scoped subscriptions and no
 teacher embedding license. Subscription periods are monthly and annual, both automatically
 renewing. Prices, annual discounts, teacher bounds, commission and fee allocation are
-configurable. MotifPath-owned content is not sold individually, and subscribers get no discount
-on teacher purchases. New sales require complete validated configuration and
+configurable. A teacher sells a path within the teacher price bounds. An administrator may add a
+one-time offer to a MotifPath-owned course or path, per item, at an administrator-approved price
+with no commission, teacher earnings or settlement (ADR-068); an item without one stays
+Plus-only. While a learner's platform subscription is active, MotifPath-owned items offer no
+purchase and checkout refuses one; the offer returns when the subscription ends. Subscribers get
+no discount on teacher purchases. New sales require complete validated configuration and
 eligible offers. Free-to-paid changes must explicitly preserve previously granted free access
 through durable grandfather grants; an existing learner is never silently charged or converted. Initial activation is **BRL only**; USD requires a separate explicit market/cost
 approval. Currency syntax alone enables nothing. A yearly offer must be cheaper than twelve
@@ -80,8 +85,11 @@ platform_premium dependencies. The single platform commission on each sale cover
 is no separate license, surcharge or prerequisite purchase for the teacher. Updating dependencies
 invalidates new-sale validation until rechecked.
 
-A purchase grants the buyer every exercise the purchased path contains, premium ones included,
-for that path only; it never unlocks those exercises elsewhere. A premium exercise in a free
+A purchase grants the buyer every exercise the purchased course or path contains, premium ones
+included, for that item only; it never unlocks those exercises elsewhere, premium tools or the
+platform subscription. A MotifPath-owned item is accessible when owned or subscribed: a buyer
+who later subscribes, or whose subscription ends, keeps the bought item, and no credit or refund
+arises from the overlap. A premium exercise in a free
 teacher path stays locked for learners without the platform subscription.
 
 Permanent buyers retain existing copies after sale withdrawal, including unfinished lessons.
@@ -150,7 +158,9 @@ out-of-range arithmetic before committing; aggregate using checked exact arithme
 For gross G and configured platform share B basis points, platform commission is
 floor((G * B + 5000) / 10000), using exact intermediate arithmetic. Teacher sale fee share uses
 the same half-up rule against actual provider fee F and configured teacher-fee basis points.
-Teacher earnings are G - commission - allocated sale fee. Never allow a configuration/offer to
+Teacher earnings are G - commission - allocated sale fee. A MotifPath-owned sale posts its gross
+to platform_sales with the actual provider fee as MotifPath cost; it has no commission, teacher
+earnings, transfer or settlement, and its refunds have no teacher recovery. Never allow a configuration/offer to
 produce negative seller earnings; unexpected late fees enter reconciled platform adjustment
 review rather than silently debiting a teacher bank account. Snapshot allocation configuration
 at accepted sale; later configuration changes affect only future sales. Refund processing fees
@@ -180,7 +190,8 @@ reconcile competing outcomes before initiating any additional financial return.
 ## Refund review and notifications
 
 Refund eligibility is first platform subscription per holder, never reset by rejoin, renewal or
-period switch. Paid path purchase refunds use the original acquisition payment. The commercial
+period switch. Each paid course or path purchase, teacher or MotifPath, has its own window and
+refunds use the original acquisition payment. The commercial
 window starts at max(verified paid_at, first access_available_at), only when both exist, and
 ends **inclusively 168 hours later in UTC**. Use original durable request time, not admin handling
 time; a timely request stays timely. Future renewal remains enabled after refund unless the

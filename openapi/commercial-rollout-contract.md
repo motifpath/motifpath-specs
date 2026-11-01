@@ -1,6 +1,6 @@
 # Commercial activation registry — MOT-115
 
-**Revision:** MOT-115-r4 · **Status:** Proposed; explicit PO registry approval pending. r4 removes the premium embedding license and content-scoped subscriptions (ADR-067).
+**Revision:** MOT-115-r5 · **Status:** Proposed; explicit PO registry approval pending. r4 removes the premium embedding license and content-scoped subscriptions (ADR-067). r5 adds motifpath_purchase, one-time purchases of MotifPath-owned items (ADR-068).
 
 This is the durable activation contract for new commercial capabilities. It does not enable flags, approve Figma revisions or prove runtime readiness. All defaults are OFF in local, test, staging and production; every environment starts with empty subject allowlists. No environment inherits another environment’s activation or cohort.
 
@@ -34,6 +34,7 @@ Gilson Yamada is the accountable owner for every flag, as assigned for commercia
 | plus_checkout | MOT-127, MOT-128 | Checkout steward | Reject new Plus checkout sessions; fulfill authorized in-flight sessions and process their verified outcomes. |
 | teacher_paid_paths | MOT-131 | Teacher commerce steward | Stop new paid sale-state activation/offers; preserve free authoring, existing path lifecycle, retained buyer copies and permanent rights. |
 | path_purchase | MOT-131 | Purchase fulfillment steward | Reject new path checkout sessions; fulfill authorized in-flight purchases and retain permanent grants. |
+| motifpath_purchase | MOT-131 | Purchase fulfillment steward | Hide and reject new MotifPath-owned course/path offers and checkout sessions; fulfill authorized in-flight purchases and retain permanent grants. Plus coverage is unaffected. |
 | teacher_settlement | MOT-133 | Financial operations steward | Stop onboarding new sellers/settlement programs; continue accounting, refunds, chargebacks, reconciliation and existing settlement obligations under approved policy. |
 | private_beta | MOT-137 | Release steward | Stop admitting new commercial participants/actions; honor existing grants and service existing billing/payment obligations for removed cohorts. |
 
@@ -59,6 +60,7 @@ Edges point from a prerequisite to its dependent. These are activation dependenc
 | plus_checkout | plus_catalog, plus_webhooks, plus_billing |
 | teacher_paid_paths | commercial_validation, authorization_enforcement |
 | path_purchase | teacher_paid_paths, plus_webhooks, teacher_settlement |
+| motifpath_purchase | commercial_validation, authorization_enforcement, plus_webhooks |
 | teacher_settlement | plus_webhooks |
 | private_beta | None |
 
@@ -67,6 +69,7 @@ Conditional checks are distinct from the activation graph:
 - Fresh CMS-managed presentation requires strapi_rights readiness only for actions using that integration. Core presentation supports Plus without Strapi. CMS outage blocks a new action that cannot establish required freshness; last validated metadata may support existing rights.
 - Publication always validates transitive dependencies. MotifPath premium exercises in a paid teacher path are covered by the platform commission on each sale; the teacher needs no license or other prior purchase.
 - New path purchases additionally require validated sale manifests, seller readiness, complete price/allocation configuration and verified Connect capability. Independent Plus activation does not establish these conditions.
+- New MotifPath-owned purchases require a validated sale manifest and an administrator-approved offer; they need no seller readiness, commission configuration or Connect capability, so they can activate before teacher sales.
 
 ## Launch matrix
 

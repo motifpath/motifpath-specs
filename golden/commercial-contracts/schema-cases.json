@@ -24,6 +24,7 @@
         "currency": "BRL"
       },
       "configuration_revision": "1",
+      "seller_kind": "teacher",
       "seller_id": "12345678-1234-4234-8234-123456789012"
     },
     "valid": true
@@ -47,6 +48,7 @@
           "currency": "BRL"
         },
         "configuration_revision": "1",
+        "seller_kind": "teacher",
         "seller_id": "12345678-1234-4234-8234-123456789012"
       },
       "status": "pending",
@@ -223,6 +225,7 @@
           "currency": "BRL"
         },
         "configuration_revision": "1",
+        "seller_kind": "teacher",
         "seller_id": "12345678-1234-4234-8234-123456789012"
       },
       "status": "ready",
@@ -249,6 +252,7 @@
           "currency": "BRL"
         },
         "configuration_revision": "1",
+        "seller_kind": "teacher",
         "seller_id": "12345678-1234-4234-8234-123456789012"
       },
       "status": "pending",
@@ -275,6 +279,7 @@
           "currency": "BRL"
         },
         "configuration_revision": "1",
+        "seller_kind": "teacher",
         "seller_id": "12345678-1234-4234-8234-123456789012"
       },
       "status": "paid",
@@ -301,6 +306,7 @@
           "currency": "BRL"
         },
         "configuration_revision": "1",
+        "seller_kind": "teacher",
         "seller_id": "12345678-1234-4234-8234-123456789012"
       },
       "status": "ready",
@@ -329,6 +335,7 @@
           "currency": "BRL"
         },
         "configuration_revision": "1",
+        "seller_kind": "teacher",
         "seller_id": "12345678-1234-4234-8234-123456789012"
       },
       "status": "paid",
@@ -707,6 +714,7 @@
         "currency": "BRL"
       },
       "configuration_revision": "1",
+      "seller_kind": "teacher",
       "seller_id": "12345678-1234-4234-8234-123456789012"
     },
     "valid": false
@@ -846,6 +854,7 @@
         "currency": "BRL"
       },
       "configuration_revision": "1",
+      "seller_kind": "teacher",
       "seller_id": "12345678-1234-4234-8234-123456789012"
     },
     "valid": false
@@ -897,6 +906,132 @@
       "permission": "platform_premium",
       "evidence_entry_id": "12345678-1234-4234-8234-123456789012",
       "license_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "MotifPath course purchase offer has no teacher seller",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "course_purchase",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 9000,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "platform",
+      "seller_id": null
+    },
+    "valid": true
+  },
+  {
+    "name": "MotifPath path purchase offer has no teacher seller",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "path_purchase",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 9000,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "platform",
+      "seller_id": null
+    },
+    "valid": true
+  },
+  {
+    "name": "teacher course purchase offer is refused",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "course_purchase",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 9000,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "teacher",
+      "seller_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "MotifPath offer cannot name a teacher seller",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "course_purchase",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 9000,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "platform",
+      "seller_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "teacher offer requires the owning teacher",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "path_purchase",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 9000,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "teacher",
+      "seller_id": null
+    },
+    "valid": false
+  },
+  {
+    "name": "path purchase cannot cover a course",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "path_purchase",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 9000,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "platform",
+      "seller_id": null
     },
     "valid": false
   }

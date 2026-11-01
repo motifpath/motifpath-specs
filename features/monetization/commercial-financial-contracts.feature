@@ -64,6 +64,12 @@ Feature: Financial journal, refunds, disputes and settlement
     When the sale allocation is posted
     Then platform commission is 26 minor units and teacher earnings are 76 minor units
 
+  Scenario: A MotifPath sale carries no commission or teacher earnings
+    Given Alice paid 90 BRL for MotifPath-owned course "First chords" with a 4 BRL provider fee
+    When that sale is allocated
+    Then 90 BRL is recorded as MotifPath sales and 4 BRL as provider fees
+    And no commission, teacher earnings or settlement transfer is recorded
+
   Scenario: Unbalanced financial postings cannot commit
     Given a journal proposes 100 BRL of debits and 99 BRL of credits
     When that journal is submitted for posting

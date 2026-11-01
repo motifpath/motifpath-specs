@@ -40,6 +40,24 @@ Feature: Resolve commercial lesson access in a learner's copy
     When Alice checks commercial access to "Shell voicings" in her copy of that path
     Then the result allows commercial access through the paid subscription
 
+  Scenario: A MotifPath course purchase covers its lessons and premium exercises
+    Given Alice bought MotifPath-owned course "First chords", which contains premium exercise "Shell voicings"
+    And Alice has no platform subscription
+    When Alice checks commercial access to "Shell voicings" in her copy of that course
+    Then the result allows commercial access through the course purchase
+
+  Scenario: A MotifPath purchase does not cover other MotifPath content
+    Given Alice bought MotifPath-owned course "First chords"
+    And Alice has no platform subscription
+    When Alice checks commercial access to a lesson in her copy of MotifPath-owned course "Barre chords"
+    Then commercial access is blocked for lack of a valid grant
+
+  Scenario: A bought MotifPath item stays owned after the subscription ends
+    Given Alice bought MotifPath-owned course "First chords" and later subscribed to the platform
+    And her platform subscription and renewal grace have ended
+    When Alice checks commercial access to an unfinished lesson in her copy of "First chords"
+    Then the result allows commercial access through the course purchase
+
   Scenario: Cancelling renewal preserves the paid grant
     Given Alice cancelled renewal but her current paid period has not ended
     When Alice checks commercial access to a lesson covered by that period

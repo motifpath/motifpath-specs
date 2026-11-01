@@ -117,7 +117,9 @@ Publish:
     operationId: createCommercialOffer
     summary: Create an immutable one-time offer revision
     description: Registered content owner or admin only; matching expected_revision and positive
-      enabled-currency price under current configuration and teacher price bounds. Validate the
+      enabled-currency price under current configuration. Teacher-owned paths stay within teacher
+      price bounds. MotifPath-owned courses and paths are offered only by an administrator, per item,
+      with no commission (ADR-068); an item without an offer stays Plus-only. Validate the
       complete current sale manifest and transitive dependency rights. New offer revisions never
       rewrite accepted checkout snapshots. Record
       durable attributable evidence and enforce idempotent commands before revision checks.
@@ -133,6 +135,7 @@ Publish:
           type: string
           minLength: 1
           enum:
+            - course
             - path
       - name: content_id
         in: path
@@ -184,10 +187,13 @@ Offers:
   get:
     operationId: listCommercialOffers
     summary: List eligible one-time acquisition offers
-    description: Require kind and path_id. kind must be path_purchase. Resolve caller eligibility and
-      approved offers server-side; return empty items if acquisition/configuration/prerequisites are
-      unavailable. A disabled currency or malformed kind returns 400. A missing path returns 404.
-      Path-purchase offers require sale_state paid; withdrawn/free paths are not sold.
+    description: Require kind and content_id; course_purchase targets a course, path_purchase a path.
+      Resolve caller eligibility and approved offers server-side; return empty items if
+      acquisition/configuration/prerequisites are unavailable. A disabled currency or malformed kind
+      returns 400. Missing content returns 404. Purchase offers require sale_state paid;
+      withdrawn/free items are not sold. While the caller's platform subscription is active, a
+      MotifPath-owned item returns no offers because Plus already covers it; the offer returns when
+      Plus ends. A caller who already holds a permanent purchase of the item gets no offers.
     tags:
       - Commerce
     parameters:
@@ -200,10 +206,11 @@ Offers:
           minLength: 1
           enum:
             - path_purchase
-      - name: path_id
+            - course_purchase
+      - name: content_id
         in: query
         required: true
-        description: Target path.
+        description: Target course or path, matching kind.
         schema:
           type: string
           format: uuid
@@ -232,10 +239,12 @@ Offers:
 Checkouts:
   post:
     operationId: createMyCommercialCheckout
-    summary: Start a permanent path purchase checkout
+    summary: Start a permanent course or path purchase checkout
     description: Use eligible current offer_id; reject stale terms with 409. Require the current
-      validated sale manifest, verified seller/Connect capability and refund liquidity; reserve one
-      active holder/path acquisition across operation keys and reject an already active purchase.
+      validated sale manifest and refund liquidity; a teacher offer also requires verified
+      seller/Connect capability. Reserve one active holder/item acquisition across operation keys and
+      reject an already active purchase with 409. A MotifPath-owned item is refused with 409 while the
+      caller's platform subscription is active.
       Bind accepted terms, customer and applicable
       commission revision before provider work; browser return never proves payment. Durable
       intent/audit precede provider calls; unknown outcomes remain pending and reconcile before any
