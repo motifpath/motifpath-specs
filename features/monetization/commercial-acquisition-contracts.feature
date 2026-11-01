@@ -129,7 +129,7 @@ Feature: Authoritative offers and one-time acquisition
     When an administrator creates a 120 BRL one-time offer for MotifPath-owned course "First chords"
     Then the offer is accepted
 
-  Scenario: A teacher course is not sold individually
-    Given teacher "Bea" owns course "Blues phrasing"
-    When Bea creates a one-time course offer for "Blues phrasing"
-    Then the offer is refused because only MotifPath sells courses individually
+  Scenario: A teacher sells a course once
+    Given teacher "Bea" owns course "Blues phrasing" and is approved for seller activation
+    When Bea creates a 50 BRL one-time course offer for "Blues phrasing" within the teacher price bounds
+    Then the offer is accepted with Bea as the seller

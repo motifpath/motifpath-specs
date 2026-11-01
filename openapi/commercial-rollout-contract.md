@@ -16,7 +16,7 @@ The authority commits an audited activation revision before it governs new inten
 
 ## Registry
 
-Gilson Yamada is the accountable owner for every flag, as assigned for commercial rollout, reconciliation and editorial approval in the accepted contract index. Steward roles below describe proposed delegation, not separately assigned people. Core remains the decision authority for every row. Names retain the existing ticket mappings; plus_* covers the one platform subscription scope.
+Gilson Yamada is the accountable owner for every flag, as assigned for commercial rollout, reconciliation and editorial approval in the accepted contract index. Steward roles below describe proposed delegation, not separately assigned people. Core remains the decision authority for every row. Names retain the existing ticket mappings; plus_* covers the one platform subscription scope, and teacher_paid_paths/path_purchase cover teacher courses as well as paths.
 
 | Flag suffix (`monetization.`) | Runtime task | Steward role | OFF behavior |
 |---|---|---|---|
@@ -33,7 +33,7 @@ Gilson Yamada is the accountable owner for every flag, as assigned for commercia
 | plus_billing | MOT-129 | Billing lifecycle steward | Hide new acquisition-related billing UI; preserve existing subscription status, cancellation and required billing support. |
 | plus_checkout | MOT-127, MOT-128 | Checkout steward | Reject new Plus checkout sessions; fulfill authorized in-flight sessions and process their verified outcomes. |
 | teacher_paid_paths | MOT-131 | Teacher commerce steward | Stop new paid sale-state activation/offers; preserve free authoring, existing path lifecycle, retained buyer copies and permanent rights. |
-| path_purchase | MOT-131 | Purchase fulfillment steward | Reject new path checkout sessions; fulfill authorized in-flight purchases and retain permanent grants. |
+| path_purchase | MOT-131 | Purchase fulfillment steward | Reject new teacher course/path checkout sessions; fulfill authorized in-flight purchases and retain permanent grants. |
 | motifpath_purchase | MOT-131 | Purchase fulfillment steward | Hide and reject new MotifPath-owned course/path offers and checkout sessions; fulfill authorized in-flight purchases and retain permanent grants. Plus coverage is unaffected. |
 | teacher_settlement | MOT-133 | Financial operations steward | Stop onboarding new sellers/settlement programs; continue accounting, refunds, chargebacks, reconciliation and existing settlement obligations under approved policy. |
 | private_beta | MOT-137 | Release steward | Stop admitting new commercial participants/actions; honor existing grants and service existing billing/payment obligations for removed cohorts. |
@@ -68,7 +68,7 @@ Conditional checks are distinct from the activation graph:
 
 - Fresh CMS-managed presentation requires strapi_rights readiness only for actions using that integration. Core presentation supports Plus without Strapi. CMS outage blocks a new action that cannot establish required freshness; last validated metadata may support existing rights.
 - Publication always validates transitive dependencies. MotifPath premium exercises in a paid teacher path are covered by the platform commission on each sale; the teacher needs no license or other prior purchase.
-- New path purchases additionally require validated sale manifests, seller readiness, complete price/allocation configuration and verified Connect capability. Independent Plus activation does not establish these conditions.
+- New teacher course/path purchases additionally require validated sale manifests, seller readiness, complete price/allocation configuration and verified Connect capability. Independent Plus activation does not establish these conditions.
 - New MotifPath-owned purchases require a validated sale manifest and an administrator-approved offer; they need no seller readiness, commission configuration or Connect capability, so they can activate before teacher sales.
 
 ## Launch matrix

@@ -952,7 +952,7 @@
     "valid": true
   },
   {
-    "name": "teacher course purchase offer is refused",
+    "name": "teacher course purchase offer names the owning teacher",
     "schema": "commerce.yaml#/Offer",
     "value": {
       "offer_id": "12345678-1234-4234-8234-123456789012",
@@ -970,7 +970,7 @@
       "seller_kind": "teacher",
       "seller_id": "12345678-1234-4234-8234-123456789012"
     },
-    "valid": false
+    "valid": true
   },
   {
     "name": "MotifPath offer cannot name a teacher seller",

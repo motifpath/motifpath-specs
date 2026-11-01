@@ -26,7 +26,7 @@ MotifPath-owned content (team-authored courses and paths, premium exercises and 
 it never covers teacher-priced content. There are no course- or path-scoped subscriptions and no
 teacher embedding license. Subscription periods are monthly and annual, both automatically
 renewing. Prices, annual discounts, teacher bounds, commission and fee allocation are
-configurable. A teacher sells a path within the teacher price bounds. An administrator may add a
+configurable. A teacher sells an owned course or path within the teacher price bounds. An administrator may add a
 one-time offer to a MotifPath-owned course or path, per item, at an administrator-approved price
 with no commission, teacher earnings or settlement (ADR-068); an item without one stays
 Plus-only. While a learner's platform subscription is active, MotifPath-owned items offer no
