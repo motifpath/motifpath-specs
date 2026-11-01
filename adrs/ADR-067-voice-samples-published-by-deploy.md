@@ -1,11 +1,12 @@
 # ADR-067: Voice samples are committed to motifpath-core and published by every deploy
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-11-01
 **Deciders:** Gilson (Product Owner)
 **Input:** MOT-180 (production and staging had no voice samples, so every played sound failed).
 PO answer, 2026-11-01: commit the rendered samples and have the deploy sync them.
 **Amends:** ADR-041's "Samples live on the ADR-021 media stack" bullet, by saying how they get there.
+**Accepted:** 2026-11-01, by Gilson.
 
 ---
 
