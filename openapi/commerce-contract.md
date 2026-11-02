@@ -64,6 +64,49 @@ Existing free rights are backfilled explicitly before new enforcement; no blanke
 or new charge is inferred. Backfill is restartable, uniquely keyed by source/resource/holder and
 never deletes progress. Rollback stops new acquisition but does not revert paid records.
 
+### Ownership rules (MOT-118)
+
+Decided by Gilson Yamada on 2026-11-02.
+
+- **Who owns new content.** When a course, path, content node or exercise is created, core records
+  its ownership in the same transaction: creator_id is the authenticated author and source is
+  native. Content created by a user whose role is admin is platform-owned; anyone else's is owned
+  by that teacher. Ownership never changes when the author's role later changes, when the content
+  is edited, or when it is published, retired or archived.
+- **Platform owner identity.** owner_id for platform-owned content is the fixed MotifPath Catalog
+  system profile (77d0239a-8d28-5c95-bc6e-53d59f7f84a8). creator_id keeps the admin who actually
+  wrote it, so every platform-owned item resolves to one rights holder while authorship is kept.
+- **Backfill of existing content.** One deterministic, restartable migration gives every existing
+  course, path, content node and exercise an ownership record with source reviewed_legacy and its
+  own evidence entry. The author is the item's recorded creator (created_by, or teacher_id for
+  paths and content nodes). An author who is an admin when the migration runs, or the catalog
+  profile itself, gives platform ownership; any other author gives teacher ownership by that
+  author; no recorded author gives unresolved, with a null owner_id and a null creator_id. The
+  mapping is keyed by content kind and id, so rerunning it changes nothing that is already
+  recorded. Unresolved items stay free and learnable; they only cannot be offered for sale until
+  an administrator corrects them.
+- **Copies made by an author.** When an author creates new content from an item someone else owns
+  (copy, fork or duplicate), the new item is owned by its creator under the rule above, and its
+  copied_from records the source item, the source owner and the source ownership revision. This
+  attribution does not license the source: whether the copy may be sold is decided by commercial
+  validation of its dependencies (MOT-121), not by the copy's ownership. No author-facing copy of
+  a course, path, content node or exercise exists yet, so copied_from is null for all current
+  content; the operation that adds one must set it and add its scenario.
+- **Learner copies are not new content.** A StudentPath, an enrollment's copied items and any
+  other learner copy have no ownership record of their own; they resolve to the ownership of the
+  template or course they were copied from.
+- **Revisions.** Ownership.revision starts at 1 and increases by one with each applied correction.
+  It is independent of CommercialContent.revision (sale state) and of content edits. A correction
+  states the ownership revision it observed; a stale one returns 409.
+- **Who may change ownership.** Only an administrator, through correctCommercialOwnership, with a
+  reason. The item's owner cannot transfer it, and no editorial, CMS or request field can set
+  owner_kind, owner_id, creator_id or copied_from. A correction appends history: the previous
+  owner, creator and evidence stay readable, and creator_id is never rewritten.
+- **Feature flag.** monetization.content_ownership gates the correction command only; while it is
+  OFF the command returns 403 and changes nothing. Recording ownership for new content, the
+  backfill and the owner/admin read always run, because withholding them would only create more
+  unresolved records to backfill later.
+
 A commercial release is an immutable rights/dependency manifest keyed separately from existing
 CourseVersion, live LearningPath and ContentNodeVersion identities. It captures exact core
 references, content revisions/digests, ownership, permissions and transitive premium dependencies.

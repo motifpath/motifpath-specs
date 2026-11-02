@@ -47,6 +47,7 @@ Ownership:
     - source
     - evidence_entry_id
     - revision
+    - copied_from
   properties:
     content:
       $ref: "#/ContentRef"
@@ -84,7 +85,14 @@ Ownership:
     revision:
       type: integer
       minimum: 1
-      description: Monotonic rights-holder revision; separate from template edits or offer prices.
+      description: Monotonic rights-holder revision, starting at 1 and increased by each applied
+        correction; separate from template edits, sale-state revisions or offer prices.
+    copied_from:
+      oneOf:
+        - $ref: "#/CopiedFrom"
+        - type: "null"
+      description: Source this content was created from by an author, or null when it was not
+        created from another item. Attribution only; it grants no right to the source.
   allOf:
     - if:
         properties:
@@ -869,6 +877,36 @@ PositiveMoney:
           description: Strictly positive price.
           minimum: 1
   description: Paid price; free access is a separate grant, not a zero-value payment.
+CopiedFrom:
+  type: object
+  description: The item an author copied, with its ownership as it stood when the copy was made.
+  additionalProperties: false
+  required:
+    - content
+    - owner_kind
+    - owner_id
+    - ownership_revision
+  properties:
+    content:
+      $ref: "#/ContentRef"
+      description: Source content.
+    owner_kind:
+      type: string
+      description: Rights-holder category of the source when it was copied.
+      enum:
+        - platform
+        - teacher
+        - unresolved
+    owner_id:
+      type:
+        - string
+        - "null"
+      description: Rights holder of the source when it was copied; null when it was unresolved.
+      format: uuid
+    ownership_revision:
+      type: integer
+      minimum: 1
+      description: Source ownership revision when it was copied.
 OwnershipCommand:
   type: object
   description: Admin-only correction of provenance; never silently transfer an existing commercial obligation.
@@ -881,7 +919,7 @@ OwnershipCommand:
   properties:
     expected_revision:
       type: integer
-      description: Observed commercial content revision.
+      description: Observed ownership revision (Ownership.revision), not the sale-state revision.
       minimum: 1
     owner_kind:
       type: string

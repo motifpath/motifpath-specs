@@ -479,9 +479,10 @@ Ownership:
   post:
     operationId: correctCommercialOwnership
     summary: Correct authoritative ownership as an administrator
-    description: Backend-resolved admin only. Verify legal/creator evidence and expected_revision;
+    description: Backend-resolved admin only; the item's owner and every other caller get 403. Verify
+      legal/creator evidence and expected_revision against the current ownership revision;
       append provenance correction without rewriting original creator or transferring existing
-      financial obligations. CMS/user claims cannot establish ownership. Same-intent retry returns
+      financial obligations. Returns 403 while the content-ownership rollout is OFF. CMS/user claims cannot establish ownership. Same-intent retry returns
       the original result; conflicting reuse or stale revision returns 409. Durable audit failure
       prevents mutation.
     tags:
