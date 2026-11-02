@@ -75,6 +75,12 @@ arbitrary reveal interactions, keyboard answer behavior or clue-content links wo
 
 ## Classification and readiness
 
+See the [classification and placement proposal](classification-proposal.md) for the
+recommended curator decision, observable skill definitions, exercise evidence and
+A-curriculum/B-standalone placement. It proposes new keys without using them as valid
+classification; catalog and curriculum changes await acceptance.
+
+
 | Unit/resource | Existing compatible concepts | Skill evidence and disposition |
 |---|---|---|
 | A: names and octave references | `note-names`, `octaves`, both universal | Universal visual naming/location skill remains unresolved. `match-pitch` assesses auditory matching, which these tasks do not test |
