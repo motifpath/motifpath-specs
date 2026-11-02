@@ -123,9 +123,12 @@ placement” in response to the explicit two-skill and A-curriculum/B-standalone
 This supersedes the earlier proposal-only status; merging documentation alone was not approval.
 Reference-data delivery must reconcile the new catalog with the core installation and its
 frozen-catalog test counts (previously 219 skills / 366 applies; now 221 / 370). No core
-migration or tests are changed by this source-spec PR. The full Python compiler was not run
-in this session because PyYAML is unavailable; the targeted Node/YAML validation checks the
-approved nodes, compatibility, unchanged baseline graph and curriculum scope.
+migration or tests are changed by this source-spec PR. The full Python knowledge-map compiler subsequently passed with 221 skills, 125 concepts,
+370 applies and 144 requires. Six compiler validation/deterministic-rendering tests passed
+using the bundled Python runtime and PyYAML isolated under a temporary validation directory.
+The old frozen-count assertion is intentionally left for the core reference-data delivery
+change; it still expects 219 skills and 366 applies. Targeted Node/YAML validation also
+checks the approved nodes, compatibility, unchanged baseline graph and curriculum scope.
 
 Final musical/locale review, native support, pt_BR persistence, final branded production and
 publication remain separate gates.
