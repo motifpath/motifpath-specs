@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0 — 2026-11-02
+
+- Capture MOT-160 visual-draft review decisions and the syllabus/transition review gate.
+- Require a dedicated application opening per lesson with immediate use and concrete
+  connections to future subjects, including at beginner level.
+- Clarify diagram naming, recognizable fretboard context, practice labels and precise
+  internal/external resource mapping without implying installed content or runtime support.
+- Align the skill, production packet and presentation guide; retain the explicit audio gate.
+
 ## 1.2.0 — 2026-10-18
 
 - Replace the ten-slide starter with a 47-slide MotifPath presentation library,

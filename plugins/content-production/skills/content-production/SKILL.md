@@ -1,6 +1,6 @@
 ---
 name: content-production
-version: 1.2.0
+version: 1.3.0
 description: Plan, produce, check and improve MotifPath lessons, exercises and practice resources with practical outcomes, knowledge-map classification and locale-specific language. Use for editorial content production and content presentation storyboards; software implementation and curriculum redesign remain separate tasks.
 ---
 
@@ -19,6 +19,9 @@ preserve the brand theme, and adapt editable music diagrams to the actual instru
 and example. The filled pt_BR lesson illustrates the visual system, not approved content.
 Keep author instructions in notes or author-only pages. Check every rendered slide;
 a structurally valid deck alone does not establish presentation quality.
+
+Read [draft review guidelines](references/draft-review-guidelines.md) when planning or
+revising a visual draft, its lesson openings, diagrams, practice prompts or resource map.
 
 ## Run a PDCA phase
 
@@ -86,7 +89,10 @@ continue independent work. Declare curriculum participation explicitly:
 
 ## Author for practical value
 
-1. Open with something the learner can hear, play, recognize or solve, and explain why it helps.
+1. Start every lesson with a dedicated application summary before explanation or practice.
+   In slide drafts, give each lesson its own opening application slide. State concrete use
+   now and explain how it supports specific later subjects. Then show something the learner
+   can hear, play, recognize or solve. See the draft review guidelines for examples.
 2. Give the complete useful method now. Remove padding, teasers and withheld steps. Keep scope
    narrow rather than deleting necessary explanation. A shorter unit is not better if unusable.
 3. Demonstrate the method, then ask for an active attempt and provide actionable feedback,
@@ -135,6 +141,8 @@ Return the filled template, asset/interaction inventory, classification evidence
 curriculum applicability and unresolved gaps. Include a short quality verdict with pass,
 revise or blocked and reasons for each criterion:
 
+- Dedicated lesson application opening, immediate use and explicit future-subject connections.
+- Reviewable syllabus, coherent transitions, visible diagrams and mapped supporting resources.
 - Practical outcome and value per element; complete method without withholding.
 - Sufficient context and usable prerequisite references.
 - Musical/answer accuracy, localization, classification and instrument compatibility.

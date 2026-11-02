@@ -24,6 +24,15 @@ show visual treatment and require musical/editorial review before teaching.
 Six native title/body layouts are also supplied, but duplicating a finished library
 slide is the most direct way to retain its complete composition and diagrams.
 
+## Editorial draft review
+
+Apply the [draft review guidelines](draft-review-guidelines.md) before full production.
+Show proposed diagrams in the short slide preview. Give each lesson a dedicated opening
+application slide covering immediate use and concrete links to later subjects. This opening
+is separate from the cover and syllabus. Use descriptive visible diagram titles and direct
+practice labels. Fretted examples need recognizable instrument/string context and markers
+between frets, with open-string positions distinguished. Keep author IDs in metadata.
+
 ## Visual standard
 
 Source: `motifpath-brand/tokens.json` and `BRAND.md`, inspected 2026-10-18.
