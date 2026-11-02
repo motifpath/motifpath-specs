@@ -87,3 +87,38 @@ Feature: Teacher selling terms, sales, payout account and sale blockers
     Then the path's commercial state lists the blocker "new_sales_paused"
     And its sale state remains paid
     And Alice keeps her access
+
+  Scenario: A teacher reads her sales for a chosen period
+    Given Bea sold "Blues shuffle" 12 times in October and once in September
+    When Bea lists her sales from 1 October to 1 November in her time zone
+    Then she sees the 12 October sales
+    And the summary counts all 12 sales, not just the page she reads
+
+  Scenario: A refund before transfer leaves nothing to recover
+    Given Bea's sale of "Blues shuffle" was refunded before its earnings were transferred
+    When Bea lists her sales
+    Then that sale shows nothing due, because its earnings were cancelled
+
+  Scenario: A refund after transfer shows what is still to recover
+    Given Bea's earnings from a sale of "Blues shuffle" were transferred
+    And the sale was then fully refunded
+    And a later transfer deducted part of those earnings
+    When Bea lists her sales
+    Then that sale shows the amount already deducted and the amount still to recover
+    And it names the transfer that deducted it
+
+  Scenario: A teacher reads her transfers for a chosen period
+    Given Bea received transfers in September and October
+    When Bea lists her transfers from 1 October to 1 November
+    Then she sees only the October transfers, each with its creation time
+
+  Scenario: A verified teacher manages her payout account on the provider's page
+    Given Bea's payout account is verified
+    When Bea asks for a payout dashboard link
+    Then she receives a short-lived link to the provider-hosted dashboard
+    And MotifPath shows none of her bank details
+
+  Scenario: There is no dashboard before payout setup
+    Given Bea has never set up payouts
+    When Bea asks for a payout dashboard link
+    Then the request is refused as a conflict

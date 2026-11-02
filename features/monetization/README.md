@@ -25,7 +25,7 @@ implementation passes TDD. PR approval accepts proposed API details, not a deplo
 | [Refunds and chargebacks](refunds-and-chargebacks.feature) | Refund scope, paid-access window, independent grants and pending disputes |
 | [Refund commands](refund-commands.feature) | Caller cases, admin execution and per-payment uniqueness |
 | [Teacher commercial rights](teacher-commercial-rights.feature) | Permanent purchases, retained copies, free updates and future-earnings recovery |
-| [Teacher selling contracts](teacher-selling-contracts.feature) | Selling terms, own sales, payout account and onboarding, sale blockers (MOT-130) |
+| [Teacher selling contracts](teacher-selling-contracts.feature) | Selling terms, own sales by period with refund recovery, transfers by period, payout account, onboarding and dashboard, sale blockers (MOT-130) |
 | [Stripe ingestion](stripe-payment-ingestion.feature) | Verified payment receipts and acquisition intent |
 | [Payment reconciliation](payment-reconciliation.feature) | Duplicate/out-of-order recovery, unknown outcomes and notices |
 | [Commercial audit](commercial-audit.feature) | Immutable evidence, attempts, causality and admin inspection |

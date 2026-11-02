@@ -994,6 +994,7 @@ Settlement:
     - status
     - sale_payment_ids
     - evidence_entry_id
+    - created_at
   properties:
     settlement_id:
       type: string
@@ -1027,6 +1028,10 @@ Settlement:
       type: string
       description: Latest obligation evidence.
       format: uuid
+    created_at:
+      type: string
+      description: When the obligation was created; the period filter uses this time (MOT-130).
+      format: date-time
 SettlementPage:
   type: object
   description: Teacher-owned settlement history ordered by stable settlement identity.
@@ -1377,6 +1382,7 @@ TeacherSale:
     - earnings
     - status
     - refunded_at
+    - recovery
     - settlement_id
   properties:
     sale_payment_id:
@@ -1418,6 +1424,11 @@ TeacherSale:
           format: uuid
         - type: "null"
       description: Settlement that included these earnings, if any.
+    recovery:
+      oneOf:
+        - $ref: "#/SaleRecovery"
+        - type: "null"
+      description: How the refunded earnings are taken back; required when refunded, null otherwise.
   allOf:
     - if:
         properties:
@@ -1430,15 +1441,63 @@ TeacherSale:
             type: string
             format: date-time
             description: Required refund time.
+          recovery:
+            $ref: "#/SaleRecovery"
+            description: Required recovery state.
+      else:
+        properties:
+          recovery:
+            type: "null"
+            description: Only refunded sales have a recovery.
+SaleRecovery:
+  type: object
+  description: Recovery of one refunded sale's earnings, in the earnings currency (MOT-130). Recovery
+    only offsets future earnings and never exceeds the original earnings; the teacher never pays
+    MotifPath back directly.
+  additionalProperties: false
+  required:
+    - status
+    - due_minor
+    - recovered_minor
+    - settlement_ids
+  properties:
+    status:
+      type: string
+      description: nothing_due = refunded before the earnings were transferred, so they were cancelled
+        and due_minor is 0; outstanding = recovered_minor is below due_minor; recovered =
+        recovered_minor equals due_minor.
+      enum:
+        - nothing_due
+        - outstanding
+        - recovered
+    due_minor:
+      type: integer
+      description: Transferred earnings to take back, at most the original earnings.
+      minimum: 0
+      maximum: 9007199254740991
+    recovered_minor:
+      type: integer
+      description: Amount already deducted from later settlements, at most due_minor.
+      minimum: 0
+      maximum: 9007199254740991
+    settlement_ids:
+      type: array
+      description: Later settlements that deducted part of this recovery, oldest first.
+      uniqueItems: true
+      items:
+        type: string
+        format: uuid
+        description: Settlement that deducted recovery.
 TeacherSalePage:
   type: object
-  description: Caller's own sales, newest first.
+  description: Caller's own sales in the requested period, newest first.
   additionalProperties: false
   required:
     - items
     - total
     - limit
     - offset
+    - summary
   properties:
     items:
       type: array
@@ -1459,6 +1518,40 @@ TeacherSalePage:
       type: integer
       minimum: 0
       description: Skipped records.
+    summary:
+      type: array
+      description: Totals for every sale in the requested period, not just this page; one row per
+        currency.
+      items:
+        $ref: "#/TeacherSalesSummary"
+        description: Currency totals.
+TeacherSalesSummary:
+  type: object
+  description: Totals of the caller's sales sold in the requested period, in one currency (MOT-130).
+  additionalProperties: false
+  required:
+    - currency
+    - sales_count
+    - refunded_count
+    - earned_minor
+  properties:
+    currency:
+      type: string
+      description: Original accounting currency.
+      pattern: ^[A-Z]{3}$
+    sales_count:
+      type: integer
+      description: Sales sold in the period, including those later refunded.
+      minimum: 0
+    refunded_count:
+      type: integer
+      description: Sales sold in the period that were later fully refunded.
+      minimum: 0
+    earned_minor:
+      type: integer
+      description: Posted earnings of the period's sales that were not refunded.
+      minimum: 0
+      maximum: 9007199254740991
 PayoutAccount:
   type: object
   description: The caller's payout account readiness (MOT-130). No bank details, identity documents or
@@ -1486,6 +1579,23 @@ PayoutAccount:
       type: string
       format: date-time
       description: Last reconciled provider state.
+PayoutDashboardLink:
+  type: object
+  description: Short-lived single-use link to the provider-hosted payout dashboard, where the teacher
+    manages bank details and sees bank payouts (MOT-130).
+  additionalProperties: false
+  required:
+    - url
+    - expires_at
+  properties:
+    url:
+      type: string
+      format: uri
+      description: Provider-hosted dashboard login page.
+    expires_at:
+      type: string
+      format: date-time
+      description: When the link stops working.
 PayoutOnboardingLink:
   type: object
   description: Short-lived link to provider-hosted onboarding; return URLs are configured server-side.

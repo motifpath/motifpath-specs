@@ -1094,7 +1094,8 @@
       },
       "status": "pending",
       "refunded_at": null,
-      "settlement_id": null
+      "settlement_id": null,
+      "recovery": null
     },
     "valid": true
   },
@@ -1118,7 +1119,15 @@
       },
       "status": "refunded",
       "refunded_at": "2026-10-16T09:00:00Z",
-      "settlement_id": "12345678-1234-4234-8234-123456789012"
+      "settlement_id": "12345678-1234-4234-8234-123456789012",
+      "recovery": {
+        "status": "outstanding",
+        "due_minor": 3820,
+        "recovered_minor": 1000,
+        "settlement_ids": [
+          "12345678-1234-4234-8234-123456789012"
+        ]
+      }
     },
     "valid": true
   },
@@ -1143,7 +1152,8 @@
       "status": "pending",
       "refunded_at": null,
       "settlement_id": null,
-      "buyer_id": "12345678-1234-4234-8234-123456789012"
+      "buyer_id": "12345678-1234-4234-8234-123456789012",
+      "recovery": null
     },
     "valid": false
   },
@@ -1167,7 +1177,8 @@
       },
       "status": "refunded",
       "refunded_at": null,
-      "settlement_id": null
+      "settlement_id": null,
+      "recovery": null
     },
     "valid": false
   },
@@ -1198,6 +1209,220 @@
     "value": {
       "url": "https://connect.stripe.com/setup/e/acct_x/abc",
       "expires_at": "2026-11-01T10:52:00Z"
+    },
+    "valid": true
+  },
+  {
+    "name": "sale refunded before its earnings were transferred has nothing to recover",
+    "schema": "commerce.yaml#/TeacherSale",
+    "value": {
+      "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "sold_at": "2026-10-14T12:00:00Z",
+      "price": {
+        "amount_minor": 4900,
+        "currency": "BRL"
+      },
+      "earnings": {
+        "amount_minor": 3820,
+        "currency": "BRL"
+      },
+      "status": "refunded",
+      "refunded_at": "2026-10-16T09:00:00Z",
+      "settlement_id": null,
+      "recovery": {
+        "status": "nothing_due",
+        "due_minor": 0,
+        "recovered_minor": 0,
+        "settlement_ids": []
+      }
+    },
+    "valid": true
+  },
+  {
+    "name": "sale refunded after transfer and fully recovered",
+    "schema": "commerce.yaml#/TeacherSale",
+    "value": {
+      "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "sold_at": "2026-10-14T12:00:00Z",
+      "price": {
+        "amount_minor": 4900,
+        "currency": "BRL"
+      },
+      "earnings": {
+        "amount_minor": 3820,
+        "currency": "BRL"
+      },
+      "status": "refunded",
+      "refunded_at": "2026-10-16T09:00:00Z",
+      "settlement_id": "12345678-1234-4234-8234-123456789012",
+      "recovery": {
+        "status": "recovered",
+        "due_minor": 3820,
+        "recovered_minor": 3820,
+        "settlement_ids": [
+          "12345678-1234-4234-8234-123456789012"
+        ]
+      }
+    },
+    "valid": true
+  },
+  {
+    "name": "refunded teacher sale states its recovery",
+    "schema": "commerce.yaml#/TeacherSale",
+    "value": {
+      "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "sold_at": "2026-10-14T12:00:00Z",
+      "price": {
+        "amount_minor": 4900,
+        "currency": "BRL"
+      },
+      "earnings": {
+        "amount_minor": 3820,
+        "currency": "BRL"
+      },
+      "status": "refunded",
+      "refunded_at": "2026-10-16T09:00:00Z",
+      "settlement_id": "12345678-1234-4234-8234-123456789012",
+      "recovery": null
+    },
+    "valid": false
+  },
+  {
+    "name": "unrefunded teacher sale has no recovery",
+    "schema": "commerce.yaml#/TeacherSale",
+    "value": {
+      "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "sold_at": "2026-10-28T12:00:00Z",
+      "price": {
+        "amount_minor": 4900,
+        "currency": "BRL"
+      },
+      "earnings": {
+        "amount_minor": 3820,
+        "currency": "BRL"
+      },
+      "status": "pending",
+      "refunded_at": null,
+      "settlement_id": null,
+      "recovery": {
+        "status": "outstanding",
+        "due_minor": 3820,
+        "recovered_minor": 0,
+        "settlement_ids": []
+      }
+    },
+    "valid": false
+  },
+  {
+    "name": "teacher sale page with period summary",
+    "schema": "commerce.yaml#/TeacherSalePage",
+    "value": {
+      "items": [
+        {
+          "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+          "content": {
+            "kind": "path",
+            "content_id": "12345678-1234-4234-8234-123456789012"
+          },
+          "sold_at": "2026-10-28T12:00:00Z",
+          "price": {
+            "amount_minor": 4900,
+            "currency": "BRL"
+          },
+          "earnings": {
+            "amount_minor": 3820,
+            "currency": "BRL"
+          },
+          "status": "pending",
+          "refunded_at": null,
+          "settlement_id": null,
+          "recovery": null
+        }
+      ],
+      "total": 1,
+      "limit": 20,
+      "offset": 0,
+      "summary": [
+        {
+          "currency": "BRL",
+          "sales_count": 12,
+          "refunded_count": 1,
+          "earned_minor": 42020
+        }
+      ]
+    },
+    "valid": true
+  },
+  {
+    "name": "teacher sale page needs its period summary",
+    "schema": "commerce.yaml#/TeacherSalePage",
+    "value": {
+      "items": [],
+      "total": 0,
+      "limit": 20,
+      "offset": 0
+    },
+    "valid": false
+  },
+  {
+    "name": "settlement with its creation time",
+    "schema": "commerce.yaml#/Settlement",
+    "value": {
+      "settlement_id": "12345678-1234-4234-8234-123456789012",
+      "teacher_id": "12345678-1234-4234-8234-123456789012",
+      "amount": {
+        "amount_minor": 11460,
+        "currency": "BRL"
+      },
+      "status": "transferred",
+      "sale_payment_ids": [
+        "12345678-1234-4234-8234-123456789012"
+      ],
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012",
+      "created_at": "2026-10-25T03:00:00Z"
+    },
+    "valid": true
+  },
+  {
+    "name": "settlement needs its creation time",
+    "schema": "commerce.yaml#/Settlement",
+    "value": {
+      "settlement_id": "12345678-1234-4234-8234-123456789012",
+      "teacher_id": "12345678-1234-4234-8234-123456789012",
+      "amount": {
+        "amount_minor": 11460,
+        "currency": "BRL"
+      },
+      "status": "transferred",
+      "sale_payment_ids": [
+        "12345678-1234-4234-8234-123456789012"
+      ],
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "payout dashboard link",
+    "schema": "commerce.yaml#/PayoutDashboardLink",
+    "value": {
+      "url": "https://connect.stripe.com/express/acct_x/abc",
+      "expires_at": "2026-11-01T10:47:00Z"
     },
     "valid": true
   },

@@ -808,6 +808,21 @@ Settlements:
     parameters:
       - $ref: ../../core-domain-service.yaml#/components/parameters/Limit
       - $ref: ../../core-domain-service.yaml#/components/parameters/Offset
+      - name: created_from
+        in: query
+        required: false
+        description: Inclusive start of the period, as an instant the client computes in the teacher's
+          time zone (MOT-130). Filters on created_at.
+        schema:
+          type: string
+          format: date-time
+      - name: created_before
+        in: query
+        required: false
+        description: Exclusive end of the period; must be after created_from. Filters on created_at.
+        schema:
+          type: string
+          format: date-time
     responses:
       "200":
         description: Authoritative recorded result; pending never claims external success.
@@ -1019,12 +1034,29 @@ TeacherSales:
     summary: List the caller's own sales
     description: Backend-resolved teacher only; newest first. Each sale gives the price, the teacher's
       posted earnings and its status. Never return buyer identity, contact or payment method.
-      New-acquisition OFF never hides past sales or refunds (MOT-130).
+      New-acquisition OFF never hides past sales or refunds (MOT-130). The optional period filters on
+      sold_at; summary totals every sale in the period, not just the page. A refunded sale states
+      whether its earnings were cancelled, are still being recovered, or were recovered.
     tags:
       - Commerce
     parameters:
       - $ref: ../../core-domain-service.yaml#/components/parameters/Limit
       - $ref: ../../core-domain-service.yaml#/components/parameters/Offset
+      - name: sold_from
+        in: query
+        required: false
+        description: Inclusive start of the period, as an instant the client computes in the teacher's
+          time zone (MOT-130). Filters on sold_at.
+        schema:
+          type: string
+          format: date-time
+      - name: sold_before
+        in: query
+        required: false
+        description: Exclusive end of the period; must be after sold_from. Filters on sold_at.
+        schema:
+          type: string
+          format: date-time
     responses:
       "200":
         description: Authoritative result; command pending is not completion.
@@ -1103,6 +1135,49 @@ PayoutOnboarding:
           application/json:
             schema:
               $ref: ../schemas/commerce.yaml#/PayoutOnboardingLink
+      "400":
+        $ref: ./subscriptions.yaml#/InvalidRequest
+      "401":
+        $ref: ./subscriptions.yaml#/Unauthenticated
+      "403":
+        description: Caller is not a backend-resolved teacher.
+        content:
+          application/json:
+            schema:
+              $ref: ../../core-domain-service.yaml#/components/schemas/ForbiddenError
+      "404":
+        $ref: ./subscriptions.yaml#/NotFound
+      "409":
+        $ref: ./subscriptions.yaml#/Conflict
+      "503":
+        $ref: ./subscriptions.yaml#/Unavailable
+PayoutDashboard:
+  post:
+    operationId: createMyPayoutDashboardLink
+    summary: Create a provider-hosted payout dashboard link
+    description: Backend-resolved teacher only. Return a short-lived single-use link to the provider's
+      payout dashboard, where the teacher manages bank details and sees bank payouts; MotifPath never
+      shows or stores them. Refused with 409 until onboarding was submitted (status not_started).
+      Allowed while teacher_settlement pauses new onboarding, so existing accounts stay manageable
+      (MOT-130).
+    tags:
+      - Commerce
+    parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, actor and action. A replay within the link's
+          lifetime returns the same link.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Authoritative result; command pending is not completion.
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/commerce.yaml#/PayoutDashboardLink
       "400":
         $ref: ./subscriptions.yaml#/InvalidRequest
       "401":
