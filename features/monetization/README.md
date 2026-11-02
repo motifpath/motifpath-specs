@@ -10,6 +10,7 @@ implementation passes TDD. PR approval accepts proposed API details, not a deplo
 - [ADR-058: Stripe](../../adrs/ADR-058-stripe-payment-provider.md), accepted.
 - [ADR-060: transactional records and recovery](../../adrs/ADR-060-commercial-records-and-recovery.md), accepted by Gilson Yamada on 2026-10-15.
 - [ADR-067: two commercial products](../../adrs/ADR-067-two-commercial-products.md), accepted 2026-10-29: one platform subscription plus permanent teacher-path purchases; content-scoped subscriptions and the teacher embedding license are removed.
+- [ADR-069: commercial activation admin API](../../adrs/ADR-069-commercial-activation-admin-api.md), proposed 2026-11-02: activation stored in core, changed through a dedicated audited admin API with a kill switch.
 - [ADR-068: buy once or Plus on MotifPath content](../../adrs/ADR-068-buy-once-motifpath-content.md), accepted 2026-11-01: an administrator may add a one-time offer, with no commission, to a MotifPath-owned course or path; subscribers are not offered it, and owned stays owned.
 - [Commercial architecture and policies](../../openapi/commerce-contract.md): ownership, manifests, grants, ledger/rounding, settlement, refunds/disputes, CMS, delivery, retention and recovery.
 - [Core-domain API](../../openapi/core-domain-service.yaml): existing subscription/refund/Stripe/audit/access operations plus consolidated commerce operations.
@@ -30,6 +31,7 @@ implementation passes TDD. PR approval accepts proposed API details, not a deplo
 | [Payment reconciliation](payment-reconciliation.feature) | Duplicate/out-of-order recovery, unknown outcomes and notices |
 | [Commercial audit](commercial-audit.feature) | Immutable evidence, attempts, causality and admin inspection |
 | [Commercial access](commercial-access.feature) | Caller copy, independent rights, privacy and delivery-time checks |
+| [Commercial activation](commercial-activation.feature) | Admin rollout API, default OFF, allowlists, prerequisites, kill switch and OFF fencing (MOT-181, ADR-069) |
 | [Content ownership](content-ownership.feature) | Ownership at creation, persistence across edits and learner copies, admin-only corrections, rollout OFF and legacy backfill (MOT-118) |
 | [Content contracts](commercial-content-contracts.feature) | Provenance, immutable manifests, platform premium dependencies and withdrawal |
 | [Acquisition contracts](commercial-acquisition-contracts.feature) | Configured offers, path checkout and holdings |
@@ -52,6 +54,7 @@ or settlement obligations. UI mirrors decisions. Plus and teacher commerce have 
 
 | Ticket | Flag(s), prefix `monetization.` | Contract surface and scenarios |
 |---|---|---|
+| MOT-181 | none (foundation) | Commercial audit write path and hot-store admin read, durable idempotent commands, rollout API and evaluation; audit, controls and activation scenarios |
 | MOT-118 | content_ownership | Commerce ownership read/correction; content ownership scenarios |
 | MOT-119 | content_versions | Immutable commercial release manifests; preserve existing course/path copies and ADR-055 |
 | MOT-120 | strapi_rights | CMS hint API, field authority/mapping/reconciliation; integration contracts |

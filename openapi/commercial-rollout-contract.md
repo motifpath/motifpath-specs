@@ -42,6 +42,17 @@ Gilson Yamada is the accountable owner for every flag, as assigned for commercia
 
 Flag names never switch off the invariant they resemble: progress retention, existing-resource authorization and established provider processing are always enforced. OFF stops new activation/onboarding, not existing protection, evidence or obligations.
 
+## Administration and evaluation
+
+Activation is stored in core-domain and changed only through the admin rollout API
+(`getCommercialRollout`, `changeCommercialFlag`, `turnOffAllCommercialFlags`; ADR-069). Each change
+is revision-checked, idempotent and committed with its audit evidence; the kill switch needs no
+revision. Subjects are `user:<core user id>` or `service:<service name>`; an empty allowlist allows
+no one. Each operation's contract names the subject evaluated for it and for each prerequisite;
+content-ownership corrections use the content's current owner. New intents record the activation
+revision they were authorized under and are fenced against a concurrent OFF. Scenarios:
+[commercial activation](../features/monetization/commercial-activation.feature).
+
 ## Prerequisites for new actions
 
 Edges point from a prerequisite to its dependent. These are activation dependencies, not instructions to stop background obligations. Enabling an upstream flag never enables a dependent automatically. A disabled prerequisite refuses dependent new actions even when the dependent’s configured value is ON.
@@ -105,4 +116,4 @@ MOT-118–125, MOT-127–129, MOT-131 and MOT-133 are mapped above; MOT-137 owns
 
 Proposed behavior is in [commercial controls](../features/monetization/commercial-controls.feature), complemented by the [contract index](../features/monetization/README.md). Scenarios remain @wip until runtime TDD and real persistence/recovery verification pass. Syntax and graph checks establish only specification consistency.
 
-MOT-117 contracts and accepted ADR-058/059/060 remain authoritative. MOT-115-r4 requires explicit PO approval recording approver, reviewed revision and date before its names/activation decisions become approved. PR creation or integration alone is not that approval. Figma, deployment configuration and runtime evidence remain separate gates. Local implementation plans and JSON review artifacts remain unversioned under ADR-022.
+MOT-117 contracts and accepted ADR-058/059/060 remain authoritative. MOT-115-r5 was approved by Gilson Yamada on 2026-11-02 (see the header). PR creation or integration alone is never such an approval. Figma, deployment configuration and runtime evidence remain separate gates. Local implementation plans and JSON review artifacts remain unversioned under ADR-022.

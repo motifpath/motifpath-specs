@@ -1,0 +1,109 @@
+Rollout:
+  get:
+    operationId: getCommercialRollout
+    summary: Read commercial activation as an administrator
+    description: Backend-resolved administrator only (403 otherwise). Returns every registered flag in
+      the trusted environment, whether or not any flag is on. The environment is the deployment's
+      own and cannot be selected by the caller. If activation storage cannot be read, returns 503;
+      it never reports flags as OFF in place of an error.
+    tags: [Commercial rollout]
+    responses:
+      "200":
+        description: Current activation.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/commercial-rollout.yaml#/CommercialRollout'}
+      "400": {$ref: './subscriptions.yaml#/InvalidRequest'}
+      "401": {$ref: './subscriptions.yaml#/Unauthenticated'}
+      "403":
+        description: Caller is not an administrator.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ForbiddenError'}
+      "503": {$ref: './subscriptions.yaml#/Unavailable'}
+
+Flag:
+  put:
+    operationId: changeCommercialFlag
+    summary: Change one commercial flag's switch and allowlist
+    description: Backend-resolved administrator only (403 otherwise). Requires expected_revision equal
+      to the current activation revision; a stale revision returns 409 and changes nothing. Same
+      key and same intent returns the original receipt before the revision check; the same key with
+      a different intent returns 409. An applied change increments the activation revision by one
+      and is committed together with audit evidence recording actor, reason and before/after
+      state; if evidence cannot be written, nothing changes and 503 is returned. Enabling a flag
+      never enables its prerequisites or dependents. A change to the current values is still a
+      recorded change. An unregistered flag returns 404.
+    tags: [Commercial rollout]
+    parameters:
+      - name: flag
+        in: path
+        required: true
+        description: Registered flag.
+        schema: {$ref: '../schemas/commercial-rollout.yaml#/FlagName'}
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, administrator, action and flag. Fingerprint the
+          full request intent.
+        schema: {type: string, format: uuid}
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '../schemas/commercial-rollout.yaml#/FlagChange'}
+    responses:
+      "200":
+        description: Recorded change.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/commercial-rollout.yaml#/RolloutCommand'}
+      "400": {$ref: './subscriptions.yaml#/InvalidRequest'}
+      "401": {$ref: './subscriptions.yaml#/Unauthenticated'}
+      "403":
+        description: Caller is not an administrator.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ForbiddenError'}
+      "404": {$ref: './subscriptions.yaml#/NotFound'}
+      "409": {$ref: './subscriptions.yaml#/Conflict'}
+      "503": {$ref: './subscriptions.yaml#/Unavailable'}
+
+KillSwitch:
+  post:
+    operationId: turnOffAllCommercialFlags
+    summary: Turn every commercial flag OFF
+    description: Backend-resolved administrator only (403 otherwise). Sets every flag's enabled to false
+      in one change, keeping allowlists, and needs no expected revision, so a stale caller can
+      always use it. Increments the activation revision by one and commits audit evidence with it;
+      if evidence cannot be written, nothing changes and 503 is returned. New commercial intents
+      are refused once it commits; intents authorized earlier keep their recorded revision and
+      remain recoverable. Same key and same intent returns the original receipt.
+    tags: [Commercial rollout]
+    parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, administrator and action. Fingerprint the full
+          request intent.
+        schema: {type: string, format: uuid}
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '../schemas/commercial-rollout.yaml#/KillSwitch'}
+    responses:
+      "200":
+        description: Recorded change.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/commercial-rollout.yaml#/RolloutCommand'}
+      "400": {$ref: './subscriptions.yaml#/InvalidRequest'}
+      "401": {$ref: './subscriptions.yaml#/Unauthenticated'}
+      "403":
+        description: Caller is not an administrator.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ForbiddenError'}
+      "409": {$ref: './subscriptions.yaml#/Conflict'}
+      "503": {$ref: './subscriptions.yaml#/Unavailable'}

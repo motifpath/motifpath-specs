@@ -1,0 +1,169 @@
+FlagName:
+  type: string
+  description: Registered commercial activation flag, without the monetization. prefix.
+  enum:
+    - content_ownership
+    - content_versions
+    - strapi_rights
+    - commercial_validation
+    - entitlement_resolution
+    - access_grants
+    - progress_retention
+    - authorization_enforcement
+    - plus_catalog
+    - plus_webhooks
+    - plus_billing
+    - plus_checkout
+    - teacher_paid_paths
+    - path_purchase
+    - motifpath_purchase
+    - teacher_settlement
+    - private_beta
+
+SubjectId:
+  type: string
+  description: Rollout subject, either user:<core user UUID> or service:<service name>.
+  pattern: "^(user:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|service:[a-z][a-z0-9-]{0,62})$"
+  maxLength: 80
+
+FlagState:
+  type: object
+  description: One flag's configured and effective activation in this environment.
+  additionalProperties: false
+  required:
+    - flag
+    - enabled
+    - subject_ids
+    - prerequisites
+    - effective
+    - updated_at
+    - updated_by
+  properties:
+    flag:
+      $ref: "#/FlagName"
+      description: Registered flag.
+    enabled:
+      type: boolean
+      description: Configured switch. Starts false in every environment.
+    subject_ids:
+      type: array
+      description: Subjects allowed when enabled. An empty list allows no one; there is no wildcard.
+      maxItems: 500
+      uniqueItems: true
+      items:
+        $ref: "#/SubjectId"
+        description: One allowed subject.
+    prerequisites:
+      type: array
+      description: Flags that must also allow the operation's subject before this flag allows it.
+      uniqueItems: true
+      items:
+        $ref: "#/FlagName"
+        description: One prerequisite.
+    effective:
+      type: boolean
+      description: True when enabled and every prerequisite is effective. Subject allowlists still apply.
+    updated_at:
+      type:
+        - string
+        - "null"
+      format: date-time
+      description: When this flag last changed, or null if it never has.
+    updated_by:
+      type:
+        - string
+        - "null"
+      format: uuid
+      description: Administrator who last changed it, or null if it never has.
+
+CommercialRollout:
+  type: object
+  description: Every registered flag's activation in the trusted environment, at one revision.
+  additionalProperties: false
+  required:
+    - revision
+    - flags
+  properties:
+    revision:
+      type: integer
+      minimum: 0
+      description: Environment-wide activation revision; 0 before the first change, plus one per
+        applied change.
+    flags:
+      type: array
+      description: One entry per registered flag, in registry order.
+      items:
+        $ref: "#/FlagState"
+        description: One flag.
+
+FlagChange:
+  type: object
+  description: Replace one flag's switch and allowlist.
+  additionalProperties: false
+  required:
+    - expected_revision
+    - enabled
+    - subject_ids
+    - reason
+  properties:
+    expected_revision:
+      type: integer
+      minimum: 0
+      description: Activation revision the administrator observed.
+    enabled:
+      type: boolean
+      description: New switch value.
+    subject_ids:
+      type: array
+      description: New complete allowlist; replaces the previous one.
+      maxItems: 500
+      uniqueItems: true
+      items:
+        $ref: "#/SubjectId"
+        description: One allowed subject.
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 1000
+      description: Why the change is made; recorded in the audit evidence.
+
+KillSwitch:
+  type: object
+  description: Turn every flag OFF at once, keeping allowlists.
+  additionalProperties: false
+  required:
+    - reason
+  properties:
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 1000
+      description: Why everything is turned off; recorded in the audit evidence.
+
+RolloutCommand:
+  type: object
+  description: Durable receipt for an activation change.
+  additionalProperties: false
+  required:
+    - operation_id
+    - status
+    - revision
+    - evidence_entry_id
+  properties:
+    operation_id:
+      type: string
+      format: uuid
+      description: Durable scoped logical identity of the change.
+    status:
+      type: string
+      description: Activation changes commit atomically, so they are applied or not recorded.
+      enum:
+        - applied
+    revision:
+      type: integer
+      minimum: 1
+      description: Activation revision produced by this change.
+    evidence_entry_id:
+      type: string
+      format: uuid
+      description: Audit evidence committed with the change.

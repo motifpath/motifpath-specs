@@ -1491,5 +1491,89 @@
       "target_offer_id": "12345678-1234-4234-8234-123456789012"
     },
     "valid": false
+  },
+  {
+    "name": "rollout user subject",
+    "schema": "commercial-rollout.yaml#/SubjectId",
+    "value": "user:77d0239a-8d28-5c95-bc6e-53d59f7f84a8",
+    "valid": true
+  },
+  {
+    "name": "rollout service subject",
+    "schema": "commercial-rollout.yaml#/SubjectId",
+    "value": "service:core-domain",
+    "valid": true
+  },
+  {
+    "name": "rollout subject without a kind",
+    "schema": "commercial-rollout.yaml#/SubjectId",
+    "value": "77d0239a-8d28-5c95-bc6e-53d59f7f84a8",
+    "valid": false
+  },
+  {
+    "name": "rollout wildcard subject",
+    "schema": "commercial-rollout.yaml#/SubjectId",
+    "value": "user:*",
+    "valid": false
+  },
+  {
+    "name": "flag change",
+    "schema": "commercial-rollout.yaml#/FlagChange",
+    "value": {
+      "expected_revision": 0,
+      "enabled": true,
+      "subject_ids": [
+        "service:core-domain"
+      ],
+      "reason": "Foundation rehearsal"
+    },
+    "valid": true
+  },
+  {
+    "name": "flag change without reason",
+    "schema": "commercial-rollout.yaml#/FlagChange",
+    "value": {
+      "expected_revision": 0,
+      "enabled": true,
+      "subject_ids": []
+    },
+    "valid": false
+  },
+  {
+    "name": "flag change with duplicate subjects",
+    "schema": "commercial-rollout.yaml#/FlagChange",
+    "value": {
+      "expected_revision": 0,
+      "enabled": true,
+      "subject_ids": [
+        "service:core-domain",
+        "service:core-domain"
+      ],
+      "reason": "x"
+    },
+    "valid": false
+  },
+  {
+    "name": "unregistered flag",
+    "schema": "commercial-rollout.yaml#/FlagName",
+    "value": "free_money",
+    "valid": false
+  },
+  {
+    "name": "kill switch",
+    "schema": "commercial-rollout.yaml#/KillSwitch",
+    "value": {
+      "reason": "Incident"
+    },
+    "valid": true
+  },
+  {
+    "name": "kill switch with revision",
+    "schema": "commercial-rollout.yaml#/KillSwitch",
+    "value": {
+      "reason": "Incident",
+      "expected_revision": 3
+    },
+    "valid": false
   }
 ]
