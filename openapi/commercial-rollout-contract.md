@@ -1,6 +1,8 @@
 # Commercial activation registry — MOT-115
 
-**Revision:** MOT-115-r5 · **Status:** Proposed; explicit PO registry approval pending. r4 removes the premium embedding license and content-scoped subscriptions (ADR-067). r5 adds motifpath_purchase, one-time purchases of MotifPath-owned items (ADR-068).
+**Revision:** MOT-115-r5 · **Status:** Approved by Gilson Yamada on 2026-11-02. r4 removes the premium embedding license and content-scoped subscriptions (ADR-067). r5 adds motifpath_purchase, one-time purchases of MotifPath-owned items (ADR-068).
+
+Approval was explicitly recorded in chat on 2026-11-02, while planning MOT-118. Scope: flag names, accountability, steward roles, OFF behavior, prerequisites, targeting and rehearsal tracks as written in r5. It approves no Figma revision, price, cohort or deployment, and enables no flag.
 
 This is the durable activation contract for new commercial capabilities. It does not enable flags, approve Figma revisions or prove runtime readiness. All defaults are OFF in local, test, staging and production; every environment starts with empty subject allowlists. No environment inherits another environment’s activation or cohort.
 
