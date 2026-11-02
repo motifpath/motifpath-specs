@@ -37,19 +37,19 @@ implementation passes TDD. PR approval accepts proposed API details, not a deplo
 
 ## Rollout controls
 
-[Commercial activation registry](../../openapi/commercial-rollout-contract.md) defines proposed
-MOT-115-r4 names, ownership, default-OFF targeting, independent readiness tracks and audited
-rollback. [Commercial control scenarios](commercial-controls.feature) cover activation boundaries;
-registry and Figma approvals remain separate from contract integration.
+[Commercial activation registry](../../openapi/commercial-rollout-contract.md) defines approved
+MOT-115-r5 names, ownership, default-OFF targeting, independent readiness tracks and audited
+rollback. [Commercial control scenarios](commercial-controls.feature) cover activation boundaries.
+Gilson approved registry revision MOT-115-r5 on 2026-11-02; Figma approvals remain separate.
 
 ## Deliverable and flag mapping
 
-Flag names below match the proposed MOT-115 registry; registry approval is tracked in MOT-115,
-not asserted here. Every default is OFF. New actions require backend evaluation and cohort
+Flag names below match MOT-115-r5, explicitly approved by Gilson Yamada on 2026-11-02.
+Every default is OFF. New actions require backend evaluation and cohort
 approval; OFF never disables existing rights, progress, audit, cancellation, refund, reconciliation
 or settlement obligations. UI mirrors decisions. Plus and teacher commerce have separate readiness.
 
-| Ticket | Proposed flag(s), prefix `monetization.` | Contract surface and scenarios |
+| Ticket | Flag(s), prefix `monetization.` | Contract surface and scenarios |
 |---|---|---|
 | MOT-118 | content_ownership | Commerce ownership read/correction; content contracts |
 | MOT-119 | content_versions | Immutable commercial release manifests; preserve existing course/path copies and ADR-055 |
@@ -97,10 +97,10 @@ and [retention scenarios](audit-archival.feature).
 
 ## Acceptance and remaining external gates
 
-ADR-060 was accepted by Gilson Yamada on 2026-10-15. The consolidated PR completes the
-specification surfaces for MOT-117; its review must accept API additions, message schemas and
-scenarios before MOT-117 is marked done. No runtime evidence is claimed by syntax/schema checks. MOT-115 registry and
-MOT-116 Figma approvals remain separate blockers to implementation; no approval is fabricated.
+ADR-060 was accepted by Gilson Yamada on 2026-10-15. MOT-117 contracts are merged into the epic.
+No runtime evidence is claimed by syntax/schema checks. Gilson approved MOT-115-r5 on 2026-11-02
+and the MOT-116 Figma revision r5 on 2026-11-01; later UX changes need renewed approval, and no
+deployment approval is implied.
 
 Deployment inputs remain explicit: approved prices/discounts/bounds/commissions and BRL offers;
 Brazilian Stripe/Connect capabilities, fees and refund liquidity; pinned compatible SDK and CMS
