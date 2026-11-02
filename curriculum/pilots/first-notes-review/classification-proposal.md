@@ -1,11 +1,12 @@
 # First notes: classification and placement decision
 
-MOT-160 · Proposed for curator/PO review · 2026-11-02.
+MOT-160 · Accepted by the product owner in this session · 2026-11-02.
 Source: merged pilot checkpoint PR #366, epic revision `99a6d30`.
-This document proposes a bounded resolution; it does not add nodes to the shared catalog,
-assign installed IDs, approve the whole lesson direction or publish content.
+The product owner explicitly approved the recommended skills and placement. This branch
+implements the catalog and lesson A plan changes. Installed IDs, the complete lesson direction
+and publication are separate decisions.
 
-## Recommended decision
+## Accepted decision
 
 1. Add two beginner universal skill definitions under the existing `reading` skill root:
    **Interpret note names** and **Count semitone steps from a visual reference**.
@@ -21,13 +22,13 @@ Keyboard, bass and guitar remain examples, not restrictions on the universal par
 
 ## Proposed skill definitions
 
-Keys below are **candidates for review only**, not existing catalog keys. No content may
-claim valid classification with them until the curator accepts and installs the catalog change.
-The names stand alone in filters and chips. The existing `reading` parent is universal.
+The keys below are now defined in this branch's catalog under the approved universal
+`reading` parent. They still require environment installation before app authoring can
+resolve them to installed IDs. The names stand alone in filters and chips.
 
-| Field | Lesson A candidate | Lesson B candidate |
+| Field | Lesson A skill | Lesson B skill |
 |---|---|---|
-| Candidate key | `interpret-note-names` | `count-semitone-steps` |
+| Catalog key | `interpret-note-names` | `count-semitone-steps` |
 | en | Interpret note names | Count semitone steps from a visual reference |
 | pt_BR | Interpretar os nomes das notas | Contar semitons com uma referência visual |
 | Parent | Existing `reading` skill | Existing `reading` skill |
@@ -91,7 +92,7 @@ exercise response/options, evidence linking, feedback and retry behavior before 
 Text/image-choice fallbacks can avoid reliance on unverified keyboard hit regions. Optional
 playback adds perception support without changing what these questions assess.
 
-## Placement change after approval
+## Approved placement
 
 - **A:** use the existing `sh-ear-first` lesson titled “Os nomes das notas: dó, ré, mi e C,
   D, E”, section Notas, as the source slot. Keep the path's main ear-training outcome;
@@ -103,20 +104,28 @@ playback adds perception support without changing what these questions assess.
   Si=B and the meaning of octave labels locally when needed, so access to A is not essential.
   Its C-major example is a transfer task, not approval to teach the complete harmony curriculum.
 
-After acceptance, change the catalog and A's YAML classification together, regenerate the
-curriculum tree, validate scope/keys/graph and inspect resulting flags. Reconcile installed
+This branch changes the catalog and A's YAML classification together and regenerates the
+curriculum tree. Validate scope/keys/graph and inspect resulting flags. Reconcile installed
 IDs separately. B's standalone packet must still have a valid skill and concept classification.
 
-## Alternatives and disposition
+## Alternatives considered and accepted disposition
 
-- **Recommended:** approve the two narrowly observable skills and A-curriculum/B-standalone
-  placement, then implement the catalog/plan change in a follow-up reviewed commit.
+- **Accepted and implemented in this branch:** the two narrowly observable skills and
+  A-curriculum/B-standalone placement. Source validation confirms the catalog change only
+  adds these two skills and their four `applies` links; the tree regenerates with zero flags.
 - **Retain existing catalog:** keep this as an unclassified editorial draft. Publication stays
   blocked; do not attach auditory skills merely to make validation pass.
 - **Change the learning outcomes:** redesign around auditory matching or instrument-specific
   performance. This reopens the accepted universal visual draft and needs a new PO decision.
 
-Merging this proposal as documentation records the recommendation, not curator acceptance.
-The requested decision is whether to approve the recommended skill definitions and placement.
+Acceptance evidence: the product owner selected “Approve the recommended skills and
+placement” in response to the explicit two-skill and A-curriculum/B-standalone decision.
+This supersedes the earlier proposal-only status; merging documentation alone was not approval.
+Reference-data delivery must reconcile the new catalog with the core installation and its
+frozen-catalog test counts (previously 219 skills / 366 applies; now 221 / 370). No core
+migration or tests are changed by this source-spec PR. The full Python compiler was not run
+in this session because PyYAML is unavailable; the targeted Node/YAML validation checks the
+approved nodes, compatibility, unchanged baseline graph and curriculum scope.
+
 Final musical/locale review, native support, pt_BR persistence, final branded production and
 publication remain separate gates.

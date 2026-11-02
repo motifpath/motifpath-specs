@@ -24,6 +24,14 @@ presentations or media. Generate audio only when explicitly requested. Full
 production, editorial review, native delivery and publication remain separate gates.
 MOT-160 is not complete merely because this proposal exists.
 
+## Approved classification and placement (2026-11-02)
+
+The PO approved `interpret-note-names` for A in `sh-ear-first` / Notas and
+`count-semitone-steps` for standalone B. Both skills are universal beginner skills under
+`reading`; the catalog and A's lesson tags are updated together. See the
+[accepted decision](first-notes-review/classification-proposal.md). Installed IDs and
+native behavior remain unverified.
+
 ## Presentation baseline
 
 Content-production v1.3.0 and the shared 47-slide MotifPath library are available in
