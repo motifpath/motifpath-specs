@@ -6,6 +6,14 @@ Historical source revision: 98905d4. No full lesson, deck, video or audio produc
 is authorized by this proposal. Superseded production files are excluded from this
 PR; the earlier experiment remains recoverable in Git history at that revision.
 
+## Visual review checkpoint (2026-11-02)
+
+Use [the visual review packet](first-notes-review/README.md) for the current review.
+The product owner requested visible diagrams and dedicated application-opening slides
+for both lessons, with immediate use and future-subject connections. That preliminary
+18-slide storyboard is authorized; final lesson/media production remains a later gate.
+The original prose below retains the proposed outcomes and open classification decisions.
+
 ## Working agreement for future iterations
 
 1. First deliver a short content draft, proposed learning flow, and diagram concepts.

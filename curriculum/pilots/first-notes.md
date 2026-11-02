@@ -6,6 +6,11 @@ brief and the one-string guitar experiment.
 
 ## Current review target
 
+The current visual checkpoint is [the review packet](first-notes-review/README.md),
+with an 18-slide preview incorporating the 2026-11-02 session feedback. Use it to review
+the two outcomes, transitions, visible diagrams and resource map together.
+
+
 Read [the current proposal](first-notes-proposal-v2.md). It contains:
 
 - Two beginner pt_BR units: note names, then tones and semitones.
@@ -21,9 +26,9 @@ MOT-160 is not complete merely because this proposal exists.
 
 ## Presentation baseline
 
-Content-production v1.2.0 and the shared 47-slide MotifPath library are available in
+Content-production v1.3.0 and the shared 47-slide MotifPath library are available in
 the content-production epic, introduced by PR #361. Reuse that library after the
-content direction is accepted; no new lesson deck belongs to this proposal review.
+content direction is accepted; the preliminary review storyboard is now explicitly requested; final learner decks remain pending direction acceptance.
 
 ## Superseded experiment
 
