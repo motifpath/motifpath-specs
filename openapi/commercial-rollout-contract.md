@@ -35,7 +35,7 @@ Gilson Yamada is the accountable owner for every flag, as assigned for commercia
 | teacher_paid_paths | MOT-131 | Teacher commerce steward | Stop new paid sale-state activation/offers; preserve free authoring, existing path lifecycle, retained buyer copies and permanent rights. |
 | path_purchase | MOT-131 | Purchase fulfillment steward | Reject new teacher course/path checkout sessions; fulfill authorized in-flight purchases and retain permanent grants. |
 | motifpath_purchase | MOT-131 | Purchase fulfillment steward | Hide and reject new MotifPath-owned course/path offers and checkout sessions; fulfill authorized in-flight purchases and retain permanent grants. Plus coverage is unaffected. |
-| teacher_settlement | MOT-133 | Financial operations steward | Stop onboarding new sellers/settlement programs; continue accounting, refunds, chargebacks, reconciliation and existing settlement obligations under approved policy. |
+| teacher_settlement | MOT-133 | Financial operations steward | Stop onboarding new sellers/settlement programs (no new payout onboarding links); continue accounting, refunds, chargebacks, reconciliation and existing settlement obligations under approved policy, and keep balances, sales and settlements readable. |
 | private_beta | MOT-137 | Release steward | Stop admitting new commercial participants/actions; honor existing grants and service existing billing/payment obligations for removed cohorts. |
 
 Flag names never switch off the invariant they resemble: progress retention, existing-resource authorization and established provider processing are always enforced. OFF stops new activation/onboarding, not existing protection, evidence or obligations.
