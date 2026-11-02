@@ -200,9 +200,10 @@ teacher-owned item, a verified payout account. The content read lists current sa
 the caller, including new_sales_paused under rollout, so the UI mirrors core without deciding;
 no blocker is ever resolved by a license or purchase.
 
-Sales and settlements take an optional half-open period (sold_from/sold_before on sold_at,
-created_from/created_before on a settlement's created_at); the client computes the instants in the
-teacher's time zone. The sales page carries per-currency totals for the whole period. Balances stay
+Sales require a half-open period (sold_from/sold_before on sold_at) and settlements accept one
+(created_from/created_before on created_at, both or neither); the client computes the instants in
+the teacher's time zone. A period spans at most 366 days, so there is no unbounded "all time"
+total. The sales page carries per-currency totals for the whole period. Balances stay
 point-in-time and ignore the period. Each refunded sale states its recovery: nothing_due when the
 refund came before transfer (earnings cancelled), outstanding with the amount deducted so far, or
 recovered, naming the later settlements that deducted it. A verified (or action_required) teacher

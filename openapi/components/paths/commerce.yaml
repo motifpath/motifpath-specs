@@ -812,14 +812,15 @@ Settlements:
         in: query
         required: false
         description: Inclusive start of the period, as an instant the client computes in the teacher's
-          time zone (MOT-130). Filters on created_at.
+          time zone (MOT-130). Filters on created_at. Optional; when one is given, both are required.
         schema:
           type: string
           format: date-time
       - name: created_before
         in: query
         required: false
-        description: Exclusive end of the period; must be after created_from. Filters on created_at.
+        description: Exclusive end of the period; must be after created_from and at most 366 days later,
+          otherwise 400. Filters on created_at.
         schema:
           type: string
           format: date-time
@@ -1034,8 +1035,9 @@ TeacherSales:
     summary: List the caller's own sales
     description: Backend-resolved teacher only; newest first. Each sale gives the price, the teacher's
       posted earnings and its status. Never return buyer identity, contact or payment method.
-      New-acquisition OFF never hides past sales or refunds (MOT-130). The optional period filters on
-      sold_at; summary totals every sale in the period, not just the page. A refunded sale states
+      New-acquisition OFF never hides past sales or refunds (MOT-130). The required period (at most
+      366 days, so totals stay bounded) filters on sold_at; summary totals every sale in the period,
+      not just the page. A refunded sale states
       whether its earnings were cancelled, are still being recovered, or were recovered.
     tags:
       - Commerce
@@ -1044,7 +1046,7 @@ TeacherSales:
       - $ref: ../../core-domain-service.yaml#/components/parameters/Offset
       - name: sold_from
         in: query
-        required: false
+        required: true
         description: Inclusive start of the period, as an instant the client computes in the teacher's
           time zone (MOT-130). Filters on sold_at.
         schema:
@@ -1052,8 +1054,9 @@ TeacherSales:
           format: date-time
       - name: sold_before
         in: query
-        required: false
-        description: Exclusive end of the period; must be after sold_from. Filters on sold_at.
+        required: true
+        description: Exclusive end of the period; must be after sold_from and at most 366 days later,
+          otherwise 400. Filters on sold_at.
         schema:
           type: string
           format: date-time

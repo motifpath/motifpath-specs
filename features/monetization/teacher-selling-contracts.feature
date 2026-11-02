@@ -94,6 +94,19 @@ Feature: Teacher selling terms, sales, payout account and sale blockers
     Then she sees the 12 October sales
     And the summary counts all 12 sales, not just the page she reads
 
+  Scenario: Sales are always read for a bounded period
+    When Bea lists her sales without a period
+    Then the request is invalid
+
+  Scenario: A sales period longer than a year is refused
+    When Bea lists her sales from 1 January 2025 to 1 November 2026
+    Then the request is invalid
+    And no totals are computed
+
+  Scenario: A transfer period longer than a year is refused
+    When Bea lists her transfers from 1 January 2025 to 1 November 2026
+    Then the request is invalid
+
   Scenario: A refund before transfer leaves nothing to recover
     Given Bea's sale of "Blues shuffle" was refunded before its earnings were transferred
     When Bea lists her sales
