@@ -9,7 +9,7 @@ follows and what an installation must guarantee.
 - **Three instruments, beginner to solid intermediate:** electric guitar, acoustic guitar
   (steel-string and nylon violão, in popular styles) and 4-string electric bass. The core is
   blues/rock plus Brazilian popular music. Style is a tag on content, never a branch of the tree.
-- **344 nodes: 219 skills under 16 roots, 125 concepts under 11 roots.**
+- **346 nodes: 221 skills under 16 roots, 125 concepts under 11 roots.**
   - Built from two 2026-10-02 research maps:
     - electric guitar: RSL, Trinity, RGT@LCM, Berklee Online, MI, JustinGuitar, Guitar
       Tricks, Fender Play, Pickup Music, EM&T;
@@ -26,7 +26,7 @@ follows and what an installation must guarantee.
   - plus Use modal interchange.
   - A placeholder concept needn't be applied or required: it marks what comes after solid
     intermediate, and no beginner-to-intermediate skill uses it yet.
-- **Edges: 366 `applies` and 144 `requires`.**
+- **Edges: 370 `applies` and 144 `requires`.**
   - `requires` comes only from the research's sourced dependencies (syllabus or method
     order, research or stated synthesis), one edge per target.
   - Not encoded:
@@ -149,6 +149,18 @@ itself:
   composition skill;
 - **gear:** every tone-and-gear skill;
 - **practice craft,** as above.
+
+### First-notes classification amendment (MOT-160)
+
+The product owner approved two universal beginner skills under Reading on 2026-11-02:
+`interpret-note-names` applies `note-names` and `octaves`; `count-semitone-steps` applies
+`tones-and-semitones` and `sharps-and-flats`. Authored `exercise` items can assess their
+written/visual responses. These are separate from auditory matching and physical fretboard
+performance. No new `requires` edges follow from the editorial lesson order.
+
+This source catalog amendment still needs installed-map reconciliation and reference-data
+delivery before app content may resolve the new keys to IDs. It does not establish native
+exercise behavior or mastery.
 
 ## Delivery
 

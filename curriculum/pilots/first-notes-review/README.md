@@ -5,7 +5,7 @@ MOT-160 · pt_BR · beginner · Plan/Check · revision 1 · 2026-11-02.
 This packet carries the visual draft revised with the product owner in the MOT-160
 session into PR #366. It supersedes the prose-only review format of
 [first-notes-proposal-v2.md](../first-notes-proposal-v2.md), while preserving its two
-universal outcomes, explicit audio gate and unresolved classification/placement decisions.
+universal outcomes, explicit audio gate. The classification/placement decision below was subsequently approved.
 It is a preliminary editorial storyboard, not a complete lesson or installed experience.
 
 ## Review artifacts
@@ -75,29 +75,34 @@ arbitrary reveal interactions, keyboard answer behavior or clue-content links wo
 
 ## Classification and readiness
 
+The product owner approved [the classification and placement decision](classification-proposal.md)
+on 2026-11-02. The catalog now defines the two universal skills; lesson A occupies the
+existing `sh-ear-first` / Notas slot and lesson B is standalone. Installed-ID reconciliation
+remains pending. The 18-slide preview is the earlier review snapshot; use this decision and
+the table below for the current classification state.
+
 | Unit/resource | Existing compatible concepts | Skill evidence and disposition |
 |---|---|---|
-| A: names and octave references | `note-names`, `octaves`, both universal | Universal visual naming/location skill remains unresolved. `match-pitch` assesses auditory matching, which these tasks do not test |
-| B: distance counting | `tones-and-semitones`; `sharps-and-flats` for the intermediate-key explanation; `major-scale` for the C-major application | Universal visual step-counting skill remains unresolved. `hear-intervals` is auditory and is not evidence for this outcome |
+| A: names and octave references | `note-names`, `octaves`, both universal | `interpret-note-names`, universal beginner; auditory matching remains outside these tasks |
+| B: distance counting | `tones-and-semitones`; `sharps-and-flats` for the intermediate-key explanation; `major-scale` for the C-major application | `count-semitone-steps`, universal beginner; classify the C-major application with `major-scale` only where taught |
 | Instrument-specific location examples | Select only concepts actually taught by each resource | `find-notes-root-strings` is fretted-only and covers Mi and Lá. A Mi-only visual example cannot establish mastery across both strings or classify a universal parent |
 
 Evidence: `catalogs/knowledge-map.yaml`, universal concepts and skill entries
-`match-pitch`, `hear-intervals`, `find-notes-root-strings`. Existing nodes were inspected;
-no node, skill key or installed ID was fabricated. Beginner is the editorial difficulty.
-Installed classifications and curriculum position remain unapproved. No YAML was changed.
+`match-pitch`, `hear-intervals`, `find-notes-root-strings`. The two added skills were explicitly approved by the product owner; no installed ID is
+claimed. Beginner is the editorial difficulty. Lesson A's YAML classification is updated;
+lesson B remains standalone. Installed classifications remain unverified.
 
 | Gate | Current evidence / next action |
 |---|---|
 | Visual draft and session corrections | Included; revisions address the specific feedback. Acceptance of the complete sequence remains pending |
 | Musical/locale accuracy | AI editorial self-check only; MOT-161 human review still required |
 | Brand production baseline | This schematic review draft preserves the session's visual treatment. Final production must use the approved Manrope/brand library and receive a visual check |
-| Universal skill classification | Curator decision required for visual naming/location and distance counting; do not substitute an auditory/fretted-only skill |
-| Curriculum position | A relates to `sh-ear-first` / Notas. The A/B split and B's exact placement remain proposals |
+| Universal skill classification | PO approved `interpret-note-names` and `count-semitone-steps`; source catalog updated, installed IDs pending |
+| Curriculum position | PO approved A in `sh-ear-first` / Notas and B standalone; no new path or idea-stage promotion |
 | Native behavior | Verify diagram rendering/playback, answer types, clues, feedback and keyboard/text alternatives in the destination |
 | Locale persistence | Verify `pt_BR` metadata and installed IDs; Portuguese copy alone is insufficient |
 | Release | No full-production, publication or epic-promotion claim follows from this checkpoint |
 
 Next review: use slides 3–8 for lesson A's purpose, naming method, octave bridge and
 instrument examples, then slides 9–14 for lesson B's purpose, distance reasoning and
-application. Record changes against slide numbers or resource names. Resolve classification
-with the curator before readiness; produce final lessons only after draft direction is accepted.
+application. Record changes against slide numbers or resource names. Reconcile the approved classification with installed IDs before readiness; produce final lessons only after draft direction is accepted.
