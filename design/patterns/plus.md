@@ -2,7 +2,7 @@
 
 **Source:** ADR-067 (two commercial products) · ADR-068 (buy once or Plus on MotifPath content) ·
 MOT-116 (Figma "Monetization — two products r5", PO approval 2026-11-01) · MOT-126 (row H, Plus
-states r1) · [commerce contract](../../openapi/commerce-contract.md)
+states r1, PO approval 2026-11-02) · [commerce contract](../../openapi/commerce-contract.md)
 
 ## When
 
