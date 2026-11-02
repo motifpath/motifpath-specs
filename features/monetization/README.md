@@ -30,6 +30,7 @@ implementation passes TDD. PR approval accepts proposed API details, not a deplo
 | [Payment reconciliation](payment-reconciliation.feature) | Duplicate/out-of-order recovery, unknown outcomes and notices |
 | [Commercial audit](commercial-audit.feature) | Immutable evidence, attempts, causality and admin inspection |
 | [Commercial access](commercial-access.feature) | Caller copy, independent rights, privacy and delivery-time checks |
+| [Content ownership](content-ownership.feature) | Ownership at creation, persistence across edits and learner copies, admin-only corrections, rollout OFF and legacy backfill (MOT-118) |
 | [Content contracts](commercial-content-contracts.feature) | Provenance, immutable manifests, platform premium dependencies and withdrawal |
 | [Acquisition contracts](commercial-acquisition-contracts.feature) | Configured offers, path checkout and holdings |
 | [Financial contracts](commercial-financial-contracts.feature) | Exact refund deadline, admin review/retry, final disputes, rounding and settlement |
@@ -51,7 +52,7 @@ or settlement obligations. UI mirrors decisions. Plus and teacher commerce have 
 
 | Ticket | Flag(s), prefix `monetization.` | Contract surface and scenarios |
 |---|---|---|
-| MOT-118 | content_ownership | Commerce ownership read/correction; content contracts |
+| MOT-118 | content_ownership | Commerce ownership read/correction; content ownership scenarios |
 | MOT-119 | content_versions | Immutable commercial release manifests; preserve existing course/path copies and ADR-055 |
 | MOT-120 | strapi_rights | CMS hint API, field authority/mapping/reconciliation; integration contracts |
 | MOT-121 | commercial_validation | Release and sale-state commands, transitive dependency validation; content contracts |
