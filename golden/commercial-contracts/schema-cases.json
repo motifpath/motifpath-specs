@@ -1455,5 +1455,41 @@
       "content": null
     },
     "valid": false
+  },
+  {
+    "name": "resume renewal command receipt",
+    "schema": "subscriptions.yaml#/SubscriptionCommand",
+    "value": {
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "subscription_id": "12345678-1234-4234-8234-123456789012",
+      "action": "resume_renewal",
+      "status": "pending"
+    },
+    "valid": true
+  },
+  {
+    "name": "resume renewal requires the observed revision",
+    "schema": "subscriptions.yaml#/ResumeRenewalRequest",
+    "value": {},
+    "valid": false
+  },
+  {
+    "name": "payment method session",
+    "schema": "subscriptions.yaml#/PaymentMethodSession",
+    "value": {
+      "session_url": "https://billing.example.test/session/abc",
+      "expires_at": "2026-11-01T12:30:00Z"
+    },
+    "valid": true
+  },
+  {
+    "name": "payment method session cannot carry a plan change",
+    "schema": "subscriptions.yaml#/PaymentMethodSession",
+    "value": {
+      "session_url": "https://billing.example.test/session/abc",
+      "expires_at": "2026-11-01T12:30:00Z",
+      "target_offer_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
   }
 ]

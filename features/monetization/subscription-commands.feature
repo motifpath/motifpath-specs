@@ -117,3 +117,36 @@ Feature: Caller-owned subscription commands are auditable and repeatable
     And new annual switching is subsequently disabled for her cohort
     When Alice repeats "schedule-1" with the same intent
     Then the existing operation is returned without initiating another external action
+
+  # MOT-126: resume a stopped renewal; update the payment method during grace.
+  Scenario: A stopped renewal can be resumed before the paid period ends
+    Given Alice cancelled renewal of her subscription paid until "2026-12-01T12:00:00Z"
+    When Alice resumes renewal on "2026-11-20T12:00:00Z"
+    Then renewal is enabled again without a charge now
+    And the next renewal is due on "2026-12-01T12:00:00Z"
+
+  Scenario: A renewal cannot be resumed after the paid period ended
+    Given Alice cancelled renewal and her paid period ended on "2026-12-01T12:00:00Z"
+    When Alice resumes renewal on "2026-12-02T12:00:00Z"
+    Then the resume is refused and she must subscribe again
+
+  Scenario: Resuming an already renewing subscription is a no-op
+    Given Alice's subscription is scheduled to renew
+    When Alice submits a resume operation using its current revision
+    Then an applied no-op command is recorded without another external change
+
+  Scenario: A learner in renewal grace can update the payment method
+    Given Alice's renewal payment failed and her seven-day grace is active
+    When Alice opens the payment method page
+    Then a provider-hosted session limited to updating her payment method is returned
+
+  Scenario: Returning from the payment method page does not prove payment
+    Given Alice updated her payment method during renewal grace
+    And the retried renewal payment is not yet verified
+    When Alice returns to her subscriptions
+    Then her subscription still shows renewal grace until the payment is verified
+
+  Scenario: An expired subscription has no payment method page
+    Given Alice's subscription has expired with no remaining grace period
+    When Alice opens the payment method page
+    Then the request is refused and she must subscribe again

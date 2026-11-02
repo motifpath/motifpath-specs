@@ -86,6 +86,71 @@ CancelRenewal:
       '409': {$ref: '#/Conflict'}
       '503': {$ref: '#/Unavailable'}
 
+ResumeRenewal:
+  parameters:
+    - $ref: '#/SubscriptionID'
+  post:
+    operationId: resumeMySubscriptionRenewal
+    summary: Turn a stopped renewal back on before the paid period ends
+    description: |
+      Undo a caller-owned cancellation while billing_status is paid and the current
+      paid period has not ended. Nothing is charged or credited now; the next renewal
+      happens at paid_until on the authoritative terms applicable then. After paid_until,
+      or outside the paid status, resuming is refused (409); the learner subscribes again.
+      If renewal is already enabled, record an applied no-op command.
+      Activation requires server-side action/cohort/prerequisite decisions (403 if OFF),
+      because it re-enables future charges. Record one durable operation with audit
+      evidence; 200 alone does not claim the provider has already re-enabled renewal.
+      expected_revision prevents racing a renewal or another lifecycle command.
+      Process same-key retries as described by IdempotencyKey before revision checks.
+      Another user's subscription is indistinguishable from a missing one (404).
+    tags: [Subscriptions]
+    parameters:
+      - $ref: '#/IdempotencyKey'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '../schemas/subscriptions.yaml#/ResumeRenewalRequest'}
+    responses:
+      '200': {$ref: '#/CommandReceipt'}
+      '400': {$ref: '#/InvalidRequest'}
+      '401': {$ref: '#/Unauthenticated'}
+      '403': {$ref: '#/Forbidden'}
+      '404': {$ref: '#/NotFound'}
+      '409': {$ref: '#/Conflict'}
+      '503': {$ref: '#/Unavailable'}
+
+PaymentMethodSession:
+  parameters:
+    - $ref: '#/SubscriptionID'
+  post:
+    operationId: createMyPaymentMethodSession
+    summary: Open the provider-hosted page to update the subscription payment method
+    description: |
+      Create a short-lived provider-hosted session, limited to updating the payment
+      method of this caller-owned subscription, while billing_status is paid or
+      renewal_grace. Return URL and allowed actions are backend-controlled; the page
+      cannot change plan, price or cancellation. Returning from the page never proves
+      payment: a retried renewal grants only its verified billed interval, without extra
+      days for the grace already used. Servicing an existing subscription stays available
+      while acquisition flags are OFF. Expired subscriptions are refused (409).
+      Another user's subscription is indistinguishable from a missing one (404).
+    tags: [Subscriptions]
+    parameters:
+      - $ref: '#/IdempotencyKey'
+    responses:
+      '200':
+        description: Provider-hosted session to open in the browser.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/subscriptions.yaml#/PaymentMethodSession'}
+      '400': {$ref: '#/InvalidRequest'}
+      '401': {$ref: '#/Unauthenticated'}
+      '404': {$ref: '#/NotFound'}
+      '409': {$ref: '#/Conflict'}
+      '503': {$ref: '#/Unavailable'}
+
 ScheduleAnnual:
   parameters:
     - $ref: '#/SubscriptionID'

@@ -220,8 +220,8 @@ CommercialContent:
 Offer:
   type: object
   description: Immutable backend-approved one-time offer revision; configurable terms never come from
-    checkout input. A teacher sells an owned course or path (ADR-067); MotifPath sells an owned
-    course or path it chose to offer (ADR-068).
+    checkout input. A teacher sells an owned course or path; MotifPath sells an owned
+    course or path it chose to offer.
   additionalProperties: false
   required:
     - offer_id
