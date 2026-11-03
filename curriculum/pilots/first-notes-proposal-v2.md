@@ -1,5 +1,10 @@
 # First notes — proposal v2 for review
 
+**Current handoff (2026-11-03):** The product owner accepted the visual direction
+and authorized full lesson drafts. See the [complete lesson packet](../content/first-notes/README.md).
+The review-stage restrictions below describe this earlier checkpoint; audio and
+publication still require separate authorization.
+
 **MOT-160 · Plan · 2026-10-18 · awaiting PO draft/diagram review.** Supersedes the
 v1 guitar-only application and generated-audio requirements in first-notes.md.
 Historical source revision: 98905d4. No full lesson, deck, video or audio production
