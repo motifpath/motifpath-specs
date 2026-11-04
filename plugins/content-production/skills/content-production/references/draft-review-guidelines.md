@@ -123,6 +123,9 @@ Use the exact preview revision for both passes.
 - Each transition follows from knowledge already introduced and motivates the next step.
 - Diagram titles are understandable; instrument, string, positions and movements are clear.
 - Practice prompts explain the action, purpose, support and feedback in the target locale.
+- The review draft shows proposed exercises and the packet maps them to platform
+  authoring. If there is a final PowerPoint, inspect slides, hidden slides and notes
+  for exercise prompts, answers, feedback and retries and remove any that remain.
 - Resource references identify exact sections, purpose, access, status and alternatives.
 - Classification, curriculum placement, human music/locale review, native runtime support
   and publication approval remain separate gates. Neither a visual draft nor its approval

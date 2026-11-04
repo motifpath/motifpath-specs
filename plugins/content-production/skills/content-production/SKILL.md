@@ -20,6 +20,11 @@ and example. The filled pt_BR lesson illustrates the visual system, not approved
 Keep author instructions in notes or author-only pages. Check every rendered slide;
 a structurally valid deck alone does not establish presentation quality.
 
+Propose exercises in the review draft with their prompts, answers or rubrics, feedback
+and retries. Author the approved exercises separately in MotifPath. Exclude all
+exercise material from the final PowerPoint, including hidden slides and speaker
+notes. Keep worked demonstrations and references that direct learners to platform practice.
+
 Read [draft review guidelines](references/draft-review-guidelines.md) when planning or
 revising a visual draft, its lesson openings, diagrams, practice prompts or resource map.
 

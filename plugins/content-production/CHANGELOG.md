@@ -7,6 +7,7 @@
 - Require a learner walkthrough and an editorial inspection of the preview.
 - Plan native delivery and fallbacks for essential interactions.
 - Record reusable skill improvements with evidence and a check for the next lesson.
+- Review exercises in drafts, author them in MotifPath and exclude them from final PowerPoint files.
 
 ## 1.3.0 — 2026-11-02
 

@@ -19,6 +19,8 @@ The theme uses the canonical MotifPath palette and Manrope typography. Original
 brand artwork remains unchanged; generated supporting images are illustrative.
 Every placeholder is intentional and editable.
 Duplicate only the layouts the unit needs. Remove the author pages before learner delivery.
+Show exercise proposals in the review draft and author the approved exercises in
+MotifPath. Exclude exercise material from the final PowerPoint slides and notes.
 The deck is in English as an authoring template; replace learner-facing placeholders
 with copy in the unit's declared locale. It contains no working exercise or grading engine.
 

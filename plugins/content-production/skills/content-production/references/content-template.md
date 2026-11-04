@@ -85,6 +85,11 @@ Fill this map during Plan for every essential interaction and update it as evide
 Record when hints, answers, feedback and retries become available. State whether
 learners can reveal answers before responding and why.
 
+Include exercise proposals in the review draft and keep the authoring details in this
+packet for separate registration in MotifPath. In a PowerPoint delivery, retain worked
+demonstrations and remove exercise prompts, options, answer keys, feedback and retries
+from slides and notes.
+
 | Modality | Included activity or reason omitted | Link to outcome | Instrument-free option |
 |---|---|---|---|
 | Perception | Fill | Fill | Fill or explain |
@@ -113,6 +118,7 @@ For every asset/interaction record:
 | Classification and instrument scope | Fill | Fill |
 | Meaningful modalities, feedback and application | Fill | Fill |
 | Learner walkthrough and editorial inspection, including reveal timing | Fill | Fill |
+| Exercises proposed in draft and assigned to platform authoring. Final PowerPoint contains no exercise material, or PowerPoint N/A | Fill | Fill |
 | Accessibility and asset rights | Fill | Fill |
 | Curriculum alignment, or standalone N/A | Fill | Fill |
 | Native delivery verification | Fill | Fill |
