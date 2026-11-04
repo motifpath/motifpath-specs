@@ -88,8 +88,21 @@ picker can tag it instead.
 **6. A created progression's key is its numerals.** Its key is the mode and its numerals in ASCII,
 for example `major/I-bVII-IV-I` or `minor/i-bVI-bIII-bVII` (`b` for `♭`, `o` for `°`, `h` for `ø`).
 Catalog keys (`I-V-vi-IV`, `12-bar-blues`) have no `/`, so the two never collide. Mode, bars and
-key never change after creation. A created progression is never deleted, because charts tag it by
-key.
+key never change after creation: a progression created with the wrong numerals is removed and
+created again.
+
+**6a. Admins remove progressions created by mistake.** An admin removes a created progression
+that is not `in_drills`:
+
+- **Never tagged:** if no chart revision, draft or published, has ever tagged it, it is deleted.
+  Nothing points at it, and its mode and numerals are free to be created again.
+- **Tagged:** if any chart revision tags it, it is retired instead of deleted, because a
+  published revision never changes and still shows its tags by key. A retired progression
+  disappears from the picker and can't be newly tagged, and saving a draft that still tags it is
+  refused until the tag is removed. Revisions that already tag it keep showing it. Its mode and
+  numerals stay taken: creating the same ones again restores it instead.
+- **In drills:** a promoted progression and the 10 catalog progressions are never removed or
+  retired, because practice states and evidence point at their items.
 
 **7. Names come from the numerals.** A created progression's name is its numerals joined by `–`,
 the same in every language (`i–♭VI–♭III–♭VII`). An admin can give it an optional nickname per
@@ -135,6 +148,13 @@ later. The borrowed degrees are the common modal-mixture chords of pop and rock 
 text*, which can't be played or checked. *Rejected: diatonic numerals only*, which refuses many of
 the songs this is for.
 
+**Retire when tagged, delete when not.** Published chart revisions are immutable and show their
+tags by key, so deleting a progression they tag would leave them pointing at nothing. *Rejected:
+refusing removal while any chart uses it*, which can never succeed once a published revision has
+tagged it. *Rejected: deleting and untagging every chart automatically*, which rewrites published
+revisions. *Rejected: no removal at all*, which leaves mistakes in every admin's picker (PO,
+2026-11-04).
+
 **Keys from the numerals.** A readable key in logs and item keys, and identical numerals always
 give the same key, which `(mode, bars)` uniqueness already guarantees. *Rejected: a random slug*,
 which hides what a tag means in logs, item keys and support questions.
@@ -154,8 +174,10 @@ which hides what a tag means in logs, item keys and support questions.
 - Promoted progressions exist only in the environment they were promoted in. Dev and staging start
   with the 10 catalog progressions; `seed-full` creates a few chart-only and promoted ones so
   development covers both.
-- No edit or delete: a progression created by mistake stays, chart-only and unused. A retire flag
-  can come later if the picker gets cluttered.
+- No edit: fixing a progression's numerals means removing it and creating it again, then
+  re-tagging the sections that used it.
+- Removal has two outcomes, delete or retire, depending on whether any chart revision has tagged
+  the progression. The admin interface has to make clear which one happens.
 - The grammar leaves out secondary dominants (`V/V`), slash chords, suspended and extended chords.
   A section built on them stays untagged until the grammar grows.
 - Promotion is one-way. Taking a bad progression out of the drills needs a new decision.
@@ -167,6 +189,8 @@ which hides what a tag means in logs, item keys and support questions.
 - The `progressions` table gets an `in_drills` column and the `(mode, bars)` uniqueness, in a new
   migration; existing rows become `in_drills = true`.
 - `progressions.yaml` stays the source of the original 10 progressions and their updates.
+- Created progressions get a `retired` flag next to `in_drills`; the picker lists only progressions
+  that are not retired.
 
 ## Related ADRs
 
