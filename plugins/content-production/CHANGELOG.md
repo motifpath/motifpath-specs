@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0 — 2026-11-04
+
+- Trace teaching steps and learner actions to the observable lesson outcome.
+- Map likely mistakes to actionable feedback and fresh practice examples.
+- Require a learner walkthrough and an editorial inspection of the preview.
+- Plan native delivery and fallbacks for essential interactions.
+- Record reusable skill improvements with evidence and a check for the next lesson.
+
 ## 1.3.0 — 2026-11-02
 
 - Capture MOT-160 visual-draft review decisions and the syllabus/transition review gate.
