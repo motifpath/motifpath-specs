@@ -91,8 +91,10 @@ Catalog keys (`I-V-vi-IV`, `12-bar-blues`) have no `/`, so the two never collide
 key never change after creation: a progression created with the wrong numerals is removed and
 created again.
 
-**6a. Admins remove progressions created by mistake.** An admin removes a created progression
-that is not `in_drills`:
+**6a. Admins remove progressions created by mistake.** Removing a progression from a song chart
+only takes the tag off that section; the progression itself stays. A progression is removed only
+from the admin progression list (Admin › Progressions), never from the song chart editor. There, an
+admin removes a created progression that is not `in_drills`:
 
 - **Never tagged:** if no chart revision, draft or published, has ever tagged it, it is deleted.
   Nothing points at it, and its mode and numerals are free to be created again.
@@ -154,6 +156,12 @@ refusing removal while any chart uses it*, which can never succeed once a publis
 tagged it. *Rejected: deleting and untagging every chart automatically*, which rewrites published
 revisions. *Rejected: no removal at all*, which leaves mistakes in every admin's picker (PO,
 2026-11-04).
+
+**Removal lives in the progression list, not the chart.** A progression is shared by every chart
+and every admin, so removing it is a catalog action, not a chart edit. In the chart editor,
+removing a progression means untagging the section, which is what an author editing one chart
+expects. *Rejected: a Remove action in the song chart picker*, where an author meaning to untag one
+section could delete or retire a progression other charts use (PO, 2026-11-04).
 
 **Keys from the numerals.** A readable key in logs and item keys, and identical numerals always
 give the same key, which `(mode, bars)` uniqueness already guarantees. *Rejected: a random slug*,
