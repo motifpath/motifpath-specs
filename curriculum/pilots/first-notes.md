@@ -1,8 +1,9 @@
 # First-notes pilot — MOT-159 / MOT-160
 
-**Current status:** Plan; awaiting product-owner review of the short drafts and
-proposed diagrams. The 2026-10-18 calibration supersedes the original production
-brief and the one-string guitar experiment.
+**Current status:** Do; on 2026-11-03 the product owner accepted the 18-slide
+sequence and diagram direction and authorized two complete pt_BR lesson drafts.
+Review the [full lesson packet](../content/first-notes/README.md). Educator review,
+native delivery verification and publication remain separate gates.
 
 ## Current review target
 
@@ -19,8 +20,8 @@ Read [the current proposal](first-notes-proposal-v2.md). It contains:
 - A resource map for native diagrams/playback, exercises, clues and feedback.
 - Open classification, curriculum-placement and native-capability checks.
 
-Review these drafts and diagram concepts before producing complete lessons,
-presentations or media. Generate audio only when explicitly requested. Full
+The direction-review gate was accepted on 2026-11-03; full article drafts are now
+available in the linked production packet. Generate audio only when explicitly requested. Full
 production, editorial review, native delivery and publication remain separate gates.
 MOT-160 is not complete merely because this proposal exists.
 
@@ -36,7 +37,7 @@ native behavior remain unverified.
 
 Content-production v1.3.0 and the shared 47-slide MotifPath library are available in
 the content-production epic, introduced by PR #361. Reuse that library after the
-content direction is accepted; the preliminary review storyboard is now explicitly requested; final learner decks remain pending direction acceptance.
+content direction is accepted; the accepted storyboard informs the current full article drafts.
 
 ## Superseded experiment
 

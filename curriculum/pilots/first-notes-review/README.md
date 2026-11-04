@@ -1,5 +1,10 @@
 # First notes: visual review checkpoint
 
+**Current handoff (2026-11-03):** The product owner accepted the visual direction
+and authorized full lesson drafts. See the [complete lesson packet](../../content/first-notes/README.md).
+The review-stage restrictions below describe this earlier checkpoint; audio and
+publication still require separate authorization.
+
 MOT-160 · pt_BR · beginner · Plan/Check · revision 1 · 2026-11-02.
 
 This packet carries the visual draft revised with the product owner in the MOT-160

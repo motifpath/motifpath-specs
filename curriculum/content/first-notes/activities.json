@@ -1,0 +1,730 @@
+[
+  {
+    "key": "a-name-f",
+    "unit": "a",
+    "language": "pt_BR",
+    "difficulty": "beginner",
+    "instruments": [],
+    "exercise_type": "text_response",
+    "skill_keys": [
+      "interpret-note-names"
+    ],
+    "concept_keys": [
+      "note-names"
+    ],
+    "prompt": "Qual letra representa Fá?",
+    "options": [
+      {
+        "key": "a",
+        "label": "E",
+        "value": "E",
+        "correct": false,
+        "reason": "E representa Mi. Procure Fá na linha dos nomes."
+      },
+      {
+        "key": "b",
+        "label": "F",
+        "value": "F",
+        "correct": true,
+        "reason": "F é a letra correspondente a Fá."
+      },
+      {
+        "key": "c",
+        "label": "G",
+        "value": "G",
+        "correct": false,
+        "reason": "G representa Sol. Fá corresponde a outra letra."
+      }
+    ],
+    "hint": "Localize Fá na primeira linha da tabela e leia a letra logo abaixo.",
+    "rationale": "Fá corresponde a F. As duas formas indicam o mesmo nome de nota.",
+    "retry": {
+      "key": "a-name-g-retry",
+      "prompt": "Pratique de novo: qual letra representa Sol?",
+      "options": [
+        {
+          "key": "a",
+          "label": "A",
+          "value": "A",
+          "correct": false,
+          "reason": "A corresponde a Lá."
+        },
+        {
+          "key": "b",
+          "label": "F",
+          "value": "F",
+          "correct": false,
+          "reason": "F corresponde a Fá."
+        },
+        {
+          "key": "c",
+          "label": "G",
+          "value": "G",
+          "correct": true,
+          "reason": "G corresponde a Sol."
+        }
+      ],
+      "hint": "Consulte a coluna de Sol na tabela.",
+      "rationale": "Sol corresponde a G. A consulta funciona nos dois sentidos, nome para letra e letra para nome."
+    }
+  },
+  {
+    "key": "a-octaves",
+    "unit": "a",
+    "language": "pt_BR",
+    "difficulty": "beginner",
+    "instruments": [],
+    "exercise_type": "text_response",
+    "skill_keys": [
+      "interpret-note-names"
+    ],
+    "concept_keys": [
+      "note-names",
+      "octaves"
+    ],
+    "prompt": "O que C4 e C5 têm em comum e o que muda?",
+    "options": [
+      {
+        "key": "a",
+        "label": "Mesmo nome, mas alturas em oitavas diferentes",
+        "value": "same-name-different-octave",
+        "correct": true,
+        "reason": "A letra C se repete e o número da oitava muda."
+      },
+      {
+        "key": "b",
+        "label": "Nomes diferentes e a mesma altura",
+        "value": "different-name-same-pitch",
+        "correct": false,
+        "reason": "As duas letras são C, que representa Dó."
+      },
+      {
+        "key": "c",
+        "label": "Mesmo nome e exatamente a mesma altura",
+        "value": "same-name-same-pitch",
+        "correct": false,
+        "reason": "Os números 4 e 5 indicam oitavas diferentes."
+      }
+    ],
+    "hint": "Separe a informação da letra da informação do número.",
+    "rationale": "Os dois são Dó. C5 fica uma oitava acima de C4; o número identifica a oitava da referência.",
+    "retry": {
+      "key": "a-octaves-retry",
+      "prompt": "Pratique de novo: E1 e E2 são duas notas com qual nome?",
+      "options": [
+        {
+          "key": "a",
+          "label": "Ré",
+          "value": "D",
+          "correct": false,
+          "reason": "Ré usa a letra D."
+        },
+        {
+          "key": "b",
+          "label": "Mi",
+          "value": "E",
+          "correct": true,
+          "reason": "A letra E significa Mi, independentemente da oitava."
+        },
+        {
+          "key": "c",
+          "label": "Fá",
+          "value": "F",
+          "correct": false,
+          "reason": "Fá usa a letra F."
+        }
+      ],
+      "hint": "Consulte E na tabela e deixe os números de oitava de lado por um instante.",
+      "rationale": "As duas notas são Mi. E1 e E2 têm o mesmo nome em registros diferentes; E2 está uma oitava acima de E1."
+    }
+  },
+  {
+    "key": "a-position-g",
+    "unit": "a",
+    "language": "pt_BR",
+    "difficulty": "beginner",
+    "instruments": [],
+    "exercise_type": "text_response",
+    "skill_keys": [
+      "interpret-note-names"
+    ],
+    "concept_keys": [
+      "note-names",
+      "octaves"
+    ],
+    "prompt": "Nos dois desenhos da corda Mi, em qual casa está a nota Sol / G?",
+    "options": [
+      {
+        "key": "a",
+        "label": "Casa 1",
+        "value": 1,
+        "correct": false,
+        "reason": "A primeira casa está identificada como Fá / F."
+      },
+      {
+        "key": "b",
+        "label": "Casa 2",
+        "value": 2,
+        "correct": false,
+        "reason": "Sol aparece depois da segunda casa, na terceira."
+      },
+      {
+        "key": "c",
+        "label": "Casa 3",
+        "value": 3,
+        "correct": true,
+        "reason": "O rótulo Sol / G está na terceira casa de cada desenho."
+      }
+    ],
+    "hint": "Procure o rótulo G, depois confira o número da casa na mesma coluna.",
+    "rationale": "Sol está na casa 3: G2 na guitarra e G1 no baixo. O número 3 indica a casa; os números em G2/G1 indicam as oitavas.",
+    "retry": {
+      "key": "a-position-f-retry",
+      "prompt": "Pratique de novo: para encontrar Fá / F na corda Mi mostrada, qual posição você consulta?",
+      "options": [
+        {
+          "key": "a",
+          "label": "Corda solta",
+          "value": 0,
+          "correct": false,
+          "reason": "A corda solta é Mi nos exemplos."
+        },
+        {
+          "key": "b",
+          "label": "Casa 1",
+          "value": 1,
+          "correct": true,
+          "reason": "A primeira casa está identificada como Fá."
+        },
+        {
+          "key": "c",
+          "label": "Casa 3",
+          "value": 3,
+          "correct": false,
+          "reason": "A terceira casa mostra Sol."
+        }
+      ],
+      "hint": "Traduza Fá para F e procure esse rótulo no desenho.",
+      "rationale": "Fá está na casa 1: F2 na guitarra e F1 no baixo. A posição é semelhante, e os registros são diferentes."
+    }
+  },
+  {
+    "key": "a-phrase",
+    "unit": "a",
+    "language": "pt_BR",
+    "difficulty": "beginner",
+    "instruments": [],
+    "exercise_type": "text_response",
+    "skill_keys": [
+      "interpret-note-names"
+    ],
+    "concept_keys": [
+      "note-names"
+    ],
+    "prompt": "Como fica E–F–G–F–E usando os nomes em português?",
+    "options": [
+      {
+        "key": "a",
+        "label": "Mi–Sol–Fá–Sol–Mi",
+        "value": "wrong-swap",
+        "correct": false,
+        "reason": "F é Fá e G é Sol; confira a ordem das duas letras centrais."
+      },
+      {
+        "key": "b",
+        "label": "Mi–Fá–Sol–Fá–Mi",
+        "value": "E F G F E",
+        "correct": true,
+        "reason": "Cada letra foi substituída pelo nome correspondente, mantendo a ordem."
+      },
+      {
+        "key": "c",
+        "label": "Ré–Mi–Fá–Mi–Ré",
+        "value": "wrong-start",
+        "correct": false,
+        "reason": "A primeira letra é E, que corresponde a Mi, e não Ré."
+      }
+    ],
+    "hint": "Traduza uma letra por vez. Comece pelo E e mantenha a ordem escrita.",
+    "rationale": "A frase é Mi–Fá–Sol–Fá–Mi. Traduzir os nomes não muda a ordem das notas. Nas cordas dos exemplos, as posições são solta–1–3–1–solta.",
+    "retry": {
+      "key": "a-phrase-retry",
+      "prompt": "Pratique de novo: como fica G–F–E em português?",
+      "options": [
+        {
+          "key": "a",
+          "label": "Lá–Sol–Fá",
+          "value": "wrong-letter",
+          "correct": false,
+          "reason": "G corresponde a Sol, não Lá."
+        },
+        {
+          "key": "b",
+          "label": "Mi–Fá–Sol",
+          "value": "reverse",
+          "correct": false,
+          "reason": "Essa resposta inverte a ordem da frase."
+        },
+        {
+          "key": "c",
+          "label": "Sol–Fá–Mi",
+          "value": "G F E",
+          "correct": true,
+          "reason": "G, F e E correspondem a Sol, Fá e Mi nessa ordem."
+        }
+      ],
+      "hint": "Comece pela letra G, sem ler a sequência de trás para a frente.",
+      "rationale": "G–F–E corresponde a Sol–Fá–Mi. A ordem de leitura faz parte da indicação musical."
+    }
+  },
+  {
+    "key": "b-ef",
+    "unit": "b",
+    "language": "pt_BR",
+    "difficulty": "beginner",
+    "instruments": [],
+    "exercise_type": "text_response",
+    "skill_keys": [
+      "count-semitone-steps"
+    ],
+    "concept_keys": [
+      "tones-and-semitones"
+    ],
+    "prompt": "Quantos semitons há de Mi4 (E4) a Fá4 (F4)?",
+    "options": [
+      {
+        "key": "a",
+        "label": "Um semitom",
+        "value": 1,
+        "correct": true,
+        "reason": "Uma mudança liga duas alturas vizinhas."
+      },
+      {
+        "key": "b",
+        "label": "Dois semitons, ou um tom",
+        "value": 2,
+        "correct": false,
+        "reason": "As duas posições mostradas correspondem a uma única mudança entre elas."
+      },
+      {
+        "key": "c",
+        "label": "Nenhum semitom",
+        "value": 0,
+        "correct": false,
+        "reason": "Sem mudança de altura, a distância seria zero."
+      }
+    ],
+    "hint": "Observe se existe uma tecla entre Mi e Fá.",
+    "rationale": "É um semitom. Mi4 e Fá4 são teclas vizinhas; sair de uma e chegar à outra conta uma mudança.",
+    "evidence": {
+      "midi": [
+        64,
+        65
+      ],
+      "semitones": 1
+    },
+    "retry": {
+      "key": "b-ef-retry",
+      "prompt": "Pratique de novo: de Si3 ao Dó4 seguinte, há quantos semitons?",
+      "options": [
+        {
+          "key": "a",
+          "label": "Um semitom",
+          "value": 1,
+          "correct": true,
+          "reason": "Uma mudança liga duas alturas vizinhas."
+        },
+        {
+          "key": "b",
+          "label": "Dois semitons, ou um tom",
+          "value": 2,
+          "correct": false,
+          "reason": "As duas posições mostradas correspondem a uma única mudança entre elas."
+        },
+        {
+          "key": "c",
+          "label": "Nenhum semitom",
+          "value": 0,
+          "correct": false,
+          "reason": "Sem mudança de altura, a distância seria zero."
+        }
+      ],
+      "hint": "Si e o Dó seguinte são teclas vizinhas.",
+      "rationale": "Há um semitom, pois não existe tecla intermediária entre Si3 e C4.",
+      "evidence": {
+        "midi": [
+          59,
+          60
+        ],
+        "semitones": 1
+      }
+    }
+  },
+  {
+    "key": "b-cd",
+    "unit": "b",
+    "language": "pt_BR",
+    "difficulty": "beginner",
+    "instruments": [],
+    "exercise_type": "text_response",
+    "skill_keys": [
+      "count-semitone-steps"
+    ],
+    "concept_keys": [
+      "tones-and-semitones",
+      "sharps-and-flats"
+    ],
+    "prompt": "Quantos semitons há de Dó4 (C4) a Ré4 (D4)?",
+    "options": [
+      {
+        "key": "a",
+        "label": "Um semitom",
+        "value": 1,
+        "correct": false,
+        "reason": "Faltou contar a passagem pela posição intermediária."
+      },
+      {
+        "key": "b",
+        "label": "Dois semitons, ou um tom",
+        "value": 2,
+        "correct": true,
+        "reason": "Duas mudanças incluem uma posição intermediária."
+      },
+      {
+        "key": "c",
+        "label": "Nenhum semitom",
+        "value": 0,
+        "correct": false,
+        "reason": "Sem mudança de altura, a distância seria zero."
+      }
+    ],
+    "hint": "Siga Dó, Dó♯ e Ré. Conte as mudanças, começando em zero no Dó.",
+    "rationale": "Há dois semitons, ou um tom: Dó até Dó♯ é o primeiro passo, e Dó♯ até Ré é o segundo.",
+    "evidence": {
+      "midi": [
+        60,
+        62
+      ],
+      "semitones": 2
+    },
+    "retry": {
+      "key": "b-cd-retry",
+      "prompt": "Pratique de novo: Sol4–Sol♯4–Lá4 mostra quantos semitons entre Sol4 e Lá4?",
+      "options": [
+        {
+          "key": "a",
+          "label": "Um semitom",
+          "value": 1,
+          "correct": false,
+          "reason": "Faltou contar a passagem pela posição intermediária."
+        },
+        {
+          "key": "b",
+          "label": "Dois semitons, ou um tom",
+          "value": 2,
+          "correct": true,
+          "reason": "Duas mudanças incluem uma posição intermediária."
+        },
+        {
+          "key": "c",
+          "label": "Nenhum semitom",
+          "value": 0,
+          "correct": false,
+          "reason": "Sem mudança de altura, a distância seria zero."
+        }
+      ],
+      "hint": "O ponto de partida é Sol4. Conte cada passagem para o próximo nome da lista.",
+      "rationale": "Há dois semitons. As três posições mostram duas mudanças, e não três.",
+      "evidence": {
+        "midi": [
+          67,
+          69
+        ],
+        "semitones": 2
+      }
+    }
+  },
+  {
+    "key": "b-transfer",
+    "unit": "b",
+    "language": "pt_BR",
+    "difficulty": "beginner",
+    "instruments": [],
+    "exercise_type": "text_response",
+    "skill_keys": [
+      "count-semitone-steps"
+    ],
+    "concept_keys": [
+      "tones-and-semitones",
+      "sharps-and-flats"
+    ],
+    "prompt": "De Fá na casa 1 até Sol na casa 3, na mesma corda, qual é a distância nos dois instrumentos?",
+    "options": [
+      {
+        "key": "a",
+        "label": "Um semitom",
+        "value": 1,
+        "correct": false,
+        "reason": "Faltou contar a passagem pela posição intermediária."
+      },
+      {
+        "key": "b",
+        "label": "Dois semitons, ou um tom",
+        "value": 2,
+        "correct": true,
+        "reason": "Duas mudanças incluem uma posição intermediária."
+      },
+      {
+        "key": "c",
+        "label": "Nenhum semitom",
+        "value": 0,
+        "correct": false,
+        "reason": "Sem mudança de altura, a distância seria zero."
+      }
+    ],
+    "hint": "Percorra casa 1, casa 2 e casa 3. A segunda casa também entra no caminho.",
+    "rationale": "São dois semitons, ou um tom. Casa 1 até casa 2 é um passo; casa 2 até casa 3 é outro. A guitarra e o baixo estão em registros diferentes, mas o número de passos é o mesmo.",
+    "evidence": {
+      "midi": [
+        41,
+        43
+      ],
+      "semitones": 2
+    },
+    "retry": {
+      "key": "b-transfer-retry",
+      "prompt": "Pratique de novo: no baixo, da corda Mi solta (E1) até Fá na casa 1 (F1), qual é a distância?",
+      "options": [
+        {
+          "key": "a",
+          "label": "Um semitom",
+          "value": 1,
+          "correct": true,
+          "reason": "Uma mudança liga duas alturas vizinhas."
+        },
+        {
+          "key": "b",
+          "label": "Dois semitons, ou um tom",
+          "value": 2,
+          "correct": false,
+          "reason": "As duas posições mostradas correspondem a uma única mudança entre elas."
+        },
+        {
+          "key": "c",
+          "label": "Nenhum semitom",
+          "value": 0,
+          "correct": false,
+          "reason": "Sem mudança de altura, a distância seria zero."
+        }
+      ],
+      "hint": "A primeira casa é a próxima posição depois da corda solta.",
+      "rationale": "É um semitom: houve uma mudança, de solta para casa 1, sempre na mesma corda.",
+      "evidence": {
+        "midi": [
+          28,
+          29
+        ],
+        "semitones": 1
+      }
+    }
+  },
+  {
+    "key": "b-bc",
+    "unit": "b",
+    "language": "pt_BR",
+    "difficulty": "beginner",
+    "instruments": [],
+    "exercise_type": "text_response",
+    "skill_keys": [
+      "count-semitone-steps"
+    ],
+    "concept_keys": [
+      "tones-and-semitones"
+    ],
+    "prompt": "De Si3 (B3) ao Dó4 (C4) seguinte, há um ou dois semitons?",
+    "options": [
+      {
+        "key": "a",
+        "label": "Um semitom",
+        "value": 1,
+        "correct": true,
+        "reason": "Uma mudança liga duas alturas vizinhas."
+      },
+      {
+        "key": "b",
+        "label": "Dois semitons, ou um tom",
+        "value": 2,
+        "correct": false,
+        "reason": "As duas posições mostradas correspondem a uma única mudança entre elas."
+      },
+      {
+        "key": "c",
+        "label": "Nenhum semitom",
+        "value": 0,
+        "correct": false,
+        "reason": "Sem mudança de altura, a distância seria zero."
+      }
+    ],
+    "hint": "Veja o fim de um ciclo de nomes e o início do seguinte; não há tecla entre essas duas.",
+    "rationale": "Há um semitom. O número da oitava muda de 3 para 4, mas esse par continua formado por teclas vizinhas.",
+    "evidence": {
+      "midi": [
+        59,
+        60
+      ],
+      "semitones": 1
+    },
+    "retry": {
+      "key": "b-bc-retry",
+      "prompt": "Pratique de novo: de Mi4 a Fá4, sem tecla intermediária, qual é a distância?",
+      "options": [
+        {
+          "key": "a",
+          "label": "Um semitom",
+          "value": 1,
+          "correct": true,
+          "reason": "Uma mudança liga duas alturas vizinhas."
+        },
+        {
+          "key": "b",
+          "label": "Dois semitons, ou um tom",
+          "value": 2,
+          "correct": false,
+          "reason": "As duas posições mostradas correspondem a uma única mudança entre elas."
+        },
+        {
+          "key": "c",
+          "label": "Nenhum semitom",
+          "value": 0,
+          "correct": false,
+          "reason": "Sem mudança de altura, a distância seria zero."
+        }
+      ],
+      "hint": "Conte somente a mudança de Mi para Fá.",
+      "rationale": "Há um semitom. Mi–Fá e Si–Dó são os dois pares consecutivos de nomes naturais com um semitom nesta sequência.",
+      "evidence": {
+        "midi": [
+          64,
+          65
+        ],
+        "semitones": 1
+      }
+    }
+  },
+  {
+    "key": "b-major-pattern",
+    "unit": "b",
+    "language": "pt_BR",
+    "difficulty": "beginner",
+    "instruments": [],
+    "exercise_type": "text_response",
+    "skill_keys": [
+      "count-semitone-steps"
+    ],
+    "concept_keys": [
+      "tones-and-semitones",
+      "major-scale"
+    ],
+    "prompt": "Qual sequência descreve as distâncias de Dó–Ré–Mi–Fá–Sol–Lá–Si–Dó?",
+    "options": [
+      {
+        "key": "a",
+        "label": "T–T–S–T–T–T–S",
+        "value": [
+          2,
+          2,
+          1,
+          2,
+          2,
+          2,
+          1
+        ],
+        "correct": true,
+        "reason": "Mi–Fá e Si–Dó têm um semitom; os demais pares têm dois."
+      },
+      {
+        "key": "b",
+        "label": "T–T–T–S–T–T–S",
+        "value": [
+          2,
+          2,
+          2,
+          1,
+          2,
+          2,
+          1
+        ],
+        "correct": false,
+        "reason": "Essa sequência troca as distâncias de Mi–Fá e Fá–Sol."
+      },
+      {
+        "key": "c",
+        "label": "S–T–T–T–S–T–T",
+        "value": [
+          1,
+          2,
+          2,
+          2,
+          1,
+          2,
+          2
+        ],
+        "correct": false,
+        "reason": "Dó–Ré tem dois semitons, e não um; confira também Sol–Lá."
+      }
+    ],
+    "hint": "Conte cada par na régua. Procure primeiro os dois pares sem posição intermediária.",
+    "rationale": "O padrão é T–T–S–T–T–T–S. Em semitons, 2+2+1+2+2+2+1=12, chegando ao Dó uma oitava acima.",
+    "evidence": {
+      "scale": [
+        60,
+        62,
+        64,
+        65,
+        67,
+        69,
+        71,
+        72
+      ]
+    },
+    "retry": {
+      "key": "b-major-pattern-retry",
+      "prompt": "Pratique de novo: no trecho Mi4–Fá4–Sol4, qual é a distância apenas de Mi4 até Fá4?",
+      "options": [
+        {
+          "key": "a",
+          "label": "Um semitom",
+          "value": 1,
+          "correct": true,
+          "reason": "Uma mudança liga duas alturas vizinhas."
+        },
+        {
+          "key": "b",
+          "label": "Dois semitons, ou um tom",
+          "value": 2,
+          "correct": false,
+          "reason": "As duas posições mostradas correspondem a uma única mudança entre elas."
+        },
+        {
+          "key": "c",
+          "label": "Nenhum semitom",
+          "value": 0,
+          "correct": false,
+          "reason": "Sem mudança de altura, a distância seria zero."
+        }
+      ],
+      "hint": "Considere apenas o primeiro par do trecho.",
+      "rationale": "Mi4 até Fá4 tem um semitom. O par seguinte, Fá4 até Sol4, tem dois; por isso a sequência desse trecho é S–T.",
+      "evidence": {
+        "midi": [
+          64,
+          65
+        ],
+        "semitones": 1
+      },
+      "concept_keys": [
+        "tones-and-semitones"
+      ]
+    }
+  }
+]
