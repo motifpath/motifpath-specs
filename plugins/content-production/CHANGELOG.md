@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1 — 2026-11-05
+
+- Make editorial walkthroughs and applicable shared validators the default lesson checks.
+- Require a concrete software change or recurring error to justify new automated tests.
+- Distinguish PowerPoint inspection from native exercise behavior verification.
+
 ## 1.4.0 — 2026-11-04
 
 - Trace teaching steps and learner actions to the observable lesson outcome.

@@ -107,7 +107,10 @@ reference is unavailable. Record rights and accessible alternatives before asset
 
 ## Review checklist
 
-Use the exact preview revision for both passes.
+Use the exact preview revision for both passes. Reuse applicable shared validators
+alongside the editorial walkthrough. Add automated tests when a software change or
+a recurring objective error justifies a reusable check, following repository requirements.
+Record the reason and result in the production packet's selected checks.
 
 1. Follow the lesson in learner order. Check that diagrams make sense in context and
    that learners can attempt each task with the support provided. Check that hints are

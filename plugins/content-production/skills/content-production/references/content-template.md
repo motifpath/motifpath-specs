@@ -105,6 +105,18 @@ For every asset/interaction record:
 - Capability: specified / implemented / runtime-verified, with environment and evidence.
 - Any slide/storyboard counterpart, native destination and missing-capability issue.
 
+## Selected checks
+
+| Check | Why it applies | Evidence and pending review |
+|---|---|---|
+| Editorial walkthrough | Musical accuracy, progression, diagrams, locale and feedback | Record the exact version and reviewer type |
+| Existing shared validators | Relevant structured content and assets | Name applicable checks and results |
+| New automated tests, if warranted | Software behavior changed or a recurring objective error needs a reusable check | State the risk, test and result |
+| Delivery inspection | Rendered PowerPoint and exercise-material scan when applicable, plus native exercise behavior | Record format, environment and unresolved checks |
+
+Reuse existing validators. Routine lesson authoring calls for the applicable checks above.
+Follow repository test requirements when changing authoring or delivery software.
+
 ## Readiness record
 
 | Criterion | Pass / revise / blocked | Evidence or required change |
