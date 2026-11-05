@@ -14,6 +14,11 @@ drafts. They preserve the approved universal scope and separate application open
   resource map, references/rights and remaining review gates.
 - [Reusable activity metadata](activities.json) and [asset manifest](assets/manifest.json).
 
+## Review handoff
+
+MOT-161 is in progress. The [review record](review.md) contains the AI editorial
+findings, proposed corrections and the educator/pt_BR/learner review protocol.
+
 ## Rebuild and check
 
 Use the repository's locked development dependencies (`npm ci`), which include the Markdown
