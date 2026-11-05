@@ -6,7 +6,9 @@
 **Input:** MOT-182 (epic), MOT-183. PO direction, 2026-11-04: progressions are created from the
 song chart editor's progression picker when a search finds nothing; created progressions are for
 charts only until an admin promotes them to the drills; promotion ships now (MOT-188); major and
-minor keys, with the numerals validated for consistency; drills support minor keys too (MOT-187).
+minor keys, with the numerals validated for consistency; drills support minor keys too (MOT-187). PO direction, 2026-11-05: borrowed chords are accepted
+and marked, not refused; a "Use in drills" switch when creating; no confusable list and no
+checklist; no retiring: a progression is removed once no chart's current revision tags it.
 **Amends:** `catalogs/progressions.md` (who adds progressions, modes, bar counts),
 `catalogs/reference-data.md` (the progression catalog takes no new rows).
 
@@ -47,39 +49,51 @@ snapshot (ADR-047), the practice subject catalog (ADR-064) and the song use rung
 only `in_drills` progressions. A chart can be tagged with any progression. A chart-only
 progression is never a practice subject.
 
-**3. Promotion to the drills is admin-only and one-way.** An admin promotes a created progression
-by giving it what drills need, and core refuses the promotion, saying why, unless all of these
-hold:
+**3. Adding to the drills is admin-only and one-way.** An admin adds a progression to the drills
+either when creating it (a "Use in drills" switch, off by default) or later from the admin
+progression list. Either way the admin gives only the knowledge nodes it practises, and core
+refuses, saying why, unless all of these hold:
 
 - at least one knowledge node, each one existing in the knowledge map;
-- at least one confusable partner, each one already `in_drills`, in the same mode and with the
-  same bar count; core lists the pair both ways, updating each partner in the same transaction;
-- the confusable rules of `progressions.md` hold: the two never sound the same in some key, and
-  no name contains a partner's whole name as words;
 - a bar count drill families accept (4 or 12);
-- a mode the drills support: major now; minor once MOT-187 ships.
+- a mode the drills support: major now; minor once MOT-187 ships;
+- at least one other `in_drills` progression with the same bar count, so drills have a wrong
+  answer to offer.
 
-Promotion bumps the content version stamp (ADR-064) and refreshes the practice snapshot. There is
-no demotion: practice states and evidence point at a promoted progression's items.
+Admins don't list confusable partners for a created progression. Drills choose its wrong answers:
+the `in_drills` progressions with the same bar count that share the most chords with it, bar by
+bar, those in the same mode first. The catalog's 10 progressions keep the partners listed in
+`progressions.yaml`. The confusable rules of `progressions.md` hold without a check: `(mode, bars)`
+uniqueness means two progressions in the drills never have the same numerals, and two names of the
+same bar count can't contain each other as whole words.
 
-**4. Major and minor keys, validated against a closed numeral grammar.** Every progression has a
-`mode`, `major` or `minor`, and one numeral per bar. A numeral is a degree and a suffix. Core
-refuses any numeral outside this table:
+Adding bumps the content version stamp (ADR-064) and refreshes the practice snapshot. There is no
+way back: practice states and evidence point at a drill progression's items.
 
-| Mode | Degrees |
-|---|---|
-| major | diatonic `I ii iii IV V vi vii°`; borrowed from the parallel minor `♭III iv ♭VI ♭VII` |
-| minor | diatonic `i ii° ♭III iv v ♭VI ♭VII`; from harmonic minor `V vii°` |
+**4. Major and minor keys; any root, validated as a chord.** Every progression has a `mode`,
+`major` or `minor`, and one numeral per bar. A numeral is a root, `I` to `VII` optionally preceded
+by `♭` or `♯`, and a quality given by its case and suffix. Core refuses only input that isn't a
+numeral by this grammar:
 
-| Degree written as | Suffixes allowed | Chord quality |
+| Root written as | Suffixes allowed | Chord quality |
 |---|---|---|
 | upper case (`IV`) | none, `7`, `maj7` | major, dominant 7, major 7 |
 | lower case (`ii`) | none, `7` | minor, minor 7 |
 | with `°` (`vii°`) | none, `ø7`, `°7` (in place of `°`) | diminished, half-diminished 7, diminished 7 |
 
-Every quality in the table exists in the chord catalog, so playback and the unplayed-progression
-check can spell every chord in any key. A progression has 1 to 16 bars. Input accepts `b` for
-`♭`, `o` for `°` and `h` for `ø`, and core stores the symbols.
+Every root is a fixed interval above the tonic and every quality exists in the chord catalog, so
+playback and the unplayed-progression check can spell every chord in any key. A numeral outside
+its mode's diatonic chords is accepted and marked *borrowed*: modal mixture (`♭VII`, `iv` in
+major; `♭II` in minor), Lydian `II`, or secondary dominants written as their chord (`II7` for
+V/V). The diatonic chords are:
+
+| Mode | Diatonic |
+|---|---|
+| major | `I ii iii IV V vi vii°` |
+| minor | `i ii° ♭III iv v ♭VI ♭VII`, plus harmonic minor's `V vii°` |
+
+A progression has 1 to 16 bars. Input accepts `b` for `♭`, `#` for `♯`, `o` for `°` and `h` for
+`ø`, and core stores the symbols.
 
 **5. One progression per mode and numerals.** `(mode, bars)` is unique across the table. Creating
 a progression whose mode and bars match an existing one is refused with that progression, so the
@@ -96,15 +110,16 @@ only takes the tag off that section; the progression itself stays. A progression
 from the admin progression list (Admin › Progressions), never from the song chart editor. There, an
 admin removes a created progression that is not `in_drills`:
 
-- **Never tagged:** if no chart revision, draft or published, has ever tagged it, it is deleted.
-  Nothing points at it, and its mode and numerals are free to be created again.
-- **Tagged:** if any chart revision tags it, it is retired instead of deleted, because a
-  published revision never changes and still shows its tags by key. A retired progression
-  disappears from the picker and can't be newly tagged, and saving a draft that still tags it is
-  refused until the tag is removed. Revisions that already tag it keep showing it. Its mode and
-  numerals stay taken: creating the same ones again restores it instead.
-- **In drills:** a promoted progression and the 10 catalog progressions are never removed or
-  retired, because practice states and evidence point at their items.
+- **Still in use:** while any chart's draft or latest published revision tags it, core refuses
+  the removal and lists those charts and sections. The admin untags them, saving the draft or
+  publishing a new revision, and then removes it.
+- **Not in use:** it is deleted. Its mode and numerals are free to be created again.
+- **Older published revisions** don't count. They never change and keep the tag's key, and a
+  key that no longer matches a progression is shown as the numerals it spells
+  (`major/I-bVII-IV-I` → `I–♭VII–IV–I`), without the nickname. Creating the same numerals
+  again gives the same key, so those revisions link to it again.
+- **In drills:** a progression added to the drills and the 10 catalog progressions are never
+  removed, because practice states and evidence point at their items.
 
 **7. Names come from the numerals.** A created progression's name is its numerals joined by `–`,
 the same in every language (`i–♭VI–♭III–♭VII`). An admin can give it an optional nickname per
@@ -123,12 +138,21 @@ including the cadence a hear drill plays first, is specified with MOT-187.
 
 ## Rationale
 
-**Charts only until promoted.** A drill progression reaches every learner who practises its node.
-A missing confusable partner or a name that gives an answer away degrades drills for everyone,
-while a chart tag only affects the chart. Requiring nodes, partners and the naming rules at
-promotion, not at creation, keeps creating fast in the picker. *Rejected: created progressions go
-straight to the drills* (PO, 2026-11-04). The picker would need the whole drill form, and an
-author tagging a chart is not deciding what to drill.
+**Chart only unless the admin says otherwise.** A drill progression reaches every learner who
+practises its node, while a chart tag only affects the chart. So creating defaults to chart only,
+and putting a progression in the drills is an explicit switch that asks for its knowledge nodes.
+*Rejected: created progressions go straight to the drills* (PO, 2026-11-04): an author tagging a
+chart is not always deciding what to drill. *Rejected: adding to the drills only from the
+progression list* (PO, 2026-11-05): an admin who already knows it belongs in the drills would
+have to leave the chart to finish the job.
+
+**Drills choose the wrong answers.** A wrong answer works when it sounds close, and progressions
+of the same length that share most of their chords are the close ones, so core can rank them
+without an admin. *Rejected: admins list confusable partners* (PO, 2026-11-05), which asked a
+music judgement of every admin, needed a partner already in the drills in the same mode (none
+exists for the first minor progression), and had to update both sides. *Rejected: a checklist of
+every drill rule in the dialog*: one disabled button with the reason says the same with less to
+read.
 
 **One table with a flag.** Charts tag progressions by key, so a promoted progression keeps its
 key and every chart tagged with it stays valid. *Rejected: a separate table of chart progressions*,
@@ -143,25 +167,31 @@ silently take over an admin's row and change its key, breaking the charts tagged
 *Rejected: keeping both rows, without the uniqueness*: the same progression twice in the picker
 and in the drills, as two subjects with separate progress.
 
-**A closed grammar.** Playback, the unplayed-progression check and drills must turn every numeral
-into a chord in any key, so a numeral core can't spell is an error at the source, not a silent gap
-later. The borrowed degrees are the common modal-mixture chords of pop and rock (`I–♭VII–IV`,
-`I–iv–I`), and harmonic minor's `V` and `vii°` are how minor-key songs cadence. *Rejected: free
-text*, which can't be played or checked. *Rejected: diatonic numerals only*, which refuses many of
-the songs this is for.
+**A grammar of roots and qualities.** Playback, the unplayed-progression check and drills must
+turn every numeral into a chord in any key. A root a fixed interval above the tonic, with a
+quality from the chord catalog, always can, so "consistent" means "is a chord", not "belongs to
+the key". Songs borrow freely (`I–♭VII–IV`, `i–♭II`, `I–II–IV`), and a borrowed chord is a fact
+about the song, not a mistake, so the dialog marks it instead of refusing it. *Rejected: free
+text*, which can't be played or checked. *Rejected: diatonic numerals plus a fixed list of
+borrowed ones* (the first draft of this ADR), which still refused ♭II, Lydian II and secondary
+dominants (PO, 2026-11-05).
 
-**Retire when tagged, delete when not.** Published chart revisions are immutable and show their
-tags by key, so deleting a progression they tag would leave them pointing at nothing. *Rejected:
-refusing removal while any chart uses it*, which can never succeed once a published revision has
-tagged it. *Rejected: deleting and untagging every chart automatically*, which rewrites published
-revisions. *Rejected: no removal at all*, which leaves mistakes in every admin's picker (PO,
+**Remove only when no current revision uses it.** Making the admin untag first keeps removal a
+deliberate, visible act: nothing disappears from a chart an author is working on. Counting only
+each chart's draft and latest published revision keeps that possible, because older published
+revisions never change, and those still render, since the key spells the numerals. *Rejected:
+retiring a progression that charts have tagged* (the first draft of this ADR; PO, 2026-11-05): it
+added a third state to the list, the picker and every draft, for a rare mistake. *Rejected:
+counting every revision*, which makes removal impossible once a chart has published the tag.
+*Rejected: deleting and untagging every chart automatically*, which edits authors' charts behind
+their backs. *Rejected: no removal at all*, which leaves mistakes in every admin's picker (PO,
 2026-11-04).
 
 **Removal lives in the progression list, not the chart.** A progression is shared by every chart
 and every admin, so removing it is a catalog action, not a chart edit. In the chart editor,
 removing a progression means untagging the section, which is what an author editing one chart
 expects. *Rejected: a Remove action in the song chart picker*, where an author meaning to untag one
-section could delete or retire a progression other charts use (PO, 2026-11-04).
+section could delete a progression other charts use (PO, 2026-11-04).
 
 **Keys from the numerals.** A readable key in logs and item keys, and identical numerals always
 give the same key, which `(mode, bars)` uniqueness already guarantees. *Rejected: a random slug*,
@@ -172,8 +202,8 @@ which hides what a tag means in logs, item keys and support questions.
 ### Positive
 
 - An admin tags any section with what it plays, without a specs change or a deploy.
-- Drills keep their curated quality: nothing reaches a learner until an admin promotes it, with
-  the same rules the catalog follows.
+- Drills keep their curated quality: nothing reaches a learner until an admin adds it to the
+  drills with its knowledge nodes, and only in a shape the drill families accept.
 - Minor-key charts get the unplayed-progression check and playback.
 - The drill catalog grows from progressions found in real songs.
 
@@ -184,12 +214,16 @@ which hides what a tag means in logs, item keys and support questions.
   development covers both.
 - No edit: fixing a progression's numerals means removing it and creating it again, then
   re-tagging the sections that used it.
-- Removal has two outcomes, delete or retire, depending on whether any chart revision has tagged
-  the progression. The admin interface has to make clear which one happens.
-- The grammar leaves out secondary dominants (`V/V`), slash chords, suspended and extended chords.
-  A section built on them stays untagged until the grammar grows.
-- Promotion is one-way. Taking a bad progression out of the drills needs a new decision.
-- Admins now share a mutable list with drills. Promotion must update partners, the version stamp
+- Removing a progression that a published chart uses takes a new published revision of that
+  chart first. Older revisions show it by its numerals, without its nickname.
+- Wrong answers chosen by shared chords may be weaker than a musician's pick, for example two
+  progressions that differ in one chord but sound far apart. The catalog's curated partners stay
+  for the original 10.
+- The grammar writes secondary dominants as their chord (`II7`, not `V/V`) and leaves out slash
+  chords, suspended and extended chords. A section built on them stays untagged until the grammar
+  grows.
+- Adding to the drills is one-way. Taking a bad progression out of the drills needs a new decision.
+- Admins now share a mutable list with drills. Adding to the drills must update the version stamp
   and the snapshot together, which adds a transactional write path that reference data never had.
 
 ### Neutral
@@ -197,8 +231,8 @@ which hides what a tag means in logs, item keys and support questions.
 - The `progressions` table gets an `in_drills` column and the `(mode, bars)` uniqueness, in a new
   migration; existing rows become `in_drills = true`.
 - `progressions.yaml` stays the source of the original 10 progressions and their updates.
-- Created progressions get a `retired` flag next to `in_drills`; the picker lists only progressions
-  that are not retired.
+- Chart revisions keep tags by key, with no foreign key to `progressions`, so a deleted
+  progression leaves older revisions intact.
 
 ## Related ADRs
 
@@ -206,7 +240,8 @@ which hides what a tag means in logs, item keys and support questions.
   `in_drills` progressions and is refreshed on promotion.
 - ADR-050: Chord library and song charts — charts and the chord catalog that spells every numeral.
 - ADR-057: Drill model v2 — the drill families, rungs and confusable distractors that use
-  `in_drills` progressions.
+  `in_drills` progressions; created progressions get their distractors by shared chords instead
+  of a curated list.
 - ADR-064: Precomputed practice subject catalog — promotion bumps its content version stamp.
 
 ---
