@@ -1,6 +1,6 @@
 ---
 name: content-production
-version: 1.3.0
+version: 1.4.0
 description: Plan, produce, check and improve MotifPath lessons, exercises and practice resources with practical outcomes, knowledge-map classification and locale-specific language. Use for editorial content production and content presentation storyboards; software implementation and curriculum redesign remain separate tasks.
 ---
 
@@ -19,6 +19,11 @@ preserve the brand theme, and adapt editable music diagrams to the actual instru
 and example. The filled pt_BR lesson illustrates the visual system, not approved content.
 Keep author instructions in notes or author-only pages. Check every rendered slide;
 a structurally valid deck alone does not establish presentation quality.
+
+Propose exercises in the review draft with their prompts, answers or rubrics, feedback
+and retries. Author the approved exercises separately in MotifPath. Exclude all
+exercise material from the final PowerPoint, including hidden slides and speaker
+notes. Keep worked demonstrations and references that direct learners to platform practice.
 
 Read [draft review guidelines](references/draft-review-guidelines.md) when planning or
 revising a visual draft, its lesson openings, diagrams, practice prompts or resource map.
@@ -47,8 +52,11 @@ claiming the phase passed.
 
 Act routes corrections to Do, changed objectives/classification/curriculum to Plan, and
 unresolved verification to Check. Retaining a unit does not require an artificial rewrite.
-Publication remains a separate authorized action after the applicable gates pass. Track
-proposed principles/plan/catalog changes for review rather than silently editing them.
+Publication remains a separate authorized action after the applicable gates pass.
+Record each reusable skill improvement as an observation, proposed rule, worked example
+and a check for the next lesson. Label the evidence as editorial judgment, learner
+observation or verified platform behavior. Route proposed skill, principle, plan and
+catalog changes for review.
 
 Invocation examples:
 - “Plan a pt_BR unit about alternate picking for electric guitar.”
@@ -96,7 +104,9 @@ continue independent work. Declare curriculum participation explicitly:
 2. Give the complete useful method now. Remove padding, teasers and withheld steps. Keep scope
    narrow rather than deleting necessary explanation. A shorter unit is not better if unusable.
 3. Demonstrate the method, then ask for an active attempt and provide actionable feedback,
-   common-error correction and a way to try again. Every element states its learning purpose.
+   common-error correction and a way to try again. For each assessed outcome, connect a
+   likely mistake to targeted feedback and a fresh example that checks the same reasoning.
+   Every element states its learning purpose.
    A warm-up must explain what it develops, such as alternate picking or hand synchronization.
 4. Make prerequisites reachable: explain what is assumed, link the exact internal unit or
    external section, why it matters and how to use it. Check availability/language/access.
@@ -113,7 +123,9 @@ Connect useful modalities around the same outcome. Prefer portable instrument-fr
 when it teaches something real, alongside instrument application when appropriate.
 
 Use image, audio and clickable regions as composable resources, plus supported article/video,
-diagram, exercise and practice-item capabilities. Specify stimulus, response, answer/rationale,
+diagram, exercise and practice-item capabilities. During Plan, map each essential
+diagram, question and feedback step to an intended MotifPath feature. Record the verification level and a fallback that preserves the
+outcome. Flag gaps without a viable fallback. Specify stimulus, response, answer/rationale,
 feedback, retry, instrument context and accessible alternative. Separate media playback from
 answer submission and avoid visual labels leaking an ear-training answer. Do not promise
 microphone grading, arbitrary hotspots or automated technique assessment without verified support.
@@ -150,6 +162,8 @@ revise or blocked and reasons for each criterion:
 - Accessible media/interaction alternatives and documented rights/attribution.
 - Conditional curriculum conformity and verified delivery capability.
 
+Review the exact preview first in learner order, then inspect all states as an editor.
+Record the intended feedback timing and whether the delivery format supports it.
 Separate editorial readiness, runtime verification and publication approval. Generated content
 and classifications require human musical/editorial review; AI output is not evidence of truth.
 Do not publish content, change shared catalogs or send external messages without task authority.

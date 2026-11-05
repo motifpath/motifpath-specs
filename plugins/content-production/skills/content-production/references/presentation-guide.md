@@ -24,6 +24,11 @@ show visual treatment and require musical/editorial review before teaching.
 Six native title/body layouts are also supplied, but duplicating a finished library
 slide is the most direct way to retain its complete composition and diagrams.
 
+Use exercise layouts to show proposals in the review draft. Author the approved
+exercises separately in MotifPath. Remove exercise prompts, options, answers, feedback
+and retries from the final PowerPoint, including hidden slides and speaker notes.
+Worked demonstrations and pointers to platform practice can remain.
+
 ## Editorial draft review
 
 Apply the [draft review guidelines](draft-review-guidelines.md) before full production.

@@ -63,7 +63,32 @@ Use the [draft review guidelines](draft-review-guidelines.md) to review the syll
 transitions, visible diagrams, practice wording and exact supporting-resource map.
 Feedback may follow an attempt; this is pedagogical timing, not withholding a technique.
 
+For each teaching step, record the knowledge the learner brings, the new idea, the next
+action and what that action demonstrates. Trace those actions back to the observable
+outcome. State what support the learner uses, such as a labelled diagram.
+
+| Assessed outcome | Guided practice, retry or application | Likely mistake and targeted feedback | Fresh example and evidence |
+|---|---|---|---|
+| Observable action | Activity key and available support | Explain the correction the learner can apply | Test the same reasoning with a different example and state what the response demonstrates |
+
+Use a follow-up where the learner can apply the correction. Choose an appropriate task
+or rubric for open-ended practice.
+
 ## Modalities and delivery
+
+Fill this map during Plan for every essential interaction and update it as evidence changes.
+
+| Essential diagram, question or feedback step | Intended MotifPath feature | Verification level and evidence | Fallback or unresolved gap |
+|---|---|---|---|
+| Identify the step and its purpose | Name the native delivery route | Unverified / specified / implemented / runtime-verified, with source or environment | Preserve the learning outcome or record what is blocked |
+
+Record when hints, answers, feedback and retries become available. State whether
+learners can reveal answers before responding and why.
+
+Include exercise proposals in the review draft and keep the authoring details in this
+packet for separate registration in MotifPath. In a PowerPoint delivery, retain worked
+demonstrations and remove exercise prompts, options, answer keys, feedback and retries
+from slides and notes.
 
 | Modality | Included activity or reason omitted | Link to outcome | Instrument-free option |
 |---|---|---|---|
@@ -92,6 +117,8 @@ For every asset/interaction record:
 | Locale and notation | Fill | Fill |
 | Classification and instrument scope | Fill | Fill |
 | Meaningful modalities, feedback and application | Fill | Fill |
+| Learner walkthrough and editorial inspection, including reveal timing | Fill | Fill |
+| Exercises proposed in draft and assigned to platform authoring. Final PowerPoint contains no exercise material, or PowerPoint N/A | Fill | Fill |
 | Accessibility and asset rights | Fill | Fill |
 | Curriculum alignment, or standalone N/A | Fill | Fill |
 | Native delivery verification | Fill | Fill |
@@ -103,4 +130,10 @@ An editorial pass is not a runtime pass or authorization to publish.
 
 Name the observable learning check, available events or manual observation, baseline if known,
 and what would trigger revision. No invented targets. Separate lesson completion, practice
-accuracy, fluency and retention. Propose principles/plan changes from evidence through review.
+accuracy, fluency and retention. For a proposed skill or principle change, fill in the Act record below and route it for review.
+
+| Observed problem | Evidence type and source | Proposed reusable rule | Worked example | Check in the next lesson |
+|---|---|---|---|---|
+| Name the problem and where it occurred | Editorial judgment, learner observation or verified platform behavior | State the conditions where the rule applies | Show how the rule changes a lesson | Describe what a reviewer should observe |
+
+Use the same review route for proposed curriculum plan changes.

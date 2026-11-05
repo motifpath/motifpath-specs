@@ -42,7 +42,9 @@ today's useful result to motivate a future lesson.
 State the syllabus and observable outcome of each lesson. Check what the learner knows
 at each transition, the question that motivates the next concept, and how the next example
 reuses earlier work. Introduce new notation when it becomes useful, with enough explanation
-for the next action. Identify jumps, repetition and missing bridges explicitly.
+for the next action. Identify jumps, repetition and missing bridges explicitly. For each teaching step,
+trace prior knowledge, the new idea, the next learner action and the evidence it
+provides for the outcome. State any support used in the action.
 
 For the pilot, naming a note precedes measuring the distance to the next note. The question
 “Are Mi–Fá and Dó–Ré the same distance?” motivates counting all keys, including black keys.
@@ -78,6 +80,16 @@ the answer. Distinguish the prompt, optional hint, feedback/rationale and a foll
 A static review slide may show these states together for editorial review; learner delivery
 must respect the intended timing and supported interaction.
 
+For each assessed outcome, identify a likely mistake and give feedback the learner can
+act on. Provide a fresh example to check the same reasoning after correction. Label
+guided practice, retries and application in the editorial packet. For example, if the
+learner counts both notes in Mi–Fá, explain how to count the move between them and ask
+them to apply the rule to Si–Dó.
+
+During planning, record the native feature and verification level for each essential
+diagram, prompt and feedback step. Provide a fallback that preserves the outcome or
+flag the gap for resolution.
+
 ## Map complementary resources precisely
 
 Include internal MotifPath content and suitable external references when they support the
@@ -95,12 +107,25 @@ reference is unavailable. Record rights and accessible alternatives before asset
 
 ## Review checklist
 
+Use the exact preview revision for both passes.
+
+1. Follow the lesson in learner order. Check that diagrams make sense in context and
+   that learners can attempt each task with the support provided. Check that hints are
+   optional when offered, and verify when answers, feedback and retries become visible.
+   Record whether early answer reveal is intentional.
+2. Inspect all states as an editor. Check musical accuracy, locale, answer rationales,
+   likely mistakes, retry equivalence and accessibility. Compare intended behavior with
+   the preview and the delivery format. Record pending runtime checks separately.
+
 - The short visual draft exposes the syllabus, transitions, diagrams and resource map.
 - Each lesson has a dedicated opening application slide or section with immediate use and
   a concrete connection to later subjects.
 - Each transition follows from knowledge already introduced and motivates the next step.
 - Diagram titles are understandable; instrument, string, positions and movements are clear.
 - Practice prompts explain the action, purpose, support and feedback in the target locale.
+- The review draft shows proposed exercises and the packet maps them to platform
+  authoring. If there is a final PowerPoint, inspect slides, hidden slides and notes
+  for exercise prompts, answers, feedback and retries and remove any that remain.
 - Resource references identify exact sections, purpose, access, status and alternatives.
 - Classification, curriculum placement, human music/locale review, native runtime support
   and publication approval remain separate gates. Neither a visual draft nor its approval
