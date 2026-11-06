@@ -220,6 +220,18 @@ Feature: Grade a practice answer into evidence
     Then "alice" has auto-graded evidence for that guide tone that is wrong
     And the evidence's answer key marks only the first bar hit
 
+  @wip
+  Scenario: A borrowed chord with no written seventh asks its minor seventh
+    Given the drills have the created progression "major/I-bVII-IV-I" with the bars I ♭VII IV I
+    When "alice" taps the sevenths "B G# E B" within their bars in a take of "major/I-bVII-IV-I" in C at 120 BPM
+    Then "alice" has auto-graded evidence for that guide tone that is right
+
+  @wip
+  Scenario: A written suffix decides which seventh is asked
+    Given the drills have the created progression "major/Imaj7-iih7-viio7-bVImaj7" with the bars Imaj7 iiø7 vii°7 ♭VImaj7
+    When "alice" taps the sevenths "B C G# G" within their bars in a take of "major/Imaj7-iih7-viio7-bVImaj7" in C at 120 BPM
+    Then "alice" has auto-graded evidence for that guide tone that is right
+
   # A song is rated once, whole, with no measure (MOT-152).
   Scenario: A self-rated song is kept with its rating alone
     When "alice" rates the song "Amazing Grace" on guitar as "almost"

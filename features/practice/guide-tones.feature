@@ -3,11 +3,13 @@ Feature: Tap the guide tones of a progression in time
   I want to tap the third, later the seventh, of each chord as a progression plays
   So that I connect the harmony to the neck before I improvise over changes
 
-  # A guide tone (MOT-151, rung target) plays one progression of the progression catalog once in
+  # A guide tone (MOT-151, rung target) plays one drill progression once in
   # a key, one chord a bar after a bar of count-in. While each chord sounds, the student taps the
   # asked tone of it on an empty fretboard of frets 0–5, graded by timed_taps.v1. Each time the
   # item is planned:
   # - the tone is each chord's third until the student is accurate on the item, then its seventh;
+  # - a seventh follows what is written: maj7 major, 7 and ø7 minor, °7 diminished; a chord with
+  #   no written seventh takes the major seventh on I and IV and the minor seventh elsewhere;
   # - the key is one of the 12 major keys at random, never the key of the item's last take;
   # - the tempo starts at 60 BPM while new or learning, 72 once accurate, 90 once fluent;
   # - a 12-bar blues is planned only once the student is accurate on target-chord-tones.
@@ -46,6 +48,20 @@ Feature: Tap the guide tones of a progression in time
     When the guide tone is picked for "alice"'s session in G
     Then its bars are ii V I I with the chords "Am D G G"
     And it has a voicing for each of "Am", "D" and "G"
+
+  @wip
+  Scenario: The plan spells a borrowed chord in the key
+    Given the drills have the created progression "major/I-bVII-IV-I" with the bars I ♭VII IV I
+    And "alice" has never practised the guide tone of "major/I-bVII-IV-I" on guitar
+    When the guide tone is picked for "alice"'s session in G
+    Then its bars are I ♭VII IV I with the chords "G F C G"
+
+  @wip
+  Scenario: The plan keeps a written seventh in the chord
+    Given the drills have the created progression "major/Imaj7-iih7-viio7-bVImaj7" with the bars Imaj7 iiø7 vii°7 ♭VImaj7
+    And "alice" is accurate on the guide tone of "major/Imaj7-iih7-viio7-bVImaj7" on guitar
+    When the guide tone is picked for "alice"'s session in C
+    Then it asks the tone 7 and the bars start with the chord "Cmaj7"
 
   Scenario: The plan never gives away the notes to tap
     Given "alice" has never practised the guide tone of "ii-V-I" on guitar

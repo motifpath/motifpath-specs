@@ -97,14 +97,14 @@
         },
         "progressions": {
           "type": "object",
-          "description": "Progressions of the progression catalog by key, with their numerals one bar each, in a major key.",
-          "propertyNames": { "pattern": "^[0-9A-Za-z][0-9A-Za-z-]*$" },
+          "description": "The drill progressions by key, with their numerals one bar each, in a major key.",
+          "propertyNames": { "pattern": "^([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)$" },
           "additionalProperties": {
             "type": "object",
             "additionalProperties": false,
             "required": ["bars"],
             "properties": {
-              "bars": { "type": "array", "minItems": 1, "items": { "enum": ["I", "ii", "iii", "IV", "V", "vi", "viio", "I7", "IV7", "V7"] } }
+              "bars": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^(viio|[♭♯]?((I|II|III|IV|V|VI|VII)(7|maj7)?|(i|ii|iii|iv|v|vi|vii)(7|°|ø7|°7)?))$" } }
             }
           }
         },
