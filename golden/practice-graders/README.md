@@ -24,8 +24,8 @@ Each file holds:
   - `diagrams`: the diagrams that exist. A drill shape also has its layout instrument, its
     family and member, and its positions with their intervals.
   - `shape_families`: each shape family's members, in the order they are offered.
-  - `progressions`: progressions of the progression catalog by key, with their numerals one
-    bar each. Keys, numerals, chords and chord tones are computed, so they have no reference.
+  - `progressions`: the drill progressions by key, catalog and created alike, with their
+    numerals one bar each. Keys, numerals, chords and chord tones are computed, so they have no reference.
   - `song_charts`: the song charts that exist, by id.
 - `cases`: each case is an `item_key`, a raw `response` (as a client sends it in
   `practice.item_answered`) and the `expected` result. The result is either
@@ -85,9 +85,11 @@ Each file holds:
 - **A key** is a major key, spelled as the chord catalog spells roots (C D♭ D E♭ E F F# G A♭ A
   B♭ B, written `Db`, `Eb`, `Ab`, `Bb`).
 - **The numerals** are I ii iii IV V vi viio (vii°), and their chords are the key's triads:
-  major on I IV V, minor on ii iii vi, diminished on viio. A progression's I7, IV7 and V7 are
-  dominant sevenths.
-- **A chord symbol** is a root, then `m`, `dim`, `7` or nothing. A root may be spelled either
+  major on I IV V, minor on ii iii vi, diminished on viio.
+- **A progression's bars** also take any numeral `progression_numeral.v1` reads, in a major key:
+  `♭VII` is the major chord a whole step below the tonic, `iiø7` a half-diminished seventh.
+- **A chord symbol** is a root, then `m`, `dim`, `7` or nothing; a progression's chart also has
+  `maj7`, `m7`, `m7b5` and `dim7`. A root may be spelled either
   way in a response (`F#m` and `Gbm` are one chord); an answer key spells it as the catalog
   does, even where the key would spell it otherwise (IV of D♭ is kept as `F#`).
 - **Functions:** I iii vi are tonic, ii IV subdominant, V viio dominant.

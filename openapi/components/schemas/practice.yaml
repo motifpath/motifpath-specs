@@ -377,8 +377,10 @@ TimedTapsResponse:
       type: string
       enum: ['3', '7']
       description: |
-        The chord tone asked for every chord: 3 = its third; 7 = its seventh in the key (the
-        major seventh of I and IV, the minor seventh of every other chord).
+        The chord tone asked for every chord: 3 = its third; 7 = its seventh:
+        a written suffix decides (maj7 is the major seventh, 7 and ø7 the minor seventh, °7 the
+        diminished seventh); a chord with no written seventh takes the major seventh on I and IV
+        and the minor seventh on any other numeral, in or out of the key.
     tempo_bpm:
       type: integer
       minimum: 1
@@ -1068,7 +1070,7 @@ GeneratedChoicePlayback:
         properties:
           chord:
             type: string
-            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim)?$'
+            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
             description: |
               The bar's chord symbol, spelled as the chord catalog spells roots. It is sounded,
               never shown.
@@ -1150,7 +1152,7 @@ GeneratedChoiceQuestion:
       type: array
       items:
         type: string
-        pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+        pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
       description: |
         The chart the question shows, one chord symbol per bar (four or twelve), for
         chart_to_numbers. Empty for every other way.
@@ -1183,7 +1185,7 @@ GeneratedChoiceQuestion:
             type: array
             items:
               type: string
-              pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+              pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
             description: |
               For numbers_to_chart, the option's chart, one chord symbol per bar, drawn as
               drawn_as says. Empty for every other way.
@@ -1205,7 +1207,7 @@ GeneratedChoiceQuestion:
         properties:
           chord:
             type: string
-            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
             description: The chord symbol, as it appears in chord, chart or the options.
           diagram_id:
             type: string
@@ -1462,7 +1464,7 @@ PlannedProgressionKeys:
             minItems: 4
             items:
               type: string
-              pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+              pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
             description: |
               The progression in this key, one chord symbol per bar, spelled as the chord
               catalog spells roots.
@@ -1473,7 +1475,7 @@ PlannedProgressionKeys:
               properties:
                 chord:
                   type: string
-                  pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+                  pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
                   description: The chord symbol, as it appears in chart.
                 diagram_id:
                   type: string
@@ -1492,7 +1494,7 @@ PlannedProgressionKeys:
               properties:
                 chord:
                   type: string
-                  pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+                  pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
                   description: The chord symbol, as it appears in chart.
                 root:
                   $ref: '#/FretPlace'
@@ -1560,8 +1562,10 @@ PlannedGuideTone:
       enum: ['3', '7']
       description: |
         The chord tone asked of every chord: 3 = its third, until the student is accurate on the
-        item; 7 = its seventh in the key from then on (the major seventh of I and IV, the minor
-        seventh of every other chord and of a dominant seventh).
+        item; 7 = its seventh from then on:
+        a written suffix decides (maj7 is the major seventh, 7 and ø7 the minor seventh, °7 the
+        diminished seventh); a chord with no written seventh takes the major seventh on I and IV
+        and the minor seventh on any other numeral, in or out of the key.
     tempo_bpm:
       type: integer
       minimum: 20
@@ -1591,11 +1595,11 @@ PlannedGuideTone:
         properties:
           numeral:
             type: string
-            pattern: '^(I|ii|iii|IV|V|vi|viio)7?$'
-            description: The bar's numeral in the progression catalog; a 7 marks a dominant seventh.
+            pattern: '^(viio|[♭♯]?((I|II|III|IV|V|VI|VII)(7|maj7)?|(i|ii|iii|iv|v|vi|vii)(7|°|ø7|°7)?))$'
+            description: The bar's numeral as the progression stores it; viio is vii° in the catalog's spelling.
           chord:
             type: string
-            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
             description: |
               The bar's chord symbol in music_key, spelled as the chord catalog spells roots. It
               is shown and sounded.
@@ -1609,7 +1613,7 @@ PlannedGuideTone:
         properties:
           chord:
             type: string
-            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?$'
+            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
             description: The chord symbol, as it appears in bars.
           diagram_id:
             type: string
