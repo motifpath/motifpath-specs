@@ -105,7 +105,6 @@ Feature: Admins create progressions for song charts
 
   # ── Adding to the drills ───────────────────────────────────────────────────
 
-  @wip
   Scenario: An admin adds a progression to the drills as it is created
     When "ana" creates a major progression with the bars "I", "iii", "IV" and "V", in the drills, practising the concept "common-progressions"
     Then the progression "major/I-iii-IV-V" is in the drills
@@ -125,7 +124,6 @@ Feature: Admins create progressions for song charts
     Then its wrong answers start with "I-vi-IV-V", which shares three bars with it
     And every one of its wrong answers has four bars
 
-  @wip
   Scenario: Drills never offer as a wrong answer a progression with the same chords
     Given "ana" has added the major progression "I-bVII-IV-V" to the drills
     And "ana" has added the major progression "I-#VI-IV-V" to the drills
@@ -133,7 +131,6 @@ Feature: Admins create progressions for song charts
     Then "major/I-bVII-IV-V" doesn't list "major/I-#VI-IV-V" as a wrong answer
     And "major/I-#VI-IV-V" doesn't list "major/I-bVII-IV-V" as a wrong answer
 
-  @wip
   Scenario: The catalog's progressions keep their curated wrong answers
     Given "ana" has added the major progression "I-iii-IV-V" to the drills
     When a student lists the progressions
@@ -164,7 +161,6 @@ Feature: Admins create progressions for song charts
     When "ana" adds it to the drills with no skill and no concept
     Then adding is refused as invalid
 
-  @wip
   Scenario: Creating in the drills creates nothing when it can't be added
     When "ana" creates a major progression with the bars "I", "IV" and "V", in the drills, practising the concept "common-progressions"
     Then the creation is refused because "unsupported_bar_count"
@@ -212,7 +208,6 @@ Feature: Admins create progressions for song charts
     Then the progression is removed
     And revision 1 of "Sweet Home" still tags its verse with "major/I-bVII-IV-I"
 
-  @wip
   Scenario: A drill progression is never removed
     Given "ana" has added the major progression "I-iii-IV-V" to the drills
     When "ana" removes the progression "major/I-iii-IV-V"
