@@ -84,6 +84,12 @@ paths:
     $ref: './components/paths/commercial-rollout.yaml#/KillSwitch'
   /admin/commercial-rollout/{flag}:
     $ref: './components/paths/commercial-rollout.yaml#/Flag'
+  /admin/commercial-groups:
+    $ref: './components/paths/commercial-rollout.yaml#/Groups'
+  /admin/commercial-groups/{slug}:
+    $ref: './components/paths/commercial-rollout.yaml#/Group'
+  /admin/commercial-groups/{slug}/membership:
+    $ref: './components/paths/commercial-rollout.yaml#/Membership'
   /users/me/subscription-checkouts:
     $ref: './components/paths/stripe-checkout.yaml#/Checkouts'
   /users/me/subscription-checkouts/{checkout_id}:

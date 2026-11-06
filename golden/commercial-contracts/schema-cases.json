@@ -1522,6 +1522,7 @@
     "value": {
       "expected_revision": 0,
       "enabled": true,
+      "all_users": false,
       "subject_ids": [
         "service:core-domain"
       ],
@@ -1535,6 +1536,7 @@
     "value": {
       "expected_revision": 0,
       "enabled": true,
+      "all_users": false,
       "subject_ids": []
     },
     "valid": false
@@ -1545,6 +1547,7 @@
     "value": {
       "expected_revision": 0,
       "enabled": true,
+      "all_users": false,
       "subject_ids": [
         "service:core-domain",
         "service:core-domain"
@@ -1574,6 +1577,136 @@
       "reason": "Incident",
       "expected_revision": 3
     },
+    "valid": false
+  },
+  {
+    "name": "rollout group subject",
+    "schema": "commercial-rollout.yaml#/SubjectId",
+    "value": "group:friends-and-family",
+    "valid": true
+  },
+  {
+    "name": "rollout group subject with uppercase slug",
+    "schema": "commercial-rollout.yaml#/SubjectId",
+    "value": "group:Beta",
+    "valid": false
+  },
+  {
+    "name": "flag change open to all users",
+    "schema": "commercial-rollout.yaml#/FlagChange",
+    "value": {
+      "expected_revision": 4,
+      "enabled": true,
+      "all_users": true,
+      "subject_ids": [
+        "service:core-domain"
+      ],
+      "reason": "General availability"
+    },
+    "valid": true
+  },
+  {
+    "name": "flag change for groups",
+    "schema": "commercial-rollout.yaml#/FlagChange",
+    "value": {
+      "expected_revision": 2,
+      "enabled": true,
+      "all_users": false,
+      "subject_ids": [
+        "group:beta",
+        "group:friends-and-family",
+        "user:77d0239a-8d28-5c95-bc6e-53d59f7f84a8"
+      ],
+      "reason": "Beta cohort"
+    },
+    "valid": true
+  },
+  {
+    "name": "flag change without all_users",
+    "schema": "commercial-rollout.yaml#/FlagChange",
+    "value": {
+      "expected_revision": 0,
+      "enabled": true,
+      "subject_ids": [
+        "group:beta"
+      ],
+      "reason": "x"
+    },
+    "valid": false
+  },
+  {
+    "name": "group change",
+    "schema": "commercial-rollout.yaml#/GroupChange",
+    "value": {
+      "name": "Private beta",
+      "reason": "Beta cohort"
+    },
+    "valid": true
+  },
+  {
+    "name": "group change with members",
+    "schema": "commercial-rollout.yaml#/GroupChange",
+    "value": {
+      "name": "Private beta",
+      "reason": "x",
+      "member_ids": [
+        "77d0239a-8d28-5c95-bc6e-53d59f7f84a8"
+      ]
+    },
+    "valid": false
+  },
+  {
+    "name": "membership change",
+    "schema": "commercial-rollout.yaml#/MembershipChange",
+    "value": {
+      "add": [
+        "77d0239a-8d28-5c95-bc6e-53d59f7f84a8"
+      ],
+      "remove": [],
+      "reason": "Invited"
+    },
+    "valid": true
+  },
+  {
+    "name": "membership change with nothing to do",
+    "schema": "commercial-rollout.yaml#/MembershipChange",
+    "value": {
+      "add": [],
+      "remove": [],
+      "reason": "x"
+    },
+    "valid": false
+  },
+  {
+    "name": "membership change with a group member",
+    "schema": "commercial-rollout.yaml#/MembershipChange",
+    "value": {
+      "add": [
+        "group:beta"
+      ],
+      "remove": [],
+      "reason": "x"
+    },
+    "valid": false
+  },
+  {
+    "name": "commercial group",
+    "schema": "commercial-rollout.yaml#/CommercialGroup",
+    "value": {
+      "slug": "beta",
+      "name": "Private beta",
+      "member_ids": [
+        "77d0239a-8d28-5c95-bc6e-53d59f7f84a8"
+      ],
+      "updated_at": "2026-11-06T12:00:00Z",
+      "updated_by": "0b6f3c2e-6a51-4d7b-9a43-2f1d8e5c7a90"
+    },
+    "valid": true
+  },
+  {
+    "name": "group slug with a colon",
+    "schema": "commercial-rollout.yaml#/GroupSlug",
+    "value": "group:beta",
     "valid": false
   }
 ]

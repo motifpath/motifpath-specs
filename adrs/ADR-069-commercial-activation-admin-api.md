@@ -30,20 +30,26 @@ idempotency key and no audit coupling. The alternative to both is deploy-time co
 ## Decision
 
 MotifPath will store commercial activation in a dedicated core-domain table: one row per
-registered flag, plus one environment-wide **activation revision**. Administrators change it only
+registered flag, a table of rollout **groups**, and one environment-wide **activation revision**. Administrators change it only
 through a dedicated admin API that follows the same command rules as every other commercial
 mutation:
 
 - `GET /admin/commercial-rollout` returns the activation revision and, for every registered flag,
-  its configured state (`enabled`, `subject_ids`), its prerequisites, whether it is effective
+  its configured state (`enabled`, `all_users`, `subject_ids`), its prerequisites, whether it is effective
   (enabled and every prerequisite effective), and who changed it last and when.
-- `PUT /admin/commercial-rollout/{flag}` replaces one flag's `enabled` and `subject_ids`. It
+- `PUT /admin/commercial-rollout/{flag}` replaces one flag's `enabled`, `all_users` and
+  `subject_ids`. It
   requires an `Idempotency-Key`, the observed `expected_revision` and a `reason`. A stale revision
   returns 409. A same-intent replay returns the original result; conflicting reuse of a key
   returns 409.
 - `POST /admin/commercial-rollout/kill-switch` turns every flag OFF in one change. It requires an
   `Idempotency-Key` and a `reason` but no `expected_revision`, so a stale screen or script can
-  never block it. Allowlists are kept, so turning a flag back on is a deliberate per-flag change.
+  never block it. Audiences are kept, so turning a flag back on is a deliberate per-flag change.
+- `GET /admin/commercial-groups` lists every group with its members.
+  `PUT /admin/commercial-groups/{slug}` creates or renames a group.
+  `POST /admin/commercial-groups/{slug}/membership` adds and removes members in one change. Group
+  changes need an `Idempotency-Key` and a `reason` but no `expected_revision`, because each one
+  states the wanted result; removing someone from a group can never be blocked by a stale view.
 
 Every applied change increments the activation revision by one and is committed in the same
 transaction as its audit evidence (before and after state, actor, reason, revisions). If the
@@ -51,18 +57,31 @@ evidence cannot be written, nothing changes. Only an administrator resolved from
 backend identity may call these endpoints. The environment is the trusted deployment's own; each
 environment has its own database, so no environment can inherit another's activation.
 
+**Audience.** A flag's audience is its `all_users` switch plus an allowlist of entries:
+`user:<core user id>`, `group:<slug>` or `service:<service name>`.
+
+- A group is a named set of users, such as `beta` or `friends-and-family`. It lets one allowlist
+  entry cover many people, and adding someone to the group admits them to every flag that lists it.
+  Groups hold users only and do not nest.
+- `all_users` opens a flag to every authenticated user. It is a separate, explicit field, so an
+  empty allowlist still allows no one and a forgotten list can never open a flag to everyone.
+  Services are never covered by `all_users`; a service must always be listed by name.
+
 **Evaluation.** Core answers `allowed(flag, subject)`. The answer is yes only when the flag is
-enabled, the subject is in its allowlist, and every prerequisite is allowed for the subject that
-the operation names for it. An empty allowlist allows no one; there is no wildcard and no
-percentage targeting. Subjects are `user:<core user id>` or `service:<service name>`. Each
-operation's contract names its subject: buyer, owning teacher, resource owner or service. For
+enabled, the subject is in its audience, and every prerequisite is allowed for the subject that
+the operation names for it. A user is in the audience when `all_users` is true, when the user is
+listed, or when the user is a member of a listed group. A service is in the audience only when it
+is listed. There is no wildcard entry and no percentage targeting. Each operation's contract names
+its subject: buyer, owning teacher, resource owner or service. For
 `content_ownership` corrections, the subject is the content's current owner, which is the
 MotifPath Catalog profile for platform content. A missing row, an unknown flag or a failed read
 denies, and the operation returns 503 for a read failure and 403 otherwise.
 
 **Fencing.** A new commercial intent is authorized and durably recorded in one transaction that
 holds a shared lock on the activation revision and stores the revision it was authorized under.
-Activation changes take an exclusive lock. After an OFF change commits, no new intent can be
+Activation changes take an exclusive lock. Group changes are activation changes: they increment
+the same revision and take the same lock, so removing a member fences that member's new intents
+just as an OFF change does. After an OFF change commits, no new intent can be
 authorized under the older revision. An intent authorized before it keeps its recorded revision
 and stays recoverable.
 
@@ -92,12 +111,18 @@ to reason about and to test.
 - Fencing makes "OFF means no new intent" hold under concurrency, not just eventually.
 - Flags and prerequisites are registered in code. An unregistered flag is not found and cannot be
   enabled by mistake.
+- Groups make cohorts cheap to manage: admitting a beta tester is one membership change, not one
+  change per flag. `all_users` gives general availability without a spec change.
 
 ### Negative / Trade-offs
 
 - There is no screen yet. The team changes activation with curl or a make target, as with
   ADR-052, so typing mistakes in subject ids are possible. The read shows the effective result,
   which mitigates this.
+- Opening a flag to everyone is one field away. The explicit `all_users` field, the required
+  reason and the audit evidence keep it deliberate, but no second approval is enforced.
+- A group change also bumps the activation revision, so an admin holding an older revision for a
+  flag change must re-read after any group change.
 - Every new commercial intent takes a shared lock on one row. That is negligible at alpha volume,
   but it is a serialization point to watch if write volume grows.
 - Two admin config surfaces now exist (`/admin/config` and `/admin/commercial-rollout`), and

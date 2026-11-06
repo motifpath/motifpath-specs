@@ -22,9 +22,15 @@ FlagName:
 
 SubjectId:
   type: string
-  description: Rollout subject, either user:<core user UUID> or service:<service name>.
-  pattern: "^(user:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|service:[a-z][a-z0-9-]{0,62})$"
+  description: Allowlist entry, one of user:<core user UUID>, group:<group slug> or
+    service:<service name>. A group entry allows every user who is a member of that group.
+  pattern: "^(user:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|group:[a-z][a-z0-9-]{0,62}|service:[a-z][a-z0-9-]{0,62})$"
   maxLength: 80
+
+GroupSlug:
+  type: string
+  description: Stable identifier of a rollout group, such as beta or friends-and-family.
+  pattern: "^[a-z][a-z0-9-]{0,62}$"
 
 FlagState:
   type: object
@@ -33,6 +39,7 @@ FlagState:
   required:
     - flag
     - enabled
+    - all_users
     - subject_ids
     - prerequisites
     - effective
@@ -45,9 +52,14 @@ FlagState:
     enabled:
       type: boolean
       description: Configured switch. Starts false in every environment.
+    all_users:
+      type: boolean
+      description: When true and enabled, every authenticated user is allowed. Services are never
+        covered by it and must still be listed. Starts false in every environment.
     subject_ids:
       type: array
-      description: Subjects allowed when enabled. An empty list allows no one; there is no wildcard.
+      description: Users, groups and services allowed when enabled. With all_users false, an empty
+        list allows no one; there is no wildcard entry.
       maxItems: 500
       uniqueItems: true
       items:
@@ -62,7 +74,7 @@ FlagState:
         description: One prerequisite.
     effective:
       type: boolean
-      description: True when enabled and every prerequisite is effective. Subject allowlists still apply.
+      description: True when enabled and every prerequisite is effective. The audience still applies.
     updated_at:
       type:
         - string
@@ -98,11 +110,12 @@ CommercialRollout:
 
 FlagChange:
   type: object
-  description: Replace one flag's switch and allowlist.
+  description: Replace one flag's switch and audience.
   additionalProperties: false
   required:
     - expected_revision
     - enabled
+    - all_users
     - subject_ids
     - reason
   properties:
@@ -113,9 +126,14 @@ FlagChange:
     enabled:
       type: boolean
       description: New switch value.
+    all_users:
+      type: boolean
+      description: New all-users value. Must be sent explicitly, so opening a flag to everyone is
+        never a default.
     subject_ids:
       type: array
-      description: New complete allowlist; replaces the previous one.
+      description: New complete allowlist; replaces the previous one. Every group entry must name an
+        existing group.
       maxItems: 500
       uniqueItems: true
       items:
@@ -129,7 +147,7 @@ FlagChange:
 
 KillSwitch:
   type: object
-  description: Turn every flag OFF at once, keeping allowlists.
+  description: Turn every flag OFF at once, keeping each flag's audience.
   additionalProperties: false
   required:
     - reason
@@ -167,3 +185,115 @@ RolloutCommand:
       type: string
       format: uuid
       description: Audit evidence committed with the change.
+
+CommercialGroup:
+  type: object
+  description: A named set of users that flags can allow as one allowlist entry.
+  additionalProperties: false
+  required:
+    - slug
+    - name
+    - member_ids
+    - updated_at
+    - updated_by
+  properties:
+    slug:
+      $ref: "#/GroupSlug"
+      description: Stable identifier; referenced from allowlists as group:<slug>.
+    name:
+      type: string
+      minLength: 1
+      maxLength: 120
+      description: Display name for administrators.
+    member_ids:
+      type: array
+      description: Core user ids of the members. A group holds users only; groups do not nest.
+      maxItems: 5000
+      uniqueItems: true
+      items:
+        type: string
+        format: uuid
+        description: One member.
+    updated_at:
+      type: string
+      format: date-time
+      description: When the group or its membership last changed.
+    updated_by:
+      type: string
+      format: uuid
+      description: Administrator who last changed it.
+
+CommercialGroups:
+  type: object
+  description: Every rollout group in the trusted environment, at one activation revision.
+  additionalProperties: false
+  required:
+    - revision
+    - groups
+  properties:
+    revision:
+      type: integer
+      minimum: 0
+      description: Environment-wide activation revision, shared with flag changes.
+    groups:
+      type: array
+      description: Every group, ordered by slug. Empty before the first group is created.
+      items:
+        $ref: "#/CommercialGroup"
+        description: One group.
+
+GroupChange:
+  type: object
+  description: Create a group, or rename an existing one. Membership is unchanged.
+  additionalProperties: false
+  required:
+    - name
+    - reason
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 120
+      description: Display name.
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 1000
+      description: Why the change is made; recorded in the audit evidence.
+
+MembershipChange:
+  type: object
+  description: Add and remove group members in one change. Adding a current member or removing a
+    non-member is not an error; the result is the requested membership.
+  additionalProperties: false
+  required:
+    - add
+    - remove
+    - reason
+  anyOf:
+    - properties: {add: {minItems: 1}}
+    - properties: {remove: {minItems: 1}}
+  properties:
+    add:
+      type: array
+      description: Core user ids to make members.
+      maxItems: 500
+      uniqueItems: true
+      items:
+        type: string
+        format: uuid
+        description: One user.
+    remove:
+      type: array
+      description: Core user ids to remove. A user may not appear in both lists.
+      maxItems: 500
+      uniqueItems: true
+      items:
+        type: string
+        format: uuid
+        description: One user.
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 1000
+      description: Why the change is made; recorded in the audit evidence.

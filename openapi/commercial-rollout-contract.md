@@ -45,10 +45,14 @@ Flag names never switch off the invariant they resemble: progress retention, exi
 ## Administration and evaluation
 
 Activation is stored in core-domain and changed only through the admin rollout API
-(`getCommercialRollout`, `changeCommercialFlag`, `turnOffAllCommercialFlags`; ADR-069). Each change
-is revision-checked, idempotent and committed with its audit evidence; the kill switch needs no
-revision. Subjects are `user:<core user id>` or `service:<service name>`; an empty allowlist allows
-no one. Each operation's contract names the subject evaluated for it and for each prerequisite;
+(`getCommercialRollout`, `changeCommercialFlag`, `turnOffAllCommercialFlags`, and the group
+operations `listCommercialGroups`, `saveCommercialGroup`, `changeCommercialGroupMembers`; ADR-069).
+Each change is idempotent and committed with its audit evidence. Flag changes are revision-checked;
+the kill switch and group changes need no revision. A flag's audience is an explicit `all_users`
+switch plus allowlist entries `user:<core user id>`, `group:<slug>` (a named set of users, such as
+`beta`) or `service:<service name>`. With `all_users` off, an empty allowlist allows no one;
+`all_users` never covers services. Each operation's contract names the subject evaluated for it and
+for each prerequisite;
 content-ownership corrections use the content's current owner. New intents record the activation
 revision they were authorized under and are fenced against a concurrent OFF. Scenarios:
 [commercial activation](../features/monetization/commercial-activation.feature).
