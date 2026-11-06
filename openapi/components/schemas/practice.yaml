@@ -21,7 +21,7 @@ PracticeItemKey:
       head: picking the chord for the numeral, or the numeral for the chord.
     - chord_function:<key>:<numeral> — a numeral's harmonic function in a major key: picking
       the function of its chord, or its chord for the function.
-    - chart_progression:<progression key> — a progression of the progression catalog read
+    - chart_progression:<progression key> — a drill progression read
       as a chart: picking the progression for four chords, or its chart for the progression.
       The key is picked each time it is asked, so one item covers every key.
     - heard_chord:<numeral> — a numeral recognised by ear in a key a cadence sets. The key is
@@ -45,11 +45,12 @@ PracticeItemKey:
     In these keys, <key> is a major key spelled as one of C Db D Eb E F F# G Ab A Bb B;
     <numeral> is one of I ii iii IV V vi viio (viio is vii°); <chord> is a root spelled the
     same way, followed by m (minor), dim (diminished), 7 (dominant seventh) or nothing
-    (major); <progression key> is a key of the progression catalog.
+    (major); <progression key> is the key of a drill progression: a catalog handle such as
+    I-V-vi-IV, or a created progression's mode and ASCII numerals such as major/I-bVII-IV-I.
 
     Item kinds are an open set: a new kind adds its own prefix and key scheme here, a
     grader, and its golden cases.
-  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diagram_shape:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diatonic_chord:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chord_function:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chart_progression:[0-9A-Za-z][0-9A-Za-z-]*|heard_chord:(I|ii|iii|IV|V|vi|viio)|heard_progression:[0-9A-Za-z][0-9A-Za-z-]*|chord_voicing:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|root_fifth:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|root_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|guide_tone:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9A-Za-z][0-9A-Za-z-]*|progression_keys:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9A-Za-z][0-9A-Za-z-]*|song:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$'
+  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diagram_shape:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diatonic_chord:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chord_function:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chart_progression:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|heard_chord:(I|ii|iii|IV|V|vi|viio)|heard_progression:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|chord_voicing:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|root_fifth:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|root_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|guide_tone:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|progression_keys:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|song:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$'
   example: 'fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:3'
 
 PracticeResponse:
@@ -1134,8 +1135,8 @@ GeneratedChoiceQuestion:
           properties:
             key:
               type: string
-              pattern: '^[0-9A-Za-z][0-9A-Za-z-]*$'
-              description: The progression's key in the progression catalog, such as I-V-vi-IV.
+              pattern: '^([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)$'
+              description: The progression's key, such as I-V-vi-IV or major/I-bVII-IV-I.
             name:
               type: string
               description: The progression's name in the student's language, such as "I–V–vi–IV (pop)".
@@ -1407,8 +1408,8 @@ PlannedProgressionKeys:
       properties:
         key:
           type: string
-          pattern: '^[0-9A-Za-z][0-9A-Za-z-]*$'
-          description: The progression's key in the progression catalog, such as I-V-vi-IV.
+          pattern: '^([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)$'
+          description: The progression's key, such as I-V-vi-IV or major/I-bVII-IV-I.
         name:
           type: string
           description: The progression's name in the student's language, such as "I–V–vi–IV (pop)".
@@ -1544,8 +1545,8 @@ PlannedGuideTone:
       properties:
         key:
           type: string
-          pattern: '^[0-9A-Za-z][0-9A-Za-z-]*$'
-          description: The progression's key in the progression catalog, such as ii-V-I.
+          pattern: '^([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)$'
+          description: The progression's key, such as ii-V-I or major/I-bVII-IV-I.
         name:
           type: string
           description: The progression's name in the student's language, such as "ii–V–I".
@@ -1656,9 +1657,9 @@ PlannedSong:
       description: The performer or composer the song is known by.
     progression_key:
       type: string
-      pattern: '^[0-9A-Za-z][0-9A-Za-z-]*$'
+      pattern: '^([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)$'
       description: |
-        The key, in the progression catalog, of the progression the chart plays that practises
+        The key of the progression the chart plays that practises
         the session's subject, shown as why this song was picked.
     section_index:
       type: integer

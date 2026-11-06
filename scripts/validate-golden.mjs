@@ -121,6 +121,31 @@ for (const file of chordProFiles) {
 }
 if (chordProFiles.length === 0) fail(`no golden-case files in ${chordProDir}`)
 
+// Progression numeral parser cases in golden/progression-numerals/: each file against its
+// schema.json, its file name against its parser id, and every parsed numeral against
+// ProgressionNumeral in the Core Domain Service schemas, so the cases can't drift from what
+// listProgressions returns.
+const numeralDir = 'golden/progression-numerals'
+const validateNumeralFile = ajv.compile(JSON.parse(readFileSync(join(numeralDir, 'schema.json'), 'utf8')))
+const validateNumeral = ajv.compile({ $ref: 'core.yaml#/$defs/ProgressionNumeral' })
+
+const numeralFiles = readdirSync(numeralDir).filter((f) => f.endsWith('.json') && f !== 'schema.json')
+for (const file of numeralFiles) {
+  const golden = JSON.parse(readFileSync(join(numeralDir, file), 'utf8'))
+  if (!validateNumeralFile(golden)) {
+    fail(`${file}: not a valid progression-numeral golden-case file`, validateNumeralFile.errors)
+    continue
+  }
+  if (`${golden.parser}.json` !== file) fail(`${file}: parser "${golden.parser}" doesn't match the file name`)
+  for (const c of golden.cases) {
+    if (c.expected.status === 'parsed' && !validateNumeral(c.expected.numeral)) {
+      fail(`${file} / ${c.name}: numeral`, validateNumeral.errors)
+    }
+  }
+  console.log(`${file}: ${golden.cases.length} cases`)
+}
+if (numeralFiles.length === 0) fail(`no golden-case files in ${numeralDir}`)
+
 if (failures > 0) {
   console.error(`${failures} problem(s)`)
   process.exit(1)
