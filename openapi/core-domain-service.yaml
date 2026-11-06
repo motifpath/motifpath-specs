@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.60.0
+  version: 0.60.1
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -2901,7 +2901,8 @@ paths:
         wrong answers, and its names. A client reads it to show and grade the progression drills'
         questions the same way the server does, such as a chart picked for a progression, using
         only the progressions in the drills, and to name the progressions a song chart is tagged
-        with. It is the same for every user and language and changes only when an admin creates,
+        with. Only an admin sees who created a progression; otherwise it is the same for every
+        user and language. It changes only when an admin creates,
         changes or removes a progression, so a client may keep it for the session. Any
         authenticated user may list it.
       tags:
@@ -14095,7 +14096,9 @@ components:
           oneOf:
             - $ref: '#/components/schemas/UserRef'
             - type: 'null'
-          description: The admin who created it; null for the catalog's progressions.
+          description: |
+            The admin who created it, shown only to an admin; null for any other caller, and for
+            the catalog's progressions.
         created_at:
           type:
             - string
