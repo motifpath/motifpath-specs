@@ -4,7 +4,8 @@ Feature: List the progression catalog
   So that a chart I pick for a progression is graded on the spot exactly as the record grades it
 
   # The catalog is reference data (catalogs/progressions.yaml), the same for every user and
-  # language. The app reads it to grade the progression drills' questions instantly.
+  # language. The app reads it to grade the progression drills' questions instantly. Progressions
+  # admins create are listed with it (content-management/progressions.feature).
 
   Background:
     Given student "alice" plays "guitar" and "electric-bass"
@@ -22,6 +23,12 @@ Feature: List the progression catalog
     When "alice" lists the progression catalog
     Then "12-bar-blues" has 12 bars, starting I7, I7, I7, I7, IV7
     And its name is "12-bar blues, slow change"
+
+  @wip
+  Scenario: The catalog's progressions are major and in the drills, with nothing borrowed
+    When "alice" lists the progression catalog
+    Then each of the 10 progressions is in the major mode and in the drills
+    And none of them has a borrowed bar or a creator
 
   Scenario: Confusable progressions list each other
     When "alice" lists the progression catalog

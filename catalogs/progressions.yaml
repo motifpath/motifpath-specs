@@ -6,6 +6,9 @@
 # it is symmetric, and drills offer them as distractors.
 #
 # IDs are UUID v5 under the catalog namespace, from "progression/<key>" (reference-data.md).
+#
+# The catalog is closed to new rows (ADR-070): the generator still updates these 10, but refuses a
+# new key. A new drill progression is created by an admin and added to the drills in the app.
 
 mode: major
 

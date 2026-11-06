@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motifpath.io/specs/golden/progression-numerals/schema.json",
+  "title": "Progression numeral parser golden cases",
+  "description": "One file per parser version: progression numerals as admins write them, in a mode -> how the parser reads them. Each parsed numeral must also be valid against ProgressionNumeral in openapi/core-domain-service.yaml.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["parser", "description", "cases"],
+  "properties": {
+    "parser": {
+      "type": "string",
+      "pattern": "^[a-z][a-z_]*\\.v[1-9][0-9]*$",
+      "description": "The parser id these cases pin, as <name>.v<version>. Matches the file name."
+    },
+    "description": { "type": "string", "minLength": 1 },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "input", "mode", "expected"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "input": { "type": "string", "description": "The numeral exactly as written." },
+          "mode": { "enum": ["major", "minor"], "description": "The mode the progression is in." },
+          "expected": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["status", "numeral", "root_semitones", "quality", "borrowed"],
+                "properties": {
+                  "status": { "const": "parsed" },
+                  "numeral": { "type": "string", "description": "The numeral as stored, with ♭, ♯, ° and ø." },
+                  "root_semitones": { "type": "integer", "minimum": 0, "maximum": 11, "description": "The root's interval above the tonic, in semitones." },
+                  "quality": {
+                    "enum": ["major", "minor", "diminished", "dominant_7", "major_7", "minor_7", "half_diminished_7", "diminished_7"],
+                    "description": "The chord quality, named as the chord catalog names it."
+                  },
+                  "borrowed": { "type": "boolean", "description": "True when its root and triad are outside the mode's diatonic chords." }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["status"],
+                "properties": { "status": { "const": "unparsed" } }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
