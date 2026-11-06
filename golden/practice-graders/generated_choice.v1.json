@@ -74,6 +74,22 @@
           "I7",
           "V7"
         ]
+      },
+      "major/I-bVII-IV-I": {
+        "bars": [
+          "I",
+          "♭VII",
+          "IV",
+          "I"
+        ]
+      },
+      "major/Imaj7-iih7-viio7-bVImaj7": {
+        "bars": [
+          "Imaj7",
+          "iiø7",
+          "vii°7",
+          "♭VImaj7"
+        ]
       }
     }
   },
@@ -753,6 +769,136 @@
       "expected": {
         "result": "rejected",
         "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "numbers to chart: a borrowed chord is spelled in the key",
+      "item_key": "chart_progression:major/I-bVII-IV-I",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numbers_to_chart",
+        "music_key": "G",
+        "options": [
+          "G F C G",
+          "G D Em C"
+        ],
+        "choice": "G F C G",
+        "latency_ms": 4100
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 4100,
+          "answer_key": {
+            "way": "numbers_to_chart",
+            "music_key": "G",
+            "answer": "G F C G",
+            "offered": [
+              "G F C G",
+              "G D Em C"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "numbers to chart: written sevenths are spelled in the chart",
+      "item_key": "chart_progression:major/Imaj7-iih7-viio7-bVImaj7",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "numbers_to_chart",
+        "music_key": "C",
+        "options": [
+          "Cmaj7 Dm7b5 Bdim7 Abmaj7",
+          "C G Am F"
+        ],
+        "choice": "Cmaj7 Dm7b5 Bdim7 Abmaj7",
+        "latency_ms": 5000
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 5000,
+          "answer_key": {
+            "way": "numbers_to_chart",
+            "music_key": "C",
+            "answer": "Cmaj7 Dm7b5 Bdim7 Abmaj7",
+            "offered": [
+              "Cmaj7 Dm7b5 Bdim7 Abmaj7",
+              "C G Am F"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "chart to numbers: a created progression is answered by its key",
+      "item_key": "chart_progression:major/I-bVII-IV-I",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chart_to_numbers",
+        "music_key": "D",
+        "options": [
+          "major/I-bVII-IV-I",
+          "I-V-vi-IV"
+        ],
+        "choice": "I-V-vi-IV",
+        "latency_ms": 4300
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 4300,
+          "answer_key": {
+            "way": "chart_to_numbers",
+            "music_key": "D",
+            "answer": "major/I-bVII-IV-I",
+            "offered": [
+              "major/I-bVII-IV-I",
+              "I-V-vi-IV"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "progression by number: a created progression heard",
+      "item_key": "heard_progression:major/I-bVII-IV-I",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "progression_by_number",
+        "music_key": "C",
+        "options": [
+          "major/I-bVII-IV-I",
+          "I-vi-IV-V"
+        ],
+        "choice": "major/I-bVII-IV-I",
+        "latency_ms": 9100,
+        "audio_ms": 8000
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 9100,
+          "audio_ms": 8000,
+          "answer_key": {
+            "way": "progression_by_number",
+            "music_key": "C",
+            "answer": "major/I-bVII-IV-I",
+            "offered": [
+              "major/I-bVII-IV-I",
+              "I-vi-IV-V"
+            ]
+          }
+        }
       }
     },
     {
