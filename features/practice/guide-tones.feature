@@ -49,14 +49,12 @@ Feature: Tap the guide tones of a progression in time
     Then its bars are ii V I I with the chords "Am D G G"
     And it has a voicing for each of "Am", "D" and "G"
 
-  @wip
   Scenario: The plan spells a borrowed chord in the key
     Given the drills have the created progression "major/I-bVII-IV-I" with the bars I ♭VII IV I
     And "alice" has never practised the guide tone of "major/I-bVII-IV-I" on guitar
     When the guide tone is picked for "alice"'s session in G
     Then its bars are I ♭VII IV I with the chords "G F C G"
 
-  @wip
   Scenario: The plan keeps a written seventh in the chord
     Given the drills have the created progression "major/Imaj7-iih7-viio7-bVImaj7" with the bars Imaj7 iiø7 vii°7 ♭VImaj7
     And "alice" is accurate on the guide tone of "major/Imaj7-iih7-viio7-bVImaj7" on guitar
