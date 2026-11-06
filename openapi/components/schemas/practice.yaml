@@ -377,10 +377,10 @@ TimedTapsResponse:
       type: string
       enum: ['3', '7']
       description: |
-        The chord tone asked for every chord: 3 = its third; 7 = its seventh (
-        a written suffix decides: maj7 is the major seventh, 7 and ø7 the minor seventh, °7 the
-        diminished seventh. A chord with no written seventh takes the major seventh on I and IV
-        and the minor seventh on any other numeral, in or out of the key).
+        The chord tone asked for every chord: 3 = its third; 7 = its seventh:
+        a written suffix decides (maj7 is the major seventh, 7 and ø7 the minor seventh, °7 the
+        diminished seventh); a chord with no written seventh takes the major seventh on I and IV
+        and the minor seventh on any other numeral, in or out of the key.
     tempo_bpm:
       type: integer
       minimum: 1
@@ -1562,10 +1562,10 @@ PlannedGuideTone:
       enum: ['3', '7']
       description: |
         The chord tone asked of every chord: 3 = its third, until the student is accurate on the
-        item; 7 = its seventh from then on (
-        a written suffix decides: maj7 is the major seventh, 7 and ø7 the minor seventh, °7 the
-        diminished seventh. A chord with no written seventh takes the major seventh on I and IV
-        and the minor seventh on any other numeral, in or out of the key).
+        item; 7 = its seventh from then on:
+        a written suffix decides (maj7 is the major seventh, 7 and ø7 the minor seventh, °7 the
+        diminished seventh); a chord with no written seventh takes the major seventh on I and IV
+        and the minor seventh on any other numeral, in or out of the key.
     tempo_bpm:
       type: integer
       minimum: 20
