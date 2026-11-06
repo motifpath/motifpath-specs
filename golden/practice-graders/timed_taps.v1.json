@@ -80,6 +80,14 @@
           "vii°",
           "I"
         ]
+      },
+      "major/bI-#VI-IV-I": {
+        "bars": [
+          "♭I",
+          "♯VI",
+          "IV",
+          "I"
+        ]
       }
     }
   },
@@ -719,6 +727,72 @@
               {
                 "chord": "C",
                 "note_name": "E",
+                "hit": true
+              },
+              {
+                "chord": "Bb",
+                "note_name": "D",
+                "hit": true
+              },
+              {
+                "chord": "F",
+                "note_name": "A",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a sharp root and a flat root below the tonic: ♯VI is Bb and ♭I is B in C",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:major/bI-#VI-IV-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 4,
+            "fret": 1
+          },
+          {
+            "at_ms": 2300,
+            "string": 2,
+            "fret": 3
+          },
+          {
+            "at_ms": 4050,
+            "string": 3,
+            "fret": 2
+          },
+          {
+            "at_ms": 6400,
+            "string": 1,
+            "fret": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "B",
+                "note_name": "D#",
                 "hit": true
               },
               {
