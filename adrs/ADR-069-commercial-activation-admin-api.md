@@ -1,6 +1,6 @@
 # ADR-069: Commercial Activation Lives in Core, Changed Through a Dedicated Admin API
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-11-02
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
 **Task:** MOT-181
@@ -148,4 +148,4 @@ to reason about and to test.
 
 ---
 
-*This ADR was proposed on 2026-11-02. To revise, create a new ADR with Status: Supersedes ADR-069.*
+*This ADR was proposed on 2026-11-02 and accepted by Gilson Yamada on 2026-11-06, including the rollout groups and all-users audience. To revise, create a new ADR with Status: Supersedes ADR-069.*
