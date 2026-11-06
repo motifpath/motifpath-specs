@@ -7,7 +7,7 @@ import { parse } from 'yaml'
 const ajv = new Ajv2020({ strict: false, allErrors: true })
 addFormats(ajv)
 const documents = ['commerce', 'commercial-messages', 'subscriptions', 'refunds',
-  'stripe-checkout', 'commercial-access', 'commercial-audit']
+  'stripe-checkout', 'commercial-access', 'commercial-audit', 'commercial-rollout']
 for (const name of documents) {
   ajv.addSchema({ $id: `https://contracts.motifpath.invalid/${name}.yaml`,
     ...parse(readFileSync(`openapi/components/schemas/${name}.yaml`, 'utf8')) })
