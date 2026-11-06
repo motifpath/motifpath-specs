@@ -6,7 +6,6 @@
 # chart's draft or latest published revision tags it. What the app shows is in
 # web/progression-authoring.feature.
 
-@wip
 Feature: Admins create progressions for song charts
   As an admin of the concierge team
   I want to create the progression a song plays when the catalog doesn't have it
@@ -106,23 +105,27 @@ Feature: Admins create progressions for song charts
 
   # ── Adding to the drills ───────────────────────────────────────────────────
 
+  @wip
   Scenario: An admin adds a progression to the drills as it is created
     When "ana" creates a major progression with the bars "I", "iii", "IV" and "V", in the drills, practising the concept "common-progressions"
     Then the progression "major/I-iii-IV-V" is in the drills
     And it practises the concept "common-progressions"
 
+  @wip
   Scenario: An admin adds a chart-only progression to the drills later
     Given "ana" has created the major progression "I-iii-IV-V"
     When "ana" adds it to the drills, practising the concept "common-progressions"
     Then the progression "major/I-iii-IV-V" is in the drills
     And practice offers it as a subject on the concept "common-progressions"
 
+  @wip
   Scenario: Drills offer as wrong answers the drill progressions sharing the most chords
     Given "ana" has created the major progression "I-iii-IV-V"
     When "ana" adds it to the drills, practising the concept "common-progressions"
     Then its wrong answers start with "I-vi-IV-V", which shares three bars with it
     And every one of its wrong answers has four bars
 
+  @wip
   Scenario: Drills never offer as a wrong answer a progression with the same chords
     Given "ana" has added the major progression "I-bVII-IV-V" to the drills
     And "ana" has added the major progression "I-#VI-IV-V" to the drills
@@ -130,6 +133,7 @@ Feature: Admins create progressions for song charts
     Then "major/I-bVII-IV-V" doesn't list "major/I-#VI-IV-V" as a wrong answer
     And "major/I-#VI-IV-V" doesn't list "major/I-bVII-IV-V" as a wrong answer
 
+  @wip
   Scenario: The catalog's progressions keep their curated wrong answers
     Given "ana" has added the major progression "I-iii-IV-V" to the drills
     When a student lists the progressions
@@ -141,27 +145,32 @@ Feature: Admins create progressions for song charts
     When student "alice" starts a practice session
     Then no practice subject or song is on "major/I-bVII-IV-I"
 
+  @wip
   Scenario: A bar count drills don't ask is refused
     Given "ana" has created the major progression "I-IV-V"
     When "ana" adds it to the drills, practising the concept "common-progressions"
     Then adding is refused because "unsupported_bar_count"
     And "major/I-IV-V" is still not in the drills
 
+  @wip
   Scenario: A minor progression can't reach the drills yet
     Given "ana" has created the minor progression "i-bVI-bIII-bVII"
     When "ana" adds it to the drills, practising the concept "common-progressions"
     Then adding is refused because "unsupported_mode"
 
+  @wip
   Scenario: Adding to the drills needs a skill or a concept
     Given "ana" has created the major progression "I-iii-IV-V"
     When "ana" adds it to the drills with no skill and no concept
     Then adding is refused as invalid
 
+  @wip
   Scenario: Creating in the drills creates nothing when it can't be added
     When "ana" creates a major progression with the bars "I", "IV" and "V", in the drills, practising the concept "common-progressions"
     Then the creation is refused because "unsupported_bar_count"
     And no progression is created
 
+  @wip
   Scenario: A drill progression can't be added again
     When "ana" adds "I-V-vi-IV" to the drills, practising the concept "common-progressions"
     Then adding is refused because "already_in_drills"
@@ -203,6 +212,7 @@ Feature: Admins create progressions for song charts
     Then the progression is removed
     And revision 1 of "Sweet Home" still tags its verse with "major/I-bVII-IV-I"
 
+  @wip
   Scenario: A drill progression is never removed
     Given "ana" has added the major progression "I-iii-IV-V" to the drills
     When "ana" removes the progression "major/I-iii-IV-V"
