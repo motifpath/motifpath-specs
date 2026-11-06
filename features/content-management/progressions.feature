@@ -49,6 +49,13 @@ Feature: Admins create progressions for song charts
     Then the list has the catalog's 10 progressions in the drills
     And it has "major/I-bVII-IV-I", not in the drills, with no wrong answers
 
+  Scenario: Only an admin sees who created a progression
+    Given "ana" has created the major progression "I-bVII-IV-I"
+    When "ana" lists the progression catalog
+    Then "major/I-bVII-IV-I" was created by "ana"
+    When a student lists the progressions
+    Then "major/I-bVII-IV-I" names no creator
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   Scenario: The same mode and numerals give back the existing progression
@@ -66,6 +73,11 @@ Feature: Admins create progressions for song charts
     Given "ana" has created the major progression "I-bVII-IV-I"
     When "ana" creates a minor progression with the bars "I", "♭VII", "IV" and "I"
     Then the progression "minor/I-bVII-IV-I" is created
+
+  Scenario: The same chords spelled differently are another progression
+    Given "ana" has created the major progression "I-bVII-IV-I"
+    When "ana" creates a major progression with the bars "I", "♯VI", "IV" and "I"
+    Then the progression "major/I-#VI-IV-I" is created
 
   Scenario: A progression may have up to sixteen bars
     When "ana" creates a major progression of 16 bars of "I"
@@ -110,6 +122,13 @@ Feature: Admins create progressions for song charts
     When "ana" adds it to the drills, practising the concept "common-progressions"
     Then its wrong answers start with "I-vi-IV-V", which shares three bars with it
     And every one of its wrong answers has four bars
+
+  Scenario: Drills never offer as a wrong answer a progression with the same chords
+    Given "ana" has added the major progression "I-bVII-IV-V" to the drills
+    And "ana" has added the major progression "I-#VI-IV-V" to the drills
+    When a student lists the progressions
+    Then "major/I-bVII-IV-V" doesn't list "major/I-#VI-IV-V" as a wrong answer
+    And "major/I-#VI-IV-V" doesn't list "major/I-bVII-IV-V" as a wrong answer
 
   Scenario: The catalog's progressions keep their curated wrong answers
     Given "ana" has added the major progression "I-iii-IV-V" to the drills
