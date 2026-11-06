@@ -1,6 +1,6 @@
 # ADR-070: Admins create progressions for song charts; an in-drills flag gates what drills use
 
-**Status:** Proposed
+**Status:** Accepted (2026-11-06; Figma MOT-184 signed off, specs#432 merged)
 **Date:** 2026-11-04
 **Deciders:** Gilson (Product Owner)
 **Input:** MOT-182 (epic), MOT-183. PO direction, 2026-11-04: progressions are created from the
