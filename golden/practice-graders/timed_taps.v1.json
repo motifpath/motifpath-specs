@@ -48,6 +48,46 @@
           "I7",
           "V7"
         ]
+      },
+      "major/I-bVII-IV-I": {
+        "bars": [
+          "I",
+          "♭VII",
+          "IV",
+          "I"
+        ]
+      },
+      "major/Imaj7-iih7-viio7-bVImaj7": {
+        "bars": [
+          "Imaj7",
+          "iiø7",
+          "vii°7",
+          "♭VImaj7"
+        ]
+      },
+      "major/ii7-bVII7-IV7-I7": {
+        "bars": [
+          "ii7",
+          "♭VII7",
+          "IV7",
+          "I7"
+        ]
+      },
+      "major/iv-bVI-viio-I": {
+        "bars": [
+          "iv",
+          "♭VI",
+          "vii°",
+          "I"
+        ]
+      },
+      "major/bI-#VI-IV-I": {
+        "bars": [
+          "♭I",
+          "♯VI",
+          "IV",
+          "I"
+        ]
       }
     }
   },
@@ -636,6 +676,600 @@
               {
                 "chord": "G",
                 "note_name": "F#",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a borrowed chord's third follows its own chord: D on ♭VII in C",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:major/I-bVII-IV-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 1,
+            "fret": 0
+          },
+          {
+            "at_ms": 2300,
+            "string": 2,
+            "fret": 3
+          },
+          {
+            "at_ms": 4050,
+            "string": 3,
+            "fret": 2
+          },
+          {
+            "at_ms": 6400,
+            "string": 1,
+            "fret": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              },
+              {
+                "chord": "Bb",
+                "note_name": "D",
+                "hit": true
+              },
+              {
+                "chord": "F",
+                "note_name": "A",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a sharp root and a flat root below the tonic: ♯VI is Bb and ♭I is B in C",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:major/bI-#VI-IV-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 4,
+            "fret": 1
+          },
+          {
+            "at_ms": 2300,
+            "string": 2,
+            "fret": 3
+          },
+          {
+            "at_ms": 4050,
+            "string": 3,
+            "fret": 2
+          },
+          {
+            "at_ms": 6400,
+            "string": 1,
+            "fret": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "B",
+                "note_name": "D#",
+                "hit": true
+              },
+              {
+                "chord": "Bb",
+                "note_name": "D",
+                "hit": true
+              },
+              {
+                "chord": "F",
+                "note_name": "A",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "E",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a bare borrowed chord keeps the rule: the minor seventh on ♭VII, the major on I and IV",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:major/I-bVII-IV-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "7",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 2,
+            "fret": 0
+          },
+          {
+            "at_ms": 2300,
+            "string": 3,
+            "fret": 1
+          },
+          {
+            "at_ms": 4050,
+            "string": 1,
+            "fret": 0
+          },
+          {
+            "at_ms": 6400,
+            "string": 2,
+            "fret": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "7",
+            "bars": [
+              {
+                "chord": "C",
+                "note_name": "B",
+                "hit": true
+              },
+              {
+                "chord": "Bb",
+                "note_name": "G#",
+                "hit": true
+              },
+              {
+                "chord": "F",
+                "note_name": "E",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "B",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "the major seventh on a bare ♭VII misses the bar",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:major/I-bVII-IV-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "7",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 2,
+            "fret": 0
+          },
+          {
+            "at_ms": 2300,
+            "string": 3,
+            "fret": 2
+          },
+          {
+            "at_ms": 4050,
+            "string": 1,
+            "fret": 0
+          },
+          {
+            "at_ms": 6400,
+            "string": 2,
+            "fret": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2000,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "7",
+            "bars": [
+              {
+                "chord": "C",
+                "note_name": "B",
+                "hit": true
+              },
+              {
+                "chord": "Bb",
+                "note_name": "G#",
+                "hit": false
+              },
+              {
+                "chord": "F",
+                "note_name": "E",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "B",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a bare chord keeps the rule on any quality: minor sevenths on iv, ♭VI and vii°",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:major/iv-bVI-viio-I",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "7",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 4,
+            "fret": 1
+          },
+          {
+            "at_ms": 2300,
+            "string": 1,
+            "fret": 2
+          },
+          {
+            "at_ms": 4050,
+            "string": 3,
+            "fret": 2
+          },
+          {
+            "at_ms": 6400,
+            "string": 2,
+            "fret": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "7",
+            "bars": [
+              {
+                "chord": "Fm",
+                "note_name": "D#",
+                "hit": true
+              },
+              {
+                "chord": "Ab",
+                "note_name": "F#",
+                "hit": true
+              },
+              {
+                "chord": "Bdim",
+                "note_name": "A",
+                "hit": true
+              },
+              {
+                "chord": "C",
+                "note_name": "B",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a written suffix wins: maj7 asks the major seventh, ø7 the minor, °7 the diminished",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:major/Imaj7-iih7-viio7-bVImaj7",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "7",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 2,
+            "fret": 0
+          },
+          {
+            "at_ms": 2300,
+            "string": 2,
+            "fret": 1
+          },
+          {
+            "at_ms": 4050,
+            "string": 3,
+            "fret": 1
+          },
+          {
+            "at_ms": 6400,
+            "string": 3,
+            "fret": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "7",
+            "bars": [
+              {
+                "chord": "Cmaj7",
+                "note_name": "B",
+                "hit": true
+              },
+              {
+                "chord": "Dm7b5",
+                "note_name": "C",
+                "hit": true
+              },
+              {
+                "chord": "Bdim7",
+                "note_name": "G#",
+                "hit": true
+              },
+              {
+                "chord": "Abmaj7",
+                "note_name": "G",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a written suffix keeps its chord's third",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:major/Imaj7-iih7-viio7-bVImaj7",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 1,
+            "fret": 0
+          },
+          {
+            "at_ms": 2300,
+            "string": 1,
+            "fret": 1
+          },
+          {
+            "at_ms": 4050,
+            "string": 2,
+            "fret": 3
+          },
+          {
+            "at_ms": 6400,
+            "string": 2,
+            "fret": 1
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "Cmaj7",
+                "note_name": "E",
+                "hit": true
+              },
+              {
+                "chord": "Dm7b5",
+                "note_name": "F",
+                "hit": true
+              },
+              {
+                "chord": "Bdim7",
+                "note_name": "D",
+                "hit": true
+              },
+              {
+                "chord": "Abmaj7",
+                "note_name": "C",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a written 7 asks the minor seventh, on I and IV too",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:major/ii7-bVII7-IV7-I7",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "7",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 2,
+            "fret": 1
+          },
+          {
+            "at_ms": 2300,
+            "string": 3,
+            "fret": 1
+          },
+          {
+            "at_ms": 4050,
+            "string": 4,
+            "fret": 1
+          },
+          {
+            "at_ms": 6400,
+            "string": 3,
+            "fret": 3
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "7",
+            "bars": [
+              {
+                "chord": "Dm7",
+                "note_name": "C",
+                "hit": true
+              },
+              {
+                "chord": "Bb7",
+                "note_name": "G#",
+                "hit": true
+              },
+              {
+                "chord": "F7",
+                "note_name": "D#",
+                "hit": true
+              },
+              {
+                "chord": "C7",
+                "note_name": "A#",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a written 7 keeps its chord's third",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:major/ii7-bVII7-IV7-I7",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 1,
+            "fret": 1
+          },
+          {
+            "at_ms": 2300,
+            "string": 2,
+            "fret": 3
+          },
+          {
+            "at_ms": 4050,
+            "string": 3,
+            "fret": 2
+          },
+          {
+            "at_ms": 6400,
+            "string": 1,
+            "fret": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "Dm7",
+                "note_name": "F",
+                "hit": true
+              },
+              {
+                "chord": "Bb7",
+                "note_name": "D",
+                "hit": true
+              },
+              {
+                "chord": "F7",
+                "note_name": "A",
+                "hit": true
+              },
+              {
+                "chord": "C7",
+                "note_name": "E",
                 "hit": true
               }
             ]
