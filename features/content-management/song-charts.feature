@@ -160,7 +160,6 @@ Feature: Author and publish song charts
     Then the change is refused as invalid
     And the verse's progressions are empty
 
-  @wip
   Scenario: A section is tagged with a progression an admin created
     Given "ana" has created the major progression "I-bVII-IV-I"
     And "ana" has a song chart "Sweet Home" in the concert key "D" whose verse has the chords "D C G D"
@@ -220,7 +219,6 @@ Feature: Author and publish song charts
     When "ana" tags the verse of "Amazing Grace" with the progression "minor/i-bVI-bIII-bVII"
     Then the draft lists no unplayed progression
 
-  @wip
   Scenario: A borrowed chord must sound as written
     Given "ana" has created the major progression "I-bVII-IV-I"
     And "ana" has a song chart "Sweet Home" in the concert key "D" whose verse has the chords "D C#dim G D"
