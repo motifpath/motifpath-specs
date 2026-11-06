@@ -110,31 +110,31 @@
     "rationale": "Os dois são Dó. C5 fica uma oitava acima de C4; o número identifica a oitava da referência.",
     "retry": {
       "key": "a-octaves-retry",
-      "prompt": "Pratique de novo: E1 e E2 são duas notas com qual nome?",
+      "prompt": "Pratique de novo: E1 e E2 têm o mesmo nome? Qual é mais aguda?",
       "options": [
         {
           "key": "a",
-          "label": "Ré",
-          "value": "D",
+          "label": "Mesmo nome, e E1 é mais aguda",
+          "value": "same-name-e1-higher",
           "correct": false,
-          "reason": "Ré usa a letra D."
+          "reason": "O número 2 indica a oitava acima da 1."
         },
         {
           "key": "b",
-          "label": "Mi",
-          "value": "E",
+          "label": "Mesmo nome, e E2 é mais aguda",
+          "value": "same-name-e2-higher",
           "correct": true,
-          "reason": "A letra E significa Mi, independentemente da oitava."
+          "reason": "A letra E é a mesma e a oitava 2 é mais aguda."
         },
         {
           "key": "c",
-          "label": "Fá",
-          "value": "F",
+          "label": "Nomes diferentes, e E2 é mais aguda",
+          "value": "different-name-e2-higher",
           "correct": false,
-          "reason": "Fá usa a letra F."
+          "reason": "A letra E é a mesma nas duas notas."
         }
       ],
-      "hint": "Consulte E na tabela e deixe os números de oitava de lado por um instante.",
+      "hint": "Compare a letra primeiro. Depois veja qual número de oitava é maior.",
       "rationale": "As duas notas são Mi. E1 e E2 têm o mesmo nome em registros diferentes; E2 está uma oitava acima de E1."
     }
   },
@@ -714,7 +714,7 @@
         }
       ],
       "hint": "Considere apenas o primeiro par do trecho.",
-      "rationale": "Mi4 até Fá4 tem um semitom. O par seguinte, Fá4 até Sol4, tem dois; por isso a sequência desse trecho é S–T.",
+      "rationale": "Mi4 até Fá4 tem um semitom. O par seguinte, Fá4 até Sol4, tem dois; por isso a sequência desse trecho é S–T. Agora volte à régua de prática e reconte os sete pares, sem consultar a tabela de respostas.",
       "evidence": {
         "midi": [
           64,

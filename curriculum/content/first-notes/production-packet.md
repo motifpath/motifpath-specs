@@ -111,7 +111,7 @@ follow-up questions respect the proposed timing; the editable source contains al
 
 A assumes no pitch recognition. It defines open string, nut, fret and octave notation locally.
 Playing is optional; learners who do not yet tune/play use the complete visual route. B links
-A's exact naming section and repeats the entire essential table/notation bridge inline.
+A's naming and octave sections and repeats the entire essential table/notation bridge inline.
 Complements never hide the central method elsewhere.
 
 ## Assets, rights and accessibility
@@ -148,7 +148,7 @@ created. The neutral chromatic/scale examples are original technical renderings 
 | `el-rock-power-chords` / O braço / “As notas nas cordas Mi e Lá” | Later guitar transfer | Idea-stage, guitar-only; access unverified | A/B guitar reference supplies all positions used here |
 | `ba-root-fifth-octave` / O braço / “As notas nas cordas Mi e Lá” | Later bass transfer | Idea-stage, bass-only; access unverified | A/B bass reference supplies all positions used here |
 | [musictheory.net / Steps and Accidentals](https://www.musictheory.net/lessons/20), opening definitions | After B's keyboard comparison; reinforce one/two steps | English, public URL checked 2026-11-03; lesson cannot be inspected without JavaScript in the text browser, interactive behavior not verified | Complete E–F/C–D method in B |
-| [Ableton Learning Music / Building major scales](https://learningmusic.ableton.com/advanced-topics/building-major-scales.html), opening through the whole/half-step pattern | After B's C-major application | English page text checked 2026-11-03; controls/playback not verified | Complete table, explanatory ruler and practice ruler in B |
+| [Ableton Learning Music / Construindo escalas maiores](https://learningmusic.ableton.com/pt/advanced-topics/building-major-scales.html), opening through the whole/half-step pattern | After B's C-major application | Portuguese page text checked 2026-11-05; controls/playback not verified | Complete table, explanatory ruler and practice ruler in B |
 
 Local plan references: `curriculum/plan/paths/shared.yaml`, `electric-guitar.yaml` and
 `electric-bass.yaml`; all are inspected at the source revision above. External materials

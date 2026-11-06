@@ -114,3 +114,13 @@ person may cover both review roles if their role and actual review are recorded.
 MOT-161 remains in progress until the correction dispositions, human reviews, learner
 observations and installed classification evidence are recorded. MOT-162 follows with
 native delivery validation and the release decision.
+
+## Revision 2 follow-up
+
+- R1: The E1/E2 retry now requires both the shared note name and the higher register.
+- R2: The Mi–Fá support question now directs the learner back to recount all seven distances.
+- R3: The two prerequisite links now point to the naming table and octave explanation separately.
+- R4: Lesson B and the resource map now use the publisher's Portuguese page.
+
+The original review above applies to revision 1. Human music and locale review, learner
+observations and installed classification verification are pending for revision 2.
