@@ -1138,6 +1138,72 @@
       }
     },
     {
+      "name": "a written 7 keeps its chord's third",
+      "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:major/ii7-bVII7-IV7-I7",
+      "response": {
+        "response_type": "timed_taps",
+        "music_key": "C",
+        "tone": "3",
+        "tempo_bpm": 120,
+        "taps": [
+          {
+            "at_ms": 100,
+            "string": 1,
+            "fret": 1
+          },
+          {
+            "at_ms": 2300,
+            "string": 2,
+            "fret": 3
+          },
+          {
+            "at_ms": 4050,
+            "string": 3,
+            "fret": 2
+          },
+          {
+            "at_ms": 6400,
+            "string": 1,
+            "fret": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 400,
+          "answer_key": {
+            "music_key": "C",
+            "tone": "3",
+            "bars": [
+              {
+                "chord": "Dm7",
+                "note_name": "F",
+                "hit": true
+              },
+              {
+                "chord": "Bb7",
+                "note_name": "D",
+                "hit": true
+              },
+              {
+                "chord": "F7",
+                "note_name": "A",
+                "hit": true
+              },
+              {
+                "chord": "C7",
+                "note_name": "E",
+                "hit": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
       "name": "a take with no taps misses every bar of the blues",
       "item_key": "guide_tone:6ea2d087-ab9c-59dc-9657-8546025414d2:12-bar-blues",
       "response": {
