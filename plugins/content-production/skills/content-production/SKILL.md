@@ -1,6 +1,6 @@
 ---
 name: content-production
-version: 1.4.0
+version: 1.4.1
 description: Plan, produce, check and improve MotifPath lessons, exercises and practice resources with practical outcomes, knowledge-map classification and locale-specific language. Use for editorial content production and content presentation storyboards; software implementation and curriculum redesign remain separate tasks.
 ---
 
@@ -146,6 +146,22 @@ fingering conventions and dialect consistently. Explain unavoidable borrowed ter
 names follow the catalog's language keys (`pt_BR`, `en`); display locale codes may differ.
 A translation is another language-specific unit, reviewed for meaning and musical convention,
 not a mixed-language field. Keep English terms musicians actually use where appropriate.
+
+## Choose proportionate checks
+
+For each lesson, perform the editorial walkthrough and use applicable shared validators.
+Check musical accuracy, progression, diagrams, locale and exercise feedback against the
+learning outcome. Record AI self-check and human review separately.
+
+Reuse existing checks for structured content, catalog keys, answer metadata, links and
+asset integrity when available. Introduce a new automated test when changing authoring
+or delivery software, or when a recurring objective error warrants a reusable check.
+Explain the risk it covers and follow the target repository's testing requirements.
+Treat custom preview behavior as software work and validate changes to that behavior.
+
+For final PowerPoint delivery, inspect the rendered slides and check all slides and notes
+for exercise material. Verify platform exercise behavior in its native delivery route.
+Record the checks selected, evidence and pending review in the production packet.
 
 ## Review and deliver
 
