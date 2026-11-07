@@ -317,6 +317,8 @@ skills:
 
   # Reading
   - {key: reading, names: {en: "Reading", pt_BR: "Leitura"}, instruments: all}
+  - {key: interpret-note-names, parent: reading, names: {en: "Interpret note names", pt_BR: "Interpretar os nomes das notas"}, instruments: all, level: B, applies: [note-names, octaves]}
+  - {key: count-semitone-steps, parent: reading, names: {en: "Count semitone steps from a visual reference", pt_BR: "Contar semitons com uma referência visual"}, instruments: all, level: B, applies: [tones-and-semitones, sharps-and-flats]}
   - {key: read-tab, parent: reading, names: {en: "Read tab", pt_BR: "Ler tablatura"}, instruments: fretted, level: B, applies: [tablature, tab-symbols]}
   - {key: read-rhythm-notation, parent: reading, names: {en: "Read rhythm notation", pt_BR: "Ler divisão rítmica"}, instruments: all, level: EI, applies: [rhythm-notation, note-values, dotted-notes]}
   - {key: follow-road-map, parent: reading, names: {en: "Follow a song road map", pt_BR: "Seguir o roteiro da música (ritornelo, casas, coda)"}, instruments: all, level: EI, applies: [road-map-symbols, song-form]}

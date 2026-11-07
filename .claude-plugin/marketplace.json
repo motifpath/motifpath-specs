@@ -4,7 +4,7 @@
     "name": "MotifPath Team"
   },
   "metadata": {
-    "description": "Claude Code skills for the MotifPath platform team — one plugin per skill, versioned independently."
+    "description": "Claude Code skills for the MotifPath platform team \u2014 one plugin per skill, versioned independently."
   },
   "plugins": [
     {
@@ -36,6 +36,11 @@
       "name": "pr-review",
       "source": "./plugins/pr-review",
       "description": "Context-aware pull request review that shares durable guidelines with the team as it finds them."
+    },
+    {
+      "name": "content-production",
+      "source": "./plugins/content-production",
+      "description": "Produce practical, localized, classified learning content and native practice storyboards."
     }
   ]
 }
