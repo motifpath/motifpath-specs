@@ -16,7 +16,7 @@ curriculum_section: Notas
 
 ## Para que você vai usar isso?
 
-Imagine que alguém peça: **“Toque a nota F.”** Saber que F representa Fá permite entender o pedido e procurar essa nota numa referência do instrumento. Você também consegue acompanhar uma indicação escrita como **E–F–G**, mesmo quando outra pessoa usa **Mi–Fá–Sol**.
+Você quer tocar com outras pessoas e aprender suas músicas com cifras e tutoriais, sem travar. Para isso, precisa entender o código que todo músico usa. Num ensaio, alguém diz **“a música está em G”**: saber que G é Sol permite acompanhar a conversa. Em cifras e tutoriais, as notas aparecem como **C, D, E**, mesmo quando você aprendeu **Dó, Ré, Mi**. Com o código, uma indicação como **E–F–G** e outra como **Mi–Fá–Sol** passam a dizer a mesma coisa.
 
 Esses nomes vão reaparecer em melodias, escalas e cifras. Numa cifra, **C** indica o acorde de Dó maior; o nome da nota ajuda a entender o nome do acorde, mas tocar uma nota Dó e tocar o acorde de Dó maior são ações diferentes. Vamos estudar a formação dos acordes em outro momento.
 
@@ -41,6 +41,12 @@ Use a tabela para responder. O objetivo é aprender a consultar a referência; a
 <!-- activity: a-name-f -->
 <fieldset class="practice" data-activity="a-name-f"><legend>Qual letra representa Fá?</legend><label class="choice"><input type="radio" name="a-name-f" value="a"/><span>E</span></label><label class="choice"><input type="radio" name="a-name-f" value="b"/><span>F</span></label><label class="choice"><input type="radio" name="a-name-f" value="c"/><span>G</span></label><details class="hint"><summary>Uma dica</summary><p>Localize Fá na primeira linha da tabela e leia a letra logo abaixo.</p></details><details class="feedback"><summary>Conferir resposta</summary><div><p><strong>Resposta: F.</strong> Fá corresponde a F. As duas formas indicam o mesmo nome de nota.</p><ul><li><strong>Se você escolheu “E”:</strong> E representa Mi. Procure Fá na linha dos nomes.</li><li><strong>Se você escolheu “G”:</strong> G representa Sol. Fá corresponde a outra letra.</li></ul><h4>Pratique de novo</h4><fieldset class="practice" data-activity="a-name-g-retry"><legend>Pratique de novo: qual letra representa Sol?</legend><label class="choice"><input type="radio" name="a-name-g-retry" value="a"/><span>A</span></label><label class="choice"><input type="radio" name="a-name-g-retry" value="b"/><span>F</span></label><label class="choice"><input type="radio" name="a-name-g-retry" value="c"/><span>G</span></label><details class="hint"><summary>Uma dica</summary><p>Consulte a coluna de Sol na tabela.</p></details><details class="feedback"><summary>Conferir resposta</summary><div><p><strong>Resposta: G.</strong> Sol corresponde a G. A consulta funciona nos dois sentidos, nome para letra e letra para nome.</p><ul><li><strong>Se você escolheu “A”:</strong> A corresponde a Lá.</li><li><strong>Se você escolheu “F”:</strong> F corresponde a Fá.</li></ul></div></details></fieldset></div></details></fieldset>
 <!-- /activity -->
+
+## O código também nas mãos
+
+O mesmo código aparece fora do papel. No palco, músicos costumam combinar o tom da música com sinais de mão, com a palma voltada para a banda: um dedo levantado para Dó, dois para Ré, três para Mi, quatro para Fá, a mão aberta para Sol, polegar e mínimo para Lá e polegar e indicador para Si. Em geral, a palma para a frente indica maior e o dorso da mão indica menor; maior e menor são assunto de outra lição. As convenções variam entre grupos, então combine os sinais antes de tocar.
+
+<!-- Revisão pendente: confirmar o sinal de Si com a revisão musical antes da publicação. -->
 
 ## Encontrando os nomes no teclado
 
@@ -94,6 +100,18 @@ Se você já sabe afinar e produzir som no instrumento, pode experimentar as pos
 <fieldset class="practice" data-activity="a-position-g"><legend>Nos dois desenhos da corda Mi, em qual casa está a nota Sol / G?</legend><label class="choice"><input type="radio" name="a-position-g" value="a"/><span>Casa 1</span></label><label class="choice"><input type="radio" name="a-position-g" value="b"/><span>Casa 2</span></label><label class="choice"><input type="radio" name="a-position-g" value="c"/><span>Casa 3</span></label><details class="hint"><summary>Uma dica</summary><p>Procure o rótulo G, depois confira o número da casa na mesma coluna.</p></details><details class="feedback"><summary>Conferir resposta</summary><div><p><strong>Resposta: Casa 3.</strong> Sol está na casa 3: G2 na guitarra e G1 no baixo. O número 3 indica a casa; os números em G2/G1 indicam as oitavas.</p><ul><li><strong>Se você escolheu “Casa 1”:</strong> A primeira casa está identificada como Fá / F.</li><li><strong>Se você escolheu “Casa 2”:</strong> Sol aparece depois da segunda casa, na terceira.</li></ul><h4>Pratique de novo</h4><fieldset class="practice" data-activity="a-position-f-retry"><legend>Pratique de novo: para encontrar Fá / F na corda Mi mostrada, qual posição você consulta?</legend><label class="choice"><input type="radio" name="a-position-f-retry" value="a"/><span>Corda solta</span></label><label class="choice"><input type="radio" name="a-position-f-retry" value="b"/><span>Casa 1</span></label><label class="choice"><input type="radio" name="a-position-f-retry" value="c"/><span>Casa 3</span></label><details class="hint"><summary>Uma dica</summary><p>Traduza Fá para F e procure esse rótulo no desenho.</p></details><details class="feedback"><summary>Conferir resposta</summary><div><p><strong>Resposta: Casa 1.</strong> Fá está na casa 1: F2 na guitarra e F1 no baixo. A posição é semelhante, e os registros são diferentes.</p><ul><li><strong>Se você escolheu “Corda solta”:</strong> A corda solta é Mi nos exemplos.</li><li><strong>Se você escolheu “Casa 3”:</strong> A terceira casa mostra Sol.</li></ul></div></details></fieldset></div></details></fieldset>
 <!-- /activity -->
 
+## Onde cada instrumento toca
+
+Teclado, guitarra e baixo usam os mesmos nomes, mas cada um cobre uma faixa de alturas. Num teclado de 88 teclas, do A0 ao C8, o Dó central é o C4. As faixas abaixo indicam o som real de instrumentos comuns; a extensão muda com o número de casas.
+
+| Instrumento | Faixa aproximada |
+|---|---|
+| Teclado de 88 teclas | A0 a C8 |
+| Guitarra de 22 casas | E2 a D6 |
+| Baixo de 20 casas | E1 a D♯4 |
+
+Numa banda, o **baixo** sustenta o grave, a **guitarra** ocupa o meio e o **teclado** alcança toda a extensão. As faixas se sobrepõem; por isso, quem toca junto costuma dividir as regiões para que os instrumentos não disputem o mesmo espaço.
+
 ## Aplicação: uma pequena frase em dois jeitos de escrever
 
 Leia esta frase de estudo: **Mi–Fá–Sol–Fá–Mi**. Ela começa em Mi, sobe até Sol e retorna a Mi. Você pode acompanhar a ordem apontando cada nome, sem tocar ou cantar.
@@ -104,7 +122,9 @@ Na guitarra ou no baixo dos exemplos, a mesma ordem de posições é **solta–1
 <fieldset class="practice" data-activity="a-phrase"><legend>Como fica E–F–G–F–E usando os nomes em português?</legend><label class="choice"><input type="radio" name="a-phrase" value="a"/><span>Mi–Sol–Fá–Sol–Mi</span></label><label class="choice"><input type="radio" name="a-phrase" value="b"/><span>Mi–Fá–Sol–Fá–Mi</span></label><label class="choice"><input type="radio" name="a-phrase" value="c"/><span>Ré–Mi–Fá–Mi–Ré</span></label><details class="hint"><summary>Uma dica</summary><p>Traduza uma letra por vez. Comece pelo E e mantenha a ordem escrita.</p></details><details class="feedback"><summary>Conferir resposta</summary><div><p><strong>Resposta: Mi–Fá–Sol–Fá–Mi.</strong> A frase é Mi–Fá–Sol–Fá–Mi. Traduzir os nomes não muda a ordem das notas. Nas cordas dos exemplos, as posições são solta–1–3–1–solta.</p><ul><li><strong>Se você escolheu “Mi–Sol–Fá–Sol–Mi”:</strong> F é Fá e G é Sol; confira a ordem das duas letras centrais.</li><li><strong>Se você escolheu “Ré–Mi–Fá–Mi–Ré”:</strong> A primeira letra é E, que corresponde a Mi, e não Ré.</li></ul><h4>Pratique de novo</h4><fieldset class="practice" data-activity="a-phrase-retry"><legend>Pratique de novo: como fica G–F–E em português?</legend><label class="choice"><input type="radio" name="a-phrase-retry" value="a"/><span>Lá–Sol–Fá</span></label><label class="choice"><input type="radio" name="a-phrase-retry" value="b"/><span>Mi–Fá–Sol</span></label><label class="choice"><input type="radio" name="a-phrase-retry" value="c"/><span>Sol–Fá–Mi</span></label><details class="hint"><summary>Uma dica</summary><p>Comece pela letra G, sem ler a sequência de trás para a frente.</p></details><details class="feedback"><summary>Conferir resposta</summary><div><p><strong>Resposta: Sol–Fá–Mi.</strong> G–F–E corresponde a Sol–Fá–Mi. A ordem de leitura faz parte da indicação musical.</p><ul><li><strong>Se você escolheu “Lá–Sol–Fá”:</strong> G corresponde a Sol, não Lá.</li><li><strong>Se você escolheu “Mi–Fá–Sol”:</strong> Essa resposta inverte a ordem da frase.</li></ul></div></details></fieldset></div></details></fieldset>
 <!-- /activity -->
 
-## O que você já consegue conferir
+## Você já fala o código
+
+Lembra do objetivo do começo: tocar com outras pessoas e seguir cifras e tutoriais? Você acabou de dar o primeiro passo. Ler C, D, E como Dó, Ré, Mi e achar essas notas no instrumento é o que permite entender o que a banda pede.
 
 Escolha uma letra na tabela e diga seu nome em português. Encontre um exemplo com esse rótulo. Se houver um número junto à letra, diga que ele identifica a oitava usada na referência.
 

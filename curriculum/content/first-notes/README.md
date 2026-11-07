@@ -40,7 +40,7 @@ a human music/locale review or verify the running MotifPath application.
 
 One pt_BR PowerPoint per lesson, built from revision 2 and the approved 18-slide sequence:
 
-- [Lesson A deck](slides/lesson-a.pt-BR.pptx): 11 slides, “C, D, E…: o código que todo músico usa”.
+- [Lesson A deck](slides/lesson-a.pt-BR.pptx): 15 slides, “C, D, E…: o código que todo músico usa”.
 - [Lesson B deck](slides/lesson-b.pt-BR.pptx): 13 slides, “Nem todo passo é igual: o padrão da escala maior”.
 
 The decks use the MotifPath brand presentation library (content-production 1.4.1). Keyboard,

@@ -313,10 +313,84 @@ def c_major_ruler(slide, x, y, step):
         line(slide, xa, by, xb, by, color=VIOLET if d == 1 else INK, width=2)
         line(slide, xa, by - 8, xa, by, color=VIOLET if d == 1 else INK, width=2)
         line(slide, xb, by - 8, xb, by, color=VIOLET if d == 1 else INK, width=2)
-        label = "S" if d == 1 else "T"
+        # One unit per label: 2 semitones read as 1T (one tone), never "2 T".
+        label = "1S" if d == 1 else "1T"
         text(slide, xa, by + 8, xb - xa, 26,
-             [[(f"{d}  ", {"b": True}), (label, {"b": True, "c": VIOLET if d == 1 else INK})]],
-             size=17, align="c")
+             [[(label, {"b": True, "c": VIOLET if d == 1 else INK})]], size=17, align="c")
+
+
+FINGERS = ("index", "middle", "ring", "pinky")
+
+
+def hand_sign(slide, x, y, w, raised, name):
+    """Original stylized hand (palm facing the viewer): raised fingers are tall, the
+    others are folded stubs. raised: subset of {'thumb', 'index', 'middle', 'ring', 'pinky'}."""
+    u = w / 5
+    palm_x, palm_w = x + 1.1 * u, 3.8 * u
+    palm_y, palm_h = y + 2.4 * u, 1.9 * u
+    for i, finger in enumerate(FINGERS):
+        fx = palm_x + 0.1 * u + i * 0.92 * u
+        up = finger in raised
+        fy = y if up else palm_y - 0.55 * u
+        fh = (palm_y - y) + 0.5 * u if up else 1.0 * u
+        rect(slide, fx, fy, 0.78 * u, fh, fill=VIOLET, shape=MSO_SHAPE.ROUNDED_RECTANGLE,
+             radius=0.5, name=f"{name}: dedo {finger}{' levantado' if up else ''}")
+    rect(slide, palm_x, palm_y, palm_w, palm_h, fill=VIOLET,
+         shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.3, name=f"{name}: palma")
+    if "thumb" in raised:
+        t = rect(slide, x + 0.45 * u, palm_y - 0.7 * u, 0.78 * u, 2.0 * u, fill=VIOLET,
+                 shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.5, name=f"{name}: polegar levantado")
+        t.rotation = -35
+
+
+PIANO_LOW, PIANO_HIGH = 21, 108  # A0–C8 (MIDI)
+WHITE_PCS = {0, 2, 4, 5, 7, 9, 11}
+
+
+def note_label(midi):
+    names = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]
+    return f"{names[midi % 12]}{midi // 12 - 1}"
+
+
+def range_chart(slide, x, y, w, bars):
+    """88-key keyboard A0–C8 with sounding-range bars above it. bars: (label, low, high, fill)."""
+    whites = [m for m in range(PIANO_LOW, PIANO_HIGH + 1) if m % 12 in WHITE_PCS]
+    kw = w / len(whites)
+    index = {m: i for i, m in enumerate(whites)}
+
+    def center(m):
+        return x + (index[m] + 0.5) * kw if m in index else x + (index[m - 1] + 1) * kw
+
+    for row, (label, low, high, fill) in enumerate(bars):
+        by = y + row * 46
+        b = rect(slide, center(low) - kw / 2, by, center(high) - center(low) + kw, 36, fill=fill,
+                 shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.3, name=f"Extensão {label}")
+        label_shape(b, f"{label}  {note_label(low)}–{note_label(high)}", size=15, color=WHITE)
+    ky, kh = y + len(bars) * 46 + 14, 120
+    for m in whites:
+        rect(slide, center(m) - kw / 2, ky, kw, kh, fill=LILAC if m == 60 else WHITE,
+             line=FRET_GRAY, line_w=0.5, name=f"Tecla {note_label(m)}")
+    for m in range(PIANO_LOW, PIANO_HIGH + 1):
+        if m % 12 not in WHITE_PCS:
+            rect(slide, center(m) - kw * 0.3, ky, kw * 0.6, kh * 0.6, fill=INK,
+                 name=f"Tecla {note_label(m)}")
+    for m in whites:
+        if m % 12 == 0:
+            text(slide, center(m) - 40, ky + kh + 8, 80, 22, [[(note_label(m), {"b": m == 60})]],
+                 size=13, color=VIOLET if m == 60 else MUTED, align="c")
+    return ky + kh + 34
+
+
+def tone_split(slide, x, y, w):
+    """One tone drawn as a bar split into two equal semitones (dark slide)."""
+    top = rect(slide, x, y, w, 64, fill=LILAC, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.2,
+               name="1 tom")
+    label_shape(top, "1 tom", size=24, color=INDIGO)
+    half = (w - 12) / 2
+    for i in range(2):
+        h = rect(slide, x + i * (half + 12), y + 80, half, 64, fill="1C1F4A", line=LILAC,
+                 line_w=1.5, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.2, name=f"Semitom {i + 1}")
+        label_shape(h, "1 semitom", size=20, color=WHITE)
 
 
 # ---------------------------------------------------------------- deck assembly
@@ -351,10 +425,11 @@ class Deck:
         text(s, 64, 112, 1150, 60, [[(title, {"b": True})]], size=34, color=WHITE, name="Título")
         return s
 
-    def cover(self, title_lines, result, meta, notes):
+    def cover(self, title_lines, promise, notes):
+        """Title and promise only: level and instrument metadata stay off the cover."""
         s = self._new(FRAME_COVER, notes)
         replace_runs(find_shape(s, "[Lesson title]"), title_lines)
-        replace_runs(find_shape(s, "[A concrete musical result]"), [result, meta])
+        replace_runs(find_shape(s, "[A concrete musical result]"), [promise])
         return s
 
     def closing(self, heading_lines, detail, notes):
@@ -422,32 +497,54 @@ NO_EXERCISES = ("Entrega ao estudante: as atividades desta lição são feitas n
 def build_lesson_a(template, out):
     d = Deck(template)
     d.cover(["C, D, E…"], "O código que todo músico usa",
-            "Iniciante  /  Instrumento opcional",
             "Lição A, pt_BR, versão 2 do artigo (PR #436). " + NO_EXERCISES)
 
     s = d.light("Para que você vai usar isso?",
-                "Abertura de aplicação. Uso imediato: entender um pedido como “toque a nota F” "
-                "e acompanhar E–F–G escrito como Mi–Fá–Sol. Próximos assuntos: melodias, escalas "
-                "e cifras; tocar a nota Dó e tocar o acorde C são ações diferentes. Ao terminar, "
-                "a pessoa relaciona nomes e letras e localiza exemplos com uma referência, sem "
-                "reconhecer notas de ouvido nem decorar o braço. Instrumento é opcional.")
-    two_cards(s, "Agora",
-              ["“Toque a nota F” → Fá", "Mi–Fá–Sol = E–F–G"],
-              "Depois",
-              ["Melodias e escalas", "Cifras: C = acorde de Dó maior"], y=210, h=260, size=26)
+                "Abertura de aplicação. Desejo da pessoa: tocar suas músicas com outras pessoas e "
+                "seguir cifras e tutoriais sem travar. O primeiro passo é o código de nomes: quando "
+                "alguém diz “a música está em G”, você sabe que é Sol; C, D, E deixam de ser letras "
+                "soltas. Numa cifra, C indica o acorde de Dó maior; tocar a nota Dó e tocar o acorde "
+                "são ações diferentes, estudadas depois. A lição não exige reconhecer notas de ouvido "
+                "nem decorar o braço. Instrumento é opcional.")
+    two_cards(s, "Seu objetivo",
+              ["Tocar com outras pessoas", "Seguir cifras e tutoriais sem travar"],
+              "O primeiro passo",
+              ["“Está em G”: você sabe que é Sol", "C, D, E deixam de ser letras soltas"],
+              y=210, h=260, size=24)
+
+    s = d.light("As sete notas",
+                "Construção em três slides. Primeiro, os sete nomes em português, na ordem: Dó, Ré, "
+                "Mi, Fá, Sol, Lá, Si.")
+    names_and_letters(s, 206, letters=False)  # same positions as the next two slides
+
+    s = d.light("Cada nota tem uma letra",
+                "Alternativa textual: Dó=C, Ré=D, Mi=E, Fá=F, Sol=G, Lá=A, Si=B. Leia nos dois "
+                "sentidos: A é Lá.")
+    names_and_letters(s, 206)
 
     s = d.light("Um nome, duas escritas",
-                "Alternativa textual da tabela: Dó=C, Ré=D, Mi=E, Fá=F, Sol=G, Lá=A, Si=B. Leia "
-                "nos dois sentidos: A é Lá. Exemplo resolvido: Mi–Fá–Sol corresponde a E–F–G; "
-                "as notas são as mesmas, muda só a escrita.")
-    text(s, 64, 224, 120, 30, "Nome", size=15, color=MUTED)
-    text(s, 64, 310, 120, 30, "Letra", size=15, color=MUTED)
-    for i, (n, l) in enumerate(zip(NAMES, LETTERS)):
-        cx = 184 + i * 147
-        chip(s, cx, 206, 131, 66, n, fill=WHITE, color=INK, size=24, line_color=RULE)
-        chip(s, cx, 288, 131, 72, l, fill=VIOLET, color=WHITE, size=30)
+                "Resumo da construção. Exemplo resolvido: Mi–Fá–Sol corresponde a E–F–G; as notas "
+                "são as mesmas, muda só a escrita.")
+    names_and_letters(s, 206)
     callout(s, 430, 130, [[("Mi–Fá–Sol  =  E–F–G", {"b": True, "c": VIOLET, "sz": 32})],
                           "Mesmas notas, outra escrita."])
+
+    s = d.light("O código também nas mãos",
+                "Outra forma do mesmo código: no palco, músicos combinam o tom da música com sinais "
+                "de mão, com a palma voltada para a banda. Desenhos originais e simplificados: Dó, "
+                "indicador levantado; Ré, indicador e médio; Mi, três dedos; Fá, quatro dedos; Sol, "
+                "mão aberta; Lá, polegar e mínimo; Si, polegar e indicador. Em geral, a palma para a "
+                "frente indica maior e o dorso da mão indica menor; maior e menor são assunto de "
+                "outra lição. As convenções variam entre grupos: combine os sinais antes de tocar. "
+                "PENDENTE: confirmar o sinal de Si com a revisão musical antes da publicação.")
+    signs = [("Dó", {"index"}), ("Ré", {"index", "middle"}), ("Mi", {"index", "middle", "ring"}),
+             ("Fá", set(FINGERS)), ("Sol", {"thumb", *FINGERS}), ("Lá", {"thumb", "pinky"}),
+             ("Si", {"thumb", "index"})]
+    for i, (n, raised) in enumerate(signs):
+        cx = 72 + i * 164
+        hand_sign(s, cx + 12, 220, 120, raised, f"Sinal de {n}")
+        text(s, cx, 360, 140, 40, [[(n, {"b": True})]], size=26, align="c")
+    text(s, 64, 470, 1152, 50, "No palco, a banda combina o tom com as mãos.", size=24)
 
     s = d.light("Os nomes no teclado",
                 "Alternativa textual: teclas brancas da esquerda para a direita C4, D4, E4, F4, "
@@ -476,7 +573,7 @@ def build_lesson_a(template, out):
     text(s, 64, 520, 1152, 50, "O número indica a oitava, não casa, corda ou dedo.",
          size=22, color=LILAC)
 
-    s = d.light("Palavras do braço",
+    s = d.light("Conhecendo o braço",
                 "Vocabulário: corda solta (tocar sem pressionar uma casa), pestana (peça junto ao "
                 "começo do braço), traste (divisão de metal) e casa (espaço entre dois trastes, "
                 "ou entre a pestana e o primeiro traste). Nos desenhos, o braço está de frente, "
@@ -491,6 +588,19 @@ def build_lesson_a(template, out):
              radius=0.06, name=f"Termo {term}")
         text(s, cx + 24, 252, 230, 36, [[(term, {"b": True})]], size=24, color=VIOLET)
         text(s, cx + 24, 306, 226, 100, desc, size=22)
+
+    s = d.light("Para localizar uma nota",
+                "Método em quatro passos, demonstrado com Sol no slide seguinte: G, rótulo G, casa 3 "
+                "na corda Mi grave (G2 na guitarra, G1 no baixo). A casa 3 é uma posição no braço, "
+                "não uma instrução para usar o terceiro dedo. Tocar é opcional e exige afinação "
+                "padrão: pressione dentro da casa, perto do traste à direita, sem apertar sobre o "
+                "metal.")
+    steps_row(s, [("01", "Nome", "Sol"),
+                  ("02", "Letra", "G"),
+                  ("03", "Rótulo", "Ache G no desenho."),
+                  ("04", "Corda e casa", "Corda Mi, casa 3.")])
+    callout(s, 450, 110, [[("Casa 3 ", {"b": True, "c": VIOLET}),
+                           ("é uma posição, não o terceiro dedo.", {})]], size=24)
 
     s = d.light("Guitarra e baixo: corda Mi",
                 "Alternativa textual. Guitarra, sexta corda em afinação padrão: solta Mi E2, "
@@ -508,17 +618,19 @@ def build_lesson_a(template, out):
     text(s, 64, 570, 1152, 40, "○ corda solta    ● posição na mesma corda",
          size=18, color=MUTED)
 
-    s = d.light("Para localizar uma nota",
-                "Método em quatro passos, demonstrado com Sol: G, rótulo G, casa 3 na corda Mi "
-                "grave (G2 na guitarra, G1 no baixo). A casa 3 é uma posição no braço, não uma "
-                "instrução para usar o terceiro dedo. Tocar é opcional e exige afinação padrão: "
-                "pressione dentro da casa, perto do traste à direita, sem apertar sobre o metal.")
-    steps_row(s, [("01", "Nome", "Sol"),
-                  ("02", "Letra", "G"),
-                  ("03", "Rótulo", "Ache G no desenho."),
-                  ("04", "Corda e casa", "Corda Mi, casa 3.")])
-    callout(s, 450, 110, [[("Casa 3 ", {"b": True, "c": VIOLET}),
-                           ("é uma posição, não o terceiro dedo.", {})]], size=24)
+    s = d.light("Onde cada instrumento toca",
+                "Alternativa textual: teclado de 88 teclas, de A0 a C8, com o Dó central (C4) "
+                "destacado. Faixas de altura real (som que soa): teclado A0–C8; guitarra E2–D6, com "
+                "22 casas; baixo E1–D sustenido 4, com 20 casas. A extensão muda com o número de "
+                "casas. Numa banda, o baixo sustenta o grave, a guitarra ocupa o meio e o teclado "
+                "alcança toda a extensão; as faixas se sobrepõem, por isso os músicos dividem as "
+                "regiões ao tocar juntos.")
+    end = range_chart(s, 64, 196, 1152, [("Teclado", 21, 108, "1C1F4A"),
+                                          ("Guitarra", 40, 86, VIOLET),
+                                          ("Baixo", 28, 63, "4C1D95")])
+    text(s, 64, end + 14, 1152, 40,
+         [[("Baixo", {"b": True}), (" no grave, ", {}), ("guitarra", {"b": True}),
+           (" no meio, ", {}), ("teclado", {"b": True}), (" em toda a extensão.", {})]], size=22)
 
     s = d.light("Aplicação: uma frase",
                 "Frase de estudo original: Mi–Fá–Sol–Fá–Mi, ou E–F–G–F–E. Na corda Mi grave da "
@@ -536,47 +648,59 @@ def build_lesson_a(template, out):
             chip(s, 290 + c_i * 186, ry, 168, 80, v, fill=fill, color=col,
                  size=28 if r_i < 2 else 22, line_color=ln)
 
-    s = d.light("O que você já consegue",
-                "Verificação de sucesso com apoio da tabela e dos desenhos: escolher uma letra e "
-                "dizer seu nome; reconhecer que o número indica a oitava; encontrar o rótulo no "
-                "teclado ou na corda Mi grave e conferir corda e casa. Não mede reconhecimento "
-                "auditivo nem fluência ao tocar. " + NO_EXERCISES)
-    two_cards(s, "Com a tabela", ["Letra → nome", "Número → oitava"],
-              "Com os desenhos", ["Rótulo → tecla", "Rótulo → corda e casa"],
-              y=210, h=260, size=26)
+    s = d.light("Você já fala o código",
+                "Fechamento ligado à abertura. Conquista: ler C, D, E como Dó, Ré, Mi e achar a nota "
+                "no teclado, na guitarra e no baixo com uma referência. Isso aproxima o objetivo da "
+                "abertura: entender o que a banda pede e seguir cifras e tutoriais. Não mede "
+                "reconhecimento auditivo nem fluência ao tocar. " + NO_EXERCISES)
+    two_cards(s, "Você já consegue", ["Ler C, D, E… como Dó, Ré, Mi…", "Achar a nota no instrumento"],
+              "Seu objetivo ficou mais perto", ["Entender o que a banda pede", "Seguir cifras e tutoriais"],
+              y=210, h=260, size=24)
     practice_banner(s, "Atividades desta lição.")
 
     d.closing(["Nem todo passo", "é igual"],
               "Próxima lição: o padrão da escala maior.",
-              "Próxima lição: “Nem todo passo é igual: o padrão da escala maior”. Os nomes dizem quais "
-              "notas procurar; a próxima lição conta a distância entre elas e mostra por que "
-              "alguns nomes vizinhos ficam mais perto que outros.")
+              "Próxima lição: “Nem todo passo é igual: o padrão da escala maior”. Os nomes dizem "
+              "quais notas procurar; a próxima lição conta a distância entre elas e mostra por "
+              "que alguns nomes vizinhos ficam mais perto que outros.")
     d.save(out, "C, D, E…: o código que todo músico usa")
+
+
+def names_and_letters(s, y, letters=True):
+    """Progressive build: identical positions on every slide that reveals the table."""
+    text(s, 64, y + 18, 120, 30, "Nome", size=15, color=MUTED)
+    if letters:
+        text(s, 64, y + 104, 120, 30, "Letra", size=15, color=MUTED)
+    for i, (n, l) in enumerate(zip(NAMES, LETTERS)):
+        cx = 184 + i * 147
+        chip(s, cx, y, 131, 66, n, fill=WHITE, color=INK, size=24, line_color=RULE)
+        if letters:
+            chip(s, cx, y + 82, 131, 72, l, fill=VIOLET, color=WHITE, size=30)
 
 
 def build_lesson_b(template, out):
     d = Deck(template)
     d.cover(["Nem todo passo", "é igual"], "O padrão da escala maior",
-            "Iniciante  /  Instrumento opcional",
             "Lição B, pt_BR, versão 2 do artigo (PR #436). " + NO_EXERCISES)
 
     s = d.light("Para que você vai usar isso?",
-                "Abertura de aplicação. Uso imediato: transformar “suba um tom a partir de Fá” em "
-                "uma contagem de teclas ou casas até a próxima nota da melodia. Próximos assuntos: "
-                "escalas (organizam distâncias), transposição (mudar a nota inicial e manter as "
-                "distâncias), intervalos para acordes e campo harmônico. Hoje: contar um ou dois "
-                "semitons e aplicar em Dó maior, sem instrumento se preferir. Fora do escopo: "
-                "construir acordes, transpor uma escala inteira e reconhecer intervalos de ouvido.")
-    two_cards(s, "Agora",
-              ["“Suba um tom a partir de Fá”", "→ conte teclas ou casas"],
-              "Depois",
-              ["Escalas", "Transposição", "Acordes"], y=210, h=260, size=26)
+                "Abertura de aplicação. Desejo da pessoa: improvisar, criar os próprios solos e tocar "
+                "uma música no tom de quem canta. O primeiro passo é saber quais notas cabem na "
+                "música: a escala maior é o primeiro mapa, e ela nasce de passos de tom e semitom. "
+                "Hoje: contar um ou dois semitons e aplicar em Dó maior, sem instrumento se preferir. "
+                "Fora do escopo: improvisar, construir acordes, transpor uma escala inteira e "
+                "reconhecer intervalos de ouvido.")
+    two_cards(s, "Seu objetivo",
+              ["Improvisar e criar seus solos", "Tocar no tom de quem canta"],
+              "O primeiro passo",
+              ["A escala maior é o primeiro mapa", "Ela nasce de tons e semitons"],
+              y=210, h=260, size=24)
 
     s = d.light("Referência rápida",
-                "Ponte com a lição “C, D, E…: o código que todo músico usa”: seções “Um mesmo nome pode aparecer de duas "
-                "formas” (tabela de nomes e letras) e “O nome se repete; a altura muda” (números "
-                "de oitava). Depois do Si, a sequência recomeça em Dó. Esta lição funciona sem "
-                "abrir a anterior.")
+                "Ponte com a lição “C, D, E…: o código que todo músico usa”: seções “Um mesmo nome "
+                "pode aparecer de duas formas” (tabela de nomes e letras) e “O nome se repete; a "
+                "altura muda” (números de oitava). Depois do Si, a sequência recomeça em Dó. Esta "
+                "lição funciona sem abrir a anterior.")
     for i, (n, l) in enumerate(zip(NAMES, LETTERS)):
         chip(s, 64 + i * 166, 230, 150, 84, f"{n} = {l}", fill=WHITE, color=INK, size=24,
              line_color=RULE)
@@ -584,15 +708,14 @@ def build_lesson_b(template, out):
                            ("mesmo nome, outra oitava.", {})]], size=24)
 
     s = d.dark("A menor contagem",
-               "Nos exemplos, a oitava está dividida em 12 semitons iguais. Um semitom é um passo "
-               "entre alturas vizinhas: a próxima tecla, branca ou preta, ou a próxima casa na "
-               "mesma corda. Um tom são dois semitons. Contamos mudanças; o ponto de partida não "
-               "é um passo.")
-    for i, (big, small) in enumerate((("1 semitom", "próxima tecla ou casa"),
-                                     ("1 tom", "dois semitons"))):
-        cy = 220 + i * 130
-        text(s, 64, cy, 360, 70, [[(big, {"b": True})]], size=44, color=LILAC)
-        text(s, 440, cy + 12, 760, 60, small, size=30, color=WHITE)
+               "Alternativa textual do desenho: uma barra de um tom dividida em duas metades iguais, "
+               "cada uma um semitom. Um semitom é meio tom: a próxima tecla, branca ou preta, ou a "
+               "próxima casa na mesma corda. Um tom são dois semitons. Nos exemplos, a oitava tem "
+               "12 semitons iguais. Contamos mudanças; o ponto de partida não é um passo.")
+    tone_split(s, 64, 220, 560)
+    text(s, 680, 220, 536, 150,
+         [[("1 semitom = ½ tom", {"b": True, "c": LILAC, "sz": 40})],
+          "a próxima tecla ou casa"], size=26, color=WHITE, spacing=10)
     text(s, 64, 520, 1152, 50, "Conte mudanças, não posições.", size=24, color="E4D6FF")
 
     s = d.light("Mi–Fá e Dó–Ré",
@@ -664,11 +787,11 @@ def build_lesson_b(template, out):
          size=44, color=WHITE, spacing=12)
 
     s = d.light("Dó maior",
-                "Alternativa textual da régua: de C4 a C5, posições 0 a 12. Notas naturais em "
-                "0 Dó, 2 Ré, 4 Mi, 5 Fá, 7 Sol, 9 Lá, 11 Si, 12 Dó. Distâncias consecutivas: "
-                "Dó–Ré 2, Ré–Mi 2, Mi–Fá 1, Fá–Sol 2, Sol–Lá 2, Lá–Si 2, Si–Dó 1. Padrão "
-                "T–T–S–T–T–T–S; soma 12 semitons, chegando ao Dó uma oitava acima. Cada espaço "
-                "da régua é um semitom.")
+                "Alternativa textual da régua: de C4 a C5, posições 0 a 12, uma por semitom. Notas "
+                "naturais em 0 Dó, 2 Ré, 4 Mi, 5 Fá, 7 Sol, 9 Lá, 11 Si, 12 Dó. Distâncias "
+                "consecutivas: Dó–Ré 1 tom, Ré–Mi 1 tom, Mi–Fá 1 semitom, Fá–Sol 1 tom, Sol–Lá "
+                "1 tom, Lá–Si 1 tom, Si–Dó 1 semitom. Padrão T–T–S–T–T–T–S; soma 12 semitons, "
+                "chegando ao Dó uma oitava acima.")
     c_major_ruler(s, 112, 200, 88)
     callout(s, 450, 120, [[("T–T–S–T–T–T–S", {"b": True, "c": VIOLET, "sz": 32})],
                           [("T = tom    S = semitom    total: 12 semitons", {"c": MUTED})]])
@@ -687,23 +810,25 @@ def build_lesson_b(template, out):
              color=VIOLET if v == "1" else INK, align="c")
     callout(s, 450, 110, [[("O último passo é menor.", {"b": True, "c": VIOLET})]], size=26)
 
-    s = d.light("O que você já consegue",
-                "Verificação de sucesso com apoio da régua e dos desenhos: contar mudanças a partir "
-                "de zero, incluir a tecla ou casa intermediária, distinguir semitom de tom e "
-                "lembrar que Mi–Fá e Si–Dó têm um semitom. Não mede velocidade, execução nem "
-                "reconhecimento das distâncias pelo som. Recursos externos opcionais (musictheory.net "
-                "e Ableton Learning Music) ficam no artigo e no plano do professor. " + NO_EXERCISES)
-    two_cards(s, "Contar", ["Comece em 0", "Inclua as intermediárias"],
-              "Distinguir", ["1 = semitom, 2 = tom", "Mi–Fá, Si–Dó: semitom"],
-              y=210, h=260, size=26)
+    s = d.light("Você já vê o padrão",
+                "Fechamento ligado à abertura. Conquista: contar tons e semitons e montar Dó maior "
+                "pelo padrão T–T–S–T–T–T–S. Esse padrão é a base para improvisar com a escala e "
+                "tocar em outros tons, que são os objetivos da abertura; improvisar e transpor ainda "
+                "são próximos passos. Não mede velocidade, execução nem reconhecimento das "
+                "distâncias pelo som. Recursos externos opcionais ficam no artigo e no plano do "
+                "professor. " + NO_EXERCISES)
+    two_cards(s, "Você já consegue", ["Contar tons e semitons", "Montar a escala de Dó maior"],
+              "Seu objetivo ficou mais perto", ["Base para improvisar", "e tocar em outros tons"],
+              y=210, h=260, size=24)
     practice_banner(s, "Atividades desta lição.")
 
     d.closing(["Escolha outro par", "e refaça a contagem"],
-              "Depois: escalas, transposição e acordes.",
+              "Depois: escalas em outros tons e improviso.",
               "Próxima ação de prática: escolher outro par na régua e recontar. Depois, usar o "
-              "mesmo raciocínio para estudar outras escalas, transpor pequenas melodias e "
-              "entender os intervalos que formam os acordes.")
+              "mesmo padrão para montar escalas em outros tons, improvisar com elas e entender os "
+              "intervalos que formam os acordes.")
     d.save(out, "Nem todo passo é igual: o padrão da escala maior")
+
 
 if __name__ == "__main__":
     template, out_dir = sys.argv[1], Path(sys.argv[2])
