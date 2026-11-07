@@ -176,9 +176,11 @@ plus the five always-on items.
     injecting state? Does it fake away the very nondeterminism the guarantee has to survive — a
     shuffle replaced by a no-op, a fixed seed, a frozen clock, a fake that never fails? A rule that
     must hold *whatever* the order, timing, or failure needs at least one test where those vary.
-    — *Smell:* a suite that only manipulates internal state and never fires the real event, or
-    fires one part of a multi-part gesture; a guarantee about order or timing tested only with the
-    order or clock pinned.
+    When an expected value changes to make a check pass, was its failure asking for other work, and
+    was that work done? — *Smell:* a suite that only manipulates internal state and never fires the
+    real event, or fires one part of a multi-part gesture; a guarantee about order or timing tested
+    only with the order or clock pinned; an expected value that used to move together with other
+    work, moving alone.
 
 19. **Existing discussion is context.** Prior discussion holds decisions a fresh review can't see.
     Have you listed all discussion (bot and human, resolved and open), fully paginated, and deduped
