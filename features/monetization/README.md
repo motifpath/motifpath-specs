@@ -8,8 +8,8 @@ implementation passes TDD. PR approval accepts proposed API details, not a deplo
 
 The core-domain API lists every commercial operation before core builds it. Until the runtime
 ticket that owns an operation ships, core answers it with `501 Not Implemented` and a JSON body
-whose `message` says the operation isn't available yet, whoever the caller is; only a path or
-query parameter that doesn't parse is still refused with 400 first. The answer changes nothing
+whose `message` says the operation isn't available yet, whoever the caller is; only a request
+whose parameters, headers or JSON body can't be read is still refused with 400 first. The answer changes nothing
 and records nothing. A runtime ticket replaces the 501 with the operation's documented
 responses, under its rollout flag.
 
