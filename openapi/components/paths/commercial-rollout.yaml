@@ -1,0 +1,225 @@
+Rollout:
+  get:
+    operationId: getCommercialRollout
+    summary: Read commercial activation as an administrator
+    description: Backend-resolved administrator only (403 otherwise). Returns every registered flag in
+      the trusted environment, whether or not any flag is on. The environment is the deployment's
+      own and cannot be selected by the caller. If activation storage cannot be read, returns 503;
+      it never reports flags as OFF in place of an error.
+    tags: [Commercial rollout]
+    responses:
+      "200":
+        description: Current activation.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/commercial-rollout.yaml#/CommercialRollout'}
+      "400": {$ref: './subscriptions.yaml#/InvalidRequest'}
+      "401": {$ref: './subscriptions.yaml#/Unauthenticated'}
+      "403":
+        description: Caller is not an administrator.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ForbiddenError'}
+      "503": {$ref: './subscriptions.yaml#/Unavailable'}
+
+Flag:
+  put:
+    operationId: changeCommercialFlag
+    summary: Change one commercial flag's switch and audience
+    description: Backend-resolved administrator only (403 otherwise). Requires expected_revision equal
+      to the current activation revision; a stale revision returns 409 and changes nothing. Same
+      key and same intent returns the original receipt before the revision check; the same key with
+      a different intent returns 409. An applied change increments the activation revision by one
+      and is committed together with audit evidence recording actor, reason and before/after
+      state; if evidence cannot be written, nothing changes and 503 is returned. Enabling a flag
+      never enables its prerequisites or dependents. all_users must be sent explicitly. A group
+      entry naming a group that does not exist returns 400. A change to the current values is
+      still a recorded change. An unregistered flag returns 404.
+    tags: [Commercial rollout]
+    parameters:
+      - name: flag
+        in: path
+        required: true
+        description: Registered flag.
+        schema: {$ref: '../schemas/commercial-rollout.yaml#/FlagName'}
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, administrator, action and flag. Fingerprint the
+          full request intent.
+        schema: {type: string, format: uuid}
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '../schemas/commercial-rollout.yaml#/FlagChange'}
+    responses:
+      "200":
+        description: Recorded change.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/commercial-rollout.yaml#/RolloutCommand'}
+      "400": {$ref: './subscriptions.yaml#/InvalidRequest'}
+      "401": {$ref: './subscriptions.yaml#/Unauthenticated'}
+      "403":
+        description: Caller is not an administrator.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ForbiddenError'}
+      "404": {$ref: './subscriptions.yaml#/NotFound'}
+      "409": {$ref: './subscriptions.yaml#/Conflict'}
+      "503": {$ref: './subscriptions.yaml#/Unavailable'}
+
+KillSwitch:
+  post:
+    operationId: turnOffAllCommercialFlags
+    summary: Turn every commercial flag OFF
+    description: Backend-resolved administrator only (403 otherwise). Sets every flag's enabled to false
+      in one change, keeping all_users and allowlists, and needs no expected revision, so a stale caller can
+      always use it. Increments the activation revision by one and commits audit evidence with it;
+      if evidence cannot be written, nothing changes and 503 is returned. New commercial intents
+      are refused once it commits; intents authorized earlier keep their recorded revision and
+      remain recoverable. Same key and same intent returns the original receipt.
+    tags: [Commercial rollout]
+    parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, administrator and action. Fingerprint the full
+          request intent.
+        schema: {type: string, format: uuid}
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '../schemas/commercial-rollout.yaml#/KillSwitch'}
+    responses:
+      "200":
+        description: Recorded change.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/commercial-rollout.yaml#/RolloutCommand'}
+      "400": {$ref: './subscriptions.yaml#/InvalidRequest'}
+      "401": {$ref: './subscriptions.yaml#/Unauthenticated'}
+      "403":
+        description: Caller is not an administrator.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ForbiddenError'}
+      "409": {$ref: './subscriptions.yaml#/Conflict'}
+      "503": {$ref: './subscriptions.yaml#/Unavailable'}
+
+Groups:
+  get:
+    operationId: listCommercialGroups
+    summary: List rollout groups and their members as an administrator
+    description: Backend-resolved administrator only (403 otherwise). Returns every group in the
+      trusted environment with its members, and the current activation revision. If storage cannot
+      be read, returns 503; it never reports an empty group in place of an error.
+    tags: [Commercial rollout]
+    responses:
+      "200":
+        description: Current groups.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/commercial-rollout.yaml#/CommercialGroups'}
+      "400": {$ref: './subscriptions.yaml#/InvalidRequest'}
+      "401": {$ref: './subscriptions.yaml#/Unauthenticated'}
+      "403":
+        description: Caller is not an administrator.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ForbiddenError'}
+      "503": {$ref: './subscriptions.yaml#/Unavailable'}
+
+Group:
+  put:
+    operationId: saveCommercialGroup
+    summary: Create or rename a rollout group
+    description: Backend-resolved administrator only (403 otherwise). Creates the group with no
+      members, or renames an existing one; membership is never changed here. No expected revision
+      is needed. Same key and same intent returns the original receipt; the same key with a
+      different intent returns 409. An applied change increments the activation revision by one
+      and is committed together with audit evidence; if evidence cannot be written, nothing changes
+      and 503 is returned. Groups are not deleted in the MVP.
+    tags: [Commercial rollout]
+    parameters:
+      - name: slug
+        in: path
+        required: true
+        description: Group slug.
+        schema: {$ref: '../schemas/commercial-rollout.yaml#/GroupSlug'}
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, administrator, action and group. Fingerprint
+          the full request intent.
+        schema: {type: string, format: uuid}
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '../schemas/commercial-rollout.yaml#/GroupChange'}
+    responses:
+      "200":
+        description: Recorded change.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/commercial-rollout.yaml#/RolloutCommand'}
+      "400": {$ref: './subscriptions.yaml#/InvalidRequest'}
+      "401": {$ref: './subscriptions.yaml#/Unauthenticated'}
+      "403":
+        description: Caller is not an administrator.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ForbiddenError'}
+      "409": {$ref: './subscriptions.yaml#/Conflict'}
+      "503": {$ref: './subscriptions.yaml#/Unavailable'}
+
+Membership:
+  post:
+    operationId: changeCommercialGroupMembers
+    summary: Add and remove members of a rollout group
+    description: Backend-resolved administrator only (403 otherwise). Applies the adds and removes as
+      one change. No expected revision is needed, because the request states the wanted membership
+      for each listed user, so removing someone can never be blocked by a stale view. Every id must
+      be an existing core user and may not appear in both lists (400 otherwise). Same key and same
+      intent returns the original receipt; the same key with a different intent returns 409. An
+      applied change increments the activation revision by one, so a removed member is fenced like
+      an OFF change; intents authorized before it keep their recorded revision. Audit evidence
+      recording actor, reason and the members added and removed is committed with it; if it cannot
+      be written, nothing changes and 503 is returned. An unknown group returns 404.
+    tags: [Commercial rollout]
+    parameters:
+      - name: slug
+        in: path
+        required: true
+        description: Group slug.
+        schema: {$ref: '../schemas/commercial-rollout.yaml#/GroupSlug'}
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: UUID scoped by trusted environment, administrator, action and group. Fingerprint
+          the full request intent.
+        schema: {type: string, format: uuid}
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '../schemas/commercial-rollout.yaml#/MembershipChange'}
+    responses:
+      "200":
+        description: Recorded change.
+        content:
+          application/json:
+            schema: {$ref: '../schemas/commercial-rollout.yaml#/RolloutCommand'}
+      "400": {$ref: './subscriptions.yaml#/InvalidRequest'}
+      "401": {$ref: './subscriptions.yaml#/Unauthenticated'}
+      "403":
+        description: Caller is not an administrator.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ForbiddenError'}
+      "404": {$ref: './subscriptions.yaml#/NotFound'}
+      "409": {$ref: './subscriptions.yaml#/Conflict'}
+      "503": {$ref: './subscriptions.yaml#/Unavailable'}

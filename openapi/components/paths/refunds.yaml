@@ -1,0 +1,127 @@
+Requests:
+  post:
+    operationId: requestMyPaymentRefund
+    summary: Request a full refund of a caller-owned payment
+    description: |
+      Record one refund case per successful payment, with durable actor/audit evidence.
+      Derive amount and currency from the backend payment; never accept customer monetary
+      terms or owner identity. Another user's payment is indistinguishable from missing (404).
+      Unsuccessful payments return 409. This operation creates no financial refund or grant removal.
+      Retain cases requiring admin review instead of treating them as commercially eligible.
+      A timely request does not become late merely because admin handling is delayed.
+      Same-key conflicting intent returns 409. Concurrent or different-key requests for the
+      same payment return its existing case with original reason and time intact; retain the
+      new attempts in audit evidence. Acquisition OFF does not prevent existing-payment support.
+    tags: [Refunds]
+    parameters:
+      - $ref: '#/IdempotencyKey'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '../schemas/refunds.yaml#/CreateRefundRequest'}
+    responses:
+      '200': {$ref: '#/CaseResponse'}
+      '400': {$ref: './subscriptions.yaml#/InvalidRequest'}
+      '401': {$ref: './subscriptions.yaml#/Unauthenticated'}
+      '404': {$ref: './subscriptions.yaml#/NotFound'}
+      '409': {$ref: '#/Conflict'}
+      '503': {$ref: './subscriptions.yaml#/Unavailable'}
+
+Request:
+  parameters:
+    - $ref: '#/RefundRequestID'
+  get:
+    operationId: getRefundRequest
+    summary: Read an owned refund case or an admin handling case
+    description: |
+      Return current case state to its payment owner or a registered admin whose role is
+      resolved by the backend. Other callers receive 404 without payment disclosure.
+      Available during acquisition rollback; pending/unknown financial outcomes remain processing.
+      Only backend-verified refund success changes payment-linked access; neither client polling
+      nor the creation/execution request itself proves a successful financial refund.
+    tags: [Refunds]
+    responses:
+      '200': {$ref: '#/CaseResponse'}
+      '400': {$ref: './subscriptions.yaml#/InvalidRequest'}
+      '401': {$ref: './subscriptions.yaml#/Unauthenticated'}
+      '404': {$ref: './subscriptions.yaml#/NotFound'}
+      '503': {$ref: './subscriptions.yaml#/Unavailable'}
+
+Execute:
+  parameters:
+    - $ref: '#/RefundRequestID'
+  post:
+    operationId: executeFullPaymentRefund
+    summary: Execute an eligible full refund as an admin
+    description: |
+      Require an authenticated backend-resolved admin role (403 for non-admins).
+      Accept only requested cases at expected_revision that are commercially_eligible or
+      review_approved by explicit audited admin review. Unreviewed cases are not executable.
+      Record durable operator/reason/operation evidence before external refund work. Return
+      processing while financial outcome is pending/unknown; never infer failure from a timeout.
+      Per-payment financial uniqueness spans request identities and admin actors: concurrent
+      admins cannot initiate a second refund, even with distinct keys. A conflicting or uncertain
+      execution returns 409; reconcile it instead of issuing another external refund.
+      Unresolved competing refund/chargeback settlement also returns 409 until reconciled;
+      verified final lost disputes end only that payment grant and require reconciled
+      returned-money accounting before any additional customer refund.
+      Same-key same-intent replay returns the original operation's current case before checking
+      the originally observed revision. Replays still require admin authorization.
+      A confirmed successful refund returns 100% in the original currency with fees absorbed
+      by MotifPath, ending only its payment-linked access immediately and retaining progress,
+      financial history and independent access. Acquisition switches cannot stop fulfillment.
+      Partial refunds are outside this full-refund surface. Explicit admin review and failed-case
+      recovery have separate revision-checked endpoints; a new key never permits repeating
+      an uncertain financial operation.
+    tags: [Refunds]
+    parameters:
+      - $ref: '#/IdempotencyKey'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '../schemas/refunds.yaml#/ExecuteRefundRequest'}
+    responses:
+      '200': {$ref: '#/CaseResponse'}
+      '400': {$ref: './subscriptions.yaml#/InvalidRequest'}
+      '401': {$ref: './subscriptions.yaml#/Unauthenticated'}
+      '403':
+        description: Caller is not an admin; no financial execution is authorized.
+        content:
+          application/json:
+            schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ForbiddenError'}
+      '404': {$ref: './subscriptions.yaml#/NotFound'}
+      '409': {$ref: '#/Conflict'}
+      '503': {$ref: './subscriptions.yaml#/Unavailable'}
+
+RefundRequestID:
+  name: refund_request_id
+  in: path
+  required: true
+  description: Stable refund case identity, visible only to its payment owner or an admin.
+  schema: {type: string, format: uuid}
+
+IdempotencyKey:
+  name: Idempotency-Key
+  in: header
+  required: true
+  description: |
+    UUID for one logical request or execution, scoped by trusted environment, authenticated
+    actor and action. Fingerprint complete intent, including payment/case, reason and observed
+    revision. Same key with changed intent returns 409; same intent returns the original
+    request/execution's current case without repeating effects after concurrency or restart.
+    Separate business uniqueness prevents two refunds for one payment across different actors
+    or keys. Durable identity and attempts remain traceable after transient cache expiry.
+  schema: {type: string, format: uuid}
+
+CaseResponse:
+  description: Current durable case state; requested/processing is not proof of financial refund success.
+  content:
+    application/json:
+      schema: {$ref: '../schemas/refunds.yaml#/RefundRequest'}
+Conflict:
+  description: Unsuccessful payment, changed idempotency intent, stale revision or an ineligible/conflicting execution state.
+  content:
+    application/json:
+      schema: {$ref: '../../core-domain-service.yaml#/components/schemas/ConflictError'}

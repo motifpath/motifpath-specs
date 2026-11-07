@@ -1,0 +1,299 @@
+FlagName:
+  type: string
+  description: Registered commercial activation flag, without the monetization. prefix.
+  enum:
+    - content_ownership
+    - content_versions
+    - strapi_rights
+    - commercial_validation
+    - entitlement_resolution
+    - access_grants
+    - progress_retention
+    - authorization_enforcement
+    - plus_catalog
+    - plus_webhooks
+    - plus_billing
+    - plus_checkout
+    - teacher_paid_paths
+    - path_purchase
+    - motifpath_purchase
+    - teacher_settlement
+    - private_beta
+
+SubjectId:
+  type: string
+  description: Allowlist entry, one of user:<core user UUID>, group:<group slug> or
+    service:<service name>. A group entry allows every user who is a member of that group.
+  pattern: "^(user:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|group:[a-z][a-z0-9-]{0,62}|service:[a-z][a-z0-9-]{0,62})$"
+  maxLength: 80
+
+GroupSlug:
+  type: string
+  description: Stable identifier of a rollout group, such as beta or friends-and-family.
+  pattern: "^[a-z][a-z0-9-]{0,62}$"
+
+FlagState:
+  type: object
+  description: One flag's configured and effective activation in this environment.
+  additionalProperties: false
+  required:
+    - flag
+    - enabled
+    - all_users
+    - subject_ids
+    - prerequisites
+    - effective
+    - updated_at
+    - updated_by
+  properties:
+    flag:
+      $ref: "#/FlagName"
+      description: Registered flag.
+    enabled:
+      type: boolean
+      description: Configured switch. Starts false in every environment.
+    all_users:
+      type: boolean
+      description: When true and enabled, every authenticated user is allowed. Services are never
+        covered by it and must still be listed. Starts false in every environment.
+    subject_ids:
+      type: array
+      description: Users, groups and services allowed when enabled. With all_users false, an empty
+        list allows no one; there is no wildcard entry.
+      maxItems: 500
+      uniqueItems: true
+      items:
+        $ref: "#/SubjectId"
+        description: One allowed subject.
+    prerequisites:
+      type: array
+      description: Flags that must also allow the operation's subject before this flag allows it.
+      uniqueItems: true
+      items:
+        $ref: "#/FlagName"
+        description: One prerequisite.
+    effective:
+      type: boolean
+      description: True when enabled and every prerequisite is effective. The audience still applies.
+    updated_at:
+      type:
+        - string
+        - "null"
+      format: date-time
+      description: When this flag last changed, or null if it never has.
+    updated_by:
+      type:
+        - string
+        - "null"
+      format: uuid
+      description: Administrator who last changed it, or null if it never has.
+
+CommercialRollout:
+  type: object
+  description: Every registered flag's activation in the trusted environment, at one revision.
+  additionalProperties: false
+  required:
+    - revision
+    - flags
+  properties:
+    revision:
+      type: integer
+      minimum: 0
+      description: Environment-wide activation revision; 0 before the first change, plus one per
+        applied change.
+    flags:
+      type: array
+      description: One entry per registered flag, in registry order.
+      items:
+        $ref: "#/FlagState"
+        description: One flag.
+
+FlagChange:
+  type: object
+  description: Replace one flag's switch and audience.
+  additionalProperties: false
+  required:
+    - expected_revision
+    - enabled
+    - all_users
+    - subject_ids
+    - reason
+  properties:
+    expected_revision:
+      type: integer
+      minimum: 0
+      description: Activation revision the administrator observed.
+    enabled:
+      type: boolean
+      description: New switch value.
+    all_users:
+      type: boolean
+      description: New all-users value. Must be sent explicitly, so opening a flag to everyone is
+        never a default.
+    subject_ids:
+      type: array
+      description: New complete allowlist; replaces the previous one. Every group entry must name an
+        existing group.
+      maxItems: 500
+      uniqueItems: true
+      items:
+        $ref: "#/SubjectId"
+        description: One allowed subject.
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 1000
+      description: Why the change is made; recorded in the audit evidence.
+
+KillSwitch:
+  type: object
+  description: Turn every flag OFF at once, keeping each flag's audience.
+  additionalProperties: false
+  required:
+    - reason
+  properties:
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 1000
+      description: Why everything is turned off; recorded in the audit evidence.
+
+RolloutCommand:
+  type: object
+  description: Durable receipt for an activation change.
+  additionalProperties: false
+  required:
+    - operation_id
+    - status
+    - revision
+    - evidence_entry_id
+  properties:
+    operation_id:
+      type: string
+      format: uuid
+      description: Durable scoped logical identity of the change.
+    status:
+      type: string
+      description: Activation changes commit atomically, so they are applied or not recorded.
+      enum:
+        - applied
+    revision:
+      type: integer
+      minimum: 1
+      description: Activation revision produced by this change.
+    evidence_entry_id:
+      type: string
+      format: uuid
+      description: Audit evidence committed with the change.
+
+CommercialGroup:
+  type: object
+  description: A named set of users that flags can allow as one allowlist entry.
+  additionalProperties: false
+  required:
+    - slug
+    - name
+    - member_ids
+    - updated_at
+    - updated_by
+  properties:
+    slug:
+      $ref: "#/GroupSlug"
+      description: Stable identifier; referenced from allowlists as group:<slug>.
+    name:
+      type: string
+      minLength: 1
+      maxLength: 120
+      description: Display name for administrators.
+    member_ids:
+      type: array
+      description: Core user ids of the members. A group holds users only; groups do not nest.
+      maxItems: 5000
+      uniqueItems: true
+      items:
+        type: string
+        format: uuid
+        description: One member.
+    updated_at:
+      type: string
+      format: date-time
+      description: When the group or its membership last changed.
+    updated_by:
+      type: string
+      format: uuid
+      description: Administrator who last changed it.
+
+CommercialGroups:
+  type: object
+  description: Every rollout group in the trusted environment, at one activation revision.
+  additionalProperties: false
+  required:
+    - revision
+    - groups
+  properties:
+    revision:
+      type: integer
+      minimum: 0
+      description: Environment-wide activation revision, shared with flag changes.
+    groups:
+      type: array
+      description: Every group, ordered by slug. Empty before the first group is created.
+      items:
+        $ref: "#/CommercialGroup"
+        description: One group.
+
+GroupChange:
+  type: object
+  description: Create a group, or rename an existing one. Membership is unchanged.
+  additionalProperties: false
+  required:
+    - name
+    - reason
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 120
+      description: Display name.
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 1000
+      description: Why the change is made; recorded in the audit evidence.
+
+MembershipChange:
+  type: object
+  description: Add and remove group members in one change. Adding a current member or removing a
+    non-member is not an error; the result is the requested membership.
+  additionalProperties: false
+  required:
+    - add
+    - remove
+    - reason
+  anyOf:
+    - properties: {add: {minItems: 1}}
+    - properties: {remove: {minItems: 1}}
+  properties:
+    add:
+      type: array
+      description: Core user ids to make members.
+      maxItems: 500
+      uniqueItems: true
+      items:
+        type: string
+        format: uuid
+        description: One user.
+    remove:
+      type: array
+      description: Core user ids to remove. A user may not appear in both lists.
+      maxItems: 500
+      uniqueItems: true
+      items:
+        type: string
+        format: uuid
+        description: One user.
+    reason:
+      type: string
+      minLength: 1
+      maxLength: 1000
+      description: Why the change is made; recorded in the audit evidence.

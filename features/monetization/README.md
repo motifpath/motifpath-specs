@@ -1,0 +1,123 @@
+# Monetization contracts — MOT-117
+
+This directory is the consolidated contract index for the monetization epic. Business decisions
+from 2026-10-13 through 2026-10-15 are incorporated; scenarios remain `@wip` until runtime
+implementation passes TDD. PR approval accepts proposed API details, not a deployment.
+
+## Operations not yet built
+
+The core-domain API lists every commercial operation before core builds it. Until the runtime
+ticket that owns an operation ships, core answers it with `501 Not Implemented` and a JSON body
+whose `message` says the operation isn't available yet, whoever the caller is; only a request
+whose parameters, headers or JSON body can't be read is still refused with 400 first. The answer changes nothing
+and records nothing. A runtime ticket replaces the 501 with the operation's documented
+responses, under its rollout flag.
+
+## Decisions and source contracts
+
+- [ADR-059: commercial authority, audit and idempotency](../../adrs/ADR-059-commercial-authority-audit-and-idempotency.md), accepted; renumbered from the colliding ADR-057 without changing the decision.
+- [ADR-058: Stripe](../../adrs/ADR-058-stripe-payment-provider.md), accepted.
+- [ADR-060: transactional records and recovery](../../adrs/ADR-060-commercial-records-and-recovery.md), accepted by Gilson Yamada on 2026-10-15.
+- [ADR-071: two commercial products](../../adrs/ADR-071-two-commercial-products.md), accepted 2026-10-29: one platform subscription plus permanent teacher-path purchases; content-scoped subscriptions and the teacher embedding license are removed.
+- [ADR-069: commercial activation admin API](../../adrs/ADR-069-commercial-activation-admin-api.md), accepted by Gilson Yamada on 2026-11-06: activation stored in core, changed through a dedicated audited admin API with a kill switch; audiences are users, groups (beta, friends-and-family), services, or all users.
+- [ADR-068: buy once or Plus on MotifPath content](../../adrs/ADR-068-buy-once-motifpath-content.md), accepted 2026-11-01: an administrator may add a one-time offer, with no commission, to a MotifPath-owned course or path; subscribers are not offered it, and owned stays owned.
+- [Commercial architecture and policies](../../openapi/commerce-contract.md): ownership, manifests, grants, ledger/rounding, settlement, refunds/disputes, CMS, delivery, retention and recovery.
+- [Core-domain API](../../openapi/core-domain-service.yaml): existing subscription/refund/Stripe/audit/access operations plus consolidated commerce operations.
+- [Commercial domain schemas](../../openapi/components/schemas/commerce.yaml) and [private message schemas](../../openapi/components/schemas/commercial-messages.yaml).
+- [Stripe processing profile](../../openapi/stripe-event-processing.md): verified receipts, account/mode isolation, uniqueness and recovery.
+
+## Behavior coverage
+
+| Contract | Coverage |
+|---|---|
+| [Subscription lifecycle](subscription-lifecycle.feature) | Platform monthly and annual billing, renewal, cancellation, grace and retained completion |
+| [Subscription commands](subscription-commands.feature) | Caller ownership, revisions, rollback and durable idempotency |
+| [Refunds and chargebacks](refunds-and-chargebacks.feature) | Refund scope, paid-access window, independent grants and pending disputes |
+| [Refund commands](refund-commands.feature) | Caller cases, admin execution and per-payment uniqueness |
+| [Teacher commercial rights](teacher-commercial-rights.feature) | Permanent purchases, retained copies, free updates and future-earnings recovery |
+| [Teacher selling contracts](teacher-selling-contracts.feature) | Selling terms, own sales by period with refund recovery, transfers by period, payout account, onboarding and dashboard, sale blockers (MOT-130) |
+| [Stripe ingestion](stripe-payment-ingestion.feature) | Verified payment receipts and acquisition intent |
+| [Payment reconciliation](payment-reconciliation.feature) | Duplicate/out-of-order recovery, unknown outcomes and notices |
+| [Commercial audit](commercial-audit.feature) | Immutable evidence, attempts, causality and admin inspection |
+| [Commercial access](commercial-access.feature) | Caller copy, independent rights, privacy and delivery-time checks |
+| [Commercial activation](commercial-activation.feature) | Admin rollout API, default OFF, audiences (users, groups, services, all users), prerequisites, kill switch and OFF fencing (MOT-181, ADR-069) |
+| [Content ownership](content-ownership.feature) | Ownership at creation, persistence across edits and learner copies, admin-only corrections, rollout OFF and legacy backfill (MOT-118) |
+| [Content contracts](commercial-content-contracts.feature) | Provenance, immutable manifests, platform premium dependencies and withdrawal |
+| [Acquisition contracts](commercial-acquisition-contracts.feature) | Configured offers, path checkout and holdings |
+| [Financial contracts](commercial-financial-contracts.feature) | Exact refund deadline, admin review/retry, final disputes, rounding and settlement |
+| [Integration contracts](commercial-integration-contracts.feature) | CMS hints, private messages, audit coupling, media bypass and restore fencing |
+
+## Rollout controls
+
+[Commercial activation registry](../../openapi/commercial-rollout-contract.md) defines approved
+MOT-115-r5 names, ownership, default-OFF targeting, independent readiness tracks and audited
+rollback. [Commercial control scenarios](commercial-controls.feature) cover activation boundaries.
+Gilson approved registry revision MOT-115-r5 on 2026-11-02; Figma approvals remain separate.
+
+## Deliverable and flag mapping
+
+Flag names below match MOT-115-r5, explicitly approved by Gilson Yamada on 2026-11-02.
+Every default is OFF. New actions require backend evaluation and cohort
+approval; OFF never disables existing rights, progress, audit, cancellation, refund, reconciliation
+or settlement obligations. UI mirrors decisions. Plus and teacher commerce have separate readiness.
+
+| Ticket | Flag(s), prefix `monetization.` | Contract surface and scenarios |
+|---|---|---|
+| MOT-181 | none (foundation) | Commercial audit write path and hot-store admin read, durable idempotent commands, rollout API and evaluation; audit, controls and activation scenarios |
+| MOT-118 | content_ownership | Commerce ownership read/correction; content ownership scenarios |
+| MOT-119 | content_versions | Immutable commercial release manifests; preserve existing course/path copies and ADR-055 |
+| MOT-120 | strapi_rights | CMS hint API, field authority/mapping/reconciliation; integration contracts |
+| MOT-121 | commercial_validation | Release and sale-state commands, transitive dependency validation; content contracts |
+| MOT-122 | entitlement_resolution | Commercial access API and grant schema; access scenarios |
+| MOT-123 | access_grants | Typed grant/payment/purchase facts; acquisition, refund and reconciliation scenarios |
+| MOT-124 | progress_retention | Existing worker-owned progress, completed-lesson retention; lifecycle/access scenarios |
+| MOT-125 | authorization_enforcement | Protected lesson/exercise/media/export boundaries; integration/access failure scenarios |
+| MOT-127 | plus_catalog, plus_checkout | Subscription offer configuration/list and checkout; subscription/acquisition scenarios |
+| MOT-128 | plus_webhooks, plus_checkout | Stripe receipt and verified payment processing; ingestion/reconciliation scenarios |
+| MOT-129 | plus_billing | Cancellation/switch, renewal grace and notices; lifecycle/command/recovery scenarios |
+| MOT-131 | teacher_paid_paths, path_purchase, motifpath_purchase | Sale-state/offer, sale blockers, selling terms, checkout and permanent holdings for teacher and MotifPath-owned courses/paths; acquisition/content/access/teacher-selling scenarios |
+| MOT-133 | teacher_settlement | Full refund review/retry, journal, balances/settlement history, teacher sales list, payout account and onboarding link, internal transfer obligations; financial/teacher-selling scenarios |
+| MOT-134 | each affected flag | End-to-end acquisition, refund, expiry, retained purchase and failed delivery scenarios across this directory |
+| MOT-135 | each affected flag | OFF/restart/replay scenarios; no lost existing obligation or unrestricted protected content |
+| MOT-136 | plus_webhooks, access_grants, strapi_rights, teacher_settlement, private_beta | Recovery/alerts, journal/inbox/outbox/evidence integrity and CMS reconciliation |
+| MOT-137 | private_beta | Independent Plus-first and teacher readiness; scoped cohorts with all existing-right safeguards |
+
+MOT-114/115/116/117 and MOT-126/130 are audit, registry, design or contract gates, not separate
+runtime switches. MOT-119 implementation must preserve existing lesson rendering/update behavior;
+commercial manifests do not replace live path editing with a new publication/version process.
+
+## Reviewed acquisition and pricing boundaries
+
+Buyer path offers require full manifest/dependency validation. MotifPath premium exercises in a
+paid teacher path are covered by the platform commission; the teacher buys nothing first. MOT-132
+(embedding licenses) closed with ADR-071.
+Subscription price replacements require expected_offer_id (null for first creation), with
+atomic comparison/promotion. Admin current-offer reads work even when acquisition is OFF.
+
+## Audit retention and asynchronous export
+
+The recent Postgres audit table has a **30-day (720-hour) TTL from recorded_at**. A separate
+asynchronous worker exports hourly batches to S3 Object Lock, with an alert when the oldest
+unverified entry exceeds two hours. Hourly cleanup deletes expired hot rows only after exact archival proof
+and hold checks. Failed export or verification retains evidence beyond TTL and raises alerts.
+Financial/idempotency records have separate lifecycles; the audit TTL cannot erase them.
+Long-term archive retention remains seven years after closure. Audit reads span both stores
+through a mandatory compact operation/resource locator index, retained with the archive.
+Cleanup requires complete verified locator coverage; historical reads fetch only matching
+page batches and fail explicitly if the index is unavailable/rebuilding.
+See [the export/cleanup contract](../../openapi/commerce-contract.md#hot-audit-ttl-and-asynchronous-archival)
+and [retention scenarios](audit-archival.feature).
+
+## Acceptance and remaining external gates
+
+ADR-060 was accepted by Gilson Yamada on 2026-10-15. MOT-117 contracts are merged into the epic.
+No runtime evidence is claimed by syntax/schema checks. Gilson approved MOT-115-r5 on 2026-11-02
+and the MOT-116 Figma revision r5 on 2026-11-01; later UX changes need renewed approval, and no
+deployment approval is implied.
+
+Deployment inputs remain explicit: approved prices/discounts/bounds/commissions and BRL offers;
+Brazilian Stripe/Connect capabilities, fees and refund liquidity; pinned compatible SDK and CMS
+runtime when provisioned; credential rotation, retention/privacy approval and tested restore/media
+protection. Missing configuration keeps the relevant acquisition OFF. USD, partial-refund automatic
+execution, alternative providers and changes to existing learner update semantics are not enabled.
+Gilson owns commercial rollout, reconciliation and editorial approval. Plans/research stay local.

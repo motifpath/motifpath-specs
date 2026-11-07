@@ -1,0 +1,54 @@
+CommercialAccessDecision:
+  type: object
+  additionalProperties: false
+  description: Current commercial evaluation only; never a bearer capability or full learning authorization.
+  required: [decision_id, student_path_id, content_node_id, evaluated_at, policy_revision, status, reasons]
+  properties:
+    decision_id:
+      type: string
+      format: uuid
+      description: Server-issued unique evaluation identity linked to attributable evidence and the trusted learner.
+    student_path_id:
+      type: string
+      format: uuid
+      description: Caller-owned copy used to resolve authoritative commercial coverage.
+    content_node_id:
+      type: string
+      format: uuid
+      description: Lesson member of that copy evaluated for commercial access.
+    evaluated_at:
+      type: string
+      format: date-time
+      description: Trusted server instant of evaluation, not an authorization expiry or client-selected time.
+    policy_revision:
+      type: string
+      minLength: 1
+      description: Immutable revision of the approved policy applied to this evaluation.
+    status:
+      type: string
+      enum: [allowed, blocked]
+      description: Whether the commercial boundary permits the lesson; learning prerequisites are separate.
+    reasons:
+      type: array
+      minItems: 1
+      maxItems: 6
+      uniqueItems: true
+      description: All established applicable access bases, or no_valid_grant when every applicable basis is absent.
+      items:
+        type: string
+        enum: [free_content, paid_subscription, renewal_grace, permanent_purchase, completed_lesson_retention, no_valid_grant]
+  allOf:
+    - if:
+        properties:
+          status: {const: blocked, description: A blocked result has no established applicable access basis.}
+      then:
+        properties:
+          reasons:
+            const: [no_valid_grant]
+            description: Blocking requires absence of every applicable independent commercial right.
+      else:
+        properties:
+          reasons:
+            not:
+              contains: {const: no_valid_grant}
+            description: Allowed decisions identify established access bases without a contradictory denial.

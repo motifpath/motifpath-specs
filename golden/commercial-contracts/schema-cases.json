@@ -1,0 +1,1712 @@
+[
+  {
+    "name": "positive money",
+    "schema": "commerce.yaml#/PositiveMoney",
+    "value": {
+      "amount_minor": 100,
+      "currency": "BRL"
+    },
+    "valid": true
+  },
+  {
+    "name": "offer",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "path_purchase",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "teacher",
+      "seller_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "checkout pending",
+    "schema": "commerce.yaml#/Checkout",
+    "value": {
+      "checkout_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "offer": {
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "kind": "path_purchase",
+        "content": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "release_id": "12345678-1234-4234-8234-123456789012",
+        "price": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "configuration_revision": "1",
+        "seller_kind": "teacher",
+        "seller_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "status": "pending",
+      "fulfillment_status": "not_started"
+    },
+    "valid": true
+  },
+  {
+    "name": "configuration input",
+    "schema": "commerce.yaml#/ConfigurationInput",
+    "value": {
+      "enabled_currencies": [
+        "BRL"
+      ],
+      "teacher_minimum": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "teacher_maximum": {
+        "amount_minor": 50000,
+        "currency": "BRL"
+      },
+      "commission_basis_points": 2000,
+      "teacher_fee_basis_points": 0,
+      "reason": "Approved configuration",
+      "expected_revision": 0
+    },
+    "valid": true
+  },
+  {
+    "name": "payment",
+    "schema": "commerce.yaml#/Payment",
+    "value": {
+      "payment_id": "12345678-1234-4234-8234-123456789012",
+      "holder_id": "12345678-1234-4234-8234-123456789012",
+      "amount": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "provider_account_id": "acct_verified",
+      "provider_payment_id": "pi_verified",
+      "paid_at": "2026-10-15T12:00:00Z",
+      "access_available_at": null,
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "grant",
+    "schema": "commerce.yaml#/Grant",
+    "value": {
+      "grant_id": "12345678-1234-4234-8234-123456789012",
+      "holder_id": "12345678-1234-4234-8234-123456789012",
+      "scope": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "basis": "permanent_purchase",
+      "status": "active",
+      "source_id": "12345678-1234-4234-8234-123456789012",
+      "valid_from": "2026-10-15T12:00:00Z",
+      "valid_until": null,
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "private payment message",
+    "schema": "commercial-messages.yaml#/CommercialMessage",
+    "value": {
+      "message_id": "12345678-1234-4234-8234-123456789012",
+      "version": 1,
+      "environment": "test",
+      "operation": {
+        "operation_id": "12345678-1234-4234-8234-123456789012",
+        "actor_id": "12345678-1234-4234-8234-123456789012",
+        "action": "acquire",
+        "resource_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "correlation_id": "12345678-1234-4234-8234-123456789012",
+      "caused_by_entry_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_revision": 1,
+      "occurred_at": "2026-10-15T12:00:00Z",
+      "type": "payment.verified",
+      "payload": {
+        "payment_id": "12345678-1234-4234-8234-123456789012",
+        "holder_id": "12345678-1234-4234-8234-123456789012",
+        "amount": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "provider_account_id": "acct_verified",
+        "provider_payment_id": "pi_verified",
+        "paid_at": "2026-10-15T12:00:00Z",
+        "access_available_at": null,
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": true
+  },
+  {
+    "name": "invalid positive amount 0",
+    "schema": "commerce.yaml#/PositiveMoney",
+    "value": {
+      "amount_minor": 0,
+      "currency": "BRL"
+    },
+    "valid": false
+  },
+  {
+    "name": "invalid positive amount -1",
+    "schema": "commerce.yaml#/PositiveMoney",
+    "value": {
+      "amount_minor": -1,
+      "currency": "BRL"
+    },
+    "valid": false
+  },
+  {
+    "name": "invalid positive amount 1.5",
+    "schema": "commerce.yaml#/PositiveMoney",
+    "value": {
+      "amount_minor": 1.5,
+      "currency": "BRL"
+    },
+    "valid": false
+  },
+  {
+    "name": "invalid positive amount 9007199254740992",
+    "schema": "commerce.yaml#/PositiveMoney",
+    "value": {
+      "amount_minor": 9007199254740992,
+      "currency": "BRL"
+    },
+    "valid": false
+  },
+  {
+    "name": "bad currency",
+    "schema": "commerce.yaml#/Money",
+    "value": {
+      "amount_minor": 100,
+      "currency": "brl"
+    },
+    "valid": false
+  },
+  {
+    "name": "injected owner",
+    "schema": "commerce.yaml#/CheckoutRequest",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "owner_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "ready without URL",
+    "schema": "commerce.yaml#/Checkout",
+    "value": {
+      "checkout_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "offer": {
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "kind": "path_purchase",
+        "content": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "release_id": "12345678-1234-4234-8234-123456789012",
+        "price": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "configuration_revision": "1",
+        "seller_kind": "teacher",
+        "seller_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "status": "ready",
+      "fulfillment_status": "not_started"
+    },
+    "valid": false
+  },
+  {
+    "name": "unpaid applied fulfillment",
+    "schema": "commerce.yaml#/Checkout",
+    "value": {
+      "checkout_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "offer": {
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "kind": "path_purchase",
+        "content": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "release_id": "12345678-1234-4234-8234-123456789012",
+        "price": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "configuration_revision": "1",
+        "seller_kind": "teacher",
+        "seller_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "status": "pending",
+      "fulfillment_status": "applied"
+    },
+    "valid": false
+  },
+  {
+    "name": "paid pending fulfillment",
+    "schema": "commerce.yaml#/Checkout",
+    "value": {
+      "checkout_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "offer": {
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "kind": "path_purchase",
+        "content": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "release_id": "12345678-1234-4234-8234-123456789012",
+        "price": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "configuration_revision": "1",
+        "seller_kind": "teacher",
+        "seller_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "status": "paid",
+      "fulfillment_status": "pending"
+    },
+    "valid": true
+  },
+  {
+    "name": "ready valid",
+    "schema": "commerce.yaml#/Checkout",
+    "value": {
+      "checkout_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "offer": {
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "kind": "path_purchase",
+        "content": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "release_id": "12345678-1234-4234-8234-123456789012",
+        "price": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "configuration_revision": "1",
+        "seller_kind": "teacher",
+        "seller_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "status": "ready",
+      "fulfillment_status": "not_started",
+      "checkout_url": "https://checkout.stripe.com/example",
+      "expires_at": "2026-10-15T12:00:00Z"
+    },
+    "valid": true
+  },
+  {
+    "name": "URL on paid receipt",
+    "schema": "commerce.yaml#/Checkout",
+    "value": {
+      "checkout_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "offer": {
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "kind": "path_purchase",
+        "content": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "release_id": "12345678-1234-4234-8234-123456789012",
+        "price": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "configuration_revision": "1",
+        "seller_kind": "teacher",
+        "seller_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "status": "paid",
+      "fulfillment_status": "applied",
+      "checkout_url": "https://checkout.stripe.com/example"
+    },
+    "valid": false
+  },
+  {
+    "name": "injected config identity",
+    "schema": "commerce.yaml#/ConfigurationInput",
+    "value": {
+      "enabled_currencies": [
+        "BRL"
+      ],
+      "teacher_minimum": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "teacher_maximum": {
+        "amount_minor": 50000,
+        "currency": "BRL"
+      },
+      "commission_basis_points": 2000,
+      "teacher_fee_basis_points": 0,
+      "reason": "Approved configuration",
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "expected_revision": 0
+    },
+    "valid": false
+  },
+  {
+    "name": "returned config identity",
+    "schema": "commerce.yaml#/Configuration",
+    "value": {
+      "enabled_currencies": [
+        "BRL"
+      ],
+      "teacher_minimum": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "teacher_maximum": {
+        "amount_minor": 50000,
+        "currency": "BRL"
+      },
+      "commission_basis_points": 2000,
+      "teacher_fee_basis_points": 0,
+      "reason": "Approved configuration",
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "revision": 1
+    },
+    "valid": true
+  },
+  {
+    "name": "commission out of range",
+    "schema": "commerce.yaml#/ConfigurationInput",
+    "value": {
+      "enabled_currencies": [
+        "BRL"
+      ],
+      "teacher_minimum": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "teacher_maximum": {
+        "amount_minor": 50000,
+        "currency": "BRL"
+      },
+      "commission_basis_points": 10001,
+      "teacher_fee_basis_points": 0,
+      "reason": "Approved configuration",
+      "expected_revision": 0
+    },
+    "valid": false
+  },
+  {
+    "name": "review with undocumented basis",
+    "schema": "commerce.yaml#/ReviewedRefund",
+    "value": {
+      "expected_revision": 1,
+      "decision": "approve_full_refund",
+      "policy_basis": "",
+      "reason": "review"
+    },
+    "valid": false
+  },
+  {
+    "name": "private wrong payload",
+    "schema": "commercial-messages.yaml#/CommercialMessage",
+    "value": {
+      "message_id": "12345678-1234-4234-8234-123456789012",
+      "version": 1,
+      "environment": "test",
+      "operation": {
+        "operation_id": "12345678-1234-4234-8234-123456789012",
+        "actor_id": "12345678-1234-4234-8234-123456789012",
+        "action": "acquire",
+        "resource_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "correlation_id": "12345678-1234-4234-8234-123456789012",
+      "caused_by_entry_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_revision": 1,
+      "occurred_at": "2026-10-15T12:00:00Z",
+      "type": "payment.verified",
+      "payload": {
+        "grant_id": "12345678-1234-4234-8234-123456789012",
+        "holder_id": "12345678-1234-4234-8234-123456789012",
+        "scope": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "basis": "permanent_purchase",
+        "status": "active",
+        "source_id": "12345678-1234-4234-8234-123456789012",
+        "valid_from": "2026-10-15T12:00:00Z",
+        "valid_until": null,
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": false
+  },
+  {
+    "name": "private unknown event",
+    "schema": "commercial-messages.yaml#/CommercialMessage",
+    "value": {
+      "message_id": "12345678-1234-4234-8234-123456789012",
+      "version": 1,
+      "environment": "test",
+      "operation": {
+        "operation_id": "12345678-1234-4234-8234-123456789012",
+        "actor_id": "12345678-1234-4234-8234-123456789012",
+        "action": "acquire",
+        "resource_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "correlation_id": "12345678-1234-4234-8234-123456789012",
+      "caused_by_entry_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_revision": 1,
+      "occurred_at": "2026-10-15T12:00:00Z",
+      "type": "lesson.started",
+      "payload": {
+        "payment_id": "12345678-1234-4234-8234-123456789012",
+        "holder_id": "12345678-1234-4234-8234-123456789012",
+        "amount": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "provider_account_id": "acct_verified",
+        "provider_payment_id": "pi_verified",
+        "paid_at": "2026-10-15T12:00:00Z",
+        "access_available_at": null,
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": false
+  },
+  {
+    "name": "private missing causation",
+    "schema": "commercial-messages.yaml#/CommercialMessage",
+    "value": {
+      "message_id": "12345678-1234-4234-8234-123456789012",
+      "version": 1,
+      "environment": "test",
+      "operation": {
+        "operation_id": "12345678-1234-4234-8234-123456789012",
+        "actor_id": "12345678-1234-4234-8234-123456789012",
+        "action": "acquire",
+        "resource_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "correlation_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_revision": 1,
+      "occurred_at": "2026-10-15T12:00:00Z",
+      "type": "payment.verified",
+      "payload": {
+        "payment_id": "12345678-1234-4234-8234-123456789012",
+        "holder_id": "12345678-1234-4234-8234-123456789012",
+        "amount": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "provider_account_id": "acct_verified",
+        "provider_payment_id": "pi_verified",
+        "paid_at": "2026-10-15T12:00:00Z",
+        "access_available_at": null,
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": false
+  },
+  {
+    "name": "private unsupported version",
+    "schema": "commercial-messages.yaml#/CommercialMessage",
+    "value": {
+      "message_id": "12345678-1234-4234-8234-123456789012",
+      "version": 2,
+      "environment": "test",
+      "operation": {
+        "operation_id": "12345678-1234-4234-8234-123456789012",
+        "actor_id": "12345678-1234-4234-8234-123456789012",
+        "action": "acquire",
+        "resource_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "correlation_id": "12345678-1234-4234-8234-123456789012",
+      "caused_by_entry_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_revision": 1,
+      "occurred_at": "2026-10-15T12:00:00Z",
+      "type": "payment.verified",
+      "payload": {
+        "payment_id": "12345678-1234-4234-8234-123456789012",
+        "holder_id": "12345678-1234-4234-8234-123456789012",
+        "amount": {
+          "amount_minor": 100,
+          "currency": "BRL"
+        },
+        "provider_account_id": "acct_verified",
+        "provider_payment_id": "pi_verified",
+        "paid_at": "2026-10-15T12:00:00Z",
+        "access_available_at": null,
+        "offer_id": "12345678-1234-4234-8234-123456789012",
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": false
+  },
+  {
+    "name": "private grant message",
+    "schema": "commercial-messages.yaml#/CommercialMessage",
+    "value": {
+      "message_id": "12345678-1234-4234-8234-123456789012",
+      "version": 1,
+      "environment": "test",
+      "operation": {
+        "operation_id": "12345678-1234-4234-8234-123456789012",
+        "actor_id": "12345678-1234-4234-8234-123456789012",
+        "action": "acquire",
+        "resource_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "correlation_id": "12345678-1234-4234-8234-123456789012",
+      "caused_by_entry_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_id": "12345678-1234-4234-8234-123456789012",
+      "aggregate_revision": 1,
+      "occurred_at": "2026-10-15T12:00:00Z",
+      "type": "grant.changed",
+      "payload": {
+        "grant_id": "12345678-1234-4234-8234-123456789012",
+        "holder_id": "12345678-1234-4234-8234-123456789012",
+        "scope": {
+          "kind": "path",
+          "content_id": "12345678-1234-4234-8234-123456789012"
+        },
+        "basis": "permanent_purchase",
+        "status": "active",
+        "source_id": "12345678-1234-4234-8234-123456789012",
+        "valid_from": "2026-10-15T12:00:00Z",
+        "valid_until": null,
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": true
+  },
+  {
+    "name": "active permanent grant cannot expire",
+    "schema": "commerce.yaml#/Grant",
+    "value": {
+      "grant_id": "12345678-1234-4234-8234-123456789012",
+      "holder_id": "12345678-1234-4234-8234-123456789012",
+      "scope": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "basis": "permanent_purchase",
+      "status": "active",
+      "source_id": "12345678-1234-4234-8234-123456789012",
+      "valid_from": "2026-10-15T12:00:00Z",
+      "valid_until": "2027-10-15T12:00:00Z",
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "subscription grant needs period end",
+    "schema": "commerce.yaml#/Grant",
+    "value": {
+      "grant_id": "12345678-1234-4234-8234-123456789012",
+      "holder_id": "12345678-1234-4234-8234-123456789012",
+      "scope": {
+        "kind": "platform"
+      },
+      "basis": "subscription_period",
+      "status": "active",
+      "source_id": "12345678-1234-4234-8234-123456789012",
+      "valid_from": "2026-10-15T12:00:00Z",
+      "valid_until": null,
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "subscription grant cannot cover one path",
+    "schema": "commerce.yaml#/Grant",
+    "value": {
+      "grant_id": "12345678-1234-4234-8234-123456789012",
+      "holder_id": "12345678-1234-4234-8234-123456789012",
+      "scope": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "basis": "subscription_period",
+      "status": "active",
+      "source_id": "12345678-1234-4234-8234-123456789012",
+      "valid_from": "2026-10-15T12:00:00Z",
+      "valid_until": "2026-11-15T12:00:00Z",
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "review approval needs evidence",
+    "schema": "refunds.yaml#/RefundRequest",
+    "value": {
+      "refund_request_id": "12345678-1234-4234-8234-123456789012",
+      "payment_id": "12345678-1234-4234-8234-123456789012",
+      "revision": 2,
+      "request_operation_id": "12345678-1234-4234-8234-123456789012",
+      "requested_at": "2026-10-15T12:00:00Z",
+      "reason": "Customer request",
+      "amount_minor": 100,
+      "currency": "BRL",
+      "eligibility": "review_approved",
+      "status": "requested"
+    },
+    "valid": false
+  },
+  {
+    "name": "review approval with evidence",
+    "schema": "refunds.yaml#/RefundRequest",
+    "value": {
+      "refund_request_id": "12345678-1234-4234-8234-123456789012",
+      "payment_id": "12345678-1234-4234-8234-123456789012",
+      "revision": 2,
+      "request_operation_id": "12345678-1234-4234-8234-123456789012",
+      "requested_at": "2026-10-15T12:00:00Z",
+      "reason": "Customer request",
+      "amount_minor": 100,
+      "currency": "BRL",
+      "eligibility": "review_approved",
+      "status": "requested",
+      "review": {
+        "decision": "approve_full_refund",
+        "reviewed_at": "2026-10-15T12:00:00Z",
+        "reason": "Approved full return",
+        "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": true
+  },
+  {
+    "name": "path purchase still requires validated manifest",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "path_purchase",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": null,
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "teacher",
+      "seller_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "first subscription offer explicitly observes absence",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "platform"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 4500,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "New monthly price",
+      "expected_offer_id": null
+    },
+    "valid": true
+  },
+  {
+    "name": "replacement observes original subscription offer",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "platform"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 4500,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "New monthly price",
+      "expected_offer_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "subscription price cannot omit observed offer",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "platform"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 4500,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "New monthly price"
+    },
+    "valid": false
+  },
+  {
+    "name": "subscription observed offer must be UUID or null",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "platform"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 4500,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "New monthly price",
+      "expected_offer_id": "latest"
+    },
+    "valid": false
+  },
+  {
+    "name": "compact archive locator",
+    "schema": "commercial-audit.yaml#/AuditArchiveLocator",
+    "value": {
+      "environment": "test",
+      "audit_entry_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "resource_kind": "path",
+      "resource_id": "12345678-1234-4234-8234-123456789012",
+      "recorded_at": "2026-10-15T12:00:00Z",
+      "order_key": "stable-order-1",
+      "archive_batch_id": "12345678-1234-4234-8234-123456789012",
+      "entry_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "valid": true
+  },
+  {
+    "name": "archive locator requires verified batch reference",
+    "schema": "commercial-audit.yaml#/AuditArchiveLocator",
+    "value": {
+      "environment": "test",
+      "audit_entry_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "resource_kind": "path",
+      "resource_id": "12345678-1234-4234-8234-123456789012",
+      "recorded_at": "2026-10-15T12:00:00Z",
+      "order_key": "stable-order-1",
+      "entry_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "valid": false
+  },
+  {
+    "name": "archive locator excludes full evidence payload",
+    "schema": "commercial-audit.yaml#/AuditArchiveLocator",
+    "value": {
+      "environment": "test",
+      "audit_entry_id": "12345678-1234-4234-8234-123456789012",
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "resource_kind": "path",
+      "resource_id": "12345678-1234-4234-8234-123456789012",
+      "recorded_at": "2026-10-15T12:00:00Z",
+      "order_key": "stable-order-1",
+      "archive_batch_id": "12345678-1234-4234-8234-123456789012",
+      "entry_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "before_state": {}
+    },
+    "valid": false
+  },
+  {
+    "name": "embedding license is not an offer kind",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "embedding_license",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 100,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "teacher",
+      "seller_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "subscription offer cannot be scoped to a course",
+    "schema": "commerce.yaml#/SubscriptionOfferConfig",
+    "value": {
+      "scope": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "billing_period": "monthly",
+      "price": {
+        "amount_minor": 2000,
+        "currency": "BRL"
+      },
+      "configuration_id": "12345678-1234-4234-8234-123456789012",
+      "reason": "Course price",
+      "expected_offer_id": null
+    },
+    "valid": false
+  },
+  {
+    "name": "embedded platform premium dependency needs no license",
+    "schema": "commerce.yaml#/Dependency",
+    "value": {
+      "content": {
+        "kind": "content_node",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "permission": "platform_premium",
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "dependency cannot carry a license",
+    "schema": "commerce.yaml#/Dependency",
+    "value": {
+      "content": {
+        "kind": "content_node",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "permission": "platform_premium",
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012",
+      "license_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "MotifPath course purchase offer has no teacher seller",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "course_purchase",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 9000,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "platform",
+      "seller_id": null
+    },
+    "valid": true
+  },
+  {
+    "name": "MotifPath path purchase offer has no teacher seller",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "path_purchase",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 9000,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "platform",
+      "seller_id": null
+    },
+    "valid": true
+  },
+  {
+    "name": "teacher course purchase offer names the owning teacher",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "course_purchase",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 9000,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "teacher",
+      "seller_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": true
+  },
+  {
+    "name": "MotifPath offer cannot name a teacher seller",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "course_purchase",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 9000,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "platform",
+      "seller_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "teacher offer requires the owning teacher",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "path_purchase",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 9000,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "teacher",
+      "seller_id": null
+    },
+    "valid": false
+  },
+  {
+    "name": "path purchase cannot cover a course",
+    "schema": "commerce.yaml#/Offer",
+    "value": {
+      "offer_id": "12345678-1234-4234-8234-123456789012",
+      "kind": "path_purchase",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "release_id": "12345678-1234-4234-8234-123456789012",
+      "price": {
+        "amount_minor": 9000,
+        "currency": "BRL"
+      },
+      "configuration_revision": "1",
+      "seller_kind": "platform",
+      "seller_id": null
+    },
+    "valid": false
+  },
+  {
+    "name": "teacher selling terms",
+    "schema": "commerce.yaml#/TeacherSellingTerms",
+    "value": {
+      "configuration_revision": 3,
+      "currency": "BRL",
+      "teacher_minimum": {
+        "amount_minor": 1000,
+        "currency": "BRL"
+      },
+      "teacher_maximum": {
+        "amount_minor": 50000,
+        "currency": "BRL"
+      },
+      "commission_basis_points": 2000,
+      "teacher_fee_basis_points": 5000
+    },
+    "valid": true
+  },
+  {
+    "name": "teacher selling terms never expose the admin reason",
+    "schema": "commerce.yaml#/TeacherSellingTerms",
+    "value": {
+      "configuration_revision": 3,
+      "currency": "BRL",
+      "teacher_minimum": {
+        "amount_minor": 1000,
+        "currency": "BRL"
+      },
+      "teacher_maximum": {
+        "amount_minor": 50000,
+        "currency": "BRL"
+      },
+      "commission_basis_points": 2000,
+      "teacher_fee_basis_points": 5000,
+      "reason": "launch"
+    },
+    "valid": false
+  },
+  {
+    "name": "teacher sale",
+    "schema": "commerce.yaml#/TeacherSale",
+    "value": {
+      "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "sold_at": "2026-10-28T12:00:00Z",
+      "price": {
+        "amount_minor": 4900,
+        "currency": "BRL"
+      },
+      "earnings": {
+        "amount_minor": 3820,
+        "currency": "BRL"
+      },
+      "status": "pending",
+      "refunded_at": null,
+      "settlement_id": null,
+      "recovery": null
+    },
+    "valid": true
+  },
+  {
+    "name": "refunded teacher sale",
+    "schema": "commerce.yaml#/TeacherSale",
+    "value": {
+      "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "sold_at": "2026-10-14T12:00:00Z",
+      "price": {
+        "amount_minor": 4900,
+        "currency": "BRL"
+      },
+      "earnings": {
+        "amount_minor": 3820,
+        "currency": "BRL"
+      },
+      "status": "refunded",
+      "refunded_at": "2026-10-16T09:00:00Z",
+      "settlement_id": "12345678-1234-4234-8234-123456789012",
+      "recovery": {
+        "status": "outstanding",
+        "due_minor": 3820,
+        "recovered_minor": 1000,
+        "settlement_ids": [
+          "12345678-1234-4234-8234-123456789012"
+        ]
+      }
+    },
+    "valid": true
+  },
+  {
+    "name": "teacher sale never names the buyer",
+    "schema": "commerce.yaml#/TeacherSale",
+    "value": {
+      "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "sold_at": "2026-10-28T12:00:00Z",
+      "price": {
+        "amount_minor": 4900,
+        "currency": "BRL"
+      },
+      "earnings": {
+        "amount_minor": 3820,
+        "currency": "BRL"
+      },
+      "status": "pending",
+      "refunded_at": null,
+      "settlement_id": null,
+      "buyer_id": "12345678-1234-4234-8234-123456789012",
+      "recovery": null
+    },
+    "valid": false
+  },
+  {
+    "name": "refunded teacher sale needs its refund time",
+    "schema": "commerce.yaml#/TeacherSale",
+    "value": {
+      "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "sold_at": "2026-10-28T12:00:00Z",
+      "price": {
+        "amount_minor": 4900,
+        "currency": "BRL"
+      },
+      "earnings": {
+        "amount_minor": 3820,
+        "currency": "BRL"
+      },
+      "status": "refunded",
+      "refunded_at": null,
+      "settlement_id": null,
+      "recovery": null
+    },
+    "valid": false
+  },
+  {
+    "name": "payout account checking",
+    "schema": "commerce.yaml#/PayoutAccount",
+    "value": {
+      "status": "checking",
+      "onboarding_available": true,
+      "updated_at": "2026-11-01T10:42:00Z"
+    },
+    "valid": true
+  },
+  {
+    "name": "payout account never exposes bank details",
+    "schema": "commerce.yaml#/PayoutAccount",
+    "value": {
+      "status": "verified",
+      "onboarding_available": true,
+      "updated_at": "2026-11-01T10:42:00Z",
+      "bank_account": "0001-2"
+    },
+    "valid": false
+  },
+  {
+    "name": "payout onboarding link",
+    "schema": "commerce.yaml#/PayoutOnboardingLink",
+    "value": {
+      "url": "https://connect.stripe.com/setup/e/acct_x/abc",
+      "expires_at": "2026-11-01T10:52:00Z"
+    },
+    "valid": true
+  },
+  {
+    "name": "sale refunded before its earnings were transferred has nothing to recover",
+    "schema": "commerce.yaml#/TeacherSale",
+    "value": {
+      "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "sold_at": "2026-10-14T12:00:00Z",
+      "price": {
+        "amount_minor": 4900,
+        "currency": "BRL"
+      },
+      "earnings": {
+        "amount_minor": 3820,
+        "currency": "BRL"
+      },
+      "status": "refunded",
+      "refunded_at": "2026-10-16T09:00:00Z",
+      "settlement_id": null,
+      "recovery": {
+        "status": "nothing_due",
+        "due_minor": 0,
+        "recovered_minor": 0,
+        "settlement_ids": []
+      }
+    },
+    "valid": true
+  },
+  {
+    "name": "sale refunded after transfer and fully recovered",
+    "schema": "commerce.yaml#/TeacherSale",
+    "value": {
+      "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "sold_at": "2026-10-14T12:00:00Z",
+      "price": {
+        "amount_minor": 4900,
+        "currency": "BRL"
+      },
+      "earnings": {
+        "amount_minor": 3820,
+        "currency": "BRL"
+      },
+      "status": "refunded",
+      "refunded_at": "2026-10-16T09:00:00Z",
+      "settlement_id": "12345678-1234-4234-8234-123456789012",
+      "recovery": {
+        "status": "recovered",
+        "due_minor": 3820,
+        "recovered_minor": 3820,
+        "settlement_ids": [
+          "12345678-1234-4234-8234-123456789012"
+        ]
+      }
+    },
+    "valid": true
+  },
+  {
+    "name": "refunded teacher sale states its recovery",
+    "schema": "commerce.yaml#/TeacherSale",
+    "value": {
+      "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+      "content": {
+        "kind": "course",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "sold_at": "2026-10-14T12:00:00Z",
+      "price": {
+        "amount_minor": 4900,
+        "currency": "BRL"
+      },
+      "earnings": {
+        "amount_minor": 3820,
+        "currency": "BRL"
+      },
+      "status": "refunded",
+      "refunded_at": "2026-10-16T09:00:00Z",
+      "settlement_id": "12345678-1234-4234-8234-123456789012",
+      "recovery": null
+    },
+    "valid": false
+  },
+  {
+    "name": "unrefunded teacher sale has no recovery",
+    "schema": "commerce.yaml#/TeacherSale",
+    "value": {
+      "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+      "content": {
+        "kind": "path",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      },
+      "sold_at": "2026-10-28T12:00:00Z",
+      "price": {
+        "amount_minor": 4900,
+        "currency": "BRL"
+      },
+      "earnings": {
+        "amount_minor": 3820,
+        "currency": "BRL"
+      },
+      "status": "pending",
+      "refunded_at": null,
+      "settlement_id": null,
+      "recovery": {
+        "status": "outstanding",
+        "due_minor": 3820,
+        "recovered_minor": 0,
+        "settlement_ids": []
+      }
+    },
+    "valid": false
+  },
+  {
+    "name": "teacher sale page with period summary",
+    "schema": "commerce.yaml#/TeacherSalePage",
+    "value": {
+      "items": [
+        {
+          "sale_payment_id": "12345678-1234-4234-8234-123456789012",
+          "content": {
+            "kind": "path",
+            "content_id": "12345678-1234-4234-8234-123456789012"
+          },
+          "sold_at": "2026-10-28T12:00:00Z",
+          "price": {
+            "amount_minor": 4900,
+            "currency": "BRL"
+          },
+          "earnings": {
+            "amount_minor": 3820,
+            "currency": "BRL"
+          },
+          "status": "pending",
+          "refunded_at": null,
+          "settlement_id": null,
+          "recovery": null
+        }
+      ],
+      "total": 1,
+      "limit": 20,
+      "offset": 0,
+      "summary": [
+        {
+          "currency": "BRL",
+          "sales_count": 12,
+          "refunded_count": 1,
+          "earned_minor": 42020
+        }
+      ]
+    },
+    "valid": true
+  },
+  {
+    "name": "teacher sale page needs its period summary",
+    "schema": "commerce.yaml#/TeacherSalePage",
+    "value": {
+      "items": [],
+      "total": 0,
+      "limit": 20,
+      "offset": 0
+    },
+    "valid": false
+  },
+  {
+    "name": "settlement with its creation time",
+    "schema": "commerce.yaml#/Settlement",
+    "value": {
+      "settlement_id": "12345678-1234-4234-8234-123456789012",
+      "teacher_id": "12345678-1234-4234-8234-123456789012",
+      "amount": {
+        "amount_minor": 11460,
+        "currency": "BRL"
+      },
+      "status": "transferred",
+      "sale_payment_ids": [
+        "12345678-1234-4234-8234-123456789012"
+      ],
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012",
+      "created_at": "2026-10-25T03:00:00Z"
+    },
+    "valid": true
+  },
+  {
+    "name": "settlement needs its creation time",
+    "schema": "commerce.yaml#/Settlement",
+    "value": {
+      "settlement_id": "12345678-1234-4234-8234-123456789012",
+      "teacher_id": "12345678-1234-4234-8234-123456789012",
+      "amount": {
+        "amount_minor": 11460,
+        "currency": "BRL"
+      },
+      "status": "transferred",
+      "sale_payment_ids": [
+        "12345678-1234-4234-8234-123456789012"
+      ],
+      "evidence_entry_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "payout dashboard link",
+    "schema": "commerce.yaml#/PayoutDashboardLink",
+    "value": {
+      "url": "https://connect.stripe.com/express/acct_x/abc",
+      "expires_at": "2026-11-01T10:47:00Z"
+    },
+    "valid": true
+  },
+  {
+    "name": "sale blocker on a nested dependency",
+    "schema": "commerce.yaml#/SaleBlocker",
+    "value": {
+      "code": "dependency_rights",
+      "content": {
+        "kind": "content_node",
+        "content_id": "12345678-1234-4234-8234-123456789012"
+      }
+    },
+    "valid": true
+  },
+  {
+    "name": "sale blocker without content",
+    "schema": "commerce.yaml#/SaleBlocker",
+    "value": {
+      "code": "payout_account_not_verified",
+      "content": null
+    },
+    "valid": true
+  },
+  {
+    "name": "unknown sale blocker",
+    "schema": "commerce.yaml#/SaleBlocker",
+    "value": {
+      "code": "needs_license",
+      "content": null
+    },
+    "valid": false
+  },
+  {
+    "name": "resume renewal command receipt",
+    "schema": "subscriptions.yaml#/SubscriptionCommand",
+    "value": {
+      "operation_id": "12345678-1234-4234-8234-123456789012",
+      "subscription_id": "12345678-1234-4234-8234-123456789012",
+      "action": "resume_renewal",
+      "status": "pending"
+    },
+    "valid": true
+  },
+  {
+    "name": "resume renewal requires the observed revision",
+    "schema": "subscriptions.yaml#/ResumeRenewalRequest",
+    "value": {},
+    "valid": false
+  },
+  {
+    "name": "payment method session",
+    "schema": "subscriptions.yaml#/PaymentMethodSession",
+    "value": {
+      "session_url": "https://billing.example.test/session/abc",
+      "expires_at": "2026-11-01T12:30:00Z"
+    },
+    "valid": true
+  },
+  {
+    "name": "payment method session cannot carry a plan change",
+    "schema": "subscriptions.yaml#/PaymentMethodSession",
+    "value": {
+      "session_url": "https://billing.example.test/session/abc",
+      "expires_at": "2026-11-01T12:30:00Z",
+      "target_offer_id": "12345678-1234-4234-8234-123456789012"
+    },
+    "valid": false
+  },
+  {
+    "name": "rollout user subject",
+    "schema": "commercial-rollout.yaml#/SubjectId",
+    "value": "user:77d0239a-8d28-5c95-bc6e-53d59f7f84a8",
+    "valid": true
+  },
+  {
+    "name": "rollout service subject",
+    "schema": "commercial-rollout.yaml#/SubjectId",
+    "value": "service:core-domain",
+    "valid": true
+  },
+  {
+    "name": "rollout subject without a kind",
+    "schema": "commercial-rollout.yaml#/SubjectId",
+    "value": "77d0239a-8d28-5c95-bc6e-53d59f7f84a8",
+    "valid": false
+  },
+  {
+    "name": "rollout wildcard subject",
+    "schema": "commercial-rollout.yaml#/SubjectId",
+    "value": "user:*",
+    "valid": false
+  },
+  {
+    "name": "flag change",
+    "schema": "commercial-rollout.yaml#/FlagChange",
+    "value": {
+      "expected_revision": 0,
+      "enabled": true,
+      "all_users": false,
+      "subject_ids": [
+        "service:core-domain"
+      ],
+      "reason": "Foundation rehearsal"
+    },
+    "valid": true
+  },
+  {
+    "name": "flag change without reason",
+    "schema": "commercial-rollout.yaml#/FlagChange",
+    "value": {
+      "expected_revision": 0,
+      "enabled": true,
+      "all_users": false,
+      "subject_ids": []
+    },
+    "valid": false
+  },
+  {
+    "name": "flag change with duplicate subjects",
+    "schema": "commercial-rollout.yaml#/FlagChange",
+    "value": {
+      "expected_revision": 0,
+      "enabled": true,
+      "all_users": false,
+      "subject_ids": [
+        "service:core-domain",
+        "service:core-domain"
+      ],
+      "reason": "x"
+    },
+    "valid": false
+  },
+  {
+    "name": "unregistered flag",
+    "schema": "commercial-rollout.yaml#/FlagName",
+    "value": "free_money",
+    "valid": false
+  },
+  {
+    "name": "kill switch",
+    "schema": "commercial-rollout.yaml#/KillSwitch",
+    "value": {
+      "reason": "Incident"
+    },
+    "valid": true
+  },
+  {
+    "name": "kill switch with revision",
+    "schema": "commercial-rollout.yaml#/KillSwitch",
+    "value": {
+      "reason": "Incident",
+      "expected_revision": 3
+    },
+    "valid": false
+  },
+  {
+    "name": "rollout group subject",
+    "schema": "commercial-rollout.yaml#/SubjectId",
+    "value": "group:friends-and-family",
+    "valid": true
+  },
+  {
+    "name": "rollout group subject with uppercase slug",
+    "schema": "commercial-rollout.yaml#/SubjectId",
+    "value": "group:Beta",
+    "valid": false
+  },
+  {
+    "name": "flag change open to all users",
+    "schema": "commercial-rollout.yaml#/FlagChange",
+    "value": {
+      "expected_revision": 4,
+      "enabled": true,
+      "all_users": true,
+      "subject_ids": [
+        "service:core-domain"
+      ],
+      "reason": "General availability"
+    },
+    "valid": true
+  },
+  {
+    "name": "flag change for groups",
+    "schema": "commercial-rollout.yaml#/FlagChange",
+    "value": {
+      "expected_revision": 2,
+      "enabled": true,
+      "all_users": false,
+      "subject_ids": [
+        "group:beta",
+        "group:friends-and-family",
+        "user:77d0239a-8d28-5c95-bc6e-53d59f7f84a8"
+      ],
+      "reason": "Beta cohort"
+    },
+    "valid": true
+  },
+  {
+    "name": "flag change without all_users",
+    "schema": "commercial-rollout.yaml#/FlagChange",
+    "value": {
+      "expected_revision": 0,
+      "enabled": true,
+      "subject_ids": [
+        "group:beta"
+      ],
+      "reason": "x"
+    },
+    "valid": false
+  },
+  {
+    "name": "group change",
+    "schema": "commercial-rollout.yaml#/GroupChange",
+    "value": {
+      "name": "Private beta",
+      "reason": "Beta cohort"
+    },
+    "valid": true
+  },
+  {
+    "name": "group change with members",
+    "schema": "commercial-rollout.yaml#/GroupChange",
+    "value": {
+      "name": "Private beta",
+      "reason": "x",
+      "member_ids": [
+        "77d0239a-8d28-5c95-bc6e-53d59f7f84a8"
+      ]
+    },
+    "valid": false
+  },
+  {
+    "name": "membership change",
+    "schema": "commercial-rollout.yaml#/MembershipChange",
+    "value": {
+      "add": [
+        "77d0239a-8d28-5c95-bc6e-53d59f7f84a8"
+      ],
+      "remove": [],
+      "reason": "Invited"
+    },
+    "valid": true
+  },
+  {
+    "name": "membership change with nothing to do",
+    "schema": "commercial-rollout.yaml#/MembershipChange",
+    "value": {
+      "add": [],
+      "remove": [],
+      "reason": "x"
+    },
+    "valid": false
+  },
+  {
+    "name": "membership change with a group member",
+    "schema": "commercial-rollout.yaml#/MembershipChange",
+    "value": {
+      "add": [
+        "group:beta"
+      ],
+      "remove": [],
+      "reason": "x"
+    },
+    "valid": false
+  },
+  {
+    "name": "commercial group",
+    "schema": "commercial-rollout.yaml#/CommercialGroup",
+    "value": {
+      "slug": "beta",
+      "name": "Private beta",
+      "member_ids": [
+        "77d0239a-8d28-5c95-bc6e-53d59f7f84a8"
+      ],
+      "updated_at": "2026-11-06T12:00:00Z",
+      "updated_by": "0b6f3c2e-6a51-4d7b-9a43-2f1d8e5c7a90"
+    },
+    "valid": true
+  },
+  {
+    "name": "group slug with a colon",
+    "schema": "commercial-rollout.yaml#/GroupSlug",
+    "value": "group:beta",
+    "valid": false
+  }
+]
