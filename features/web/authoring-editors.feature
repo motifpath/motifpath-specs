@@ -49,6 +49,45 @@ Feature: Edit and publish authored content
       When "bob" waits without tapping Save
       Then the course's saved summary is unchanged
 
+  Rule: Lesson languages are explicit author choices
+
+    Scenario Outline: A teacher saves a lesson in Brazilian Portuguese
+      Given "bob" opens a new <type> lesson with language-agnostic selected
+      When "bob" selects "Português (Brasil)" as the lesson language
+      And "bob" fills the lesson's required content and classification and taps Save
+      Then the saved lesson is tagged with "pt_BR" rather than "any"
+      And the language picker still shows "Português (Brasil)" selected
+
+      Examples:
+        | type    |
+        | article |
+        | video   |
+
+    Scenario: Editing a lesson keeps its existing languages until changed
+      Given "bob" opens their lesson tagged with "pt_BR"
+      Then the language picker shows "Português (Brasil)" selected
+      When "bob" changes only the title and taps Save
+      Then the lesson is still tagged with "pt_BR"
+
+    Scenario: A teacher explicitly changes a lesson's language
+      Given "bob" opens their lesson tagged with "pt_BR"
+      When "bob" selects English and removes "Português (Brasil)"
+      Then the editor has unsaved changes
+      When "bob" taps Save
+      Then the lesson is tagged with "en" rather than "pt_BR"
+
+    Scenario: Removing the last specific language returns to language-agnostic
+      Given "bob" has selected only "Português (Brasil)" for a lesson
+      When "bob" removes "Português (Brasil)"
+      Then language-agnostic is selected
+      And saving never sends an empty language set or combines "any" with a specific language
+
+    Scenario: A failed save preserves the teacher's language selection
+      Given "bob" has changed their lesson's language to "pt_BR"
+      When "bob" taps Save but saving fails
+      Then the language picker still shows "Português (Brasil)" selected
+      And the lesson's language change remains unsaved and can be retried
+
   # ── Leaving with unsaved changes ─────────────────────────────────────────────
 
   Rule: Leaving an editor with unsaved changes asks first

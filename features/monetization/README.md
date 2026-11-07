@@ -4,6 +4,15 @@ This directory is the consolidated contract index for the monetization epic. Bus
 from 2026-10-13 through 2026-10-15 are incorporated; scenarios remain `@wip` until runtime
 implementation passes TDD. PR approval accepts proposed API details, not a deployment.
 
+## Operations not yet built
+
+The core-domain API lists every commercial operation before core builds it. Until the runtime
+ticket that owns an operation ships, core answers it with `501 Not Implemented` and a JSON body
+whose `message` says the operation isn't available yet, whoever the caller is; only a request
+whose parameters, headers or JSON body can't be read is still refused with 400 first. The answer changes nothing
+and records nothing. A runtime ticket replaces the 501 with the operation's documented
+responses, under its rollout flag.
+
 ## Decisions and source contracts
 
 - [ADR-059: commercial authority, audit and idempotency](../../adrs/ADR-059-commercial-authority-audit-and-idempotency.md), accepted; renumbered from the colliding ADR-057 without changing the decision.

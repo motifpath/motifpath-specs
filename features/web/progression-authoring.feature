@@ -101,6 +101,12 @@ Feature: Create and manage progressions in the app
       When "ana" chooses "Remove" on "I–IV–I–V–vi" and confirms
       Then "I–IV–I–V–vi" is no longer listed
 
+    Scenario: Choosing Remove never removes anything by itself
+      Given the list says "I–♭VII–IV–I" is tagged in 1 chart, but its last tag was taken off since
+      When "ana" chooses "Remove" on "I–♭VII–IV–I"
+      Then the dialog asks to confirm
+      And "I–♭VII–IV–I" is still listed
+
     Scenario: Adding to the drills asks for skills and concepts, and can't be undone
       When "ana" chooses "Add to drills" on "I–♭VII–IV–I"
       Then the dialog "Add I–♭VII–IV–I to the drills" shows the skills and concepts picker
