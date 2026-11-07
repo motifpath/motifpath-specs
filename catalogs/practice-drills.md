@@ -7,25 +7,425 @@ guarantee.
 
 ## Drill templates
 
-A drill template is a way of asking: what is shown, what the student answers, and whether
-the answer is timed. Thresholds and felt questions are per template, never per item.
+A drill template is a way of asking: what is shown, what the student answers, whether the
+answer is timed, and which rung of the practice ladder it trains (ADR-057). Thresholds and felt
+questions are per template, never per item.
 
-- **Fretboard cells** have two templates, one for each way of asking about a cell:
+- **The ladder**, in order: `know`, `hear`, `play_clean`, `play_in_time`, `move`, `target`,
+  `use`. Every template names its `rung`. Kinds with no template take a fixed rung:
+
+  | Kind | Rung |
+  |---|---|
+  | play-along | `play_in_time` |
+  | progression key tour | `move` |
+  | chord change | `play_in_time` |
+  | single chord, self-rated | `play_clean` |
+  | song | `use` |
+
+- **Second way.** A generated template that asks among options names its `second_way`: another
+  template of the same item kind that asks the same item another way. The composer asks an item
+  the way with fewer right answers, so a lucky guess meets the other way. A template with no
+  second way of its own instead brings its item back later in the same session, after at least
+  three other items. A template marked `comes_back` does both: an ear drill's second way is
+  seen, not heard, so the item also comes back by ear in the same session.
+
+- **Fretboard cells** have three templates, one for each way of asking about a cell:
   - `fretboard_cell:name_the_note`: the cell is shown, and the student names its note.
   - `fretboard_cell:find_the_note`: a note and string are named, and the student taps the
     cell.
+  - `fretboard_cell:find_every_instance`: the cell's note is named, and the student taps every
+    place of it in the fret window. One answer is graded on every cell it covers (see
+    "Find every instance").
 - **Diagram shapes** have two templates:
   - `diagram_shape:name_the_shape`: the shape is shown without its name, and the student
     picks which member of its family it is.
   - `diagram_shape:find_the_degree`: the shape is shown with its root marked and its other
     positions unlabelled, and the student taps the asked degree.
 - **Authored exercises** are grouped into families by exercise type, one template each:
-  `exercise:<exercise_type>`. A family's exercises share one threshold, since one exercise
+  `exercise:<exercise_type>`. They are `know`, or `hear` when the student answers what they hear
+  (`audio_recognition`, `audio_selection`). A family's exercises share one threshold, since one exercise
   rarely gathers enough answers to calibrate on its own.
-- **Play-alongs and chord changes** have no template. They are measured in tempo and changes
-  per minute, against targets that come from the music.
+- **Guide tones** have one template, `guide_tone:tap_the_third`. It isn't timed: a guide tone
+  is measured in tempo, like a play-along (see "Guide tones"), so it has no fluent time and no
+  felt question.
+- **Play-alongs and chord changes** have no template. A play-along is measured in tempo,
+  against the target its music sets; a chord change in clean changes per minute, against the
+  catalog's change target (see "Chord drills").
 - An answer's template comes from its item kind and response type (and, for exercises, the
-  exercise's type). Keys never change.
+  exercise's type; for a generated question asked among options, the way it was asked:
+  `diatonic_chord:numeral_to_chord`). Keys never change.
+
+## Challenge rules
+
+Every generated question must test the skill it names (ADR-057). A planned item is valid only
+when:
+
+1. **No marked answer.** Nothing in the stimulus sets the right answer(s) apart: no label, marker
+   shape, colour, highlight, size or position unique to them. What the question gives (the root
+   in find the degree) may be marked, and is never asked.
+2. **Plausible distractors.** Options are near misses a learner confuses, and none can be ruled
+   out without the skill: a numeral question offers only chords of the asked key; a progression
+   question offers its confusable progressions (`progressions.yaml`).
+3. **The answer is never in the wording.** Neither the prompt nor an option's name contains it.
+4. **Asked twice.** A template asked among options has a second way, or brings the item back
+   later in the session.
+5. **Harder as the level rises.** A template may list **variants** by the student's level on
+   the item (more keys, no cadence, a faster tempo). The level picks the variant.
+
+They bind generated drills only: authored exercises are their author's responsibility. A family
+whose generator can produce an invalid item is not installed: its property test runs over every
+item of the catalog, every way and every variant.
+
+## Drill families v2
+
+Declared by ADR-057 and built one slice at a time. The item key schemes, response types,
+graders and golden cases of every family are specified together (`PracticeItemKey` and the
+responses in the practice schemas; `golden/practice-graders/`), so each is graded alike from
+the start. Each slice then adds its templates and fluent times to `practice-drills.yaml` (with
+fixed IDs) and its generator; until then a family installs nothing. The P1 harmony families
+and the P2 ear families are installed (see "Harmony drills" and "Ear drills" below), and so
+are the P3 chord families (see "Chord drills"), the P4 key tours ("Progression key tours"),
+the P5 guide tones ("Guide tones") and the P6 songs ("Songs"). Every family has a bass version on the
+`electric-bass` layout: chord boxes become chord symbols, or the answer is a chord tone tapped
+on the bass fretboard, at positions computed from the chord's formula and the tuning.
+
+| Family (item kind) | One item is | Templates (rung) | Second way | Nodes | Slice |
+|---|---|---|---|---|---|
+| `diatonic_chord` | a numeral in a major key | `numeral_to_chord` (know): "In G, which chord is vi?", pick the chord · `chord_to_numeral` (know): a chord and a key, pick the numeral | each other | `diatonic-chords`, `roman-numerals` | P1 |
+| `chord_function` | a numeral in a major key | `chord_to_function` (know): "In G, D is…", pick tonic, subdominant or dominant · `function_to_chord` (know): pick a chord with the asked function | each other | `chord-function` | P1 |
+| `chart_progression` | a progression (`progressions.yaml`) | `chart_to_numbers` (know): its chart in a key, pick the progression · `numbers_to_chart` (know): a progression and a key, pick its chart | each other | `read-chord-charts`, `common-progressions` | P1 |
+| `heard_chord` | a numeral in a major key | `cadence_then_chord` (hear): a cadence sets the key, a chord plays, pick the numeral; the tonic alone once accurate · `see_then_name` (hear): a key and the chord drawn, pick the numeral | each other, and comes back by ear | `hear-chord-quality`, `hear-progressions` | P2 |
+| `heard_progression` | a 4-bar progression | `progression_by_number` (hear): four chords in a random key, pick the progression; confusable progressions offered | comes back | `hear-progressions`, `common-progressions` | P2 |
+| `chord_voicing` | a chord voicing (bass: a chord's root and fifth) | none, self-rated (play_clean) | — | `play-open-chords` (bass: `play-root-fifth-lines`) | P3 |
+| `chord_change` | two chords (bass: their roots) | none, changes per minute (play_in_time) | — | `change-chords` (bass: `play-root-notes`) | P3 |
+| `progression_keys` | a progression (`progressions.yaml`) on a layout | none, self-rated at a tempo; the key moves on after a clean take (move) | — | `common-progressions`, `play-shapes-in-any-key` (bass: `play-chord-tone-lines`) | P4 |
+| `guide_tone` | a progression on a layout | `tap_the_third` (target): over the playback, tap the 3rd of each chord as it arrives; the 7th once accurate | — (not asked among options) | `target-chord-tones`, `voice-lead` (bass: `play-chord-tone-lines`) | P5 |
+| `song` | a published song chart whose sections are tagged with the progressions they play, on a layout | none, self-rated (use) | — | its sections' progressions' nodes (`common-progressions`, and `cadences` or `blues-form`) | P6 |
+| `fretboard_cell` | a cell (string and fret) on a layout | `find_every_instance` (know): the cell's note is named, tap every place of it in the fret window; graded on every cell in the window | — (not asked among options) | `find-notes-root-strings`, `find-notes-top-strings` (the cells' own) | P7 |
+
+**Item keys and graders.** A key is part of the item when the fact differs per key (the vi of
+G is not the vi of E♭); a relative skill is one item in every key, and the key is picked each
+time it is asked and sent back with the answer. The same goes for a guide tone's tone and tempo,
+and for a fretboard cell's fret window.
+
+| Kind | Item key | Picked each time | Response | Grader |
+|---|---|---|---|---|
+| `diatonic_chord` | `diatonic_chord:<key>:<numeral>` | — | `generated_choice` | `generated_choice.v1` |
+| `chord_function` | `chord_function:<key>:<numeral>` | — | `generated_choice` | `generated_choice.v1` |
+| `chart_progression` | `chart_progression:<progression key>` | key | `generated_choice` | `generated_choice.v1` |
+| `heard_chord` | `heard_chord:<numeral>` | key | `generated_choice` | `generated_choice.v1` |
+| `heard_progression` | `heard_progression:<progression key>` | key | `generated_choice` | `generated_choice.v1` |
+| `chord_voicing` | `chord_voicing:<diagram id>` | — | `self_rating`, no measure | `self_rating.v1` |
+| `root_fifth` (bass) | `root_fifth:<layout id>:<chord>` | — | `self_rating`, no measure | `self_rating.v1` |
+| `root_change` (bass) | `root_change:<layout id>:<from chord>:<to chord>` | — | `self_rating` + changes per minute | `self_rating.v1` |
+| `progression_keys` | `progression_keys:<layout id>:<progression key>` | key (the tour's) | `self_rating` + tempo and key | `self_rating.v1` |
+| `guide_tone` | `guide_tone:<layout id>:<progression key>` | key, tone, tempo and note value | `timed_taps` | `timed_taps.v1` |
+| `song` | `song:<layout id>:<song chart id>` | — | `self_rating`, no measure | `self_rating.v1` |
+| `fretboard_cell` (find every instance) | `fretboard_cell:<layout id>:<string>:<fret>` | fret window | `multi_tap` | `multi_tap.v2`, on every cell in the window |
+
+The bass versions of the harmony and ear families are the same items: only how an option is
+drawn changes (a chord symbol instead of a chord box). `play_along` keeps its key and grader.
+
+## Harmony drills
+
+`diatonic_chord`, `chord_function` and `chart_progression` are generated from the major keys
+and the progression catalog, never authored, and recalled in the head on every instrument.
+
+- **Items:**
+  - `diatonic_chord` and `chord_function`: the numerals ii iii IV V vi viio in each of the 12
+    major keys, 72 items each. The tonic is never an item: its chord is the key's own name, so
+    a question about it would answer itself. The I chord still appears as an option and in
+    every chart.
+  - `chart_progression`: every progression of the progression catalog, asked in a key picked
+    each time.
+  - They roll up to the nodes of the families table, and a chart progression also to its
+    progression's nodes. They suit every instrument, so a student who plays guitar and bass
+    practises one set. Like fretboard cells, they are practised in the head only.
+  - **They count toward their nodes like any item, from the day they are installed.** Unseen
+    ones count as new. A node a student made accurate through lessons and exercises can
+    therefore show a lower level, and the readiness that requires it can drop, until the
+    drills are practised: the level says what is still to do.
+- **The chords** are the key's triads: major on I IV V, minor on ii iii vi, diminished on viio,
+  spelled as the chord catalog spells roots. A progression's I7, IV7 and V7 are dominant
+  sevenths. A chord function question asks the triad, never a seventh, which would give the
+  dominant away.
+- **The options** are shuffled, four at most:
+  - numeral to chord: the answer and the three chords of the key whose numerals are nearest
+    the asked one around the scale (one step away, then two), so every option is a chord of
+    the key;
+  - chord to numeral: the answer and the three numerals nearest it;
+  - chord to function: tonic, subdominant and dominant;
+  - function to chord: one chord of the key with the asked function, and three of the key's
+    chords with other functions;
+  - read the chart and pick the chart: the progression, then its confusables, then theirs, up
+    to four, all with as many bars as the progression. The two 12-bar forms are confusable
+    only with each other, so they offer two.
+
+  A tie between equally near options is broken at random.
+- **The prompt** names the key and what the question gives (the numeral, the chord, the
+  function or the progression), never the answer.
+- **How it is drawn:**
+  - On guitar, a chord is a chord box, unnamed until answered. A chord always gets the same
+    box: its open voicing if the chord catalog has one, else its lowest-difficulty voicing,
+    the lowest fret on a tie. The plan names the voicing, so every client draws the same box.
+  - On bass, a chord is its chord symbol.
+  - A four-bar chart is drawn as boxes on guitar and as symbols on bass. A 12-bar chart is
+    drawn as symbols on every instrument, in three lines of four, as a blues is written.
+  - **Which reading a session uses:** harmony items are recalled in the head, where no
+    instrument is in hand, so a session takes its reading from the student's fretboard
+    layouts. With one of `guitar` and `electric-bass`, always that one. With both, sessions in
+    the head take turns: guitar when the student has started an even number of sessions in the
+    head so far, bass when odd, so both readings get practised. With neither, chord symbols.
+    Every harmony item of a session is drawn the same way.
+- **New items come key by key,** around the circle of fifths from C (C G F D B♭ A E♭ E A♭ B D♭
+  F#). A student is offered the new numerals of a key before any of the next key.
+- **The key of a chart question** (rule 5) is picked among C G D F A while the student is new
+  or learning on the item, and among all 12 keys from accurate on.
+- **Ways:** each family's two templates are each other's second way. With no right answers
+  yet, numeral to chord, chord to function and read the chart come first.
+
+## Ear drills
+
+`heard_chord` and `heard_progression` are generated from the major keys and the progression
+catalog, like the harmony drills, and recognised by ear in the head on every instrument.
+
+- **Items:**
+  - `heard_chord`: the numerals ii iii IV V vi viio, 6 items, each asked in a key picked each
+    time among all 12. The tonic is never an item, since the cadence ends on it.
+  - `heard_progression`: every 4-bar progression of the progression catalog. The 12-bar forms
+    are never asked by ear: twelve bars are too long to hold before answering.
+  - They roll up to the nodes of the families table, and a heard progression also to its
+    progression's nodes. Like the harmony drills, they count toward their nodes from the day
+    they are installed, and suit every instrument.
+- **The playback** is in 4/4, one chord a bar, in the chords' voicings (the voicing rule of
+  the harmony drills):
+  - `cadence_then_chord`: I IV V I, then the asked chord, while the student is new or learning
+    on the item. From accurate on, the tonic chord alone, for one bar, then the asked chord: a
+    numeral still needs a key, and the tonic is the least it takes.
+  - `progression_by_number`: the progression's four bars.
+  - The bars that set the key show their numerals; the asked chord's bar shows "?", and a
+    progression's bars show nothing. The chords are sounded, never named.
+  - On a session that reads chords on bass, each chord's root also plays under it in the bass
+    voice. The chords keep their guitar voicing.
+- **The tempo** starts by the student's level on the item (`hear_tempo_bpm`): 70 BPM while new
+  or learning, 90 once accurate, 110 once fluent. The student may change the tempo and the note
+  value (quarters, eighths, triplets, sixteenths) before or between plays. A note value is a
+  speed factor, as for play-alongs: eighths play two chords a bar. Neither is graded; the
+  latency is judged net of the sound heard once, at the speed it was played (`audio_ms`).
+- **The options:**
+  - `cadence_then_chord` and `see_then_name`: the answer and the three numerals nearest it
+    around the scale (one step away, then two), until the student is fluent on the item; then
+    all seven numerals, the tonic included, in scale order.
+  - `progression_by_number`: the progression, then its confusables, then theirs, up to four,
+    all of four bars. Confusable progressions are asked next to each other in a session.
+- **`see_then_name`** names the key and draws the chord, a box on guitar and a symbol on bass,
+  by the session's reading (the harmony drills' rule). It plays nothing. It is the ear drill's
+  second way, so a lucky guess by ear meets the chord's numeral by sight; the item also comes
+  back by ear later in the same session.
+- **Ways:** `cadence_then_chord` comes first. When an item comes back in the same session, it
+  is asked by ear again, in a newly picked key.
+
+## Chord drills
+
+`chord_voicing` and `chord_change` (on bass, `root_fifth` and `root_change`) are played with the
+instrument in hand and rated, never recalled in the head.
+
+- **Items** are a curated set (`chord_drills`), not every voicing of the chord catalog:
+  - single chords: the open voicings of C, A, G, E, D, Am, Em and Dm, keyed
+    `chord_voicing:<voicing diagram id>`;
+  - changes: ten pairs of those chords (Am–C, C–G, G–D, D–A, A–E, Am–E, Em–G, D–Em, Am–Dm,
+    Em–C), keyed `chord_change:<from diagram id>:<to diagram id>` in the order listed. A pair is
+    one item, practised both ways in the same minute;
+  - on bass, the same chords by symbol on the `electric-bass` layout:
+    `root_fifth:<layout id>:<chord>` and `root_change:<layout id>:<from chord>:<to chord>`.
+  - They roll up to the nodes of the families table: `play-open-chords` and `change-chords` on
+    guitar, `play-root-fifth-lines` and `play-root-notes` on bass. A chord voicing suits the
+    instruments its diagram is linked to; a bass item suits the instruments of its layout.
+  - They are offered like any node's items: a path skill's as new, whatever it requires (no
+    prerequisite in practice), and other nodes' as stretch. Which chords a student has met is
+    not tracked.
+- **In a session** they are focus items of an in-hand session, never in the head, never the
+  warm-up or the application ending. At most 4 single chords and 2 changes a session. A single
+  chord takes 20 seconds, a change 90 (a bar of count-in, the minute and the count). On guitar,
+  a single chord comes before a change that uses it in the same session.
+- **How they are drawn:** a guitar chord is its voicing's chord box, named (playing it is the
+  skill, so the name gives nothing away). On bass, the root and fifth are marked on the bass
+  board, at the positions ADR-057 computes (lowest fret, then lowest string), inside frets 0–5;
+  a root change marks both roots.
+- **A single chord** is fretted, strummed once and rated clean, almost or struggled by the
+  student. It has no measure, so a clean take is fully fluent and accuracy alone decides its
+  level.
+- **A change** is one minute at a tempo, one change on every beat:
+  - the student sets the tempo before the minute (the metronome ticks while they try it), starts
+    it after a bar of count-in, and counts the changes that rang clean when it is over. The count
+    starts at the item's last count;
+  - the take sends the tempo and the count. Its rating follows from the share of the beats that
+    changed cleanly, count ÷ tempo: clean from 0.9, almost from 0.6, struggled below. The student
+    doesn't rate it, so the count and the rating never disagree;
+  - **the ladder** runs across sessions, since a session plays a change once. The plan starts a
+    change at the tempo of its last minute: 5 BPM up after two clean minutes in a row, 5 down
+    after a struggled one, never below 20. A change never played starts at 40;
+  - **the target** is the catalog's change target, the same for every pair and instrument: 60
+    clean changes a minute (version 1). A minute's fluency is its count ÷ the target. The best
+    clean count is the student's edge: a minute that isn't clean above it doesn't count against
+    them, as for a play-along's tempo.
+- **Not asked among options**, so the challenge rules on options and second ways don't apply.
+
+## Progression key tours
+
+`progression_keys` is played with the instrument in hand and rated. The student plays one
+progression of the progression catalog along with its backing, key after key around the cycle of
+fourths, and so learns it by number instead of by one fingering (MOT-150).
+
+- **Items:** every progression of the progression catalog on each of the `guitar` and
+  `electric-bass` layouts, keyed `progression_keys:<layout id>:<progression key>`, 20 items.
+  - Each item rolls up to `common-progressions` and its progression's nodes, plus
+    `play-shapes-in-any-key` on guitar or `play-chord-tone-lines` on bass.
+  - An item suits the instruments of its layout.
+  - Items are offered like any node's: a path skill's as new, with no prerequisite in practice.
+- **In a session**, a tour is a focus item of an in-hand session:
+  - never in the head, never the warm-up and never the application ending. Sessions in the head
+    practise the same progressions through the harmony and ear drills;
+  - at most 1 a session, played over up to 3 takes;
+  - it is sized like a play-along. Each take is a bar of count-in plus its bars at the start
+    tempo, then about 10 seconds to rate it.
+- **A take** plays the progression four times through (16 bars) when it has four bars, and once
+  when it is a 12-bar blues.
+  - It is in 4/4, one chord a bar, after a bar of count-in.
+  - The backing plays the chords in their voicings (the harmony drills' voicing rule) at the
+    take's tempo and note value.
+- **The key order** is the cycle of fourths from C, the same on every instrument: C F B♭ E♭ A♭
+  D♭ F# B E A D G. Keys are spelled as the chord catalog spells roots.
+- **The tour** keeps one tempo for the item, across sessions.
+  - **A clean key:** a key is clean when a take in it is rated clean at an effective speed at or
+    above the tour tempo. A clean take slower than the tour tempo, at a tempo the student chose,
+    doesn't make its key clean.
+  - **The next take:** after a clean take, it is in the next key of the cycle that isn't clean
+    yet, at the same tempo. After an almost or a struggle, it stays in the key.
+  - **A struggle** at or below the tour tempo lowers it by 5 BPM, never below 60% of the target.
+    Keys already clean stay clean, since they were clean faster. A struggle above the tour tempo,
+    at a tempo the student chose, is exploring and changes nothing, as for a play-along's best
+    clean tempo.
+  - **A finished tour:** when all 12 keys are clean, the tour tempo goes up 5 BPM and the tour
+    starts again at C, with no key clean. By itself it never climbs past the target.
+  - **Choosing a tempo:** the student may choose any tempo for a take, as on a play-along.
+  - **The start:** a session starts the item at the first key of the cycle not yet clean, at the
+    tour tempo, in the note value of the last clean take (quarters with none). A tour never
+    played starts at C, at 60% of the target rounded down to 5 BPM.
+  - **The target** is 100 BPM in quarters, the same for every progression and instrument
+    (`progression_keys.target_tempo_bpm`).
+- **How it is drawn** (Figma 17k; bass 18z):
+  - the progression's name; the last clean key and tempo with the key to play ("Clean in G at
+    84 BPM · now in A");
+  - the chart in chord symbols, in the take's key (a 12-bar blues in three lines of four);
+  - the key line: five keys of the cycle around the current one, with the clean ones ticked;
+  - the tempo control.
+  - **On guitar**, each chord's box is shown on demand (the chord card), from the harmony drills'
+    voicing rule, so every client draws the same box.
+  - **On bass**, the board marks each chord's root, third and fifth, so the line says whether
+    the chord is major or minor. Each tone sits at its lowest fret, then its lowest string,
+    inside frets 0–5: the rule of a root and fifth. A dominant seventh keeps root, third and
+    fifth on the board, and its symbol shows the 7.
+- **Rating:** the student rates each take clean, almost or struggled (`self_rating.v1`). The take
+  sends its tempo, its note value and the key it was played in. As for a play-along, a take's
+  fluency is its effective speed ÷ the target.
+- **The summary** says how many keys are clean at the tour tempo: "Clean in 3 of 12 keys at
+  85 BPM".
+- **Not asked among options**, so the challenge rules on options and second ways don't apply.
+
+## Guide tones
+
+`guide_tone` is tapped on the screen in time with a progression's playback, and so recalled in
+the head (MOT-151). While each chord sounds, the student taps a chord tone of it on an empty
+fretboard: its third, later its seventh. It connects the harmony to the neck, the first step of
+improvising over changes.
+
+- **Items:** every progression of the progression catalog on each of the `guitar` and
+  `electric-bass` layouts, keyed `guide_tone:<layout id>:<progression key>`, 20 items.
+  - Each item rolls up to `target-chord-tones`, plus `voice-lead` on guitar or
+    `play-chord-tone-lines` on bass.
+  - An item suits the instruments of its layout.
+  - Items are offered like any node's: a path skill's as new, with no prerequisite in practice.
+    A 12-bar blues is planned only once the student is accurate on `target-chord-tones`; until
+    then the four-bar progressions stand in.
+- **In a session**, a guide tone is a focus item of a session in the head, on a layout of the
+  student's instruments:
+  - never in an in-hand session: nothing is played on the instrument;
+  - at most 1 a session, over up to 3 takes. The item ends after a right take, or after its third;
+  - it is sized by its 3 takes at its start tempo: each a bar of count-in and the progression
+    once, then 5 seconds to see the result.
+- **What is asked** is picked each time the item is planned:
+  - **the tone:** each chord's third until the student is accurate on the item, then its seventh
+    in the key (the major seventh of I and IV, the minor seventh of every other chord and of a
+    dominant seventh);
+  - **the key:** one of the 12 major keys at random, never the key of the item's last take. Every
+    take of the item in a session is in the same key;
+  - **the tempo:** by the student's level on the item: 60 BPM while new or learning, 72 once
+    accurate, 90 once fluent. The student may change the tempo and the note value (a speed
+    factor) before a take. A tempo is never graded, but it sets the take's fluency.
+- **A take** is in 4/4, one chord a bar, after a bar of count-in. The progression plays once, in
+  the chords' voicings (the harmony drills' voicing rule); on the `electric-bass` layout, each
+  chord's root also plays under it in the bass voice. In eighths, a chord lasts half a bar, as on
+  a play-along.
+- **How it is drawn** (Figma 17l; bass 18l):
+  - the progression with its numerals and key ("ii – V – I in G") over the playback, and the
+    bars as chord symbols, the sounding one highlighted. The chords are named: tapping their
+    tone is the skill;
+  - the fretboard of frets 0–5 (the open string and frets 1–5), the same window on guitar and
+    on bass. Every pitch class lies inside it on both layouts. Nothing is marked on it: a tap
+    leaves a dot where it landed;
+  - a line naming the layout, the window and the bars hit so far ("Guitar · frets 0–5 · 2 of 2
+    in time so far"). A bar's result shows once the bar has passed, never while it sounds.
+- **The result** of a take shows each bar's chord as hit or missed. It never names the asked
+  notes or draws their places, so the next take in the same key is still asked.
+- **Grading** (`timed_taps.v1`): a bar is hit when a tap within it sounds the asked tone, in any
+  octave, and no tap within it sounds another note. The take is right only when every bar is
+  hit. The take sends its key, tone, tempo, note value and taps.
+- **Fluency:** a right take's fluency is its effective speed over the target, 90 BPM in quarters
+  (`guide_tones.target_tempo_bpm`), capped at 1, as for a play-along's tempo. The take's latency
+  is kept but never judged. So a student accurate at 72 BPM, the tempo the plan gives once
+  accurate, reaches the fluency that `fluent` needs.
+- **The summary** says how many bars the best take hit: "4 of 4 chords in time".
+- **Not asked among options**, so the challenge rules on options and second ways don't apply.
+
+## Songs
+
+A `song` is a published song chart played whole on the instrument in hand: the `use` rung, where
+a progression is applied in music (MOT-152). Teachers spend about half of practice on songs.
+
+- **Items:** every published song chart with at least one section tagged with a progression
+  (ADR-050, tagged by section since 2026-10-24), on each
+  of the `guitar` and `electric-bass` layouts, keyed `song:<layout id>:<song chart id>`. A song
+  on guitar and the same song on bass are two items.
+  - Its nodes are the nodes, in `progressions.yaml`, of every progression its sections are tagged
+    with: a chart whose verse is tagged `I-IV-V-I` rolls up to `common-progressions` and
+    `cadences`.
+  - A chart withdrawn later is no longer planned; its evidence stays.
+- **In a session**, a song is only ever the **application ending** of an in-hand session:
+  - the ending plays a subject, main first. For each, when the subject takes new items from the
+    `use` rung (its current rung, or the next one with material) and a song practises it, the
+    ending is that song; otherwise it is a play-along of the subject, as before;
+  - so a session plays at most one song, always last, never as the warm-up, a focus item or the
+    review block, and never in a session in the head;
+  - a chosen session has an ending when its subtree has a play-along or a song;
+  - it is sized at 2 minutes, then 10 seconds to rate it. Like any ending, it is skipped when
+    longer than a quarter of the session, so it ends sessions of 10 minutes or more.
+- **Which song**, among those that practise the subject: one never rated on the layout first,
+  then the one rated longest ago, at random among equals. The song of the student's last in-hand
+  session is taken only when no other fits.
+- **How it is played** (Figma row 11, frames 11g–11k): the whole chart as written, in its concert
+  key with its capo, never transposed. The item names the section that plays the subject's
+  progression ("Its verse plays I–IV–I–V"), its first such section. The chart's tempo, when
+  stated, is the metronome's target, an aid only (`design/patterns/self-rating.md`). On `guitar`
+  the student strums the chords; on `electric-bass` the item says "Play the root of each chord",
+  over the same chart, its chord symbols showing each chord's quality.
+- **Grading** (`self_rating.v1`): the whole song is rated once, struggled, almost or clean, with
+  no tempo, note value or key. Like a single chord, a clean rating is fully fluent: five clean
+  ratings on five days make a song fluent.
+- **Not asked among options**, so the challenge rules on options and second ways don't apply.
+
+Repertoire statuses, keep-alive reviews, the Songs tile and songs in challenges belong to MOT-76,
+which keeps this item and its key.
 
 ## Fretboard cells
 
@@ -47,6 +447,30 @@ the answer is timed. Thresholds and felt questions are per template, never per i
   |---|---|---|---|
   | `guitar` | 24 | 48 | 72 |
   | `electric-bass` | 24 | 24 | 48 |
+
+### Find every instance
+
+`fretboard_cell:find_every_instance` asks a cell by its note: "Tap every A", in the drill's fret
+window, on a board with nothing marked. The student taps and untaps places, then checks. How many
+places the note has is never shown, since it would let a student rule places out.
+
+- **One answer, graded on every cell it covers** (`multi_tap.v2`). The note is the planned cell's
+  note. Each place of the note in the window is right on its cell when tapped and wrong when
+  missed. Each other place tapped is wrong on its cell. Every cell of the window counts, whatever
+  skill it serves, so an answer can move cells of both `find-notes-root-strings` and
+  `find-notes-top-strings`.
+- **Accuracy only.** One time covers several taps, so the way has no fluent time, its evidence
+  carries no latency, and it never counts toward fluency. Naming and finding the note measure a
+  cell's speed. The answer still counts as a right answer of this way on each cell it was right
+  on, for choosing the way next time.
+- **Asked like the other two ways.** A cell is asked the way it has the fewest right answers,
+  `name_the_note`, then `find_the_note`, then `find_every_instance` on a tie. The way has its own
+  fret window, picked by the same rules. It isn't asked among options, so it has no second way
+  and never comes back.
+- **One question per note.** In a session, no two cells of the same layout and note are asked this
+  way, since one answer already covers both. The second cell is asked the way it has the next
+  fewest right answers instead.
+- **About 15 seconds** of the session, against 8 for naming or finding the note.
 
 ## Diagram shapes
 
@@ -107,8 +531,17 @@ the answer is timed. Thresholds and felt questions are per template, never per i
     | `fretboard_cell:find_the_note` | 4 s |
     | `diagram_shape:name_the_shape` | 4 s |
     | `diagram_shape:find_the_degree` | 4 s |
+    | `diatonic_chord:numeral_to_chord` | 4 s |
+    | `diatonic_chord:chord_to_numeral` | 4 s |
+    | `chord_function:chord_to_function` | 3 s |
+    | `chord_function:function_to_chord` | 4 s |
+    | `chart_progression:chart_to_numbers` | 6 s |
+    | `chart_progression:numbers_to_chart` | 8 s |
+    | `heard_chord:cadence_then_chord` | 3 s after the sound |
+    | `heard_chord:see_then_name` | 4 s |
+    | `heard_progression:progression_by_number` | 5 s after the sound |
 
-    The fretboard and diagram shape defaults stand in until the team benchmarks the drill,
+    The fretboard, diagram shape, harmony and ear defaults stand in until the team benchmarks the drill,
     which needs the drill built first; the benchmark is their version 2.
 
   - or a **benchmark**, twice the team's median net time on the drill.
@@ -127,6 +560,8 @@ the answer is timed. Thresholds and felt questions are per template, never per i
     never takes back a level.
   - An answer given before a template has any version counts for accuracy, never for fluency.
     That's why version 1 must be installed before a timed drill reaches students.
+  - An untimed template has no fluent time. A guide tone is measured in tempo instead (see
+    "Guide tones"); a cell's find every instance answers count for accuracy only.
 
 ## Felt questions
 
@@ -136,6 +571,18 @@ the answer is timed. Thresholds and felt questions are per template, never per i
 
 ## Acceptance
 
+- Every template names a rung of the ladder, and a `second_way` names another template of the
+  same item kind.
+- `hear_tempo_bpm` gives a tempo for every knowledge level.
+- Every chord drill names an open voicing of the chord catalog that exists, every change pair
+  names two of the chord drills' voicings, and no pair is listed twice in either order.
+- The chord drills' chord symbols are the chords of their voicings.
+- A change target version 1 is installed before chord changes reach students.
+- `guide_tones` gives a tempo for every knowledge level, and its fret window holds every pitch
+  class on each of its layouts.
+- `progression_keys.key_order` holds each of the 12 major keys once. Its layouts exist, and
+  every bass tour's chord tones fall inside frets 0–5 of the `electric-bass` layout.
+
 - Installing on an empty database twice gives identical template and threshold IDs.
 - The generated cells for a layout are exactly the strings and frets listed. A string the
   layout's instrument doesn't have fails the installation.
@@ -143,3 +590,5 @@ the answer is timed. Thresholds and felt questions are per template, never per i
 - Every family matches at least one catalog diagram, every matched diagram's `{shape}` is
   one of its family's members, and no diagram belongs to two families.
 - Installing aborts if a row with a fixed ID already exists with different data.
+- Every chord a harmony item can draw on guitar (every key's triads, every progression's chords
+  in every key) has an active voicing in the chord catalog.

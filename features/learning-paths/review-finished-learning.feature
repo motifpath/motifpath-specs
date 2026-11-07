@@ -4,10 +4,11 @@
 # reads never change the current course or path, an enrolment or any status. Progress stays put
 # because a completed node stays completed whatever arrives for it later (ADR-011). Events sent
 # during review carry a review marker for analytics. Accepting it is in
-# features/event-ingestion/ingest-tracking-event.feature. What the student sees is in
+# features/event-ingestion/ingest-tracking-event.feature; what the worker does with review events
+# is in features/practice/practice-sessions.feature and features/practice/knowledge-state.feature.
+# What the student sees is in
 # features/web/learning.feature and features/web/lesson-review.feature.
 
-@wip
 Feature: Read a finished course or path again
   As a student who finished a course or a standalone path
   I want to read its parts and lessons again without moving my progress
@@ -39,6 +40,22 @@ Feature: Read a finished course or path again
     And "alice" is enrolled in "fingerstyle-journey" with checkpoint 1 active
     When "alice" lists the parts of her "fingerstyle-journey" enrollment
     Then the response holds only the student path of "open-chords-path"
+
+  Scenario: After an update, only the parts of the version updated to are listed
+    Given "alice" is authenticated as a student
+    And "alice" is enrolled in "fingerstyle-journey" with checkpoint 2 active
+    And an admin publishes a new version of "fingerstyle-journey" with checkpoints "open-chords-path", "fingerpicking-path"
+    And "alice" updates her enrollment in "fingerstyle-journey"
+    When "alice" lists the parts of her "fingerstyle-journey" enrollment
+    Then the response holds only "open-chords-path" and "fingerpicking-path"
+
+  Scenario: After an update that reorders the parts, they follow the new order
+    Given "alice" is authenticated as a student
+    And "alice" is enrolled in "fingerstyle-journey" with checkpoint 2 active
+    And an admin publishes a new version of "fingerstyle-journey" with checkpoints "strumming-path", "open-chords-path"
+    And "alice" updates her enrollment in "fingerstyle-journey"
+    When "alice" lists the parts of her "fingerstyle-journey" enrollment
+    Then the response holds the student paths of "strumming-path" and "open-chords-path", in that order
 
   Scenario: Listing the parts of a finished course changes nothing
     Given "alice" is authenticated as a student
@@ -98,16 +115,3 @@ Feature: Read a finished course or path again
     Given "alice" is authenticated as a student
     When "alice" reads the student path "not-a-uuid"
     Then the request is rejected as invalid
-
-  # ── Progress during review ─────────────────────────────────────────────────
-
-  Scenario: A lesson reviewed in a finished course keeps its status
-    Given "alice" has completed course "fingerstyle-journey"
-    When "alice"'s lesson.started for the first item of "open-chords-path", marked as review, is processed
-    Then that item's status for "alice" is still "completed"
-    And the enrollment status is still "completed"
-
-  Scenario: A challenge answered in review counts as practice evidence
-    Given "alice" has completed course "fingerstyle-journey"
-    When "alice" answers an exercise of a challenge in "open-chords-path", marked as review
-    Then the answer is graded and counted in "alice"'s practice evidence like any other

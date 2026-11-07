@@ -1,19 +1,39 @@
-# MotifPath practice drill catalog v1 — the drill templates, the generated fretboard cells,
-# the diagram shape families and the timed thresholds installed in every environment. Rules: practice-drills.md.
+# MotifPath practice drill catalog v2 — the drill templates, the generated fretboard cells,
+# the diagram shape families, the timed thresholds, the chord drills, the change targets, the
+# progression key tours, the guide tones and the songs installed in every environment. Rules:
+# practice-drills.md.
 #
 # IDs are UUID v5 under the catalog namespace, from "drill-template/<key>" and
 # "drill-threshold/<template key>/v<version>" (reference-data.md).
 
+# Every template names its rung on the practice ladder: know, hear, play_clean, play_in_time,
+# move, target, use. A generated template asked among options names its second_way: the other
+# template that asks the same item, so a lucky guess meets the other way (ADR-057). A template
+# with comes_back: true also brings its item back later in the same session, asked that way
+# again, after at least three other items; a template asked among options with no second way
+# always does. A template not asked among options (guide_tone:tap_the_third,
+# fretboard_cell:find_every_instance) has neither.
 templates:
-  - {key: "fretboard_cell:name_the_note", item_kind: fretboard_cell, response_type: name_the_note, timed: true, names: {en: "Name the note", pt_BR: "Diga a nota"}, id: 4c6ffb77-ee8b-5fda-b243-784f4209bc65}
-  - {key: "fretboard_cell:find_the_note", item_kind: fretboard_cell, response_type: find_the_note, timed: true, names: {en: "Find the note", pt_BR: "Ache a nota"}, id: 6e38da0b-df26-5aa8-ab14-3b6640582174}
-  - {key: "diagram_shape:name_the_shape", item_kind: diagram_shape, response_type: name_the_shape, timed: true, names: {en: "Name the shape", pt_BR: "Diga a forma"}, id: 30abb724-d181-56d0-8255-889411531213}
-  - {key: "diagram_shape:find_the_degree", item_kind: diagram_shape, response_type: find_the_degree, timed: true, names: {en: "Find the degree", pt_BR: "Ache o grau"}, id: c11e550e-1612-5414-ba78-298e158700d0}
-  - {key: "exercise:text_response", item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Text exercises", pt_BR: "Exercícios de texto"}, id: eee88cdc-8c03-5246-b798-3ccf6941875f}
-  - {key: "exercise:audio_recognition", item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Listening exercises", pt_BR: "Exercícios de escuta"}, id: e11fdaf6-8f60-5348-ab8b-0333cb31c31f}
-  - {key: "exercise:image_recognition", item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Image recognition exercises", pt_BR: "Exercícios de reconhecimento de imagem"}, id: bfe9f72d-a2e9-5f43-a774-115b7da268f8}
-  - {key: "exercise:image_choice", item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Image choice exercises", pt_BR: "Exercícios de escolha de imagem"}, id: 2ba4103e-ce5d-554f-83a5-eba38a6ed2b6}
-  - {key: "exercise:audio_selection", item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Sound choice exercises", pt_BR: "Exercícios de escolha de som"}, id: 49aed57b-3886-53de-b6d1-4b842acc8ab1}
+  - {key: "fretboard_cell:name_the_note", rung: know, second_way: "fretboard_cell:find_the_note", item_kind: fretboard_cell, response_type: name_the_note, timed: true, names: {en: "Name the note", pt_BR: "Diga a nota"}, id: 4c6ffb77-ee8b-5fda-b243-784f4209bc65}
+  - {key: "fretboard_cell:find_the_note", rung: know, second_way: "fretboard_cell:name_the_note", item_kind: fretboard_cell, response_type: find_the_note, timed: true, names: {en: "Find the note", pt_BR: "Ache a nota"}, id: 6e38da0b-df26-5aa8-ab14-3b6640582174}
+  - {key: "fretboard_cell:find_every_instance", rung: know, item_kind: fretboard_cell, response_type: multi_tap, timed: false, names: {en: "Find every instance", pt_BR: "Ache todas as posições"}, id: f3e74d03-ed82-514f-99e0-8f7ed46f27d3}
+  - {key: "diagram_shape:name_the_shape", rung: know, second_way: "diagram_shape:find_the_degree", item_kind: diagram_shape, response_type: name_the_shape, timed: true, names: {en: "Name the shape", pt_BR: "Diga a forma"}, id: 30abb724-d181-56d0-8255-889411531213}
+  - {key: "diagram_shape:find_the_degree", rung: know, second_way: "diagram_shape:name_the_shape", item_kind: diagram_shape, response_type: find_the_degree, timed: true, names: {en: "Find the degree", pt_BR: "Ache o grau"}, id: c11e550e-1612-5414-ba78-298e158700d0}
+  - {key: "exercise:text_response", rung: know, item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Text exercises", pt_BR: "Exercícios de texto"}, id: eee88cdc-8c03-5246-b798-3ccf6941875f}
+  - {key: "exercise:audio_recognition", rung: hear, item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Listening exercises", pt_BR: "Exercícios de escuta"}, id: e11fdaf6-8f60-5348-ab8b-0333cb31c31f}
+  - {key: "exercise:image_recognition", rung: know, item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Image recognition exercises", pt_BR: "Exercícios de reconhecimento de imagem"}, id: bfe9f72d-a2e9-5f43-a774-115b7da268f8}
+  - {key: "exercise:image_choice", rung: know, item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Image choice exercises", pt_BR: "Exercícios de escolha de imagem"}, id: 2ba4103e-ce5d-554f-83a5-eba38a6ed2b6}
+  - {key: "exercise:audio_selection", rung: hear, item_kind: exercise, response_type: option_choice, timed: true, names: {en: "Sound choice exercises", pt_BR: "Exercícios de escolha de som"}, id: 49aed57b-3886-53de-b6d1-4b842acc8ab1}
+  - {key: "diatonic_chord:numeral_to_chord", rung: know, second_way: "diatonic_chord:chord_to_numeral", item_kind: diatonic_chord, response_type: generated_choice, timed: true, names: {en: "Numeral to chord", pt_BR: "Do grau ao acorde"}, id: b4a81a0e-1141-5139-a06a-6f2c7b0341ea}
+  - {key: "diatonic_chord:chord_to_numeral", rung: know, second_way: "diatonic_chord:numeral_to_chord", item_kind: diatonic_chord, response_type: generated_choice, timed: true, names: {en: "Chord to numeral", pt_BR: "Do acorde ao grau"}, id: cc7434af-9b59-5675-b90f-b340cd2ba8d3}
+  - {key: "chord_function:chord_to_function", rung: know, second_way: "chord_function:function_to_chord", item_kind: chord_function, response_type: generated_choice, timed: true, names: {en: "Chord to function", pt_BR: "Do acorde à função"}, id: a1c08e82-68e2-5d3c-8844-5a79599fc4f3}
+  - {key: "chord_function:function_to_chord", rung: know, second_way: "chord_function:chord_to_function", item_kind: chord_function, response_type: generated_choice, timed: true, names: {en: "Function to chord", pt_BR: "Da função ao acorde"}, id: b0f8fd07-9310-5b17-acb1-77070529421d}
+  - {key: "chart_progression:chart_to_numbers", rung: know, second_way: "chart_progression:numbers_to_chart", item_kind: chart_progression, response_type: generated_choice, timed: true, names: {en: "Read the chart", pt_BR: "Ler a cifra"}, id: 259ed951-c50c-5331-a2de-8475fda08106}
+  - {key: "chart_progression:numbers_to_chart", rung: know, second_way: "chart_progression:chart_to_numbers", item_kind: chart_progression, response_type: generated_choice, timed: true, names: {en: "Pick the chart", pt_BR: "Escolher a cifra"}, id: d63bfeed-3175-5b8a-a838-f543cec550ce}
+  - {key: "heard_chord:cadence_then_chord", rung: hear, second_way: "heard_chord:see_then_name", comes_back: true, item_kind: heard_chord, response_type: generated_choice, timed: true, names: {en: "Hear the chord", pt_BR: "Ouça o acorde"}, id: 001c9d1a-6bcb-5d1b-8656-b65a9a8dddfb}
+  - {key: "heard_chord:see_then_name", rung: hear, second_way: "heard_chord:cadence_then_chord", item_kind: heard_chord, response_type: generated_choice, timed: true, names: {en: "See the chord", pt_BR: "Veja o acorde"}, id: 91209c2d-71e8-52b2-a19b-f286d85f1c07}
+  - {key: "heard_progression:progression_by_number", rung: hear, comes_back: true, item_kind: heard_progression, response_type: generated_choice, timed: true, names: {en: "Hear the progression", pt_BR: "Ouça a progressão"}, id: c236ecad-5bd5-5755-b012-fd1999ee46b8}
+  - {key: "guide_tone:tap_the_third", rung: target, item_kind: guide_tone, response_type: timed_taps, timed: false, names: {en: "Guide tones", pt_BR: "Notas-guia"}, id: 448900eb-6410-554f-9e2e-dd96621008f6}
 
 # Which generated fretboard cells serve which skill, per fretboard layout. A layout is
 # named by its layout instrument; instruments with the same geometry share it (guitar and
@@ -104,3 +124,113 @@ thresholds:
   - {template: "fretboard_cell:find_the_note", version: 1, effective_from: "2026-10-06", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: b4038212-bd6e-5749-8b39-cc8862e1974e}
   - {template: "diagram_shape:name_the_shape", version: 1, effective_from: "2026-10-07", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 1d23d8ce-4370-5f08-9fcb-13c617874643}
   - {template: "diagram_shape:find_the_degree", version: 1, effective_from: "2026-10-07", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 9015ea31-c12f-5cd5-a5ce-6e0c0b507644}
+  - {template: "diatonic_chord:numeral_to_chord", version: 1, effective_from: "2026-10-15", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 5c06f0e7-016c-58e2-aa16-668e7303d0ec}
+  - {template: "diatonic_chord:chord_to_numeral", version: 1, effective_from: "2026-10-15", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: bcac1e2b-b992-5cc4-b79d-84cd0443c2dd}
+  - {template: "chord_function:chord_to_function", version: 1, effective_from: "2026-10-15", fluent_net_ms: 3000, source: default, sessions: 0, students: 0, id: 0708edcd-3cc5-5b26-956b-b2b31fde84c0}
+  - {template: "chord_function:function_to_chord", version: 1, effective_from: "2026-10-15", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 13bb96a1-a854-5ffc-a40e-1f42c9228b73}
+  - {template: "chart_progression:chart_to_numbers", version: 1, effective_from: "2026-10-15", fluent_net_ms: 6000, source: default, sessions: 0, students: 0, id: 434e18dc-ee2e-532e-b748-d2980df715f0}
+  - {template: "chart_progression:numbers_to_chart", version: 1, effective_from: "2026-10-15", fluent_net_ms: 8000, source: default, sessions: 0, students: 0, id: bfcdfcb0-a479-545e-a512-f0cf53e8eace}
+  - {template: "heard_chord:cadence_then_chord", version: 1, effective_from: "2026-10-16", fluent_net_ms: 3000, source: default, sessions: 0, students: 0, id: 5f5c21a4-5763-5f40-8e48-94d0803d760b}
+  - {template: "heard_chord:see_then_name", version: 1, effective_from: "2026-10-16", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 39073f67-3437-52fa-85d0-da2945a41600}
+  - {template: "heard_progression:progression_by_number", version: 1, effective_from: "2026-10-16", fluent_net_ms: 5000, source: default, sessions: 0, students: 0, id: 85f712d5-a4cb-5057-bae4-4db002e17974}
+
+# The tempo a question asked by ear starts at, in quarter notes per minute, by the student's
+# level on the item. The student may change it, and the answer is never graded on it.
+hear_tempo_bpm: {new: 70, learning: 70, accurate: 90, fluent: 110, retained: 110}
+
+# Chords played in hand (MOT-79): single chords played clean, and minutes of changes between two
+# chords, one change on every beat. A chord is an open voicing of the chord catalog, by its key;
+# on bass, the same chord's symbol, played as its root and fifth (or its root, in a change) on
+# the electric-bass layout. A change is one item for both directions, keyed in the order listed.
+# IDs are UUID v5 from "chord-drill/<voicing key>" and "chord-change/<from key>/<to key>".
+chord_drills:
+  bass_layout: electric-bass
+  voicings:
+    - {voicing: c-open, chord: "C", id: 85f8c0cf-00ab-5e44-9bf8-93b6dfc2b30e}
+    - {voicing: a-open, chord: "A", id: 756f0c7d-7099-55b7-9eb6-a8a6188d6666}
+    - {voicing: g-open, chord: "G", id: 2767fdc8-10f9-5bf7-967f-f0f3ca6f1654}
+    - {voicing: e-open, chord: "E", id: 35ee8677-7105-51f4-8944-749c2d1b1dc8}
+    - {voicing: d-open, chord: "D", id: cdd31617-a8c3-58f8-b1be-89eaa9294a66}
+    - {voicing: a-minor-open, chord: "Am", id: 5dbf1f22-5a33-5b37-8470-db3bb73461e0}
+    - {voicing: e-minor-open, chord: "Em", id: c8afa71b-2c2d-53bf-bd70-0ca14ae99d9a}
+    - {voicing: d-minor-open, chord: "Dm", id: 91e7bc54-7b01-526a-961c-81097785473c}
+  changes:
+    - {from: a-minor-open, to: c-open, id: 411f2e7c-89a6-5b73-bb8f-e1d02dc60e3c}
+    - {from: c-open, to: g-open, id: 0ea30916-1a46-5553-a22f-7e5bb3d87e69}
+    - {from: g-open, to: d-open, id: b17fcf5b-4b27-579b-99c2-b19661ae22c0}
+    - {from: d-open, to: a-open, id: 98fe3b03-9add-5b07-bf94-b4b3c2ec8c38}
+    - {from: a-open, to: e-open, id: ecf9af8a-1c33-508b-88f1-bb0f4e5f66cb}
+    - {from: a-minor-open, to: e-open, id: 6995e0fb-7955-581a-a777-dcb75af3f452}
+    - {from: e-minor-open, to: g-open, id: e194a68a-7295-5a8b-975a-2b4a575ada31}
+    - {from: d-open, to: e-minor-open, id: f3dafcce-6314-5817-aa24-ecb203aeb9e8}
+    - {from: a-minor-open, to: d-minor-open, id: eec553a2-ab5b-5276-9567-325dae6091e2}
+    - {from: e-minor-open, to: c-open, id: e467d02e-4ae4-5ec3-a6ca-401126630f96}
+  # At most this many of each in one session.
+  max_voicings_per_session: 4
+  max_changes_per_session: 2
+  # Seconds each takes in a session: a change is a bar of count-in, the minute and the count.
+  voicing_seconds: 20
+  change_seconds: 90
+  # The change ladder, in BPM (one change on every beat): the first minute's tempo, the step,
+  # and the floor.
+  change_first_tempo_bpm: 40
+  change_tempo_step_bpm: 5
+  change_min_tempo_bpm: 20
+  # A minute's rating, from the share of its beats that changed cleanly.
+  change_rating_from: {clean: 0.9, almost: 0.6}
+
+# Versioned targets for chord and root changes: the clean changes a minute that count as fully
+# fluent, for every pair, on every instrument. Versioned like the fluent times; never edit an
+# installed one. IDs are UUID v5 from "change-target/v<version>".
+change_targets:
+  - {version: 1, effective_from: "2026-10-18", changes_per_minute: 60, source: default, id: 02685c89-9b1e-5fd8-bd54-a733ce804181}
+
+# Progression key tours (MOT-150): a progression of the progression catalog played along with,
+# key after key around the cycle of fourths, on the guitar and electric-bass layouts. Items are
+# progression_keys:<layout id>:<progression key>, generated from the progression catalog, so
+# they have no rows or IDs of their own.
+progression_keys:
+  layouts: [guitar, electric-bass]
+  # The tour order, the same on every instrument, spelled as the chord catalog spells roots.
+  key_order: [C, F, Bb, Eb, Ab, Db, F#, B, E, A, D, G]
+  # Times through the progression in one take, by its bar count.
+  times_through: {4: 4, 12: 1}
+  max_per_session: 1
+  takes_per_session: 3
+  # The tour tempo, in quarter notes per minute: the target, the first tour's start (a share of
+  # the target, rounded down to a step), the step up after a finished tour and down after a
+  # struggle, and the floor (a share of the target).
+  target_tempo_bpm: 100
+  first_tempo_share: 0.6
+  tempo_step_bpm: 5
+  min_tempo_share: 0.6
+
+# Guide tones (MOT-151): a progression of the progression catalog played once in a key, the
+# student tapping a chord tone of each chord on the fretboard as it sounds, on the guitar and
+# electric-bass layouts. Items are guide_tone:<layout id>:<progression key>, generated from the
+# progression catalog, so they have no rows or IDs of their own.
+guide_tones:
+  layouts: [guitar, electric-bass]
+  # The window tapped in, on every layout: the open string and frets 1-5.
+  fret_window: {from_fret: 0}
+  max_per_session: 1
+  takes_per_session: 3
+  # The tone asked: the third, then the seventh from this level on the item.
+  seventh_from_level: accurate
+  # A 12-bar form is planned only from this level on target-chord-tones.
+  twelve_bar_from_level: accurate
+  # The tempo a take starts at, in quarter notes per minute, by the student's level on the item,
+  # and the target a right take's effective speed is measured against.
+  tempo_bpm: {new: 60, learning: 60, accurate: 72, fluent: 90, retained: 90}
+  target_tempo_bpm: 90
+
+# Songs (MOT-152): a published song chart, tagged with the progressions it plays, played whole on
+# the guitar and electric-bass layouts as a session's application ending. Items are
+# song:<layout id>:<song chart id>, generated from the published charts, so they have no rows or
+# IDs of their own.
+songs:
+  layouts: [guitar, electric-bass]
+  max_per_session: 1
+  # The item's estimate: playing the song, then rating it.
+  estimated_seconds: 120
+  rate_seconds: 10

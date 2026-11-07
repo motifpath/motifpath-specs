@@ -24,6 +24,49 @@ Feature: Ingest practice events
     Then the event is accepted and stored in the event log
     And the server returns the submitted event identifier and a receipt timestamp
 
+  Scenario: A note named among four choices is accepted with its choices
+    When "alice" submits a practice.item_answered event naming the note "C" among "B", "F", "C" and "C#" for the guitar cell on string 5 at fret 3
+    Then the event is accepted and stored in the event log
+    And the stored and published practice.item_answered event keeps the choices "B", "F", "C" and "C#"
+
+  Scenario: An item skipped because its sound failed to load is accepted as not answered
+    When "alice" submits a practice.item_answered event skipping exercise "hear-the-fifth" because its sound failed to load
+    Then the event is accepted and stored in the event log
+    And the stored and published practice.item_answered event is not answered, with the reason "failed_to_load"
+
+  Scenario: A generated question's answer is accepted with the options it was asked among
+    When "alice" submits a practice.item_answered event picking "Em" among "Em", "C", "Am" and "Bm" for the chord on vi in G
+    Then the event is accepted and stored in the event log
+
+  Scenario: A play-along take rated with its note value keeps it
+    When "alice" submits a practice.item_answered event rating a take of a play-along "clean" at 60 BPM in eighths
+    Then the event is accepted and stored in the event log
+    And the stored and published practice.item_answered event keeps the tempo of 60 BPM and the note value eighths
+
+  Scenario: A progression key tour take keeps the key it was played in
+    When "alice" submits a practice.item_answered event rating a take of the progression key tour of "I-V-vi-IV" on guitar "clean" at 85 BPM in A
+    Then the event is accepted and stored in the event log
+    And the stored and published practice.item_answered event keeps the tempo of 85 BPM and the key A
+
+  Scenario: A rating of a song is accepted under its song key
+    When "alice" submits a practice.item_answered event rating the song "Amazing Grace" on guitar "clean"
+    Then the event is accepted and stored in the event log
+    And the stored and published practice.item_answered event names the item "song:<guitar layout id>:<Amazing Grace's chart id>"
+
+  Scenario: A guide-tone take keeps its note value
+    When "alice" submits a practice.item_answered event for a guide-tone take of "ii-V-I" in C at 60 BPM in eighths with no taps
+    Then the event is accepted and stored in the event log
+    And the stored and published practice.item_answered event keeps the tempo of 60 BPM and the note value eighths
+
+  Scenario: A guide-tone take with no taps keeps its empty list of taps
+    When "alice" submits a practice.item_answered event for a guide-tone take of "ii-V-I" in C at 120 BPM with no taps
+    Then the event is accepted and stored in the event log
+    And the stored and published practice.item_answered event keeps an empty list of taps
+
+  Scenario: Every place of a note tapped in a fret window is accepted
+    When "alice" submits a practice.item_answered event tapping string 6 at fret 3, string 4 at fret 5 and string 1 at fret 3 for the note "G" in the window from fret 3
+    Then the event is accepted and stored in the event log
+
   Scenario: A practice.session_ended event with how a drill felt is accepted
     When "alice" submits a practice.session_ended event with 6 items answered, not left early, and "fretboard_cell:name_the_note" felt "about_right"
     Then the event is accepted and stored in the event log
@@ -99,3 +142,23 @@ Feature: Ingest practice events
     When "alice" submits a practice.item_answered event with neither a practice session nor a trigger context
     Then the submission is rejected as invalid
     And the rejection identifies "practice_session_id" as the source of the error
+
+  Scenario: A note named among three choices is rejected
+    When "alice" submits a practice.item_answered event naming the note "C" among "B", "C" and "C#" for the guitar cell on string 5 at fret 3
+    Then the submission is rejected as invalid
+    And the rejection identifies "response" as the source of the error
+
+  Scenario: A take rated with a note value that isn't one is rejected
+    When "alice" submits a practice.item_answered event rating a take of a play-along "clean" at 60 BPM in the note value "fifths"
+    Then the submission is rejected as invalid
+    And the rejection identifies "note_value" as the source of the error
+
+  Scenario: A take rated in a key that isn't one is rejected
+    When "alice" submits a practice.item_answered event rating a take of the progression key tour of "I-V-vi-IV" on guitar "clean" at 85 BPM in the key "H"
+    Then the submission is rejected as invalid
+    And the rejection identifies "music_key" as the source of the error
+
+  Scenario: A generated question's answer offering a single option is rejected
+    When "alice" submits a practice.item_answered event picking "Em" among "Em" for the chord on vi in G
+    Then the submission is rejected as invalid
+    And the rejection identifies "response" as the source of the error

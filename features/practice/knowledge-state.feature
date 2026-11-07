@@ -6,8 +6,8 @@ Feature: Derive a student's knowledge of an item from evidence
   # Rules: counted evidence becomes a hit, a miss or a hold. Sources weigh auto-graded 0.3,
   # self-assessed 0.3, teacher-reviewed 0.6. Leitner boxes wait 1, 2, 4, 8, 16, 32 days.
   # accurate = 3+ counted attempts and accuracy >= 0.8; fluent = 5+ attempts, accuracy >= 0.9
-  # and fluency >= 0.8; retained = fluent in box 5 or higher. A wrong note picked among k
-  # choices counts -1/(k-1) toward accuracy (amended 2026-10-08).
+  # and fluency >= 0.8; retained = fluent in box 5 or higher. A pick among choices counts like
+  # any answer: right 1, wrong 0 (the -1/(k-1) guess rule of 2026-10-08 was withdrawn on 2026-10-14).
 
   Background:
     Given student "alice" practises the guitar fretboard cell on string 5 at fret 3
@@ -26,6 +26,10 @@ Feature: Derive a student's knowledge of an item from evidence
     Given "alice"'s tap time is 300 milliseconds
     When "alice" answers the cell correctly 5 times, each in 1900 milliseconds
     Then "alice"'s level for the cell is "fluent"
+
+  Scenario: Answers given while reviewing a finished course count like any other
+    When "alice" answers the cell correctly 3 times on 3 different days, each marked as review
+    Then "alice"'s level for the cell is "accurate"
 
   Scenario: A fluent item that holds up in long reviews is retained
     Given "alice" is fluent on the cell and the cell is in box 4
@@ -50,45 +54,29 @@ Feature: Derive a student's knowledge of an item from evidence
     When "alice" answers the cell wrongly
     Then the cell moves to box 1 and is next due in 1 day
 
-  # ── Guessing among choices ─────────────────────────────────────────────────
-  # A wrong pick among k recorded choices counts -1/(k-1) toward accuracy instead of 0, so
-  # guessing among four averages 0. Accuracy is floored at 0. Name the note only, for now.
+  # ── Picks among choices ────────────────────────────────────────────────────
+  # No guess correction (ADR-057, withdrawing ADR-046's 1/(k-1) rule before it shipped): a wrong
+  # pick among choices counts 0 like any wrong answer. A lucky guess is caught by asking the item
+  # again, the other way or later in the session.
 
-  @wip
-  Scenario: Six right picks of seven among four note choices make a cell accurate
-    When "alice" names the cell among four choices, right 6 times and wrong once
-    Then "alice"'s accuracy on the cell is 0.81
-    And "alice"'s level for the cell is "accurate"
-
-  @wip
-  Scenario: Four right picks of five among four note choices are not yet accurate
-    When "alice" names the cell among four choices, right 4 times and wrong once
-    Then "alice"'s accuracy on the cell is 0.73
+  Scenario: A wrong pick among four note choices counts as a plain miss
+    When "alice" names the cell among four choices, right 3 times and then wrong once
+    Then "alice"'s accuracy on the cell is 0.7, as after any wrong answer
     And "alice"'s level for the cell is "learning"
 
-  @wip
-  Scenario: Picking no better than chance among four note choices reads as no accuracy
-    When "alice" names the cell among four choices, right once and wrong 5 times
-    Then "alice"'s accuracy on the cell is 0
-    And "alice"'s level for the cell is "learning"
+  # ── Find every instance (MOT-153) ──────────────────────────────────────────
+  # One find every instance answer gives evidence on every cell of its window, for accuracy only:
+  # its time covers several taps, so it never counts toward a cell's fluency.
 
-  @wip
-  Scenario: A wrong tap finding the note counts as a plain miss
-    When "alice" finds the cell's note, right 4 times and wrong once
-    Then "alice"'s accuracy on the cell is 0.8
-    And "alice"'s level for the cell is "accurate"
+  Scenario: Right answers from finding every instance make a cell accurate, never fluent
+    When "alice" finds every instance of the cell's note correctly 5 times on 5 different days, each in 1500 milliseconds
+    Then "alice"'s level for the cell is "accurate"
 
-  @wip
-  Scenario: A note named on the twelve-note keypad counts as a plain miss
-    When "alice" names the cell on the twelve-note keypad, right 4 times and wrong once
-    Then "alice"'s accuracy on the cell is 0.8
-    And "alice"'s level for the cell is "accurate"
-
-  @wip
-  Scenario: A wrong pick among four note choices still sends the cell back to box 1
-    Given the cell is in box 3
-    When "alice" names the cell among four choices wrongly
-    Then the cell moves to box 1 and is next due in 1 day
+  Scenario: A cell is fluent from timed answers, whatever finding every instance adds
+    Given "alice"'s tap time is 300 milliseconds
+    And "alice" has found every instance of the cell's note correctly 3 times
+    When "alice" answers the cell correctly 5 times, each in 1900 milliseconds
+    Then "alice"'s level for the cell is "fluent"
 
   # ── Self-rated and teacher-reviewed takes ──────────────────────────────────
 
@@ -107,6 +95,56 @@ Feature: Derive a student's knowledge of an item from evidence
     When "alice" rates a take of "pentatonic-run" as "struggled" at 100 BPM
     Then the take is counted as a miss
 
+  # A take's tempo is compared at effective speed: its BPM times its note value's factor
+  # (quarters x1, eighths x2, triplets x3, sixteenths x4; no note value = quarters; ADR-061).
+  Scenario: A clean take in eighths beats a faster-looking tempo in quarters
+    Given "alice"'s best clean tempo on "pentatonic-run" is 110 BPM
+    When "alice" rates a take of "pentatonic-run" as "clean" at 60 BPM in eighths
+    Then "alice"'s best clean tempo on "pentatonic-run" is 60 BPM in eighths
+
+  Scenario: A take in eighths that isn't clean above the best clean tempo's effective speed doesn't count
+    Given "alice"'s best clean tempo on "pentatonic-run" is 110 BPM
+    When "alice" rates a take of "pentatonic-run" as "struggled" at 60 BPM in eighths
+    Then the take is not counted as a miss
+
+  Scenario: A take in quarters slower than a best clean tempo in eighths is a real miss
+    Given "alice"'s best clean tempo on "pentatonic-run" is 60 BPM in eighths
+    When "alice" rates a take of "pentatonic-run" as "struggled" at 110 BPM
+    Then the take is counted as a miss
+
+  # A chord change's fluency is its clean count over the catalog's change target, 60 clean changes
+  # a minute; a single chord has no measure, so a clean take is fully fluent (MOT-79).
+  Scenario: Five clean minutes near the target make a chord change fluent
+    Given "alice" practises the chord change "a-minor-open" to "c-open"
+    When "alice" plays 5 clean minutes of it on 5 different days, each 54 clean changes at 60 BPM
+    Then "alice"'s level for the chord change is "fluent"
+
+  Scenario: Clean minutes far below the target leave a chord change accurate, not fluent
+    Given "alice" practises the chord change "a-minor-open" to "c-open"
+    When "alice" plays 5 clean minutes of it on 5 different days, each 30 clean changes at 30 BPM
+    Then "alice"'s level for the chord change is "accurate"
+
+  Scenario: A struggled minute above the best clean count doesn't count against the student
+    Given "alice"'s best clean count on the chord change "a-minor-open" to "c-open" is 40
+    When "alice" plays a minute of it with 45 clean changes at 90 BPM
+    Then the minute is not counted as a miss
+
+  Scenario: A struggled minute at or below the best clean count is a real miss
+    Given "alice"'s best clean count on the chord change "a-minor-open" to "c-open" is 40
+    When "alice" plays a minute of it with 30 clean changes at 60 BPM
+    Then the minute is counted as a miss
+
+  Scenario: Five clean takes make a single chord fluent
+    Given "alice" practises the single chord "a-minor-open"
+    When "alice" rates 5 takes of it "clean" on 5 different days
+    Then "alice"'s level for the single chord is "fluent"
+
+  # A song has no measure either: a clean rating is fully fluent (MOT-152).
+  Scenario: Five clean ratings make a song fluent
+    Given "alice" practises the song "Amazing Grace" on guitar
+    When "alice" rates it "clean" on 5 different days
+    Then "alice"'s level for the song is "fluent"
+
   # Parked until ADR-046 follow-up slice 5 (teacher notes): no teacher review exists yet.
   @wip
   Scenario: A teacher review resets the student's own best clean tempo
@@ -114,6 +152,40 @@ Feature: Derive a student's knowledge of an item from evidence
     When a teacher reviews "alice"'s "pentatonic-run" as clean at 100 BPM and verified
     Then "alice"'s best clean tempo on "pentatonic-run" is 100 BPM
     And "pentatonic-run" is verified for "alice"
+
+  # A progression key tour's fluency is a take's effective speed over the tour target, 100 BPM, as
+  # for a play-along's tempo over its target (MOT-150).
+  Scenario: Five clean takes at the target make a progression key tour fluent
+    Given "alice" practises the progression key tour of "I-V-vi-IV" on guitar
+    When "alice" rates 5 takes of it "clean" at 100 BPM on 5 different days, each in another key
+    Then "alice"'s level for the progression key tour is "fluent"
+
+  Scenario: Clean takes far below the target leave a progression key tour accurate, not fluent
+    Given "alice" practises the progression key tour of "I-V-vi-IV" on guitar
+    When "alice" rates 5 takes of it "clean" at 60 BPM on 5 different days, each in another key
+    Then "alice"'s level for the progression key tour is "accurate"
+
+  # A guide tone's fluency is a right take's effective speed over 90 BPM, as for a play-along's
+  # tempo over its target; its latency is kept but never judged (MOT-151).
+  Scenario: Five right guide-tone takes at 72 BPM make the guide tone fluent
+    Given "alice" practises the guide tone of "ii-V-I" on guitar
+    When "alice" makes 5 right takes of it at 72 BPM on 5 different days
+    Then "alice"'s level for the guide tone is "fluent"
+
+  Scenario: Right guide-tone takes at 60 BPM leave the guide tone accurate, not fluent
+    Given "alice" practises the guide tone of "ii-V-I" on guitar
+    When "alice" makes 5 right takes of it at 60 BPM on 5 different days
+    Then "alice"'s level for the guide tone is "accurate"
+
+  Scenario: A guide-tone take in eighths counts at its effective speed
+    Given "alice" practises the guide tone of "ii-V-I" on guitar
+    When "alice" makes 5 right takes of it at 45 BPM in eighths on 5 different days
+    Then "alice"'s level for the guide tone is "fluent"
+
+  Scenario: A slow right take with a late hit is not held against the student
+    Given "alice" practises the guide tone of "ii-V-I" on guitar
+    When "alice" makes 5 right takes of it at 90 BPM on 5 different days, each hitting a bar 2000 milliseconds after its downbeat
+    Then "alice"'s level for the guide tone is "fluent"
 
   # ── Edge cases ─────────────────────────────────────────────────────────────
 

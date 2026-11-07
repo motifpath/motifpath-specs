@@ -30,10 +30,12 @@ take.
   A song's question names no BPM (D17): the chart has no timing to grade the take against.
 - **Restart without rating** is a tertiary link above the tiles: it throws the take away and goes
   back to the tempo, recording nothing.
-- **TempoControl (the tempo ladder):** one 48 px row — metronome toggle (on by default), a slider
-  in 5 BPM steps from the ladder's slowest tempo to 300 BPM as the main control, ticks for the best
-  clean tempo and the goal, and the value at body size; tapping the value lets the student type an
-  exact BPM. The meta line above says "Take 1 of 3 · Goal 96 BPM · best clean 68".
+- **TempoControl (the tempo ladder):** the metronome row (`metronome.md`): metronome toggle (on by
+  default), a slider in 5 BPM steps from the ladder's slowest tempo to 300 BPM as the main control,
+  ticks for the best clean tempo and the goal, the value at body size (tap to type an exact BPM),
+  and the current note value as an icon, whose popover offers quarters, eighths, triplets and
+  sixteenths (ADR-061). The meta line above says "Take 1 of 3 · Goal 96 BPM · best clean 68"; a
+  best clean take in another note value reads as played ("best clean 80 in eighths").
 - **While playing:** the take ends by itself. **Restart** (back to the tempo, nothing rated) sits
   beside **Stop early**, so a wrong tempo is fixed without rating a bad take.
 - **After the last take,** Next up shows what was played and the fastest clean tempo, then the next

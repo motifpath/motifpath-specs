@@ -10,6 +10,9 @@ Feature: Compose a practice session
   # stretch, as for a caught-up student. Weak = practised, not due, not yet fluent. Stretch reaches
   # only nodes connected to what the student is learning: path skills, their applies and part_of
   # neighbours, and nodes that build on something the student has met. Every pick carries a reason.
+  # Focus (ADR-057): a session practises at most three subjects (knowledge nodes), main first, and
+  # names them; due items of other nodes come in a review block of at most 20% of the focus time or
+  # 5 items. New and stretch items come from each subject's current rung and the next one.
 
   Background:
     Given student "alice" plays "guitar" and "electric-bass"
@@ -49,11 +52,11 @@ Feature: Compose a practice session
     Then exactly one item has the reason application
     And the focus time is the 20 minutes less the warm-up and that play-along's estimated time
 
-  Scenario: With no play-along on a focus skill, the ending applies another skill of the path
-    Given no skill of the session's focus items has a play-along on guitar
-    And "alice"'s path skill "chord-tones" has the play-along "chord-tone-riff" on guitar
+  Scenario: With no play-along on any of its subjects, Today's mix has no application ending
+    Given "alice" has due items only on "diatonic-chords", "chord-tones" and "change-chords" on guitar, and none of them has a play-along
+    And "alice"'s path skill "notes-on-high-strings" has the play-along "high-strings-riff" on guitar
     When "alice" composes a 10-minute session with "guitar" in hand
-    Then the last item is "chord-tone-riff" with the reason application
+    Then no item in the session has the reason application
 
   Scenario: With no play-along on the instrument at all, the session has no ending and keeps the time for focus
     Given none of "alice"'s path skills has a play-along on "electric-bass"
@@ -136,7 +139,7 @@ Feature: Compose a practice session
     Then no item in the session has the reason warm_up or application
 
   Scenario: A fretboard cell is asked the way it has fewer right answers
-    Given "alice" has named the note of the "guitar" cell on string 6, fret 3 correctly 4 times and found it correctly once
+    Given "alice" has named the note of the "guitar" cell on string 6, fret 3 correctly 4 times, found it correctly once and found every instance of it correctly 2 times
     When the cell is picked for "alice"'s session in the head
     Then it is asked as find_the_note
 
@@ -148,6 +151,144 @@ Feature: Compose a practice session
   Scenario: A fretboard cell takes about 8 seconds of the session
     When "alice" composes a 5-minute session with no instrument in hand
     Then every fretboard cell in the session is estimated at 8 seconds
+
+  # ── Language ───────────────────────────────────────────────────────────────
+
+  # ADR-024: content is never silently offered in another language. An authored exercise is
+  # picked only when it is available in the student's locale or tagged "any". Generated drills
+  # and play-alongs are shown in the student's locale, so the rule doesn't affect them.
+
+  Scenario: Only exercises in the student's language are picked
+    Given "alice" has locale "pt_BR"
+    And "alice"'s path skill "chord-tones" has the exercise "name-the-third" in English only
+    And "alice"'s path skill "chord-tones" has the exercise "nomeie-a-terca" in Portuguese
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the session includes "nomeie-a-terca" with the reason new
+    And "name-the-third" is not in the session
+
+  Scenario: An exercise for any language is picked whatever the student's locale
+    Given "alice" has locale "pt_BR"
+    And "alice"'s path skill "chord-tones" has the exercise "hear-the-third" for any language
+    And "alice" has never answered "hear-the-third"
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the session includes "hear-the-third" with the reason new
+
+  Scenario: A due exercise not in the student's language is not reviewed
+    Given "alice"'s path skill "chord-tones" has the exercise "name-the-third" in English only
+    And the review of "name-the-third" is due for "alice"
+    And "alice" has locale "pt_BR"
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then "name-the-third" is not in the session
+
+  # ── Fret windows ───────────────────────────────────────────────────────────
+  # A fretboard drill never scrolls sideways: each drill of each layout is asked inside one window
+  # of five frets the composer picks, plus the open string when it starts at the nut (frets 0–5).
+  # The window holds the most of the drill's due cells, then weak, then new, nearest the nut on a
+  # tie. On a new-cell turn (the student has started an odd number of sessions in the head so far)
+  # a drill with new cells takes the window with the most new cells instead. Cells are frets 0 to
+  # 11, so the windows are 0–5, 2–6, 3–7 and so on up to 7–11. A guitar cell nobody has answered
+  # is new, and new cells are asked as name_the_note.
+
+  Scenario: Every cell of a drill comes from one window of five frets
+    Given "alice" has nothing due on guitar
+    And 20 weak "guitar" cells across frets 0 to 11, to be asked as find_the_note
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the session has "guitar" cells asked as find_the_note and as name_the_note
+    And every "guitar" find_the_note cell in the session carries the same fret window
+    And every "guitar" name_the_note cell in the session carries the same fret window
+    And every fretboard cell's fret is inside its window
+
+  Scenario: A window at the nut includes the open string
+    Given "alice" has nothing due or weak, and 40 new fretboard cells on guitar
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" name_the_note cells carry the fret window 0 to 5
+
+  Scenario: The window holds the most due cells, nearest the nut on a tie
+    Given "alice" has started 4 sessions in the head
+    And 6 "guitar" cells due at frets 7 to 9, to be asked as name_the_note
+    And 2 "guitar" cells due at frets 1 and 2, to be asked as name_the_note
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" name_the_note cells carry the fret window 5 to 9
+
+  Scenario: With nothing due, the window holds the most weak cells
+    Given "alice" has nothing due on guitar
+    And 5 weak "guitar" cells at frets 8 to 10, to be asked as find_the_note
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" find_the_note cells carry the fret window 6 to 10
+
+  Scenario: A due cell outside the drill's window is not picked
+    Given "alice" has started 4 sessions in the head
+    And 6 "guitar" cells due at frets 7 to 9 and 1 due at fret 0, all to be asked as name_the_note
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the session has no "guitar" name_the_note cell at fret 0
+
+  Scenario: On a new-cell turn, name the note moves to the window with the most new cells
+    Given "alice" has started 5 sessions in the head
+    And every "guitar" cell at frets 0 to 5 has been answered, 6 of them due, to be asked as name_the_note
+    And the "guitar" cells at frets 6 to 11 are new
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" name_the_note cells carry the fret window 6 to 10
+
+  Scenario: On the next session, name the note goes back to the due cells
+    Given "alice" has started 6 sessions in the head
+    And every "guitar" cell at frets 0 to 5 has been answered, 6 of them due, to be asked as name_the_note
+    And the "guitar" cells at frets 6 to 11 are new
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" name_the_note cells carry the fret window 0 to 5
+
+  Scenario: On a new-cell turn, a drill with no new cells keeps its due cells
+    Given "alice" has started 5 sessions in the head
+    And 6 "guitar" cells due at frets 1 to 3, to be asked as find_the_note
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" find_the_note cells carry the fret window 0 to 5
+
+  Scenario: Each drill has its own window
+    Given "alice" has started 4 sessions in the head
+    And 6 "guitar" cells due at frets 8 to 10, to be asked as name_the_note
+    And 6 "guitar" cells due at frets 1 to 3, to be asked as find_the_note
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" name_the_note cells carry the fret window 6 to 10
+    And the "guitar" find_the_note cells carry the fret window 0 to 5
+
+  Scenario: In a session mixing layouts, each layout's drill has its own window
+    Given "alice" has started 4 sessions in the head
+    And 6 "guitar" cells due at frets 7 to 9, to be asked as name_the_note
+    And 6 "electric-bass" cells due at frets 1 to 3, to be asked as name_the_note
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" name_the_note cells carry the fret window 5 to 9
+    And the "electric-bass" name_the_note cells carry the fret window 0 to 5
+
+  # ── Find every instance (MOT-153) ──────────────────────────────────────────
+  # A third way of asking a cell: its note is named and every place of it in the window is
+  # tapped. A cell is asked the way it has the fewest right answers, name_the_note, then
+  # find_the_note, then find_every_instance on a tie. The way has its own fret window.
+
+  Scenario: A cell found and named more often than found everywhere is asked to find every instance
+    Given "alice" has named the note of the "guitar" cell on string 6, fret 3 correctly twice, found it correctly twice and found every instance of it correctly once
+    When the cell is picked for "alice"'s session in the head
+    Then it is asked as find_every_instance
+
+  Scenario: A tie between finding the note and finding every instance asks find_the_note
+    Given "alice" has named the note of the "guitar" cell on string 6, fret 3 correctly twice, found it correctly once and found every instance of it correctly once
+    When the cell is picked for "alice"'s session in the head
+    Then it is asked as find_the_note
+
+  Scenario: Two cells of the same note are never both asked to find every instance
+    Given the "guitar" cells on string 6, fret 3 and string 1, fret 3 are both due, to be asked as find_every_instance
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then at most one of them is asked as find_every_instance
+    And the other one, if picked, is asked as name_the_note or find_the_note
+
+  Scenario: Every find every instance cell carries its drill's window
+    Given "alice" has nothing due on guitar
+    And 6 weak "guitar" cells at frets 3 to 7, to be asked as find_every_instance
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then the "guitar" find_every_instance cells carry the fret window 3 to 7
+
+  Scenario: A cell asked to find every instance takes about 15 seconds of the session
+    Given 6 weak "guitar" cells at frets 3 to 7, to be asked as find_every_instance
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then every fretboard cell asked as find_every_instance is estimated at 15 seconds
 
   Scenario: A session in the head picks diagram shapes of the student's instruments
     Given "alice" has new shapes of skill "map-fretboard-caged" on guitar
@@ -234,6 +375,279 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with no instrument in hand
     Then no two fretboard cells in a row are on the same string while a cell on another string is left
 
+  # ── Focus: subjects and rungs ──────────────────────────────────────────────
+  # A subject is one knowledge node. Today's mix takes its subjects in this order until it has
+  # three: a teacher's suggestion; the nodes with the most due and weak time; the nodes its new
+  # items come from, path skills first; the nodes with items coming due within the week, soonest
+  # first; the stretch nodes. Only its subjects' items fill the session, so it may end short.
+  # Due items of other nodes form the review block: it is filled first, from the due share, and
+  # comes right after the warm-up. The application ending plays a subject, main first, or there
+  # is none. A subject's current rung is the lowest rung on the ladder (know, hear, play_clean,
+  # play_in_time, move, target, use) with material for the session whose items on that subject
+  # are not yet accurate.
+
+  Scenario: Today's mix practises at most three subjects and names them
+    Given "alice" has due and weak items on 6 skills of their path on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then the plan names at most 3 focus nodes
+    And every item other than the warm-up and the review block practises one of them
+
+  Scenario: The main subject is the node with the most due and weak time
+    Given "alice" has 4 minutes of due and weak items on "diatonic-chords" and 2 minutes on "chord-tones" on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then the plan's first focus node is "diatonic-chords"
+
+  Scenario: Due items of other nodes come in a review block of at most 5 items
+    Given "alice" has due items on 6 skills of their path on guitar, 12 of them outside the session's focus nodes
+    When "alice" composes a 30-minute session with "guitar" in hand
+    Then exactly 5 items with the reason due practise none of the plan's focus nodes
+    And they are the most overdue of those 12
+
+  Scenario: The review block never takes more than a fifth of the focus time
+    Given "alice" has due items outside the session's focus nodes, each estimated at 30 seconds
+    When "alice" composes a 5-minute session with "guitar" in hand
+    Then the due items outside the focus nodes take at most a fifth of the focus time
+
+  Scenario: The review block comes right after the warm-up
+    Given "alice" has a clean play-along "c-major-scale" with a best clean tempo of 100 BPM
+    And "alice" has due items on 6 skills of their path on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then the due items that practise none of the plan's focus nodes come right after the warm-up, before any other item
+
+  Scenario: With few nodes due or weak, the nodes of new items complete the subjects
+    Given "alice" has due items only on "chord-tones" on guitar
+    And "alice"'s path skills "diatonic-chords" and "change-chords" have new items on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then the plan's focus nodes are "chord-tones", "diatonic-chords" and "change-chords", in that order
+
+  Scenario: A caught-up session's subjects are the nodes it reviews ahead, then those it stretches to
+    Given "alice" has nothing due, weak or new on their path for guitar
+    And "alice" has known items of "chord-tones" coming due within the week
+    And "alice" is ready to start the skill "notes-on-high-strings", which builds on a skill they have met
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the plan's focus nodes are "chord-tones" and "notes-on-high-strings", in that order
+
+  Scenario: A student new to a subject gets new items from its first two rungs
+    Given "alice" has never practised "diatonic-chords", which has items at the know, hear and play_clean rungs on guitar
+    When "alice" composes a 10-minute session with "guitar" in hand and "diatonic-chords" is a focus node
+    Then every new item of "diatonic-chords" in the session is at the know or hear rung
+
+  Scenario: Once a rung is accurate, new items climb to the next two rungs
+    Given "alice" is accurate on every know item of "diatonic-chords" on guitar
+    And "diatonic-chords" has items at the know, hear and play_clean rungs on guitar
+    When "alice" composes a 10-minute session with "guitar" in hand and "diatonic-chords" is a focus node
+    Then every new item of "diatonic-chords" in the session is at the hear or play_clean rung
+
+  Scenario: Due items are reviewed whatever their rung
+    Given "alice" is accurate on every know and hear item of "diatonic-chords" on guitar
+    And 3 know items of "diatonic-chords" are due
+    When "alice" composes a 10-minute session with "guitar" in hand and "diatonic-chords" is a focus node
+    Then the 3 due know items are in the session with the reason due
+
+  Scenario: Rungs with no material for the session are skipped
+    Given "alice" is accurate on every know item of "diatonic-chords" on guitar
+    And "diatonic-chords" has items at the know, hear and play_clean rungs, and only its know and hear items need no instrument in hand
+    When "alice" composes a 10-minute session with no instrument in hand and "diatonic-chords" is a focus node
+    Then every new item of "diatonic-chords" in the session is at the hear rung
+
+  Scenario: A subject accurate on every rung it has takes new items from its top rung
+    Given "find-notes-top-strings" has items only at the know rung
+    And "alice" is accurate on 80% of its cells on guitar, and 10 of them are new
+    When "alice" composes a 10-minute session with no instrument in hand and "find-notes-top-strings" is a focus node
+    Then the session may include new know items of "find-notes-top-strings"
+
+  Scenario: Every item carries its rung
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then every item in the session carries one of the rungs know, hear, play_clean, play_in_time, move, target or use
+
+  Scenario: Confusable progressions are asked next to each other
+    Given "alice" has new heard progressions "I-V-vi-IV" and "I-vi-IV-V", and other new heard progressions
+    When "alice" composes a 10-minute session with no instrument in hand and "hear-progressions" is a focus node
+    Then "I-V-vi-IV" and "I-vi-IV-V" are asked with no other heard progression between them
+
+  # ── Chords played in hand ──────────────────────────────────────────────────
+  # Single chords (play clean) and minutes of changes between two chords (play in time) are focus
+  # items of an in-hand session: at most 4 single chords and 2 changes, 20 and 90 seconds each. On
+  # bass they are a chord's root and fifth, and changes between two roots. A change is one minute
+  # at a tempo, one change on every beat; its ladder runs across sessions: the tempo of its last
+  # minute, 5 BPM up after two clean minutes in a row, 5 down after a struggled one, never below
+  # 20, and 40 for a change never played. Its target is the catalog's: 60 clean changes a minute.
+
+  Scenario: An in-hand guitar session plays single chords of a path skill
+    Given "alice"'s path skill "play-open-chords" has new single chords on guitar
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the session includes single chords of "play-open-chords" with the reason new
+    And every single chord in the session is at the play_clean rung
+
+  Scenario: A single chord is planned with its chord box and name
+    Given "alice"'s path skill "play-open-chords" has new single chords on guitar
+    When the single chord "a-minor-open" is picked for "alice"'s session with "guitar" in hand
+    Then it names the voicing diagram of "a-minor-open" and the chord "Am"
+
+  Scenario: A chord change is planned with both chords and its minute
+    Given "alice"'s path skill "change-chords" has new chord changes on guitar
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then the session includes a chord change of "change-chords" at the play_in_time rung
+    And it names both chords' voicing diagrams and symbols, and a target of 60 clean changes a minute
+
+  Scenario: An in-hand bass session plays a chord's root and fifth, both marked
+    Given "alice"'s path skill "play-root-fifth-lines" has new root and fifth items on electric bass
+    When the root and fifth of "Am" is picked for "alice"'s session with "electric-bass" in hand
+    Then its root is on string 3 at fret 0 and its fifth on string 4 at fret 0 of the "electric-bass" layout
+
+  Scenario: A session with the instrument in hand plays at most 4 single chords and 2 changes
+    Given "alice" has 8 new single chords and 10 new chord changes on guitar, and nothing else
+    When "alice" composes a 30-minute session with "guitar" in hand
+    Then the session has at most 4 single chords and at most 2 chord changes
+    And the session's items take less than 30 minutes
+
+  Scenario: On guitar, a single chord comes before a change that uses it
+    Given "alice" has the new single chord "a-minor-open" and the new chord change "a-minor-open" to "c-open" on guitar
+    When both are picked for "alice"'s session with "guitar" in hand
+    Then the single chord "a-minor-open" comes before the chord change
+
+  Scenario: A single chord takes 20 seconds of the session and a change 90
+    Given "alice" has new single chords and new chord changes on guitar
+    When "alice" composes a 10-minute session with "guitar" in hand
+    Then every single chord in the session is estimated at 20 seconds
+    And every chord change in the session is estimated at 90 seconds
+
+  Scenario: A chord change never played starts at 40 BPM
+    Given "alice" has never played the chord change "a-minor-open" to "c-open"
+    When the chord change is picked as a new item
+    Then its minute starts at 40 BPM, with no best clean count and no last count
+
+  Scenario: A chord change starts at the tempo of its last minute
+    Given "alice"'s last minute of "a-minor-open" to "c-open" was almost, 40 clean changes at 55 BPM
+    When the chord change is picked as a due item
+    Then its minute starts at 55 BPM, and its last count is 40
+
+  Scenario: Two clean minutes in a row raise the next minute by 5 BPM
+    Given "alice"'s last two minutes of "a-minor-open" to "c-open" were clean, the last at 50 BPM
+    When the chord change is picked as a due item
+    Then its minute starts at 55 BPM
+
+  Scenario: A single clean minute keeps the tempo
+    Given "alice"'s minutes of "a-minor-open" to "c-open" were struggled, then clean at 50 BPM
+    When the chord change is picked as a due item
+    Then its minute starts at 50 BPM
+
+  Scenario: A struggled minute lowers the next minute by 5 BPM
+    Given "alice"'s last minute of "a-minor-open" to "c-open" was struggled at 50 BPM
+    When the chord change is picked as a due item
+    Then its minute starts at 45 BPM
+
+  Scenario: The change ladder never goes below 20 BPM
+    Given "alice"'s last minute of "a-minor-open" to "c-open" was struggled at 20 BPM
+    When the chord change is picked as a due item
+    Then its minute starts at 20 BPM
+
+  Scenario: A chord change carries the best clean count since the latest teacher review
+    Given "alice" counted 30, then 38, then 34 clean changes of "a-minor-open" to "c-open", each minute clean
+    When the chord change is picked as a due item
+    Then its best clean count is 38 and its last count is 34
+
+  Scenario: A session in the head never plays chords
+    Given "alice" has new single chords and new chord changes on guitar
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then no item in the session is a single chord, a chord change, a root and fifth or a root change
+
+  Scenario: A chord item is never the warm-up or the application ending
+    Given "alice" is fluent on every single chord of "play-open-chords" on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then no single chord or chord change has the reason warm_up or application
+
+  Scenario: An in-hand session with only chords to play is composed
+    Given student "bob"'s only path skill is "play-open-chords", practised by single chords on guitar
+    When "bob" composes a 10-minute session with "guitar" in hand
+    Then the session has at least one single chord with the reason new
+
+  # ── Progression key tours ──────────────────────────────────────────────────
+  # A progression key tour plays one progression of the progression catalog along with its
+  # backing, key after key around the cycle of fourths (rung move, MOT-150). It is a focus item of
+  # an in-hand session only, at most one a session, sized like a play-along over 3 takes. On
+  # guitar the chart is in chord symbols, with a voicing per chord; on bass the board marks each
+  # chord's root, third and fifth. A tour takes about 4 minutes, so a session shorter than about
+  # 30 minutes has no room for one in its new share. The tour itself is in
+  # progression-key-tour.feature.
+
+  Scenario: An in-hand guitar session plays a progression key tour of a path skill
+    Given "alice"'s path skill "common-progressions" has new progression key tours on guitar
+    When "alice" composes a 30-minute session with "guitar" in hand
+    Then the session includes a progression key tour of "common-progressions" with the reason new
+    And the progression key tour is at the move rung
+
+  Scenario: A session plays at most one progression key tour
+    Given "alice" has 10 new progression key tours on guitar, and nothing else
+    When "alice" composes a 30-minute session with "guitar" in hand
+    Then the session has exactly one progression key tour
+
+  Scenario: A progression key tour is sized like a play-along over 3 takes
+    Given "alice" has never played the progression key tour of "I-V-vi-IV" on guitar
+    When the progression key tour is picked for "alice"'s session with "guitar" in hand
+    Then it plays 4 times through in each of at most 3 takes
+    And it is estimated at 3 takes of a bar of count-in and 16 bars at 60 BPM, each followed by 10 seconds to rate it
+
+  Scenario: A 12-bar blues tour plays the form once a take
+    Given "alice" has never played the progression key tour of "12-bar-blues" on guitar
+    When the progression key tour is picked for "alice"'s session with "guitar" in hand
+    Then it plays 1 time through in each of at most 3 takes
+
+  Scenario: On guitar, the tour lists each key's chart in chord symbols with a voicing per chord
+    Given "alice" has never played the progression key tour of "I-V-vi-IV" on guitar
+    When the progression key tour is picked for "alice"'s session with "guitar" in hand
+    Then its keys are C F Bb Eb Ab Db F# B E A D G, in that order
+    And the key of A has the chart "A E F#m D" and a voicing for each of its chords
+    And no key has chord tones
+
+  Scenario: On bass, the tour marks each chord's root, third and fifth
+    Given "alice" has never played the progression key tour of "I-V-vi-IV" on electric bass
+    When the progression key tour is picked for "alice"'s session with "electric-bass" in hand
+    Then in the key of G, the chord "Em" has its root on string 4 at fret 0, its third on string 1 at fret 0 and its fifth on string 3 at fret 2
+    And in the key of G, the chord "G" has its root on string 1 at fret 0, its third on string 3 at fret 2 and its fifth on string 2 at fret 0
+
+  Scenario: A session in the head never plays a progression key tour
+    Given "alice" has new progression key tours on guitar
+    When "alice" composes a 10-minute session with no instrument in hand
+    Then no item in the session is a progression key tour
+
+  Scenario: A progression key tour is never the warm-up or the application ending
+    Given "alice" has clean takes of the progression key tour of "I-V-vi-IV" on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then no progression key tour has the reason warm_up or application
+
+  # ── Guide tones ────────────────────────────────────────────────────────────
+  # A guide tone taps the third (later the seventh) of each chord of a catalog progression on the
+  # screen, in time with its playback (rung target, MOT-151). Nothing is played on the instrument,
+  # so it is a focus item of a session in the head only, at most one a session, sized by its 3
+  # takes at the start tempo. What it asks is in guide-tones.feature.
+
+  Scenario: A session in the head plans a guide tone of a path skill
+    Given "alice"'s path skill "target-chord-tones" has new guide tones on guitar
+    When "alice" composes a 20-minute session with no instrument in hand
+    Then the session includes a guide tone of "target-chord-tones" with the reason new
+    And the guide tone is at the target rung
+
+  Scenario: A session plans at most one guide tone
+    Given "alice" has 10 new guide tones on guitar, and nothing else
+    When "alice" composes a 30-minute session with no instrument in hand
+    Then the session has exactly one guide tone
+
+  Scenario: A guide tone is sized by its 3 takes at its start tempo
+    Given "alice" has never practised the guide tone of "ii-V-I" on guitar
+    When the guide tone is picked for "alice"'s session with no instrument in hand
+    Then it is estimated at 3 takes of a bar of count-in and 4 bars at 60 BPM, each followed by 5 seconds to see the result
+
+  Scenario: A bass student's guide tones are on the electric-bass layout
+    Given "bob" plays only "electric-bass" and has new guide tones
+    When "bob" composes a 20-minute session with no instrument in hand
+    Then every guide tone in the session is on the "electric-bass" layout
+
+  Scenario: An in-hand session never plans a guide tone
+    Given "alice" has new guide tones on guitar
+    When "alice" composes a 20-minute session with "guitar" in hand
+    Then no item in the session is a guide tone
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   Scenario: The new share is a ceiling, never filled past it
@@ -287,6 +701,16 @@ Feature: Compose a practice session
     Given "alice"'s best clean tempo on "pentatonic-run" is 150 BPM and the diagram's default playback is at 120 BPM
     When "pentatonic-run" is picked as a due item
     Then it starts at 150 BPM with a target of 120 BPM
+
+  Scenario: A play-along starts in the note value of the best clean take
+    Given "alice"'s best clean tempo on "pentatonic-run" is 50 BPM in eighths and the diagram's default playback is at 120 BPM
+    When "pentatonic-run" is picked as a due item
+    Then it starts at 50 BPM in eighths with a target of 120 BPM
+
+  Scenario: A best clean take past the target in eighths keeps its tempo and note value
+    Given "alice"'s best clean tempo on "pentatonic-run" is 80 BPM in eighths and the diagram's default playback is at 120 BPM
+    When "pentatonic-run" is picked as a due item
+    Then it starts at 80 BPM in eighths with a target of 120 BPM
 
   Scenario: A warm-up on a play-along played clean past its target is 80% of that tempo
     Given "alice" has a clean play-along "c-major-scale" with a best clean tempo of 150 BPM and a default playback at 120 BPM

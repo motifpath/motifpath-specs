@@ -7,6 +7,18 @@ changes, then `/reload-plugins` to activate them in the current session.
 
 ---
 
+## [1.2.0] — 2026-10-20
+
+### Changed
+- The deployable repositories (`motifpath-core`, `motifpath-web`) have a `stage` release-candidate
+  branch between `dev` and `main`: `dev → stage` deploys staging, `stage → main` is the release.
+  Repositories without `stage` keep `dev → main`.
+- Promotions and sync PRs are merged with a merge commit, never squash or rebase, so the commits
+  staging ran stay contained in `main`.
+- After a hotfix, the sync workflow opens PRs to `stage` as well as `dev`.
+- In the deployable repositories a release is a `vX.Y.Z` tag on `main`, and pushing it deploys
+  production; tags are never moved or deleted, and each repository versions on its own.
+
 ## [1.1.0] — 2026-08-25
 
 ### Changed

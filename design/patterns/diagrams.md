@@ -16,7 +16,7 @@ hit. A full neck doesn't fit a phone at that size, and shrinking it makes every 
 ## How
 
 - **Shared components:** `Fretboard` (flat, in the theme's colours — border fret lines and inlays,
-  an ink nut, muted strings; no wood or metal. Frets = the window drawn: 5 for shapes, a 7-place region
+  an ink nut, muted strings; no wood or metal. Frets = the window drawn: 5 for shapes, a fret window
   for drills, 12 for a full neck; Strings = 4, 6 or 7; Layout = horizontal or vertical), `FretMarker` (Note · Root ·
   Sounding · Asked · Right · Wrong), `ChordBox` with `ChordDot` (Default · Root · Sounding ·
   Asked · Right · Wrong · Missed, and for the author Correct · Hidden correct · Hidden) and `ChordBarre`, `Keyboard`, and for
@@ -29,9 +29,12 @@ hit. A full neck doesn't fit a phone at that size, and shrinking it makes every 
   sounding note is the dashed yellow ring of the reviewed PB-71 spike.
 - **Fretboard drills** (find the note, name the note; P3, MOT-80): every place the student can tap
   is **48 px wide, the open string included** (its zone left of the nut too). A drill **never
-  scrolls sideways**: on Compact it works one **neck region** of 7 places — *low* = open string to
-  fret 6, *high* = frets 6–12 — chosen by the **composer** as part of the item and named in the
-  prompt ("frets 0–6"). Medium and Expanded show the whole neck (13 × 48 px fits the breakout).
+  scrolls sideways**: each drill is asked inside one **fret window** of five frets, plus the open
+  string when it starts at the nut (frets 0–5, 6 × 48 px = 288 px), chosen by the **composer** with
+  the drill (where its due cells are, and every other session where its new cells are) and named in
+  the question ("frets 0–5"). Compact draws only
+  the window. Medium and Expanded may draw more of the neck, but the places outside the window are
+  dimmed and can't be tapped, so the item is the same on every screen (ADR-046, 2026-10-13).
   Phone evidence: on today's fitted board (≈27 px frets, 26 px open-string zone) 6 of 16 taps were
   one fret off, mostly at the nut, and open-string taps were graded as fret 1; a 48 px board that
   scrolled was the right size, but scrolling caused 2 of its 3 wrong answers.
@@ -69,7 +72,7 @@ hit. A full neck doesn't fit a phone at that size, and shrinking it makes every 
 
 - Shrink markers below tap size to make a diagram fit.
 - Fit a tappable diagram to the screen width.
-- Make a timed drill scroll, or let the app pick a drill's region around the asked cell (it gives
+- Make a timed drill scroll, or let the app frame a drill's window around the asked cell (it gives
   away half of the answer).
 - Draw a board by hand on a screen instead of using the shared components.
 - Tell diagrams in a stack apart by colour alone.

@@ -1,0 +1,58 @@
+# Louvor: playing in church and in the worship ministry. Builds on Fundamentos.
+# Format and workflow: ../../README.md.
+
+courses:
+
+  - key: ac-worship
+    track: worship
+    title: "Violão no louvor"
+    language: pt_BR
+    level: beginner
+    instruments: [guitar]
+    status: idea
+    checkpoints: [ac-worship-seventh, ac-first-dedilhado, ac-barre, ac-sing-and-play]
+
+  - key: ac-worship-ministry
+    track: worship
+    title: "Violão no ministério de louvor"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [guitar]
+    status: idea
+    checkpoints: [ac-accompany-singer, ac-worship-strums, sh-song-map, sh-key-by-ear, ac-live-ready, sh-practice-habits, sh-perform]
+
+  - key: el-worship
+    track: worship
+    title: "Guitarra no louvor"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-guitar]
+    status: idea
+    checkpoints: [el-worship-clean, el-barre, el-rhythm-guitar]
+
+  - key: el-worship-ministry
+    track: worship
+    title: "Guitarra no ministério de louvor"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-guitar]
+    status: idea
+    checkpoints: [el-worship-band, sh-song-map, sh-key-by-ear, sh-rhythm-groove, sh-practice-habits, sh-perform]
+
+  - key: ba-worship
+    track: worship
+    title: "Baixo no louvor"
+    language: pt_BR
+    level: beginner
+    instruments: [electric-bass]
+    status: idea
+    checkpoints: [ba-worship-band, ba-root-fifth-octave, ba-lock-with-drums]
+
+  - key: ba-worship-ministry
+    track: worship
+    title: "Baixo no ministério de louvor"
+    language: pt_BR
+    level: early_intermediate
+    instruments: [electric-bass]
+    status: idea
+    checkpoints: [ba-chord-tones, ba-worship-fills, sh-song-map, sh-key-by-ear, sh-practice-habits, sh-perform]

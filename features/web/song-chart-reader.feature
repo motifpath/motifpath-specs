@@ -130,6 +130,31 @@ Feature: Read a song chart and look up its chords
       When "alice" scrolls past the chart's header
       Then the chords in this song are no longer shown
 
+  # ── The progressions it plays ────────────────────────────────────────────────
+  # (MOT-152, D9: PO 2026-10-24.) A section names the progressions it plays (song-charts.feature);
+  # the reader shows them by their names in the progression catalog.
+
+  Rule: The progressions the song plays are shown once each under its chords, and on each section
+
+    Scenario: The overview lists each progression once, however many sections play it
+      Given the sections "Verse 1" and "Verse 2" of "Amazing Grace" are tagged with the progression "I-IV-I-V"
+      And its chorus is tagged with the progression "ii-V-I"
+      When "alice" opens the link to "Amazing Grace"
+      Then "Progressions in this song" shows "I–IV–I–V" and "ii–V–I", once each, in the order they first appear
+
+    Scenario: Each section shows its own progressions beside its heading
+      Given the sections "Verse 1" and "Verse 2" of "Amazing Grace" are tagged with the progression "I-IV-I-V"
+      And its chorus is tagged with the progression "ii-V-I"
+      When "alice" opens the link to "Amazing Grace"
+      Then the headings "Verse 1" and "Verse 2" each show "I–IV–I–V"
+      And the chorus's heading shows "ii–V–I"
+
+    Scenario: A chart with no tagged section shows no progressions
+      Given no section of "Amazing Grace" is tagged with a progression
+      When "alice" opens the link to "Amazing Grace"
+      Then no "Progressions in this song" is shown
+      And no section heading shows a progression
+
   # ── The chord card ───────────────────────────────────────────────────────────
 
   Rule: Tapping a chord in the lyrics opens its chord card without leaving the chart

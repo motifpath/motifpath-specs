@@ -132,6 +132,116 @@ Feature: Author and publish song charts
     When "bob" publishes "Asa Branca"
     Then the request is refused because only admins author song charts
 
+  # ── Progressions a section plays ─────────────────────────────────────────────
+  # (ADR-050 amendment 2026-10-21, revised 2026-10-24: tagged by section, MOT-152.) The author tags
+  # each section with the progressions of the progression catalog it plays; practice then ends a
+  # session on one of them with the song, played whole. A tagged progression is played by a section
+  # when its chords appear in a row in that section, in the chart's concert key: the section's chords
+  # as they sound (moved up by the capo), each counted by its root and triad (a seventh, an extension
+  # or a slash bass doesn't change it), N.C. skipped and a chord repeated in a row counted once.
+  # Another section's chords never count. The concert key must be stated. A progression is spelled in
+  # the chart's key when their modes match, and in its relative key when they don't (ADR-070 §9). An
+  # unplayed tag blocks publication, naming its section. A section may be tagged with a progression
+  # an admin created (progressions.feature), not only with the catalog's.
+
+  Scenario: An admin tags the progressions a section plays
+    Given "ana" has a song chart "Amazing Grace" in the concert key "G" whose verse has the chords "G C G D G"
+    When "ana" tags the verse of "Amazing Grace" with the progression "I-IV-I-V"
+    Then the verse's progressions are "I-IV-I-V"
+    And the draft lists no unplayed progression
+
+  Scenario: A chart's sections are untagged until its author tags them
+    When "ana" creates a song chart "Amazing Grace" in "en" with the line "[G]Amazing [C]grace"
+    Then the verse's progressions are empty
+
+  Scenario: A key no progression has can't be tagged
+    Given "ana" has a song chart "Amazing Grace" in the concert key "G" whose verse has the chords "G C G D G"
+    When "ana" tags the verse of "Amazing Grace" with the progression "I-II-III"
+    Then the change is refused as invalid
+    And the verse's progressions are empty
+
+  Scenario: A section is tagged with a progression an admin created
+    Given "ana" has created the major progression "I-bVII-IV-I"
+    And "ana" has a song chart "Sweet Home" in the concert key "D" whose verse has the chords "D C G D"
+    When "ana" tags the verse of "Sweet Home" with the progression "major/I-bVII-IV-I"
+    Then the verse's progressions are "major/I-bVII-IV-I"
+    And the draft lists no unplayed progression
+
+  Scenario: A tag the section doesn't play is saved and listed as unplayed on that section
+    Given "ana" has a song chart "Amazing Grace" in the concert key "G" whose verse has the chords "G C G D G"
+    When "ana" tags the verse of "Amazing Grace" with the progressions "I-IV-I-V" and "I-V-vi-IV"
+    Then the verse's progressions are "I-IV-I-V" and "I-V-vi-IV"
+    And the draft lists "I-V-vi-IV" on the verse as unplayed
+
+  Scenario: Another section's chords never play a section's progression
+    Given "ana" has a song chart "Amazing Grace" in the concert key "G" whose verse has the chords "G C" and whose chorus has the chords "G D"
+    When "ana" tags the verse of "Amazing Grace" with the progression "I-IV-I-V"
+    Then the draft lists "I-IV-I-V" on the verse as unplayed
+
+  Scenario: The chords are compared as they sound, with the capo
+    Given "ana" has a song chart "Amazing Grace" in the concert key "A", capo on fret 2, whose verse has the chords "G C G D"
+    When "ana" tags the verse of "Amazing Grace" with the progression "I-IV-I-V"
+    Then the draft lists no unplayed progression
+
+  Scenario: A seventh or a slash bass doesn't change the chord it counts as
+    Given the chord catalog also has the chord "G7"
+    And "ana" has a song chart "Amazing Grace" in the concert key "G" whose verse has the chords "G7 C D/F# G"
+    When "ana" tags the verse of "Amazing Grace" with the progression "I-IV-V-I"
+    Then the draft lists no unplayed progression
+
+  Scenario: A chord repeated in a row counts once
+    Given "ana" has a song chart "Amazing Grace" in the concert key "G" whose verse has the chords "G G C C D D G"
+    When "ana" tags the verse of "Amazing Grace" with the progression "I-IV-V-I"
+    Then the draft lists no unplayed progression
+
+  Scenario: The chords must come in a row, not just in order
+    Given "ana" has a song chart "Amazing Grace" in the concert key "G" whose verse has the chords "G C G D G"
+    When "ana" tags the verse of "Amazing Grace" with the progression "I-IV-V-I"
+    Then the draft lists "I-IV-V-I" on the verse as unplayed
+
+  @wip
+  Scenario: A major progression in a minor chart is spelled in the relative major key
+    Given "ana" has a song chart "Asa Branca" in the concert key "Em" whose verse has the chords "Em C G D"
+    When "ana" tags the verse of "Asa Branca" with the progression "vi-IV-I-V"
+    Then the draft lists no unplayed progression
+
+  @wip
+  Scenario: A minor progression in a minor chart is spelled in the chart's key
+    Given "ana" has created the minor progression "i-bVI-bIII-bVII"
+    And "ana" has a song chart "Asa Branca" in the concert key "Em" whose verse has the chords "Em C G D"
+    When "ana" tags the verse of "Asa Branca" with the progression "minor/i-bVI-bIII-bVII"
+    Then the draft lists no unplayed progression
+
+  @wip
+  Scenario: A minor progression in a major chart is spelled in the relative minor key
+    Given "ana" has created the minor progression "i-bVI-bIII-bVII"
+    And "ana" has a song chart "Amazing Grace" in the concert key "G" whose verse has the chords "Em C G D"
+    When "ana" tags the verse of "Amazing Grace" with the progression "minor/i-bVI-bIII-bVII"
+    Then the draft lists no unplayed progression
+
+  Scenario: A borrowed chord must sound as written
+    Given "ana" has created the major progression "I-bVII-IV-I"
+    And "ana" has a song chart "Sweet Home" in the concert key "D" whose verse has the chords "D C#dim G D"
+    When "ana" tags the verse of "Sweet Home" with the progression "major/I-bVII-IV-I"
+    Then the draft lists "major/I-bVII-IV-I" on the verse as unplayed
+
+  Scenario: A chart with no concert key plays no progression
+    Given "ana" has a song chart "Amazing Grace" with no concert key whose verse has the chords "G C G D G"
+    When "ana" tags the verse of "Amazing Grace" with the progression "I-IV-I-V"
+    Then the draft lists "I-IV-I-V" on the verse as unplayed
+
+  Scenario: A chart with an unplayed progression cannot be published
+    Given "ana" has a song chart "Amazing Grace" whose rights are confirmed, in the concert key "G" whose verse has the chords "G C G D G"
+    And the verse of "Amazing Grace" is tagged with the progression "I-V-vi-IV"
+    When "ana" publishes "Amazing Grace"
+    Then publishing is refused as not publishable, because "progressions_not_played"
+    And the refusal lists the unplayed progression "I-V-vi-IV" on the verse
+
+  Scenario: A revision keeps the progressions it was published with
+    Given "ana" published "Amazing Grace" as revision 1, its verse tagged with the progression "I-IV-I-V"
+    When "ana" removes the tag "I-IV-I-V" from the verse of the draft of "Amazing Grace"
+    Then revision 1 of "Amazing Grace" still plays "I-IV-I-V" in its verse
+
   # ── Corrections and revisions ────────────────────────────────────────────────
 
   Scenario: A correction is published as a new revision and the old one never changes

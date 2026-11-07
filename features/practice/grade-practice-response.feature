@@ -30,12 +30,24 @@ Feature: Grade a practice answer into evidence
     When "alice" rates a take of play-along "pentatonic-run" as "clean" at 90 BPM
     Then "alice" has self-assessed evidence for play-along "pentatonic-run" rated "clean" at 90 BPM
 
+  # A chord change is one minute at a tempo, one change on every beat; the student counts the
+  # changes that rang clean, and the share of the beats that did rates the minute (MOT-79).
+  Scenario: A minute of chord changes is rated by the share of beats that changed cleanly
+    Given the chord voicing diagrams "a-minor-open" and "c-open"
+    When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 60 BPM with 42 clean changes
+    Then "alice" has self-assessed evidence for that chord change rated "almost" at 60 BPM with 42 clean changes
+
+  # A progression key tour take is rated like a play-along, and also sends the key it was played
+  # in (MOT-150).
+  Scenario: A self-rated take of a progression key tour is kept with its rating, tempo and key
+    When "alice" rates a take of the progression key tour of "I-V-vi-IV" on guitar as "clean" at 85 BPM in A
+    Then "alice" has self-assessed evidence for that tour rated "clean" at 85 BPM in A
+
   Scenario: Evidence keeps the raw response and the event that sent it
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "C" after 1800 milliseconds
     Then the evidence keeps the response exactly as "alice" sent it
     And the evidence is identified by the identifier of the practice.item_answered event
 
-  @wip
   Scenario: A fretboard cell answer is graded by fretboard_cell.v2
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "C" among "B", "F", "C" and "C#" after 1500 milliseconds
     Then the evidence names the grader "fretboard_cell.v2"
@@ -44,7 +56,6 @@ Feature: Grade a practice answer into evidence
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "D" after 2500 milliseconds
     Then the evidence's answer key is string 5, fret 3, note "C"
 
-  @wip
   Scenario: Naming the note among four choices keeps the choices in the answer key
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "C#" among "B", "F", "C" and "C#" after 1700 milliseconds
     Then "alice" has auto-graded evidence for that cell that is wrong with a latency of 1700 milliseconds
@@ -137,34 +148,39 @@ Feature: Grade a practice answer into evidence
     When "alice" answers that shape by finding the degree "3" on string 4 at fret 2 after 3000 milliseconds
     Then "alice" has auto-graded evidence for that shape that is wrong with a latency of 3000 milliseconds
 
+  Scenario: A chord change's rating follows its count, whatever rating was sent
+    Given the chord voicing diagrams "a-minor-open" and "c-open"
+    When "alice" sends a minute of changes between "a-minor-open" and "c-open" rated "clean" at 60 BPM with 20 clean changes
+    Then "alice" has self-assessed evidence for that chord change rated "struggled" at 60 BPM with 20 clean changes
+
+  Scenario: Nine clean changes in ten beats is a clean minute
+    Given the chord voicing diagrams "a-minor-open" and "c-open"
+    When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 60 BPM with 54 clean changes
+    Then "alice" has self-assessed evidence for that chord change rated "clean" at 60 BPM with 54 clean changes
+
   # ── Failure cases ──────────────────────────────────────────────────────────
 
-  @wip
   Scenario: Choices that leave out the cell's note yield no evidence
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "D" among "B", "C#", "D" and "F" after 1600 milliseconds
     Then the answer is rejected because the choices are invalid
     And "alice" has no evidence for that cell
 
-  @wip
   Scenario: A note named that isn't among the choices yields no evidence
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "D" among "B", "F", "C" and "C#" after 1600 milliseconds
     Then the answer is rejected because the choices are invalid
     And "alice" has no evidence for that cell
 
-  @wip
   Scenario: Two choices spelling the same pitch yield no evidence
     When "alice" answers the guitar cell on string 5 at fret 3 by naming the note "C" among "C", "B#", "C#" and "F" after 1600 milliseconds
     Then the answer is rejected because the choices are invalid
     And "alice" has no evidence for that cell
 
-  @wip
   Scenario: An item skipped because its sound failed to load yields no evidence
     Given the exercise "hear-the-fifth" whose correct option is "Perfect fifth" out of "Perfect fourth" and "Perfect fifth"
     When "alice" sends exercise "hear-the-fifth" as not answered because its stimulus failed to load
     Then the practice.item_answered event is kept with the reason "failed_to_load"
     And "alice" has no evidence for exercise "hear-the-fifth"
 
-  @wip
   Scenario: An item that can't be shown leaves its level and review as they were
     Given "alice" is accurate on the guitar cell on string 5 at fret 3, in box 2 and due today
     When "alice" sends that cell as not answered because it is unavailable
@@ -183,11 +199,82 @@ Feature: Grade a practice answer into evidence
     Then the answer is rejected because the option is unknown
     And "alice" has no evidence for exercise "c-major-triad"
 
+  Scenario: A progression key tour take without its key yields no evidence
+    When "alice" rates a take of the progression key tour of "I-V-vi-IV" on guitar as "clean" at 85 BPM without a key
+    Then the answer is rejected because the response does not fit the item
+    And "alice" has no evidence for that tour
+
+  Scenario: A progression key tour take of a progression the catalog doesn't have yields no evidence
+    When "alice" rates a take of the progression key tour of "I-II-III" on guitar as "clean" at 85 BPM in C
+    Then the answer is rejected because the reference is unknown
+    And "alice" has no evidence for that tour
+
+  # A guide-tone take is graded bar by bar against its tempo and note value (timed_taps.v1, MOT-151).
+  Scenario: A guide-tone take with every third hit is right
+    When "alice" taps the third of each bar of "ii-V-I" in C at 120 BPM within its bar
+    Then "alice" has auto-graded evidence for that guide tone that is right
+    And the evidence's answer key marks all 4 bars hit
+
+  Scenario: A guide-tone take in eighths is graded with bars half as long
+    When "alice" taps the third of "Dm" at 100 milliseconds and of "G" at 2300 milliseconds in a take of "ii-V-I" in C at 120 BPM in eighths
+    Then "alice" has auto-graded evidence for that guide tone that is wrong
+    And the evidence's answer key marks only the first bar hit
+
+  Scenario: A borrowed chord with no written seventh asks its minor seventh
+    Given the drills have the created progression "major/I-bVII-IV-I" with the bars I ♭VII IV I
+    When "alice" taps the sevenths "B G# E B" within their bars in a take of "major/I-bVII-IV-I" in C at 120 BPM
+    Then "alice" has auto-graded evidence for that guide tone that is right
+
+  Scenario: A written suffix decides which seventh is asked
+    Given the drills have the created progression "major/Imaj7-iih7-viio7-bVImaj7" with the bars Imaj7 iiø7 vii°7 ♭VImaj7
+    When "alice" taps the sevenths "B C G# G" within their bars in a take of "major/Imaj7-iih7-viio7-bVImaj7" in C at 120 BPM
+    Then "alice" has auto-graded evidence for that guide tone that is right
+
+  # A song is rated once, whole, with no measure (MOT-152).
+  Scenario: A self-rated song is kept with its rating alone
+    When "alice" rates the song "Amazing Grace" on guitar as "almost"
+    Then "alice" has self-assessed evidence for that song rated "almost", with no tempo
+
+  Scenario: A song rated with a tempo yields no evidence
+    When "alice" rates the song "Amazing Grace" on guitar as "clean" at 80 BPM
+    Then the answer is rejected because the response does not fit the item
+    And "alice" has no evidence for that song
+
+  Scenario: A song whose chart doesn't exist yields no evidence
+    When "alice" rates the song of a song chart that doesn't exist on guitar as "clean"
+    Then the answer is rejected because the reference is unknown
+    And "alice" has no evidence for that song
+
+  # A song on guitar and the same song on bass are two skills, so two items: the key takes the layout.
+  @wip
+  Scenario: A song on guitar and the same song on bass are two items
+    When "alice" rates the song "Amazing Grace" on guitar as "clean"
+    Then "alice" has self-assessed evidence for that song rated "clean", with no tempo
+    And "alice" has no evidence for the song "Amazing Grace" on the electric-bass layout
+
+  Scenario: A play-along rating with a key yields no evidence
+    Given the play-along diagram "pentatonic-run"
+    When "alice" rates a take of play-along "pentatonic-run" as "clean" at 90 BPM in G
+    Then the answer is rejected because the response does not fit the item
+    And "alice" has no evidence for play-along "pentatonic-run"
+
   Scenario: A play-along rating without its tempo yields no evidence
     Given the play-along diagram "pentatonic-run"
     When "alice" rates a take of play-along "pentatonic-run" as "clean" without a tempo
     Then the answer is rejected because its measure is missing
     And "alice" has no evidence for play-along "pentatonic-run"
+
+  Scenario: A minute of chord changes without its tempo yields no evidence
+    Given the chord voicing diagrams "a-minor-open" and "c-open"
+    When "alice" sends a minute of changes between "a-minor-open" and "c-open" with 40 clean changes and no tempo
+    Then the answer is rejected because its measure is missing
+    And "alice" has no evidence for that chord change
+
+  Scenario: More clean changes than beats in the minute yields no evidence
+    Given the chord voicing diagrams "a-minor-open" and "c-open"
+    When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 40 BPM with 41 clean changes
+    Then the answer is rejected because the response does not fit the item
+    And "alice" has no evidence for that chord change
 
   Scenario: A cell on a string the instrument doesn't have yields no evidence
     When "alice" answers the guitar cell on string 7 at fret 3 by naming the note "C" after 1800 milliseconds
@@ -211,3 +298,62 @@ Feature: Grade a practice answer into evidence
     When "alice" answers that diagram as a shape by naming the shape "A" after 2000 milliseconds
     Then the answer is rejected because the reference is unknown
     And "alice" has no evidence for that diagram
+
+  Scenario: A heard chord named by sight among options that aren't all numerals yields no evidence
+    When "alice" answers the heard chord vi in G, asked see_then_name, by picking "vi" among "vi", "IV", "Em" and "iii"
+    Then the answer is rejected because the choices are invalid
+    And "alice" has no evidence for that question
+
+  Scenario: A chord picked that isn't among a generated question's options yields no evidence
+    When "alice" answers the diatonic chord vi in G, asked numeral_to_chord, by picking "D" among "Em", "C", "Am" and "Bm"
+    Then the answer is rejected because the choices are invalid
+    And "alice" has no evidence for that question
+
+  # ── Find every instance (MOT-153) ──────────────────────────────────────────
+  # A fretboard cell asked to find every instance names the cell's note; the student taps every
+  # place of it in the fret window. One answer is graded by multi_tap.v2 on every cell it covers,
+  # and counts for accuracy only. In frets 3 to 7 on guitar, G is at string 6 fret 3, string 4
+  # fret 5 and string 1 fret 3.
+
+  Scenario: Tapping every place of the note is right evidence on each of its cells
+    When "alice" answers the guitar cell on string 6 at fret 3 by tapping string 6 fret 3, string 1 fret 3 and string 4 fret 5 in frets 3 to 7
+    Then "alice" has auto-graded evidence that is correct for each of the guitar cells string 1 fret 3, string 4 fret 5 and string 6 fret 3
+    And each of them names the grader "multi_tap.v2"
+
+  Scenario: A place missed is wrong evidence on its cell
+    When "alice" answers the guitar cell on string 6 at fret 3 by tapping string 6 fret 3 and string 1 fret 3 in frets 3 to 7
+    Then "alice" has auto-graded evidence that is wrong for the guitar cell on string 4 at fret 5
+    And "alice" has auto-graded evidence that is correct for the guitar cells string 6 fret 3 and string 1 fret 3
+
+  Scenario: An extra tap is wrong evidence on the cell tapped
+    When "alice" answers the guitar cell on string 6 at fret 3 by tapping string 6 fret 3, string 1 fret 3, string 4 fret 5 and string 5 fret 5 in frets 3 to 7
+    Then "alice" has auto-graded evidence that is wrong for the guitar cell on string 5 at fret 5
+    And its answer key names the note "G", which is not that cell's note
+
+  Scenario: A window across root and top strings gives evidence to cells of both skills
+    When "alice" answers the guitar cell on string 5 at fret 7 by tapping string 5 fret 7 and string 2 fret 5 in frets 3 to 7
+    Then "alice" has evidence for the guitar cell on string 5 at fret 7, of skill "find-notes-root-strings"
+    And "alice" has evidence for the guitar cell on string 2 at fret 5, of skill "find-notes-top-strings"
+
+  Scenario: Finding every instance counts for accuracy, never for fluency
+    When "alice" answers the guitar cell on string 6 at fret 3 by tapping string 6 fret 3, string 1 fret 3 and string 4 fret 5 in frets 3 to 7 after 5200 milliseconds
+    Then none of "alice"'s evidence from that answer has a latency
+
+  Scenario: Each cell's evidence from one answer has its own identifier
+    When "alice" answers the guitar cell on string 6 at fret 3 by tapping string 6 fret 3, string 1 fret 3 and string 4 fret 5 in frets 3 to 7
+    Then each cell's evidence is identified by the name-based UUID of its item key under the practice.item_answered event's identifier
+
+  Scenario: A redelivered find every instance answer adds no evidence
+    Given "alice" answered the guitar cell on string 6 at fret 3 by tapping every G in frets 3 to 7
+    When the same practice.item_answered event is delivered again
+    Then "alice" still has one piece of evidence for each of the three cells
+
+  Scenario: A tap outside the window yields no evidence on any cell
+    When "alice" answers the guitar cell on string 6 at fret 3 by tapping string 6 fret 3 and string 2 fret 8 in frets 3 to 7
+    Then the answer is rejected because a cell is invalid
+    And "alice" has no evidence for any guitar cell
+
+  Scenario: A planned cell outside its window yields no evidence
+    When "alice" answers the guitar cell on string 6 at fret 10 by tapping string 6 fret 3 in frets 3 to 7
+    Then the answer is rejected because a cell is invalid
+    And "alice" has no evidence for any guitar cell
