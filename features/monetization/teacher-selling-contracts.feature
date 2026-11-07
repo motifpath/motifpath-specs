@@ -2,7 +2,7 @@
 Feature: Teacher selling terms, sales, payout account and sale blockers
   What a teacher reads and does to sell their own courses and paths. MotifPath keeps one
   commission and the teacher buys nothing first; buyers never lose what they bought.
-  # MOT-130 (Figma "Teacher sales r1"); ADR-067, ADR-059. Runtime: MOT-131, MOT-133.
+  # MOT-130 (Figma "Teacher sales r1"); ADR-071, ADR-059. Runtime: MOT-131, MOT-133.
 
   Scenario: A teacher reads the current selling terms
     Given the current configuration sets teacher prices from 10 to 500 BRL

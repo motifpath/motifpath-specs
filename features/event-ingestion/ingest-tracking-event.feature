@@ -60,13 +60,11 @@ Feature: Ingest student tracking events
 
   # ── Review of a finished course or path (MOT-106) ───────────────────────────
 
-  @wip
   Scenario: A lesson.started event marked as review is accepted
     Given student "alice" is authenticated with a valid session
     When "alice" submits a lesson.started event for content node "intro-to-chords" whose content context is marked as review
     Then the event is accepted and stored in the event log, with the review marker
 
-  @wip
   Scenario: An exercise.ended event marked as review is accepted
     Given student "alice" is authenticated with a valid session
     And "alice" has an active exercise attempt for exercise "chord-recognition-01"
@@ -122,7 +120,6 @@ Feature: Ingest student tracking events
     Then the submission is rejected as invalid
     And the rejection identifies "trigger_context" as the source of the error
 
-  @wip
   Scenario: A review marker that is not true or false is rejected
     Given student "alice" is authenticated with a valid session
     When "alice" submits an exercise.started event whose trigger context has the review marker "yes"

@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.56.0
+  version: 0.62.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -130,6 +130,13 @@ paths:
         stored name is refreshed when the claim differs from it; a missing
         or blank claim on a later request leaves the stored name unchanged.
 
+        The user's email address is taken from the "email" claim of the same
+        token (trimmed), never from the request body. A token without an email
+        claim that is a valid address is rejected with 400 on field "email". It
+        is refreshed the same way as the name: when a later token carries a
+        different valid address, the stored one is replaced; a missing, blank or
+        invalid claim leaves it unchanged.
+
         This endpoint must be called once per Clerk identity before any other
         authenticated operation. Subsequent calls with the same JWT sub return 409.
 
@@ -164,8 +171,9 @@ paths:
         "400":
           description: |
             The request is invalid. The role field is missing or contains an
-            unrecognised value (field "role"), or the session token carries no
-            non-blank name claim (field "name").
+            unrecognised value (field "role"), the session token carries no
+            non-blank name claim (field "name"), or it carries no email claim
+            that is a valid address (field "email").
           content:
             application/json:
               schema:
@@ -2970,6 +2978,289 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConflictError'
 
+  /progressions:
+    get:
+      operationId: listProgressions
+      summary: List the progressions
+      description: |
+        Returns every progression, ordered by key: the catalog's and those admins created, each
+        with its key, mode, numerals one bar each (I7 IV7 V7 being dominant sevenths), the bars
+        that are borrowed, whether it is in the drills, the progressions drills offer as its
+        wrong answers, and its names. A client reads it to show and grade the progression drills'
+        questions the same way the server does, such as a chart picked for a progression, using
+        only the progressions in the drills, and to name the progressions a song chart is tagged
+        with. Only an admin sees who created a progression; otherwise it is the same for every
+        user and language. It changes only when an admin creates,
+        changes or removes a progression, so a client may keep it for the session. Any
+        authenticated user may list it.
+      tags:
+        - Practice
+      responses:
+        "200":
+          description: Every progression.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Progression'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+    post:
+      operationId: createProgression
+      summary: Create a progression for song charts
+      description: |
+        Creates a progression from its mode and numerals, one per bar, so an admin can tag song
+        chart sections with a progression the catalog doesn't have. A numeral is a root, I to VII
+        optionally preceded by ♭ or ♯, and a quality given by its case and suffix: upper case for
+        major (also 7 and maj7), lower case for minor (also 7), and lower case with °, ø7 or °7
+        for diminished, half-diminished 7 and diminished 7. The ASCII forms b, #, o and h are
+        accepted for ♭, ♯, ° and ø, and the progression keeps the symbols. A numeral outside the
+        mode's diatonic chords is accepted and marked borrowed. A progression has 1 to 16 bars.
+
+        The created progression is for song charts only unless in_drills is true, which also needs
+        skill_ids or concept_ids and passes the same checks as addProgressionToDrills; if those
+        checks fail, nothing is created. Its key is the mode and its numerals in ASCII, such as
+        major/I-bVII-IV-I, and its name is its numerals joined by –, followed by the nickname in
+        parentheses when one is given. Mode and numerals never change. Only admins may create a
+        progression.
+      tags:
+        - Practice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProgressionInput'
+            examples:
+              borrowed:
+                summary: A major progression with a borrowed ♭VII, for charts only
+                value:
+                  mode: major
+                  bars: ["I", "bVII", "IV", "I"]
+                  nicknames:
+                    en: "Mixolydian rock"
+                    pt_BR: "rock mixolídio"
+      responses:
+        "201":
+          description: The progression was created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Progression'
+        "400":
+          description: |
+            The body is invalid: a bar that isn't a numeral (the error's field names the bar,
+            such as /bars/2), fewer than 1 or more than 16 bars, an unknown mode, or in_drills
+            true with no skill or concept.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only admins create progressions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "409":
+          description: |
+            A progression with the same mode and numerals already exists; the error returns it,
+            so the client can tag it instead. Also returned, with no progression, when in_drills
+            is true and the progression can't be added to the drills; the reasons say why.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ProgressionExistsError'
+                  - $ref: '#/components/schemas/ProgressionNotAddableError'
+
+  /progressions/{progression_id}:
+    parameters:
+      - name: progression_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The progression's identifier.
+    patch:
+      operationId: updateProgression
+      summary: Change a created progression's nickname
+      description: |
+        Replaces a created progression's nicknames, which follow its numerals in its name. An
+        empty object removes them. Mode, numerals and key never change. The catalog's
+        progressions keep their names. Only admins may change a nickname.
+      tags:
+        - Practice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProgressionNicknamesInput'
+      responses:
+        "200":
+          description: The progression with its new name.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Progression'
+        "400":
+          description: The body is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only admins change a nickname.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No progression has this identifier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: The progression is one of the catalog's, whose names don't change.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+    delete:
+      operationId: deleteProgression
+      summary: Remove a progression created by mistake
+      description: |
+        Deletes a created progression that isn't in the drills, so its mode and numerals can be
+        created again. Refused while the draft or the latest published revision of any song chart
+        tags it: the error lists those charts and sections, to untag first. Older published
+        revisions don't count; they keep the key, and a client shows a key no progression has as
+        the numerals it spells. A progression in the drills, the catalog's included, is never
+        removed. Untagging a section in a chart never removes a progression. Only admins may
+        remove a progression.
+      tags:
+        - Practice
+      responses:
+        "204":
+          description: The progression was deleted.
+        "400":
+          description: The identifier isn't a UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only admins remove progressions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No progression has this identifier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: |
+            The progression is still tagged in a chart's draft or latest published revision
+            (reason in_use, with the sections), or it is in the drills (reason in_drills).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressionInUseError'
+
+  /progressions/{progression_id}/drills:
+    post:
+      operationId: addProgressionToDrills
+      summary: Add a created progression to the drills
+      description: |
+        Makes a chart-only progression a drill progression, practising the given skills and
+        concepts. It is refused, with every reason, unless the progression has 4 or 12 bars, is
+        in a mode the drills support (major), and at least one other drill progression has the
+        same bar count. Drills offer as its wrong answers the drill progressions with the same
+        bar count that share the most chords with it, bar by bar, those in the same mode first.
+        There is no way back: a drill progression stays in the drills. Only admins may add a
+        progression to the drills.
+      tags:
+        - Practice
+      parameters:
+        - name: progression_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The progression to add.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProgressionDrillsInput'
+      responses:
+        "200":
+          description: The progression, now in the drills.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Progression'
+        "400":
+          description: The body is invalid, such as no skill and no concept, or a skill or concept that doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only admins add progressions to the drills.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No progression has this identifier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "409":
+          description: The progression can't be added to the drills; the reasons say why.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressionNotAddableError'
+
   /chords:
     get:
       operationId: searchChords
@@ -4883,6 +5174,204 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
 
+  /admin/alpha-observation:
+    get:
+      operationId: getAlphaObservation
+      summary: Observe the alpha for one week
+      description: |
+        Measures the alpha against its success metric for one week: how many
+        students practised 3 or more times, how many have done so every week so
+        far, and how far each student has got through their first path. Changes
+        nothing. Only admins may observe the alpha.
+
+        The alpha is every user with the student role who has been given at
+        least one path. A week runs Monday 00:00 to Sunday 24:00 in São Paulo
+        time (America/Sao_Paulo). A practice session belongs to the week its
+        start falls in and counts only once it is finished; sessions ended
+        early, abandoned or still in progress never count. A student is at the
+        target in a week with 3 or more counted sessions.
+
+        Students are ordered by fewest counted sessions in the week, then by
+        display name, then by student_id, and returned a page at a time. q
+        and filter narrow the page; summary and filter_counts
+        always describe the whole alpha for the week, whatever is asked for.
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/AlphaWeek'
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+          description: >-
+            Only students whose display_name contains this text, ignoring case
+            and accents ("joao" matches "João").
+        - name: filter
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - below_target
+              - quiet
+          description: |
+            Only some of the students. Every student when absent.
+            below_target — fewer than 3 counted sessions in the week.
+            quiet — quiet as AlphaStudent.quiet defines it.
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        "200":
+          description: The alpha, measured for the week.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlphaObservation'
+        "400":
+          description: >-
+            The week is not a Monday or starts after the running week, or q,
+            filter, limit or offset is out of range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user is not an admin. Only admins may observe the alpha.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /admin/alpha-observation/students:
+    get:
+      operationId: listAlphaStudents
+      summary: Find students of the alpha by name or by id
+      description: |
+        Names the students of the alpha, without measuring them: for a picker
+        that searches the alpha by name, and for naming the students behind a
+        page of events. Changes nothing. Only admins may list them.
+
+        Ordered by display_name, alphabetically as a person reads names —
+        ignoring case and accents — then by user_id, and returned a page at a
+        time. q and student_id may be combined; a student must match
+        both. A student_id outside the alpha is left out, not refused.
+      tags:
+        - Admin
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+          description: >-
+            Only students whose display_name contains this text, ignoring case
+            and accents ("joao" matches "João").
+        - name: student_id
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 100
+            items:
+              type: string
+              format: uuid
+          description: Only these students. Repeat the parameter for several.
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        "200":
+          description: A page of matching students, possibly empty.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedAlphaStudentRefs'
+        "400":
+          description: q, a student_id, limit or offset is malformed or out of range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user is not an admin. Only admins may list the alpha's students.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /admin/alpha-observation/students/{student_id}:
+    get:
+      operationId: getAlphaStudentObservation
+      summary: Observe one student of the alpha
+      description: |
+        One student's measures for a week, as getAlphaObservation reports them,
+        with the practice sessions behind them and their first path node by
+        node. Sessions of every state are listed, so a week below the target
+        can be explained. Changes nothing. Only admins may observe the alpha.
+      tags:
+        - Admin
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The student's user_id.
+        - $ref: '#/components/parameters/AlphaWeek'
+      responses:
+        "200":
+          description: The student, measured for the week.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlphaStudentObservation'
+        "400":
+          description: >-
+            The student_id is not a UUID, or the week is not a Monday or starts
+            after the running week.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: The authenticated user is not an admin. Only admins may observe the alpha.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No student with this user_id is in the alpha.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
   /courses:
     get:
       operationId: listCourses
@@ -5914,10 +6403,13 @@ paths:
       summary: List the parts of one of the authenticated student's course enrollments
       description: |
         Returns the StudentPath of every part the caller has reached in
-        this enrollment, ordered by course_checkpoint_position, each with
-        the progress state of its items. For a completed enrollment that
-        is every part of the course version the student took, never a
-        newer one. Item statuses follow the same rules as
+        this enrollment, in the order of the course version the enrollment
+        is pinned to — the version the student enrolled in, or the one they
+        last updated to — each with the progress state of its items and
+        that version's course_checkpoint_position. Parts the pinned version
+        no longer has, and copies archived by an update, are left out. For
+        a completed enrollment that is every part of the pinned version,
+        never a newer one. Item statuses follow the same rules as
         GET /students/me/path. Used to open the lessons of a finished
         course for review.
 
@@ -6215,10 +6707,26 @@ paths:
 
         With an instrument in hand, only items that suit that instrument (or every
         instrument) are picked, fretboard cells of its layout included. Without one (a session in the head), only items that need no
-        instrument in hand are picked: fretboard cells of every fretboard layout among the
-        student's instruments, and exercises; never a play-along, so such a session has no
+        instrument in hand are picked: fretboard cells and guide tones of every fretboard
+        layout among the student's instruments, and exercises; never a play-along, so such a session has no
         application ending. Any instrument may be named, not only the ones the student is
         enrolled for.
+
+        A session is focused: it practises at most three subjects (knowledge nodes), named in
+        focus_nodes, main first. For Today's mix the composer picks them: a teacher's
+        suggestion, then the nodes with the most due and weak time, then the nodes of new
+        items, then the nodes with items coming due within the week, then stretch; only their
+        items fill the session, so it may end short. Due items of other nodes come in a review
+        block of at most a fifth of the focus time or 5 items, filled first from the due share
+        and placed right after the warm-up. The application ending plays one of the subjects,
+        or there is none. With focus_node_id, the student chose the subject:
+        only items of that node and its part_of subtree are picked, there is no warm-up, and
+        the application ending is a play-along of the subtree, or none. Any node with
+        material for the session can be chosen; requirements never gate it.
+
+        For each subject, new and stretch items come from its current rung (the lowest rung
+        with material for the session whose items are not yet accurate) and the next one;
+        due, weak and review-ahead items are picked whatever their rung.
 
         Any authenticated user may practise.
       tags:
@@ -6237,7 +6745,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/PracticeSessionPlan'
         "400":
-          description: The request body failed schema validation, such as minutes outside 1–60.
+          description: |
+            The request body failed schema validation, such as minutes outside 1–60 or a
+            focus_node_id that is not a uuid.
           content:
             application/json:
               schema:
@@ -6250,8 +6760,142 @@ paths:
                 $ref: '#/components/schemas/UnauthorizedError'
         "404":
           description: |
-            No instrument exists with the given instrument_id, or nothing connected to what
-            the student is learning can be practised with the instrument chosen.
+            No instrument exists with the given instrument_id, no knowledge node exists with
+            the given focus_node_id, nothing connected to what the student is learning can be
+            practised with the instrument chosen, or the chosen node has nothing to practise
+            with it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /students/me/practice-sessions/{practice_session_id}/subject-progress:
+    get:
+      operationId: getPracticeSessionSubjectProgress
+      summary: Read where the authenticated student stands on a session's subjects, and whether the session is folded
+      description: |
+        For the session summary: each subject's current rung and the student's level on every
+        rung of it with material for the session, read now, and whether the session is caught
+        up. Levels are rolled up as in the plan's rung_level: over the items of the subject's
+        part_of subtree at that rung that suit the session: with the instrument in hand, or in
+        the head every instrument's items together, as the current rung and the composer take
+        them.
+
+        caught_up is true once the Aggregation Worker has recorded the session's
+        practice.session_ended. A student's events are folded in order, and an answer is folded
+        before it is recorded in its session, so from then on the levels include every answer
+        that arrived before the end. Until then they may not, and the client reads again.
+        A session that isn't the student's, or isn't known, is never caught up.
+
+        Derived from the student's evidence; reading it changes nothing.
+
+        Any authenticated user may read their own sessions.
+      tags:
+        - Practice
+      parameters:
+        - name: practice_session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The session, as composed by createPracticeSessionPlan.
+        - name: instrument_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: |
+            The instrument the session was practised with. Absent means a session in the head.
+        - name: node_id
+          in: query
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 3
+            items:
+              type: string
+              format: uuid
+          description: The session's subjects, the plan's focus_nodes, in order.
+      responses:
+        "200":
+          description: The subjects' rung levels now, in the order asked, and whether the session is caught up.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeSessionSubjectProgress'
+        "400":
+          description: |
+            practice_session_id, instrument_id or a node_id is not a valid uuid, or there is no
+            node_id or more than three.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No instrument exists with the given instrument_id, or no knowledge node with a given node_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /students/me/practice-subjects:
+    get:
+      operationId: listPracticeSubjects
+      summary: List the subjects the authenticated student can choose to practise
+      description: |
+        Every knowledge node with practice material for a session with the given instrument
+        in hand, or in the head, grouped by area, for the student to choose one. A node is
+        listed when it or a node part_of it has at least one item the session could pick: one
+        that suits the instrument and is played in hand, or, in the head, one recalled on the
+        screen for any of the student's instruments. Nodes on the student's paths are listed
+        with the rest, and requirements never hide a node.
+
+        Derived from the catalog and the student's evidence; reading it changes nothing.
+
+        Any authenticated user may read their own subjects.
+      tags:
+        - Practice
+      parameters:
+        - name: instrument_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: |
+            The instrument in hand. Absent means a session in the head.
+      responses:
+        "200":
+          description: The subjects the student can choose, grouped by area.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeSubjectList'
+        "400":
+          description: instrument_id is not a valid uuid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "404":
+          description: No instrument exists with the given instrument_id.
           content:
             application/json:
               schema:
@@ -6453,13 +7097,20 @@ paths:
                 $ref: '#/components/schemas/NotFoundError'
 
     patch:
-      operationId: updateMyLocale
-      summary: Set the authenticated user's locale preference
+      operationId: updateMyProfile
+      summary: Update the authenticated user's preferences
       description: |
-        Updates the locale preference on the MotifPath user record associated
-        with the authenticated Clerk identity. This is the authenticated
-        counterpart to the Accept-Language-header/localStorage preference
-        used for anonymous visitors.
+        Updates the locale, the time zone and the email preferences on the
+        MotifPath user record associated with the authenticated identity. A
+        request changes any of them and must change at least one; a field that
+        is left out keeps its value. Within email_preferences, a switch that is
+        left out keeps its value too.
+
+        The locale is the authenticated counterpart to the
+        Accept-Language-header/localStorage preference used for anonymous
+        visitors. The time zone decides the local time at which the platform's
+        emails are sent; the web client sets it to the browser's zone when the
+        two differ.
       tags:
         - Identity
       requestBody:
@@ -6467,7 +7118,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateMyLocaleRequest'
+              $ref: '#/components/schemas/UpdateMyProfileRequest'
+            examples:
+              set_time_zone:
+                summary: The web reports the browser's time zone
+                value:
+                  time_zone: America/Sao_Paulo
+              turn_progress_reports_off:
+                summary: A student turns progress reports off in settings
+                value:
+                  email_preferences:
+                    progress_report: false
       responses:
         "200":
           description: The updated user profile.
@@ -6477,8 +7138,10 @@ paths:
                 $ref: '#/components/schemas/UserProfile'
         "400":
           description: |
-            The request body failed schema validation, or locale is not a
-            known language code.
+            The request body failed schema validation or changes nothing, locale
+            is not a known language code (field "locale"), time_zone is not a
+            known IANA time zone (field "time_zone"), or email_preferences names
+            an unknown switch (field "email_preferences").
           content:
             application/json:
               schema:
@@ -6498,6 +7161,65 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+
+  /email-unsubscribes:
+    post:
+      operationId: unsubscribeFromEmails
+      summary: Turn off one kind of email with an unsubscribe token
+      description: |
+        Turns off the email preference named by an unsubscribe token, for the
+        user the token was issued to. Every progress report and reminder
+        carries such a token, both in its List-Unsubscribe header (RFC 8058
+        one-click unsubscribe, which mail clients send as a form POST with the
+        body "List-Unsubscribe=One-Click") and in the unsubscribe link in its
+        footer, which opens a web page that calls this endpoint.
+
+        No sign-in is needed: the token is the authorization. It names exactly
+        one user and one kind of email, it is signed by the platform so it
+        cannot be altered or made up, and it does not expire. Using it when
+        that kind is already off still succeeds. The user can turn the kind
+        back on in their settings; an old token still turns it off again.
+      tags:
+        - Identity
+      security: []
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+          description: The unsubscribe token from the email.
+      requestBody:
+        required: false
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              description: The body mail clients send for a one-click unsubscribe. Its content is not used.
+              properties:
+                List-Unsubscribe:
+                  type: string
+                  description: Always "One-Click".
+          application/json:
+            schema:
+              type: object
+              description: The web page sends an empty object. Its content is not used.
+      responses:
+        "200":
+          description: The kind of email named by the token is off.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailUnsubscribeResult'
+        "400":
+          description: |
+            The token is missing, malformed, altered, or names a user that no
+            longer exists. Nothing is changed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
 
   /healthz:
     get:
@@ -6566,6 +7288,17 @@ components:
         See ADR-007 for the full validation contract.
 
   parameters:
+    AlphaWeek:
+      name: week
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date
+      description: >-
+        The Monday the week starts on, in São Paulo time (e.g. 2026-10-12).
+        Defaults to the running week. A date that is not a Monday, or a week
+        after the running one, is rejected.
     Limit:
       name: limit
       in: query
@@ -8887,6 +9620,8 @@ components:
               description: |
                 The section's heading as the author wrote it (e.g. "Verse 2",
                 "Refrão"); null shows no heading.
+            progression_keys:
+              $ref: '#/components/schemas/SongChartProgressionKeys'
           required:
             - kind
             - label
@@ -9038,6 +9773,23 @@ components:
         - type
         - attrs
 
+    SongChartProgressionKeys:
+      type: array
+      maxItems: 10
+      uniqueItems: true
+      items:
+        $ref: '#/components/schemas/ProgressionKey'
+      description: |
+        The progressions a section plays, by their key (e.g. "I-IV-V-I" or
+        "major/I-bVII-IV-I"), as its author tagged them. A chart with a
+        section tagged with a drill progression is practised as a song on
+        that progression's knowledge nodes, played whole; an untagged chart,
+        or one tagged only with progressions for song charts, never is. On
+        input, absent means none, and a key no progression has is refused.
+        A published revision keeps its keys even after a progression is
+        removed; a client shows such a key as the numerals it spells. The server always writes it, empty for an untagged
+        section.
+
     SongChartDraftInput:
       type: object
       description: The fields of a song chart's draft that authors write.
@@ -9119,6 +9871,23 @@ components:
               description: |
                 Every chord anchor the server couldn't fully resolve, in
                 document order; empty when every anchor resolved.
+            unplayed_progressions:
+              type: array
+              items:
+                $ref: '#/components/schemas/SongChartUnplayedProgression'
+              description: |
+                The sections' tagged progressions the section doesn't play, by
+                section in document order, then in the order they were tagged;
+                empty when every section plays its tags. A progression is played
+                by a section when its chords appear in a row in that section, in
+                the chart's concert key: the section's chords as they sound
+                (each written chord moved up by the capo), each counted by its
+                root and triad (major, minor or diminished), N.C. skipped and a
+                chord repeated in a row counted once, against the progression's
+                numerals spelled in the concert key, a dominant seventh counting
+                as major and a repeated numeral counted once. The chords of
+                another section never count. With no stated major concert key,
+                every tag is unplayed. Any entry blocks publication.
             updated_by:
               $ref: '#/components/schemas/UserRef'
             updated_at:
@@ -9128,6 +9897,7 @@ components:
           required:
             - rights_confirmation
             - warnings
+            - unplayed_progressions
             - updated_by
             - updated_at
 
@@ -9382,6 +10152,13 @@ components:
           description: |
             The open-string pitches the chords are written for, lowest
             string first (e.g. "E2-A2-D3-G3-B3-E4", standard guitar tuning).
+        progression_keys:
+          type: array
+          items:
+            type: string
+          description: |
+            Every progression the revision's sections are tagged with, each
+            once, in document order: read from the body, never written.
         body:
           $ref: '#/components/schemas/SongChartDocument'
         rights_confirmation:
@@ -9403,6 +10180,7 @@ components:
         - tempo_bpm
         - time_signature
         - tuning_fingerprint
+        - progression_keys
         - body
         - rights_confirmation
         - published_by
@@ -9501,19 +10279,42 @@ components:
             enum:
               - rights_not_confirmed
               - unresolved_chords
+              - progressions_not_played
           description: |
             rights_not_confirmed: no admin has confirmed the song's rights
             were checked. unresolved_chords: at least one anchor has a
             warning that blocks publication (see anchor_warnings).
+            progressions_not_played: a section doesn't play at least one
+            progression it is tagged with (see unplayed_progressions).
         anchor_warnings:
           type: array
           items:
             $ref: '#/components/schemas/SongChartAnchorWarning'
           description: The anchors whose warnings block publication; empty unless reasons has unresolved_chords.
+        unplayed_progressions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SongChartUnplayedProgression'
+          description: The sections' tags the section doesn't play; empty unless reasons has progressions_not_played.
       required:
         - message
         - reasons
         - anchor_warnings
+        - unplayed_progressions
+
+    SongChartUnplayedProgression:
+      type: object
+      description: A progression a section is tagged with but doesn't play.
+      properties:
+        section_index:
+          type: integer
+          minimum: 0
+          description: The section, numbered from 0 in document order.
+        progression_key:
+          $ref: '#/components/schemas/ProgressionKey'
+      required:
+        - section_index
+        - progression_key
 
     SongChartChordProImport:
       type: object
@@ -10149,6 +10950,411 @@ components:
       required:
         - message
         - missing
+
+    AlphaWeekRange:
+      type: object
+      description: A Monday-to-Sunday week in São Paulo time.
+      properties:
+        week_start:
+          type: string
+          format: date
+          description: The Monday the week starts on.
+        week_end:
+          type: string
+          format: date
+          description: The Sunday the week ends on.
+        running:
+          type: boolean
+          description: True when the week contains the current moment, so it is still running.
+      required:
+        - week_start
+        - week_end
+        - running
+
+    AlphaCohortSummary:
+      type: object
+      description: The alpha as a whole, measured for the requested week.
+      properties:
+        student_count:
+          type: integer
+          minimum: 0
+          description: Number of students in the alpha.
+        at_target_in_week:
+          type: integer
+          minimum: 0
+          description: Students with 3 or more counted sessions in the requested week.
+        at_target_in_previous_week:
+          type: integer
+          minimum: 0
+          description: Students with 3 or more counted sessions in the week before the requested one.
+        at_target_every_week:
+          type: integer
+          minimum: 0
+          description: >-
+            Students at the target in every one of their weeks so far. A student
+            with no week so far is not counted.
+        first_path_over_target:
+          type: integer
+          minimum: 0
+          description: >-
+            Students who have completed strictly more than 70% of their first
+            path's nodes.
+        median_first_path_percent:
+          type: [integer, "null"]
+          minimum: 0
+          maximum: 100
+          description: >-
+            Median of the students' first-path completion, rounded down to a
+            whole percent; with an even number of students, the mean of the two
+            middle values. Null when the alpha has no students.
+      required:
+        - student_count
+        - at_target_in_week
+        - at_target_in_previous_week
+        - at_target_every_week
+        - first_path_over_target
+        - median_first_path_percent
+
+    AlphaWeekCount:
+      type: object
+      description: One finished week of a student's, with its counted sessions.
+      properties:
+        week_start:
+          type: string
+          format: date
+          description: The Monday the week starts on.
+        finished_sessions:
+          type: integer
+          minimum: 0
+          description: Practice sessions started in this week and finished.
+      required:
+        - week_start
+        - finished_sessions
+
+    AlphaFirstPath:
+      type: object
+      description: |
+        The student's first path — the earliest one they were given, kept even
+        if a later path replaced it — and how much of it they have completed.
+      properties:
+        student_path_id:
+          type: string
+          format: uuid
+          description: The student's copy of the path.
+        title:
+          type: string
+          description: The path's title on the student's copy.
+        given_at:
+          type: string
+          format: date-time
+          description: When the student was given this path.
+        completed_nodes:
+          type: integer
+          minimum: 0
+          description: Nodes of this path the student has completed, here or in any other path.
+        total_nodes:
+          type: integer
+          minimum: 0
+          description: All nodes of this path.
+        completed_percent:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: completed_nodes over total_nodes, rounded down to a whole percent.
+        over_target:
+          type: boolean
+          description: >-
+            True when completed_nodes over total_nodes is strictly more than
+            70%, compared exactly rather than on the rounded percent.
+      required:
+        - student_path_id
+        - title
+        - given_at
+        - completed_nodes
+        - total_nodes
+        - completed_percent
+        - over_target
+
+    AlphaStudent:
+      type: object
+      description: One student of the alpha, measured for the requested week.
+      properties:
+        student_id:
+          type: string
+          format: uuid
+          description: The student's user_id.
+        display_name:
+          type: string
+          description: The student's display name.
+        registered_at:
+          type: string
+          format: date-time
+          description: When the student registered.
+        finished_sessions_in_week:
+          type: integer
+          minimum: 0
+          description: Practice sessions started in the requested week and finished.
+        at_target_in_week:
+          type: boolean
+          description: True when finished_sessions_in_week is 3 or more.
+        weeks_so_far:
+          type: array
+          maxItems: 8
+          items:
+            $ref: '#/components/schemas/AlphaWeekCount'
+          description: >-
+            The student's most recent finished weeks, up to 8, oldest first.
+            Weeks so far start at the week the first path was given and end
+            before the running week. Empty when none has finished.
+        weeks_so_far_count:
+          type: integer
+          minimum: 0
+          description: All of the student's weeks so far, including any not listed in weeks_so_far.
+        weeks_at_target_count:
+          type: integer
+          minimum: 0
+          description: Weeks so far in which the student was at the target.
+        at_target_every_week:
+          type: boolean
+          description: >-
+            True when the student has at least one week so far and was at the
+            target in all of them.
+        last_active_at:
+          type: [string, "null"]
+          format: date-time
+          description: >-
+            When the student's most recent event of any type occurred. Null when
+            the student has no event at all.
+        quiet:
+          type: boolean
+          description: >-
+            True when last_active_at is 7 days or more before now, or, for a
+            student with no event at all, when the first path was given 7 days
+            or more before now.
+        first_path:
+          $ref: '#/components/schemas/AlphaFirstPath'
+      required:
+        - student_id
+        - display_name
+        - registered_at
+        - finished_sessions_in_week
+        - at_target_in_week
+        - weeks_so_far
+        - weeks_so_far_count
+        - weeks_at_target_count
+        - at_target_every_week
+        - last_active_at
+        - quiet
+        - first_path
+
+    AlphaObservation:
+      type: object
+      description: The alpha measured for one week.
+      properties:
+        week:
+          $ref: '#/components/schemas/AlphaWeekRange'
+        summary:
+          $ref: '#/components/schemas/AlphaCohortSummary'
+        students:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlphaStudent'
+          description: >-
+            This page of the students matching q and filter, ordered by fewest
+            counted sessions in the week, then by display name, then by
+            student_id.
+        students_total:
+          type: integer
+          minimum: 0
+          description: All students matching q and filter, across every page.
+        limit:
+          type: integer
+          description: The page size that was applied.
+        offset:
+          type: integer
+          description: The number of matching students skipped before this page.
+        filter_counts:
+          $ref: '#/components/schemas/AlphaFilterCounts'
+      required:
+        - week
+        - summary
+        - students
+        - students_total
+        - limit
+        - offset
+        - filter_counts
+
+    AlphaFilterCounts:
+      type: object
+      description: >-
+        How many students of the whole alpha each filter keeps for the week,
+        whatever q and filter the request carries, so a filter's count never
+        changes when another is picked.
+      properties:
+        all:
+          type: integer
+          minimum: 0
+          description: Every student in the alpha.
+        below_target:
+          type: integer
+          minimum: 0
+          description: Students with fewer than 3 counted sessions in the week.
+        quiet:
+          type: integer
+          minimum: 0
+          description: Quiet students.
+      required:
+        - all
+        - below_target
+        - quiet
+
+    PagedAlphaStudentRefs:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserRef'
+              description: This page of matching students, by display name then user_id.
+          required:
+            - items
+
+    AlphaSession:
+      type: object
+      description: One practice session of a student's, in any state.
+      properties:
+        practice_session_id:
+          type: string
+          format: uuid
+          description: The practice session's id.
+        started_at:
+          type: string
+          format: date-time
+          description: When the session started.
+        planned_minutes:
+          type: integer
+          minimum: 1
+          description: The minutes the student planned for the session.
+        ended_at:
+          type: [string, "null"]
+          format: date-time
+          description: >-
+            When the session ended — its end for a finished or ended-early
+            session, its last event for an abandoned one. Null while in progress.
+        state:
+          type: string
+          enum:
+            - finished
+            - ended_early
+            - abandoned
+            - in_progress
+          description: |
+            finished — ended without leaving early; the only state that counts.
+            ended_early — the student left before the end.
+            abandoned — no end arrived and the session has been silent for its
+            planned minutes plus 15.
+            in_progress — still within its planned minutes plus 15.
+        items_answered:
+          type: integer
+          minimum: 0
+          description: Items the student answered in the session.
+      required:
+        - practice_session_id
+        - started_at
+        - planned_minutes
+        - ended_at
+        - state
+        - items_answered
+
+    AlphaSessionWeek:
+      type: object
+      description: One week of a student's practice sessions.
+      properties:
+        week:
+          $ref: '#/components/schemas/AlphaWeekRange'
+        finished_sessions:
+          type: integer
+          minimum: 0
+          description: The week's counted sessions.
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlphaSession'
+          description: Every session started in the week, in any state, newest first.
+      required:
+        - week
+        - finished_sessions
+        - sessions
+
+    AlphaPathNode:
+      type: object
+      description: One node of the student's first path and where the student is with it.
+      properties:
+        position:
+          type: integer
+          minimum: 1
+          description: 1-based position of the node in the path.
+        content_node_id:
+          type: string
+          format: uuid
+          description: The content node at this position.
+        title:
+          type: string
+          description: Title of the content node.
+        status:
+          type: string
+          enum:
+            - completed
+            - in_progress
+            - not_started
+          description: |
+            completed — finished, here or in any other path.
+            in_progress — started but not finished.
+            not_started — not started yet; a node the student cannot open yet is
+            reported as not started too.
+        completed_at:
+          type: [string, "null"]
+          format: date-time
+          description: When the student first completed the node. Null unless completed.
+        started_at:
+          type: [string, "null"]
+          format: date-time
+          description: When the student first started the node. Null when not started.
+      required:
+        - position
+        - content_node_id
+        - title
+        - status
+        - completed_at
+        - started_at
+
+    AlphaStudentObservation:
+      type: object
+      description: One student of the alpha, measured for one week, with what lies behind the measures.
+      properties:
+        week:
+          $ref: '#/components/schemas/AlphaWeekRange'
+        student:
+          $ref: '#/components/schemas/AlphaStudent'
+        session_weeks:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items:
+            $ref: '#/components/schemas/AlphaSessionWeek'
+          description: The requested week, then the week before it.
+        first_path_nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlphaPathNode'
+          description: Every node of the student's first path, in path order.
+      required:
+        - week
+        - student
+        - session_weeks
+        - first_path_nodes
 
     StudentPath:
       type: object
@@ -12668,6 +13874,15 @@ components:
           minimum: 1
           maximum: 60
           description: How long the student wants to practise, in minutes.
+        focus_node_id:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          description: |
+            The knowledge node the student chose to practise. The session then holds only items
+            of that node and the nodes part_of it, at any depth. Null (or omitted) for Today's
+            mix, whose subjects the composer picks.
       additionalProperties: false
       required:
         - minutes
@@ -12693,6 +13908,20 @@ components:
           minimum: 1
           maximum: 60
           description: The time the session was composed for, in minutes.
+        focus_source:
+          $ref: './components/schemas/practice.yaml#/PracticeFocusSource'
+        focus_nodes:
+          type: array
+          minItems: 1
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/PracticeFocusNode'
+          description: |
+            The session's subjects, main first, shown to the student as what the session works
+            on. Every item practises one of them, except the warm-up and, in Today's mix, the
+            review block: due items of other nodes, at most a fifth of the focus time or 5 items,
+            right after the warm-up.
+            One node, the chosen one, when focus_source is chosen.
         items:
           type: array
           minItems: 1
@@ -12714,24 +13943,494 @@ components:
         tap_check_due:
           type: boolean
           description: |
-            True when the plan has a fretboard cell or a diagram shape and the student has
-            done no tap check in the last 30 days, or never. The client then offers the tap
+            True when the plan has a timed fretboard drill (a fretboard cell named or found,
+            or a diagram shape) and the student has done no tap check in the last 30 days, or
+            never. A cell asked to find every instance isn't timed, so it needs none. The client then offers the tap
             check before the first item; the student may skip it, and their answers are then
             judged on the whole latency.
       required:
         - practice_session_id
         - instrument_id
         - minutes
+        - focus_source
+        - focus_nodes
         - items
         - felt_questions
         - tap_check_due
+
+    PracticeFocusNode:
+      type: object
+      description: |
+        One subject of a practice session, with where the student stood on it when the session
+        was composed: rung is its current rung for the session (the lowest rung with material
+        for the session whose items are not yet accurate; with every rung accurate, the top
+        one), and rung_level the student's level on it, the highest level at least 80% of the
+        subtree's items at that rung that suit the session reach. The session summary compares
+        rung_level with the level read from getPracticeSessionSubjectProgress once the session
+        is caught up.
+      properties:
+        node_id:
+          type: string
+          format: uuid
+          description: The knowledge node practised.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+        rung:
+          $ref: './components/schemas/practice.yaml#/PracticeRung'
+        rung_level:
+          $ref: './components/schemas/practice.yaml#/KnowledgeLevel'
+      additionalProperties: false
+      required:
+        - node_id
+        - names
+        - rung
+        - rung_level
+
+    PracticeSessionSubjectProgress:
+      type: object
+      description: Where the student stands on a session's subjects now, for its summary.
+      properties:
+        caught_up:
+          type: boolean
+          description: |
+            True once the session's end has been folded, so the levels include its answers.
+        subjects:
+          type: array
+          minItems: 1
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/PracticeSubjectProgress'
+          description: One per node_id asked, in the same order.
+      additionalProperties: false
+      required:
+        - caught_up
+        - subjects
+
+    PracticeSubjectProgress:
+      type: object
+      description: One subject's rungs, read now.
+      properties:
+        node_id:
+          type: string
+          format: uuid
+          description: The knowledge node.
+        current_rung:
+          oneOf:
+            - $ref: './components/schemas/practice.yaml#/PracticeRung'
+            - type: 'null'
+          description: |
+            Its current rung now, as in the plan's rung. Null when it has no material for the
+            session any more.
+        rungs:
+          type: array
+          items:
+            $ref: '#/components/schemas/PracticeRungLevel'
+          description: Every rung with material for the session, lowest first.
+      additionalProperties: false
+      required:
+        - node_id
+        - current_rung
+        - rungs
+
+    PracticeRungLevel:
+      type: object
+      description: The student's level on one rung of a subject.
+      properties:
+        rung:
+          $ref: './components/schemas/practice.yaml#/PracticeRung'
+        level:
+          $ref: './components/schemas/practice.yaml#/KnowledgeLevel'
+      additionalProperties: false
+      required:
+        - rung
+        - level
+
+    PracticeSubjectList:
+      type: object
+      description: The subjects a student can choose to practise, for one instrument in hand or in the head.
+      properties:
+        instrument_id:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          description: The instrument in hand, or null for a session in the head.
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/PracticeSubjectGroup'
+          description: One group per area with at least one subject, in catalog order.
+      additionalProperties: false
+      required:
+        - instrument_id
+        - groups
+
+    PracticeSubjectGroup:
+      type: object
+      description: The subjects of one area.
+      properties:
+        area_node_id:
+          type: string
+          format: uuid
+          description: The area, a top-level knowledge node.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+        subjects:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PracticeSubject'
+          description: The area's nodes with material, in catalog order.
+      additionalProperties: false
+      required:
+        - area_node_id
+        - names
+        - subjects
+
+    PracticeSubject:
+      type: object
+      description: One knowledge node the student can choose to practise, with where they stand on it.
+      properties:
+        node_id:
+          type: string
+          format: uuid
+          description: The knowledge node.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+        on_path:
+          type: boolean
+          description: True when the node is a skill of one of the student's paths.
+        item_count:
+          type: integer
+          minimum: 1
+          description: Items of the node and its part_of subtree that the session could pick.
+        level:
+          oneOf:
+            - $ref: './components/schemas/practice.yaml#/KnowledgeLevel'
+            - type: 'null'
+          description: |
+            The highest level at least 80% of those items reach, for the instrument in hand; in
+            the head, the best of the student's instruments. Null for a wide node (one with
+            child nodes), shown through its children.
+        current_rung:
+          $ref: './components/schemas/practice.yaml#/PracticeRung'
+      additionalProperties: false
+      required:
+        - node_id
+        - names
+        - on_path
+        - item_count
+        - level
+        - current_rung
+
+    Progression:
+      type: object
+      description: |
+        A chord progression by number: one numeral per bar of a major or minor key, asked or
+        spelled in whatever key a drill or a chart picks. The catalog's progressions and those
+        admins create are listed together; in_drills tells the drill progressions apart from
+        those for song charts only.
+      properties:
+        progression_id:
+          type: string
+          format: uuid
+          description: The progression's fixed identifier.
+        key:
+          $ref: '#/components/schemas/ProgressionKey'
+        mode:
+          type: string
+          enum:
+            - major
+            - minor
+          description: The mode its numerals are read in.
+        bars:
+          type: array
+          minItems: 1
+          maxItems: 16
+          items:
+            $ref: '#/components/schemas/ProgressionNumeral'
+          description: |
+            One numeral per bar, such as I V vi IV, or I7 IV7 V7 for a dominant seventh. A
+            four-bar progression has four, a 12-bar form twelve.
+        borrowed_bars:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+            minimum: 0
+          description: |
+            The bars, numbered from 0, whose numeral is outside the mode's diatonic chords, judged
+            by root and triad (a seventh doesn't change it); empty when none is.
+        in_drills:
+          type: boolean
+          description: |
+            True for a drill progression: drills, practice and songs on it use it. False for a
+            progression for song charts only, which is never a practice subject.
+        confusable:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgressionKey'
+          description: |
+            The keys of the drill progressions drills offer as its wrong answers, closest first;
+            empty for a progression that isn't in the drills.
+        names:
+          $ref: '#/components/schemas/LocalizedNames'
+          description: The progression's name in each language, such as "I–V–vi–IV (pop)".
+        nicknames:
+          type: object
+          additionalProperties:
+            type: string
+            minLength: 1
+            maxLength: 60
+          description: |
+            A created progression's nickname in each language, shown after its numerals in its
+            name; absent for one with no nickname and for the catalog's progressions.
+        song_chart_count:
+          type: integer
+          minimum: 0
+          description: How many song charts tag it in their draft or latest published revision.
+        created_by:
+          oneOf:
+            - $ref: '#/components/schemas/UserRef'
+            - type: 'null'
+          description: |
+            The admin who created it, shown only to an admin; null for any other caller, and for
+            the catalog's progressions.
+        created_at:
+          type:
+            - string
+            - "null"
+          format: date-time
+          description: When it was created; null for the catalog's progressions.
+      additionalProperties: false
+      required:
+        - progression_id
+        - key
+        - mode
+        - bars
+        - borrowed_bars
+        - in_drills
+        - confusable
+        - names
+        - song_chart_count
+        - created_by
+        - created_at
+
+    ProgressionKey:
+      type: string
+      pattern: '^([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)$'
+      description: |
+        A progression's key, as item keys, answers and song chart tags name it: a catalog
+        progression's handle, such as I-V-vi-IV or 12-bar-blues, or a created progression's mode
+        and numerals in ASCII (b for ♭, # for ♯, o for °, h for ø), such as major/I-bVII-IV-I.
+
+    ProgressionNumeral:
+      type: string
+      pattern: '^[♭♯]?((I|II|III|IV|V|VI|VII)(7|maj7)?|(i|ii|iii|iv|v|vi|vii)(7|°|ø7|°7)?)$'
+      description: |
+        A chord by number: a root I to VII, optionally ♭ or ♯, upper case for a major chord (7 a
+        dominant seventh, maj7 a major seventh), lower case for a minor chord (7 a minor
+        seventh), or lower case with ° for a diminished chord (ø7 half-diminished, °7 diminished
+        seventh).
+
+    ProgressionInput:
+      type: object
+      description: A progression to create.
+      properties:
+        mode:
+          type: string
+          enum:
+            - major
+            - minor
+          description: The mode its numerals are read in.
+        bars:
+          type: array
+          minItems: 1
+          maxItems: 16
+          items:
+            type: string
+            minLength: 1
+            maxLength: 8
+          description: |
+            One numeral per bar, as ProgressionNumeral describes, where b, #, o and h may stand
+            for ♭, ♯, ° and ø.
+        nicknames:
+          type: object
+          additionalProperties:
+            type: string
+            minLength: 1
+            maxLength: 60
+          description: An optional nickname per language, keyed by Language.code.
+        in_drills:
+          type: boolean
+          default: false
+          description: True to add it to the drills as it is created.
+        skill_ids:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+          description: The skills it practises in the drills; used only when in_drills is true.
+        concept_ids:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+          description: The concepts it practises in the drills; used only when in_drills is true.
+      additionalProperties: false
+      required:
+        - mode
+        - bars
+
+    ProgressionNicknamesInput:
+      type: object
+      description: A created progression's new nicknames.
+      properties:
+        nicknames:
+          type: object
+          additionalProperties:
+            type: string
+            minLength: 1
+            maxLength: 60
+          description: The nickname per language, keyed by Language.code; empty to remove them.
+      additionalProperties: false
+      required:
+        - nicknames
+
+    ProgressionDrillsInput:
+      type: object
+      description: What a progression practises once it is in the drills; at least one skill or concept.
+      properties:
+        skill_ids:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+          description: The skills it practises.
+        concept_ids:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+          description: The concepts it practises.
+      additionalProperties: false
+
+    ProgressionExistsError:
+      type: object
+      description: Returned when a progression with the same mode and numerals already exists.
+      properties:
+        message:
+          type: string
+          description: Human-readable reason for the refusal.
+        progression:
+          $ref: '#/components/schemas/Progression'
+      additionalProperties: false
+      required:
+        - message
+        - progression
+
+    ProgressionNotAddableError:
+      type: object
+      description: Returned when a progression can't be added to the drills, with every reason.
+      properties:
+        message:
+          type: string
+          description: Human-readable summary of the refusal.
+        reasons:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum:
+              - already_in_drills
+              - unsupported_bar_count
+              - unsupported_mode
+              - no_other_drill_progression
+          description: |
+            already_in_drills: it is a drill progression already. unsupported_bar_count: drills
+            ask 4- and 12-bar progressions only. unsupported_mode: drills don't ask its mode yet.
+            no_other_drill_progression: no other drill progression has its bar count, so drills
+            have no wrong answer to offer.
+      additionalProperties: false
+      required:
+        - message
+        - reasons
+
+    ProgressionInUseError:
+      type: object
+      description: Returned when a progression can't be removed.
+      properties:
+        message:
+          type: string
+          description: Human-readable summary of the refusal.
+        reason:
+          type: string
+          enum:
+            - in_use
+            - in_drills
+          description: |
+            in_use: a song chart's draft or latest published revision tags it (see uses).
+            in_drills: it is a drill progression, which is never removed.
+        uses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgressionUse'
+          description: The sections that tag it; empty unless reason is in_use.
+      additionalProperties: false
+      required:
+        - message
+        - reason
+        - uses
+
+    ProgressionUse:
+      type: object
+      description: A song chart section tagged with a progression.
+      properties:
+        song_chart_id:
+          type: string
+          format: uuid
+          description: The chart.
+        title:
+          type: string
+          description: The chart's title.
+        revision:
+          type: string
+          enum:
+            - draft
+            - published
+          description: |
+            draft: the chart's draft tags it. published: its latest published revision does. A
+            section tagged in both is listed once for each.
+        section_index:
+          type: integer
+          minimum: 0
+          description: The section, numbered from 0 in document order.
+        section_label:
+          type:
+            - string
+            - "null"
+          description: The section's label as the chart shows it, such as "Verse 1"; null for an unlabelled section.
+      additionalProperties: false
+      required:
+        - song_chart_id
+        - title
+        - revision
+        - section_index
+        - section_label
 
     PracticeSessionItem:
       type: object
       description: |
         One item of a composed session, with what the client needs to present it. Exactly
-        one of fretboard_cell, exercise, play_along and diagram_shape is present, matching
-        kind.
+        one of fretboard_cell, exercise, play_along, diagram_shape, generated_choice,
+        chord_voicing, chord_change, root_fifth, root_change, progression_keys, guide_tone and
+        song is present, matching kind:
+        generated_choice for a diatonic chord, a chord function, a chart progression, a heard
+        chord or a heard progression.
       properties:
         item_key:
           $ref: './components/schemas/practice.yaml#/PracticeItemKey'
@@ -12739,6 +14438,8 @@ components:
           $ref: './components/schemas/practice.yaml#/PracticeItemKind'
         reason:
           $ref: './components/schemas/practice.yaml#/PracticePickReason'
+        rung:
+          $ref: './components/schemas/practice.yaml#/PracticeRung'
         node_id:
           type:
             - string
@@ -12772,15 +14473,27 @@ components:
               description: The cell's fret; 0 is the open string.
             drill:
               $ref: './components/schemas/practice.yaml#/FretboardDrill'
+            fret_window:
+              $ref: './components/schemas/practice.yaml#/FretWindow'
           additionalProperties: false
           description: |
             Present when kind is fretboard_cell. The drill is the way of asking the cell has
-            the fewer right answers so far, name_the_note on a tie.
+            the fewest right answers so far: name_the_note, then find_the_note, then
+            find_every_instance on a tie. No two cells of the same layout and note are asked
+            find_every_instance in one plan; the second is asked the way it has the next fewest
+            right answers. A cell asked
+            find_every_instance is answered under its own key, and its note is the one to find
+            everywhere in the window. The fret window is the one
+            the composer picked for this drill and layout: the one holding the most of the
+            drill's due cells, then weak, then new, the one nearest the nut on a tie. When the
+            student has started an odd number of sessions in the head so far and the drill has
+            new cells, it is instead the one holding the most new cells.
           required:
             - layout_instrument_id
             - string
             - fret
             - drill
+            - fret_window
         exercise:
           $ref: '#/components/schemas/Exercise'
         play_along:
@@ -12795,26 +14508,40 @@ components:
               type: integer
               minimum: 20
               description: |
-                The tempo to play this take at. For a warm-up, about 80% of the student's
-                best clean tempo; otherwise the tempo ladder's current step.
+                The tempo to play this take at, in start_note_value. For a warm-up, about 80%
+                of the student's best clean tempo; otherwise the tempo ladder's current step.
+            start_note_value:
+              $ref: './components/schemas/practice.yaml#/NoteValue'
             target_tempo_bpm:
               type: integer
               minimum: 20
-              description: The tempo the item aims for, the tempo of the diagram's default playback.
+              description: |
+                The tempo the item aims for, the tempo of the diagram's default playback, in
+                quarters (as written).
             best_clean_tempo_bpm:
               type:
                 - integer
                 - 'null'
               minimum: 20
               description: |
-                The student's best clean tempo since their latest teacher review. Null when
-                they have no clean take yet.
+                The student's best clean tempo since their latest teacher review, as played,
+                in best_clean_note_value: the clean take with the fastest effective speed. Null
+                when they have no clean take yet.
+            best_clean_note_value:
+              oneOf:
+                - $ref: './components/schemas/practice.yaml#/NoteValue'
+                - type: 'null'
+              description: |
+                The note value the best clean take was played at. Null when there is no clean
+                take yet.
           additionalProperties: false
           required:
             - diagram_id
             - start_tempo_bpm
+            - start_note_value
             - target_tempo_bpm
             - best_clean_tempo_bpm
+            - best_clean_note_value
         diagram_shape:
           type: object
           description: |
@@ -12882,10 +14609,27 @@ components:
             - shape
             - options
             - asked_interval
+        generated_choice:
+          $ref: './components/schemas/practice.yaml#/GeneratedChoiceQuestion'
+        chord_voicing:
+          $ref: './components/schemas/practice.yaml#/PlannedChordVoicing'
+        chord_change:
+          $ref: './components/schemas/practice.yaml#/PlannedChordChange'
+        root_fifth:
+          $ref: './components/schemas/practice.yaml#/PlannedRootFifth'
+        root_change:
+          $ref: './components/schemas/practice.yaml#/PlannedRootChange'
+        progression_keys:
+          $ref: './components/schemas/practice.yaml#/PlannedProgressionKeys'
+        guide_tone:
+          $ref: './components/schemas/practice.yaml#/PlannedGuideTone'
+        song:
+          $ref: './components/schemas/practice.yaml#/PlannedSong'
       required:
         - item_key
         - kind
         - reason
+        - rung
         - node_id
         - level
         - estimated_seconds
@@ -13210,7 +14954,8 @@ components:
             - best_clean_tempo_bpm
           description: |
             What improved. accuracy and fluency are ratios from 0 to 1 over the skill's
-            practised items; best_clean_tempo_bpm is a tempo.
+            practised items; best_clean_tempo_bpm is a tempo at effective speed, in
+            quarter-note beats per minute (80 BPM in eighths is 160).
         before:
           type: number
           minimum: 0
@@ -13464,7 +15209,7 @@ components:
           description: |
             Stable identifier for this language (e.g. "en", "pt_BR"), or the
             literal value "any" for language-agnostic content. Used as the
-            value of UpdateMyLocaleRequest.locale and of
+            value of UpdateMyProfileRequest.locale and of
             ContentNode.languages / Exercise.languages entries.
         name:
           type: string
@@ -13473,10 +15218,22 @@ components:
         - code
         - name
 
-    UpdateMyLocaleRequest:
+    UpdateMyProfileRequest:
       type: object
-      description: Payload for setting the authenticated user's locale preference.
+      description: |
+        Payload for updating the authenticated user's preferences. At least one
+        field is required; a field that is left out keeps its value.
+      minProperties: 1
+      additionalProperties: false
       properties:
+        time_zone:
+          type: string
+          minLength: 1
+          description: |
+            The IANA time zone to store for this user, such as
+            "America/Sao_Paulo". Must be a known IANA time zone.
+        email_preferences:
+          $ref: '#/components/schemas/EmailPreferencesUpdate'
         locale:
           type: string
           not:
@@ -13486,8 +15243,50 @@ components:
             be an existing language code; "any" is not a valid locale for a
             user, since it names language-agnostic content, not a language
             a person reads or speaks.
+
+    EmailPreferences:
+      type: object
+      description: |
+        Which of the platform's emails this user wants, one switch per kind.
+        Both are on for every new user. Only students are sent these emails.
+      properties:
+        progress_report:
+          type: boolean
+          description: Whether the user gets the weekly progress report.
+        reminders:
+          type: boolean
+          description: Whether the user gets reminders, both on the first days without learning activity and after 3 and 10 days without it.
       required:
-        - locale
+        - progress_report
+        - reminders
+
+    EmailPreferencesUpdate:
+      type: object
+      description: |
+        The email preference switches to change. At least one is required; a
+        switch that is left out keeps its value.
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        progress_report:
+          type: boolean
+          description: Whether the user gets the weekly progress report.
+        reminders:
+          type: boolean
+          description: Whether the user gets reminders, both on the first days without learning activity and after 3 and 10 days without it.
+
+    EmailUnsubscribeResult:
+      type: object
+      description: The email kind that was turned off by an unsubscribe link.
+      properties:
+        kind:
+          type: string
+          enum:
+            - progress_report
+            - reminders
+          description: The kind of email the user will no longer get.
+      required:
+        - kind
 
     UserRef:
       type: object
@@ -13567,6 +15366,28 @@ components:
             what other users see wherever this user is referenced (UserRef).
         locale:
           $ref: '#/components/schemas/Language'
+        email:
+          type:
+            - string
+            - "null"
+          format: email
+          maxLength: 254
+          description: |
+            The user's email address, taken from the "email" claim of the
+            session token and refreshed whenever that claim changes to another
+            valid address. Null for a user registered before addresses were
+            stored, until their next signed-in request. Shown only to its
+            owner; never part of a UserRef.
+        time_zone:
+          type:
+            - string
+            - "null"
+          description: |
+            The user's IANA time zone, such as "America/Sao_Paulo", or null when
+            none was ever set. The platform's emails use "America/Sao_Paulo"
+            when it is null.
+        email_preferences:
+          $ref: '#/components/schemas/EmailPreferences'
         registered_at:
           type: string
           format: date-time
@@ -13576,6 +15397,9 @@ components:
         - display_name
         - role
         - locale
+        - email
+        - time_zone
+        - email_preferences
         - registered_at
 
     ValidationError:

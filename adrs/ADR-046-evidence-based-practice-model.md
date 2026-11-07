@@ -44,7 +44,8 @@ Also decided:
 **Amended:** 2026-10-05, after the composer review, by Gilson. What the system suggests connects to
 what the student is learning: stretch and "ready to start" next steps reach only path skills, their
 `applies` and `part_of` neighbours, and nodes that build on something the student has met. Practice
-the student chooses for themselves, beyond these, is a later feature.
+the student chooses for themselves, beyond these, is a later feature (decided in ADR-057,
+2026-10-14).
 
 **Amended:** 2026-10-06, planning slice 4, by Gilson. The overview and the instrument tabs are the
 app's **general home**, the first screen every signed-in user sees, whatever their role. **Practice**
@@ -125,7 +126,8 @@ written in MOT-78), by Gilson:
   a twelve-note keypad. The client picks the distractors (one semitone either side, and the note at
   the same fret on an adjacent string), and the response keeps the four choices. A new grader,
   `fretboard_cell.v2`, checks them and keeps them in the answer key;
-- **a wrong pick among k choices costs 1/(k−1)** of accuracy (guess correction), so a lucky guess
+- **a wrong pick among k choices costs 1/(k−1)** of accuracy (guess correction; withdrawn
+  2026-10-14 by ADR-057, never shipped), so a lucky guess
   doesn't make a cell accurate. For now this applies to name-the-note answers that record their
   choices; it is a new version of the mastery rules. Fluency is unchanged, since it is measured by
   response time on right answers;
@@ -135,6 +137,54 @@ written in MOT-78), by Gilson:
   response with its reason, which is kept as an event and yields no evidence: no accuracy, no
   response time, no level change. While its stimulus is missing, an item's options stay locked, so
   an answer is never given unheard or unseen.
+
+**Amended:** 2026-10-13, from the Practice Shell phone prototype (MOT-55 P3; written in MOT-80), by
+Gilson. A fretboard drill never scrolls sideways, and every place on its board, the open string
+included, is at least 48 px wide:
+- each drill of each layout in a session (name the note, find the note) is asked inside one **fret
+  window** the composer picks: five frets, plus the open string when the window starts at the nut
+  (frets 0–5). All the drill's cells in the session come from its window;
+- the composer picks the window holding the most of the drill's due cells, then weak, then new,
+  the one nearest the nut on a tie. Every other session in the head, a drill with new cells takes
+  the window holding the most new cells instead, so the whole neck is reached, not only the frets
+  where cells are already due. Cells outside the window wait for another session;
+- the window limits the item on **every screen size**: the question names it ("frets 0–5"), and
+  only its places can be tapped. A phone draws only the window; a wider screen may draw more of the
+  neck, with the rest dimmed;
+- the plan carries the window on each cell. Item keys, grading and evidence don't change.
+
+**Amended:** 2026-10-14, by ADR-057 (drill model v2, MOT-142), by Gilson. ADR-057 decides, and this
+ADR defers to it on:
+- **guess correction is withdrawn** before it shipped: a wrong pick among choices counts 0, and a
+  lucky guess is caught by asking the item again. `fretboard_cell.v2` is unchanged;
+- **sessions are focused**: at most three subjects (knowledge nodes), a review block for other due
+  items in Today's mix, and new items from each subject's current rung;
+- **the student may choose a subject** (a session on one node and its `part_of` subtree), which
+  this ADR left as a later feature;
+- **new choice drills carry their options in the plan**; name the note keeps client-picked
+  distractors.
+
+**Amended:** 2026-10-18, planning the chord drills (MOT-79, drill set v2 slice P3), by Gilson.
+Chords played in hand join sessions:
+- **in hand, not only play-alongs and exercises**: an in-hand session also picks single chords
+  (`chord_voicing`; on bass, a chord's root and fifth, `root_fifth`) and changes between two
+  chords (`chord_change`; on bass, `root_change`). They are focus items, never the warm-up or the
+  application ending, and never in the head. The items are a curated set in the practice drill
+  catalog: no "chords the student has met" is tracked, and they are offered like any node's items
+  (a path skill's as new, with no prerequisite in practice; others as stretch);
+- **at most 4 single chords and 2 changes a session**, like the cap on generated drills. A single
+  chord takes 20 seconds; a change takes 90 (a bar of count-in, the minute, the count). On guitar,
+  a single chord comes before a change that uses it;
+- **a change is one minute at a tempo, one change on every beat.** The student counts the clean
+  changes, and the take sends the tempo and the count. Its rating is no longer the student's: it
+  follows from the share of the minute's beats that changed cleanly (clean from 90%, almost from
+  60%, struggled below), so the count and the rating never disagree;
+- **the change ladder runs across sessions**, since a session plays a change once: the plan
+  starts a change at the tempo of its last minute, 5 BPM up after two clean minutes in a row and
+  5 down after a struggle, never below 20; the first minute starts at 40;
+- **the target is the catalog's**: 60 clean changes a minute, for every pair, on guitar and bass,
+  versioned like the fluent times. Before this a change had no target, so any clean minute counted
+  as fully fluent.
 
 ---
 
@@ -170,7 +220,8 @@ practice; time-only threshold calibration; the map's calibration level for ranki
 ## Decision
 
 MotifPath will record practice as **evidence about items**: one observation per answer, rating or
-review, graded on the server from the raw response. A student's knowledge state for each item, the
+review, graded on the server from the raw response (one answer may cover several fretboard
+cells: amended 2026-10-21 by ADR-057). A student's knowledge state for each item, the
 level of each knowledge node and the next session are all **derived from that evidence by versioned
 rules**. Nothing about mastery is stored except the evidence itself and teacher notes.
 
@@ -253,6 +304,8 @@ One piece of evidence per observation, the only stored learning state:
   so a student's complaint about one answer can be checked from the evidence alone, even after
   the exercise changed.
 - The evidence id is the event id that produced it, so a redelivered event can't count twice.
+  *(Amended 2026-10-21 by ADR-057, MOT-153: an answer graded on several fretboard cells gives each
+  cell's evidence a name-based UUID (v5) of the cell's item key under the event id.)*
 - Evidence and teacher notes live in MongoDB. An archive to object storage is deferred until a
   measured trigger (volume or cost) calls for it.
 
@@ -297,7 +350,8 @@ One piece of evidence per observation, the only stored learning state:
 - **One rule set, reduced to three readings.** Each piece of evidence becomes a hit, a miss or a hold,
   plus an accuracy value and a fluency ratio against the item's goal: the timed threshold, the target
   tempo, or the target change count. Ratings map clean → hit, almost → hold, struggled → miss.
-- **A guess among few choices is corrected** (amended 2026-10-08, D9). A right answer's accuracy
+- **A guess among few choices is corrected** (amended 2026-10-08, D9; **withdrawn 2026-10-14 by
+  ADR-057**: a wrong pick counts 0, and a lucky guess is caught by asking again). A right answer's accuracy
   value is 1. A wrong one is 0, or **−1/(k−1)** when the answer key records the k choices the
   student picked from: −⅓ with four choices. A pure guesser then averages 0, and an item's accuracy
   (the weighted average below) is floored at 0. So 0.8 needs about 85% of four-choice picks right,
@@ -377,15 +431,31 @@ One piece of evidence per observation, the only stored learning state:
   focus skill it applies another skill of the student's paths. With none on the instrument at all,
   the session has no ending and the time stays with the focus block. Like the warm-up, a due
   play-along is never the ending (its review belongs in the focus block), and an ending longer than
-  a quarter of the session is skipped.
+  a quarter of the session is skipped. Amended 2026-10-21 (ADR-057, MOT-152): the ending is a song
+  instead when a subject is at the `use` rung and a song practises it.
 - **Playing in hand, recall in the head** (amended 2026-10-07, by Gilson, reversing 2026-10-06): a
-  session with the instrument in hand picks play-alongs and authored exercises, never a fretboard
-  cell or a diagram shape, though they suit the instrument; those are recalled in the head only.
+  session with the instrument in hand picks play-alongs, authored exercises, (amended
+  2026-10-18) single chords and chord changes, (amended 2026-10-20, ADR-057) progression key
+  tours and (amended 2026-10-21) songs, never a fretboard cell or a diagram shape, though
+  they suit the instrument; those are recalled in the head only.
   With nothing to play, an in-hand session is not found, and the client offers one in the head.
 - **In the head** (amended 2026-10-06): fretboard cells of every layout among the student's
-  instruments, diagram shapes of their instruments, and exercises; no warm-up and no application ending, since both are play-alongs.
+  instruments, diagram shapes of their instruments, exercises and (amended 2026-10-21, ADR-057)
+  guide tones of their layouts, tapped on the screen in time with a progression; no warm-up and
+  no application ending, since both are play-alongs.
   Each cell pick is asked the way (drill) with the fewer right answers on that cell, name the
   note on a tie. A session may mix layouts; each question then names its instrument.
+- **One fret window per drill** (amended 2026-10-13): for each layout, each fretboard drill takes
+  its cells from one window of five frets, starting at `from_fret`: frets 0–5 at the nut (the open
+  string and frets 1–5), otherwise any five frets up to 11, such as 3–7. The composer first decides
+  each candidate cell's drill (as above), then picks the drill's window: the most due cells, then
+  the most weak, then the most new, then the one nearest the nut. On a **new-cell turn**, when the
+  student has started an odd number of sessions in the head so far and the drill has new cells,
+  it picks the window with the most new cells instead, nearest the nut on a tie. The drill's picks
+  (due, weak, new, review ahead, stretch) come only from cells inside it; the mix, the cap of 10
+  and the interleaving apply as before. Every cell of the same drill and layout in a plan carries the same
+  window. The window limits the item on every screen size: the question names it, only its places
+  can be tapped, and a phone draws nothing else.
 - **Never empty, or no plan** (amended 2026-10-06): a plan has at least one item. A student with
   nothing connected to what they are learning gets no plan, never an unconnected stretch.
 - **Short and shuffled** (amended 2026-10-07): at most 10 items of each generated drill (a fretboard
@@ -399,7 +469,11 @@ One piece of evidence per observation, the only stored learning state:
   warm-up, and the application ending last.
 - **Item time:** a play-along is sized by its takes at its start tempo; an exercise by its authored
   `estimated_duration_seconds`, or 30 seconds without one; a fretboard cell by 8 seconds; a
-  diagram shape by 10 seconds.
+  diagram shape by 10 seconds; a single chord by 20 seconds and a chord change by 90 (amended
+  2026-10-18); a progression key tour like a play-along, over 3 takes (amended 2026-10-20); a
+  guide tone by its 3 takes at its start tempo, each a bar of count-in and the progression once,
+  then 5 seconds to see the result (amended 2026-10-21); a song by 2 minutes, then 10 seconds to
+  rate it (amended 2026-10-21).
 - **Focus time:** the session minus the warm-up and the application ending (one play-along at its
   estimated time). The mix shares the focus time. A warm-up
   play-along starts at about 80% of the best clean tempo, outside the tempo ladder and outside the
@@ -547,7 +621,8 @@ shown from evidence (tempo history, speed per string, levels).
   stories. FSRS needs fitted parameters and review data the platform doesn't have yet.
 - **Practice days, over streaks.** Streak resets punish a missed day; the home shows practice without
   penalty.
-- **Guess correction, over more attempts or a streak, for four choices** (decided 2026-10-08). With
+- **Guess correction, over more attempts or a streak, for four choices** (decided 2026-10-08;
+  withdrawn 2026-10-14 by ADR-057, in favour of asking the item again). With
   four choices, a student who knows 75% of a string's notes gets about 81% right and would read as
   `accurate`. Requiring 5+ attempts delays that but doesn't stop it. A rule like "the last four
   right" is easy to say but sits outside the fold's averages. Charging a wrong pick 1/(k−1) takes
@@ -567,6 +642,28 @@ shown from evidence (tempo history, speed per string, levels).
 - **Latency from the end of the last clip for sound options, over subtracting their lengths.**
   Subtracting every option's length assumed each clip is heard once, in full. A student who
   replays a clip to compare would be counted as slow, and one who stops a clip early as fast.
+- **A fret window, over a fitted neck or a scrolling one** (decided 2026-10-13, MOT-55 P3 on an
+  iPhone). The fitted neck had ≈27 px frets and a 26 px open-string zone: 6 of 16 taps were one
+  fret off, mostly at the nut, and open-string taps were graded as fret 1. A 48 px neck that
+  scrolled sideways was the right size, but scrolling caused 2 of its 3 wrong answers. Six places of
+  48 px (the open string and five frets) take 288 px and fit a 360 px phone with its gutters.
+- **The composer picks the window, over the client framing the asked cell.** A window placed around
+  the asked cell tells the student where the answer is. Picking it with the drill, before the
+  cells, keeps it independent of any one question.
+- **A window that moves to the due cells, over fixed low and high regions.** Fixed regions (frets
+  0–6 and 6–12) were proposed first; Gilson chose a window that follows where the drill's due cells
+  are, kept to five frets so it fits at 48 px.
+- **New-cell turns every other session, over due cells alone or the open position first**
+  (decided 2026-10-13). New cells are always asked as name the note, and after a first session the
+  window at the nut holds most of the due cells, so a window that follows due cells alone would keep
+  a beginner on frets 0–5 for weeks and never reach the upper frets of a skill that covers the whole
+  string. Counting the sessions already started keeps the composer stateless: it already reads past
+  sessions to pick the felt questions. Rotating windows by the last one used was rejected because it
+  needs that window stored per student, drill and layout.
+- **One window per drill, over one per layout or per item** (Gilson's choice). Each drill follows its
+  own due cells, and a drill's board never moves between its questions.
+- **The window on every screen size, over phones only.** The same item then has the same answer
+  space on every device, so a find-the-note answer means the same thing wherever it was given.
 
 ## Consequences
 
@@ -597,7 +694,7 @@ shown from evidence (tempo history, speed per string, levels).
 - **Requirements on empty nodes stay unmet** until content exists, which the map editor has to surface.
 - **Small-sample instability.** Below the calibration gate, thresholds don't move at all, even when the
   benchmark is visibly off.
-- **Guess correction is uneven for now** (2026-10-08). Single-answer exercises (2–5 options) and
+- **Guess correction is uneven for now** (2026-10-08; moot since ADR-057 withdrew it). Single-answer exercises (2–5 options) and
   name the shape (4–5 family members) have the same guess problem but still count a wrong pick as 0,
   so they can read as `accurate` somewhat earlier than name the note. Extending the correction to
   them is a follow-up and another mastery-rules version.
@@ -606,12 +703,21 @@ shown from evidence (tempo history, speed per string, levels).
   calibrates it.
 - **An unavailable item keeps coming back.** It yields no evidence, so it stays due or new and the
   composer may pick it again on the same device. Not-answered events are what flag it to the team.
+- **Find the note is asked among five or six frets, not twelve** (2026-10-13). A right answer shows
+  the student knows where the note is within the window, not along the whole string, and a guess
+  is right 1 time in 5 or 6. Find the note has no guess correction, so its accuracy reads a little
+  higher than before, and its fluent time may also be lax until MOT-53 calibrates it.
+- **Due cells outside the window wait.** A drill's due cells in another part of the neck stay due
+  until a session picks their window, which can be a session or two later. On a new-cell turn the
+  window may hold few due cells, so the drill's share of due items can come up short; the time passes
+  on as any short share does.
 
 ### Neutral
 
 - `exercise.answer_sent` is retired: the challenge emits `practice.item_answered` (amended 2026-10-05).
 - Evidence stays in MongoDB; the archive question is reopened only by a measured trigger.
-- Tempo targets for play-alongs and chord changes stay authored (they come from the music).
+- Tempo targets for play-alongs stay authored (they come from the music). A chord change's target
+  is the drill catalog's, the same for every pair (amended 2026-10-18).
 - Audio detection is reserved as an evidence source and is its own later spike.
 - A future take-storage decision can extend ADR-021 (presigned upload, object storage) to student
   media, and add an optional take reference to teacher notes.

@@ -1,0 +1,422 @@
+{
+  "parser": "progression_numeral.v1",
+  "description": "How a progression numeral, as an admin writes it, is read in a mode: its canonical form, root, quality and whether it is borrowed, or that it isn't a numeral. Rules: README.md.",
+  "cases": [
+    {
+      "name": "Major tonic",
+      "input": "I",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "I",
+        "root_semitones": 0,
+        "quality": "major",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Minor supertonic in major",
+      "input": "ii",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "ii",
+        "root_semitones": 2,
+        "quality": "minor",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Leading-tone diminished in major",
+      "input": "vii°",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "vii°",
+        "root_semitones": 11,
+        "quality": "diminished",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Dominant seventh is diatonic: a seventh doesn't change the triad",
+      "input": "V7",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "V7",
+        "root_semitones": 7,
+        "quality": "dominant_7",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Blues I7 counts as the tonic triad",
+      "input": "I7",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "I7",
+        "root_semitones": 0,
+        "quality": "dominant_7",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Major seventh on IV",
+      "input": "IVmaj7",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "IVmaj7",
+        "root_semitones": 5,
+        "quality": "major_7",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Minor seventh on ii",
+      "input": "ii7",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "ii7",
+        "root_semitones": 2,
+        "quality": "minor_7",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Half-diminished seventh on vii",
+      "input": "viiø7",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "viiø7",
+        "root_semitones": 11,
+        "quality": "half_diminished_7",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Flat seven in major is borrowed",
+      "input": "♭VII",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "♭VII",
+        "root_semitones": 10,
+        "quality": "major",
+        "borrowed": true
+      }
+    },
+    {
+      "name": "ASCII b stands for flat and the symbol is kept",
+      "input": "bVII",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "♭VII",
+        "root_semitones": 10,
+        "quality": "major",
+        "borrowed": true
+      }
+    },
+    {
+      "name": "Minor iv in major is borrowed (modal mixture)",
+      "input": "iv",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "iv",
+        "root_semitones": 5,
+        "quality": "minor",
+        "borrowed": true
+      }
+    },
+    {
+      "name": "Lydian II in major is borrowed",
+      "input": "II",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "II",
+        "root_semitones": 2,
+        "quality": "major",
+        "borrowed": true
+      }
+    },
+    {
+      "name": "A secondary dominant is written as its chord and is borrowed",
+      "input": "II7",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "II7",
+        "root_semitones": 2,
+        "quality": "dominant_7",
+        "borrowed": true
+      }
+    },
+    {
+      "name": "Flat six in major is borrowed",
+      "input": "♭VI",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "♭VI",
+        "root_semitones": 8,
+        "quality": "major",
+        "borrowed": true
+      }
+    },
+    {
+      "name": "Sharp four diminished, ASCII # and o",
+      "input": "#ivo",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "♯iv°",
+        "root_semitones": 6,
+        "quality": "diminished",
+        "borrowed": true
+      }
+    },
+    {
+      "name": "ASCII h stands for ø",
+      "input": "viih7",
+      "mode": "major",
+      "expected": {
+        "status": "parsed",
+        "numeral": "viiø7",
+        "root_semitones": 11,
+        "quality": "half_diminished_7",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Minor tonic",
+      "input": "i",
+      "mode": "minor",
+      "expected": {
+        "status": "parsed",
+        "numeral": "i",
+        "root_semitones": 0,
+        "quality": "minor",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Diminished supertonic in minor",
+      "input": "ii°",
+      "mode": "minor",
+      "expected": {
+        "status": "parsed",
+        "numeral": "ii°",
+        "root_semitones": 2,
+        "quality": "diminished",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Flat three in minor is diatonic",
+      "input": "♭III",
+      "mode": "minor",
+      "expected": {
+        "status": "parsed",
+        "numeral": "♭III",
+        "root_semitones": 3,
+        "quality": "major",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Flat six in minor is diatonic",
+      "input": "bVI",
+      "mode": "minor",
+      "expected": {
+        "status": "parsed",
+        "numeral": "♭VI",
+        "root_semitones": 8,
+        "quality": "major",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Flat seven in minor is diatonic",
+      "input": "♭VII",
+      "mode": "minor",
+      "expected": {
+        "status": "parsed",
+        "numeral": "♭VII",
+        "root_semitones": 10,
+        "quality": "major",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Minor v in minor",
+      "input": "v",
+      "mode": "minor",
+      "expected": {
+        "status": "parsed",
+        "numeral": "v",
+        "root_semitones": 7,
+        "quality": "minor",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Harmonic minor's major V is diatonic",
+      "input": "V",
+      "mode": "minor",
+      "expected": {
+        "status": "parsed",
+        "numeral": "V",
+        "root_semitones": 7,
+        "quality": "major",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Harmonic minor's V7 is diatonic",
+      "input": "V7",
+      "mode": "minor",
+      "expected": {
+        "status": "parsed",
+        "numeral": "V7",
+        "root_semitones": 7,
+        "quality": "dominant_7",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Harmonic minor's leading-tone diminished seventh",
+      "input": "vii°7",
+      "mode": "minor",
+      "expected": {
+        "status": "parsed",
+        "numeral": "vii°7",
+        "root_semitones": 11,
+        "quality": "diminished_7",
+        "borrowed": false
+      }
+    },
+    {
+      "name": "Neapolitan flat two in minor is borrowed",
+      "input": "♭II",
+      "mode": "minor",
+      "expected": {
+        "status": "parsed",
+        "numeral": "♭II",
+        "root_semitones": 1,
+        "quality": "major",
+        "borrowed": true
+      }
+    },
+    {
+      "name": "Major tonic in minor (Picardy) is borrowed",
+      "input": "I",
+      "mode": "minor",
+      "expected": {
+        "status": "parsed",
+        "numeral": "I",
+        "root_semitones": 0,
+        "quality": "major",
+        "borrowed": true
+      }
+    },
+    {
+      "name": "A major seventh on I in minor is borrowed",
+      "input": "Imaj7",
+      "mode": "minor",
+      "expected": {
+        "status": "parsed",
+        "numeral": "Imaj7",
+        "root_semitones": 0,
+        "quality": "major_7",
+        "borrowed": true
+      }
+    },
+    {
+      "name": "Unknown suffix",
+      "input": "V9",
+      "mode": "major",
+      "expected": {
+        "status": "unparsed"
+      }
+    },
+    {
+      "name": "Upper case with ° is not a numeral",
+      "input": "VII°",
+      "mode": "major",
+      "expected": {
+        "status": "unparsed"
+      }
+    },
+    {
+      "name": "Lower case maj7 is not a numeral",
+      "input": "iimaj7",
+      "mode": "major",
+      "expected": {
+        "status": "unparsed"
+      }
+    },
+    {
+      "name": "A root past VII",
+      "input": "VIII",
+      "mode": "major",
+      "expected": {
+        "status": "unparsed"
+      }
+    },
+    {
+      "name": "A chord letter is not a numeral",
+      "input": "G",
+      "mode": "major",
+      "expected": {
+        "status": "unparsed"
+      }
+    },
+    {
+      "name": "Two accidentals",
+      "input": "bbVII",
+      "mode": "major",
+      "expected": {
+        "status": "unparsed"
+      }
+    },
+    {
+      "name": "Whitespace is not trimmed",
+      "input": " IV",
+      "mode": "major",
+      "expected": {
+        "status": "unparsed"
+      }
+    },
+    {
+      "name": "Empty",
+      "input": "",
+      "mode": "major",
+      "expected": {
+        "status": "unparsed"
+      }
+    },
+    {
+      "name": "Accidental after the root",
+      "input": "VIIb",
+      "mode": "major",
+      "expected": {
+        "status": "unparsed"
+      }
+    },
+    {
+      "name": "Mixed case root",
+      "input": "Iv",
+      "mode": "major",
+      "expected": {
+        "status": "unparsed"
+      }
+    }
+  ]
+}

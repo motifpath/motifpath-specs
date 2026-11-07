@@ -5,8 +5,9 @@ Feature: Ask for a tap check before fretboard drills
 
   # A tap check is about 20 seconds of tapping a highlighted fret as soon as it lights up. Its
   # median becomes the student's tap time, taken off every later timed answer. A plan asks for
-  # one when it has a fretboard cell or a diagram shape and the student has done none in the
-  # last 30 days, or never.
+  # one when it has a timed fretboard drill (a cell named or found, or a diagram shape) and the
+  # student has done none in the last 30 days, or never. Finding every instance of a cell's note
+  # isn't timed, so it never needs one.
 
   Background:
     Given student "alice" plays "guitar"
@@ -42,6 +43,12 @@ Feature: Ask for a tap check before fretboard drills
     And "alice"'s next session will practise only diagram shapes
     When "alice" composes a 5-minute session with no instrument in hand
     Then the plan asks for a tap check
+
+  Scenario: A session whose only fretboard cells find every instance doesn't ask for a tap check
+    Given "alice" has never done a tap check
+    And "alice"'s next session will practise only fretboard cells asked to find every instance
+    When "alice" composes a 5-minute session with no instrument in hand
+    Then the plan doesn't ask for a tap check
 
   @web
   Scenario: A skipped tap check doesn't hold up the session

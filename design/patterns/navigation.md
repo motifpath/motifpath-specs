@@ -21,7 +21,7 @@ student can go.
 - **The container follows the size class, never the content:**
   - Compact (< 600 px): a bottom navigation bar. Every item shows its icon and its label; the
     current one gets an indicator pill behind the icon and a bolder label. Touch targets are at
-    least 48 px, and the bar sits above the home-indicator safe area.
+    least 48 px, and the bar sits above the home indicator (`device-edges.md`).
   - Medium (600–839 px): a navigation rail on the left, with the same items.
   - Expanded (≥ 840 px): a sidebar with icon and label rows.
 - **Account and settings** sit behind the avatar (MOT-60, D1–D4):
@@ -40,7 +40,8 @@ student can go.
   - Appearance and language apply at once, with no Save.
   - Sign out happens at once, with no confirm and no toast, and lands on the landing page ("You're
     signed out. Your practice and progress are saved.").
-- **Practice** opens the session setup directly, never a page in between.
+- **Practice** opens the session setup directly, never a page in between. Tools (the Metronome)
+  open from the setup's header, not from the navigation (`metronome.md`).
 - **Learning** lists every course and standalone path the student has started (in progress,
   finished, left); tapping a row continues it in My path (see `learning.md`).
 - **Discover** joins the course and path catalogs behind a Courses | Paths segmented control (see

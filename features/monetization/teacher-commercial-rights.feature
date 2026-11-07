@@ -2,7 +2,7 @@
 Feature: Teacher commercial rights and retained purchases
   Teacher creation tools remain free, teachers sell without buying anything first,
   and existing buyers retain content when new sales are withdrawn.
-  # MOT-117; ADR-059, ADR-067. Consolidated contracts define premium coverage and immutable commercial manifests.
+  # MOT-117; ADR-059, ADR-071. Consolidated contracts define premium coverage and immutable commercial manifests.
 
   Scenario: Teacher creation tools do not require a paid teacher subscription
     Given Bea is a teacher without a paid subscription

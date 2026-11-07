@@ -13,7 +13,7 @@ Run this at Phase 8 of every review (and when a dry-run surfaces a pattern worth
 
 ## 1. The filter — guideline, or just this once?
 
-Before writing anything, put the observation through all three questions. All three must pass:
+Before writing anything, put the observation through all four questions. All four must pass:
 
 1. **Remove the stack — does it survive?** If the rule doesn't exist without this repo's
    framework/language, it's a **profile norm** (goes to `profiles/<repo>.md`, with evidence), not
@@ -24,6 +24,11 @@ Before writing anything, put the observation through all three questions. All th
    question someone would ask on the *next* unrelated PR, it isn't generalized yet.
 3. **Is it falsifiable?** A question that always resolves to "yes, fine" doesn't rule anything
    out — it's not worth a reviewer's attention on every future review.
+4. **Is it stated as a principle, not a case?** Name the concept the incident is an instance of
+   ("a pointer kept by position into a collection others can reorder"), not the incident ("the
+   selected chord jumped when a bar was inserted"). A future review meets different code with
+   different names; it can only recognise the shape of the problem. If the wording still needs the
+   case to make sense, it isn't abstracted yet.
 
 This is a **conceptual** test, not a statistical one — it doesn't matter whether the pattern has
 been seen once or ten times. Frequency isn't the signal; generality is. That's also why severity
@@ -32,9 +37,11 @@ should have) is enough on its own to write something down immediately, with no w
 
 ## 2. Where it goes
 
-- **Repo-agnostic → `HEURISTICS.md`.** Add it under the right axis, phrased as a question, with a
-  one-line "smell." A short illustrative case is fine as a parenthetical, but it's there to make
-  the question recognizable — it isn't tracked as its own artifact. Respect the **24-item cap**:
+- **Repo-agnostic → `HEURISTICS.md`.** Add it under the right axis as a principle (what must stay
+  true), the question that tests it, and an abstract smell. **No cases in the checklist:** no PR or
+  ticket numbers, no product or domain nouns, no incident narrative, not even as a parenthetical.
+  Where it came from goes in the `CHANGELOG.md` entry and the commit message. Respect the
+  **24-item cap**:
   at the cap, adding a new item requires merging two neighboring items or cutting the weakest one
   first. That's a judgment call made at write time by re-reading the checklist, not a decision
   driven by usage counts.
@@ -47,7 +54,11 @@ should have) is enough on its own to write something down immediately, with no w
 - A fix that's already fully described by the PR itself and doesn't generalize beyond it.
 - Anything an existing checklist item or profile norm already covers — if the existing wording is
   too narrow to have caught this case, **widen it in place**; don't add a near-duplicate next to
-  it.
+  it. Widen the *principle*: restate the item so the new case follows from it, rather than
+  appending one more clause per incident. An item that has grown a clause for each review that
+  touched it has lost its principle; re-abstract it.
+- A case or example kept "to make the question recognizable." Recognition comes from the concept;
+  a case anchors the reader to its names and makes unfamiliar instances harder to match.
 - An impression ("this feels like it could be a problem sometimes") with no concrete case behind
   it. If you can't point to the PR that prompted the question, it isn't ready to write down.
 - A false positive on its own (the author rejected a finding with good reason) doesn't need a new

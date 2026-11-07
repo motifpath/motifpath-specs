@@ -1,6 +1,6 @@
 # Commercial activation registry — MOT-115
 
-**Revision:** MOT-115-r5 · **Status:** Approved by Gilson Yamada on 2026-11-02. r4 removes the premium embedding license and content-scoped subscriptions (ADR-067). r5 adds motifpath_purchase, one-time purchases of MotifPath-owned items (ADR-068).
+**Revision:** MOT-115-r5 · **Status:** Approved by Gilson Yamada on 2026-11-02. r4 removes the premium embedding license and content-scoped subscriptions (ADR-071). r5 adds motifpath_purchase, one-time purchases of MotifPath-owned items (ADR-068).
 
 Approval was explicitly recorded in chat on 2026-11-02, while planning MOT-118. Scope: flag names, accountability, steward roles, OFF behavior, prerequisites, targeting and rehearsal tracks as written in r5. It approves no Figma revision, price, cohort or deployment, and enables no flag.
 
@@ -116,7 +116,7 @@ Acquisition controls never disable existing-resource authorization; independent 
 
 ## Traceability and approval
 
-MOT-118–125, MOT-127–129, MOT-131 and MOT-133 are mapped above; MOT-137 owns controlled admission. MOT-134 journeys and MOT-135 rollout/rollback cover every flag; MOT-136 covers provider, grants, CMS, settlement, admission and evidence recovery. These are all 17 M1–M5 runtime/validation subtasks; MOT-132 (embedding licenses) closed with ADR-067. MOT-114/115/116/117/126/130 are audit, registry, design and contract gates, never switches that disable validation.
+MOT-118–125, MOT-127–129, MOT-131 and MOT-133 are mapped above; MOT-137 owns controlled admission. MOT-134 journeys and MOT-135 rollout/rollback cover every flag; MOT-136 covers provider, grants, CMS, settlement, admission and evidence recovery. These are all 17 M1–M5 runtime/validation subtasks; MOT-132 (embedding licenses) closed with ADR-071. MOT-114/115/116/117/126/130 are audit, registry, design and contract gates, never switches that disable validation.
 
 Proposed behavior is in [commercial controls](../features/monetization/commercial-controls.feature), complemented by the [contract index](../features/monetization/README.md). Scenarios remain @wip until runtime TDD and real persistence/recovery verification pass. Syntax and graph checks establish only specification consistency.
 

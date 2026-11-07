@@ -1,8 +1,15 @@
 # ADR-039: Single-VM cloud hosting with co-located staging and production
 
-**Status:** Accepted — 2026-09-26
+**Status:** Accepted — 2026-09-26 (partially superseded by ADR-062)
 **Date:** 2026-09-26
 **Deciders:** Gilson (PO), Claude Code
+
+> **2026-10-20:** as built, the alpha runs in `us-east-2`, the only Region the AWS account allows.
+> CI signs in with per-job IAM-user keys, because the account cannot trust GitHub's OIDC provider.
+> Deploys go through one fixed SSM document per environment. Containers cannot use the instance
+> role. `stage → main` promotions use merge commits. See
+> [ADR-062](./ADR-062-alpha-hosting-as-built.md). The topology, release flow and cost model below
+> are unchanged.
 
 ---
 

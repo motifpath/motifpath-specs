@@ -8,8 +8,9 @@
 #
 # These scenarios are verified by motifpath-web's component tests and by manual browser
 # checks, not by the core-domain BDD suite. Every value the message needs is already on the
-# client: display_name (GET /users/me), the path title (GET /students/me/path), the lesson
-# title (GET /content-nodes/{id}) and the ids.
+# client: display_name (GET /users/me), the path title (GET /students/me/path, or in review the
+# finished course or path the lesson belongs to), the lesson title (GET /content-nodes/{id}) and
+# the ids.
 #
 # Concierge number: a build-time setting (VITE_CONCIERGE_WHATSAPP_NUMBER). It is not a secret,
 # because the number is public by design.
@@ -184,6 +185,44 @@ Feature: Send to your teacher
       When the student taps "Send to your teacher" on the lesson "Shuffle in E"
       Then the prefilled message starts with "Hi!" on its own line
       And the message has no "I'm" sentence
+
+  # ── Reviewing a finished course or path ──────────────────────────────────────
+  #
+  # A lesson opened for review (lesson-review.feature) belongs to a finished course or standalone
+  # path, not to My path. The message names what the lesson belongs to, the same name the review
+  # screens show, so the concierge never sees a lesson paired with the student's current path.
+
+  Rule: In review, the message's path line names the finished course or path the lesson belongs to
+
+    Scenario Outline: Reviewing a finished course's lesson names the course
+      Given the student finished the course "Blues Foundations", whose part 1 has the lesson "Turnaround in A"
+      And the student's current path is still "Blues Basics"
+      When the student taps "Send to your teacher" on <screen> of "Turnaround in A", opened for review
+      Then the prefilled message's path line is "Path: Blues Foundations"
+      And the lesson line is "Lesson: Turnaround in A"
+
+      Examples:
+        | screen                        |
+        | the lesson                    |
+        | exercise 1 of its challenge   |
+
+    Scenario Outline: Reviewing a finished standalone path's lesson names the path
+      Given the student finished the standalone path "Open Chords", which has the lesson "G to C change"
+      And the student's current path is still "Blues Basics"
+      When the student taps "Send to your teacher" on <screen> of "G to C change", opened for review
+      Then the prefilled message's path line is "Path: Open Chords"
+
+      Examples:
+        | screen                        |
+        | the lesson                    |
+        | exercise 1 of its challenge   |
+
+    Scenario: A reviewed challenge whose course name can't be read leaves the path line out
+      Given the student is on exercise 1 of the challenge of "Turnaround in A", opened for review
+      And the name of the course it belongs to failed to load
+      When the student taps "Send to your teacher"
+      Then the prefilled message has no path line
+      And it never names the student's current path "Blues Basics" instead
 
   Rule: The message is written in the student's interface language
 

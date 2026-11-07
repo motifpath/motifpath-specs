@@ -1,5 +1,85 @@
 # PR Review — Changelog
 
+## [1.18.0] — 2026-10-28
+
+### Changed
+- `HEURISTICS.md` item 4 (second-order effects on shared invariants) now also asks about space a
+  container takes for itself: when it gains padding, an inset or a bar, does anything inside still
+  size itself to the whole outer area, or set aside the same space again? From the review of
+  motifpath-web#195, where layouts gained safe-area padding while the landing column kept a
+  screen-height minimum, full-screen pickers and a fitted lesson kept screen-height panels, and a
+  lesson's bar and a reader's foot padded for the home indicator a second time.
+- `SKILL.md`'s `version` caught up with `plugin.json` (it still said 1.16.0).
+
+## [1.17.0] — 2026-10-27
+
+### Changed
+- `HEURISTICS.md` item 7 (absence, transition, and interruption) now also covers steps that can't
+  be undone: is such a step reported as failed only when the other side is known not to have done
+  it, and does the clean-up after a failure still run when the work was cancelled? From the review
+  of motifpath-core#189, where a failed SMTP `QUIT` after the server accepted the message released
+  the send's claim and resent the email, and a claim released on the pass's cancelled context
+  failed, so that email was never sent (fixed in motifpath-core#191).
+
+## [1.16.0] — 2026-10-16
+
+### Changed
+- `HEURISTICS.md` rewritten principle-first: every item now states the principle that must stay
+  true, the questions that test it, and an abstract smell. All PR numbers, product nouns and
+  incident narratives are gone from the checklist (their history stays in the entries below), so
+  an item is matched by the shape of a problem in unfamiliar code rather than by a past case's
+  names. Same 24 items, numbers and axes; items that had grown a clause per incident (4, 7, 13)
+  are restated around one principle. The activation table no longer names a repo and adds rows
+  for extension points, reference data and new tests.
+- `HEURISTICS.md` item 18 (test the real path) now also asks whether a test fakes away the
+  nondeterminism a guarantee has to survive (a no-op shuffle, a fixed seed, a frozen clock, a
+  fake that never fails). From the MOT-148 work in motifpath-core#143, where the application
+  test's no-op shuffle hid that the composer's shuffle undid the circle-of-fifths order of new
+  keys; only BDD with the real shuffle caught it.
+- `LEARNING.md`: the filter gains a fourth question ("is it stated as a principle, not a case?"),
+  the checklist takes no cases even as parentheticals, provenance goes to this changelog and the
+  commit, and widening an item means restating its principle, not appending a clause.
+- `SKILL.md` 4d's duplicated-rule example is stated generally.
+
+## [1.15.0] — 2026-10-15
+
+### Changed
+- `HEURISTICS.md` item 8 (normalization destroys uniqueness and information) now also asks, for
+  values compared after normalizing (a unit, a scale, a conversion), which form a kept "best" or
+  "current" value holds when two forms tie, and whether it's the one the user just switched to.
+  From the review of motifpath-core#144, where a clean take in eighths tied the best in quarters
+  at effective speed and the strict comparison kept quarters.
+
+## [1.14.0] — 2026-10-15
+
+### Changed
+- `HEURISTICS.md` item 13 (same rule, two sides) now also asks, within one layer, whether a list
+  that offers choices and the action that carries one out find the items the same way. From the
+  review of motifpath-core#140, where the subjects list counted items under skills and concepts
+  but a chosen session searched by skill only, so a listed concept had nothing to practise.
+
+## [1.13.0] — 2026-10-14
+
+### Changed
+- `HEURISTICS.md` item 5 (distribution, not example) now also asks, for UI, whether a fixed-width
+  layout still fits at the narrowest width of each size class it's shown in once persistent chrome
+  takes its share, and user-facing changes now activate it. From the review of motifpath-web#151,
+  where student and event rows built for a 1280 px frame collapsed between 840 and 1010 px.
+- `HEURISTICS.md` item 2 (symmetry and precedent) now also asks, when a change adds an extension
+  point so new kinds need no change, whether the rules that still switch on the concrete kinds
+  read through it too. From the review of motifpath-core#135, where a new drill family escaped
+  the per-drill cap and its template's rung.
+
+## [1.12.0] — 2026-10-13
+
+### Changed
+- `HEURISTICS.md` item 4 (second-order effect / invariant) now also asks the other direction: does
+  new code rely on a guarantee another flow breaks, such as a read by parent id that picks up the
+  children an update archived or replaced? From the review of motifpath-core#132, where a course's
+  parts included the copy a course update had archived.
+- `profiles/motifpath-core.md`: both services' API stubs are now on oapi-codegen v2.8.0, the
+  version `mise.toml` pins; the norm no longer describes the two services on different versions.
+
 ## [1.11.0] — 2026-10-11
 
 ### Changed

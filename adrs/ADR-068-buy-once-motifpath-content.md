@@ -4,12 +4,12 @@
 **Date:** 2026-10-30
 **Deciders:** Gilson Yamada (Product Owner and engineering lead)
 **Task:** MOT-116, under MOT-107 / MOT-108
-**Supersedes:** the ADR-067 rule "MotifPath-owned content is not sold individually". The rest of
-ADR-067 stands.
+**Supersedes:** the ADR-071 rule "MotifPath-owned content is not sold individually". The rest of
+ADR-071 stands.
 
 ## Context
 
-ADR-067 reduced monetization to two products: the Plus platform subscription, which covers
+ADR-071 reduced monetization to two products: the Plus platform subscription, which covers
 MotifPath-owned content, and a permanent individual purchase of a teacher course or path. Each
 piece of content had exactly one access rule: free, included in Plus, or bought.
 
@@ -20,7 +20,7 @@ Learners who study one course at a time, or who do not want a recurring charge, 
 
 The options considered were:
 
-1. Keep ADR-067: MotifPath content stays Plus-only, and the design only explains the two products
+1. Keep ADR-071: MotifPath content stays Plus-only, and the design only explains the two products
    better.
 2. Let a MotifPath course or path carry a one-time purchase offer in addition to Plus.
 3. Let Plus also cover teacher content, so that teacher items could be bought or subscribed to.
@@ -37,7 +37,7 @@ tools, monthly or yearly, while subscribed).
   without a purchase offer stays Plus-only.
 - **What the purchase grants.** Permanent access to that one course or path, including the
   premium exercises it contains, for that item only. It does not grant premium tools, other
-  content or Plus. This mirrors the teacher purchase in ADR-067.
+  content or Plus. This mirrors the teacher purchase in ADR-071.
 - **No commission.** MotifPath is the seller, so no commission or teacher earnings apply.
   Payment, receipts and refunds follow the individual-purchase rules.
 - **Active subscribers are not offered the purchase.** While Plus is active, the item shows as
@@ -54,11 +54,11 @@ Teacher content is unchanged: buy once only, never covered by Plus.
 while Plus remains the better deal for learners who use more than one item. Learners who decide
 course by course become customers instead of leaving.
 
-**Option 1 (keep ADR-067) is rejected** because the product owner's review identified the missing
+**Option 1 (keep ADR-071) is rejected** because the product owner's review identified the missing
 choice as a gap that clearer wording cannot close: the learner still has nothing to buy except a
 subscription.
 
-**Option 3 (Plus covers teacher content) is rejected for the same reasons ADR-067 rejected the
+**Option 3 (Plus covers teacher content) is rejected for the same reasons ADR-071 rejected the
 revenue pool:** it needs a usage metric and a way to share subscription revenue with teachers,
 and the platform-first premise keeps Plus independent of teacher supply.
 
@@ -88,7 +88,7 @@ be reconsidered if subscribers ask for it.
   catalog labels handle the "Plus or buy" case.
 - A learner who bought an item and then subscribes has paid for access that Plus would also give.
   No credit or refund is offered for that overlap.
-- The ADR-067 statement "each piece of content has one access rule" no longer holds for
+- The ADR-071 statement "each piece of content has one access rule" no longer holds for
   MotifPath items that carry a purchase offer.
 
 ### Neutral
@@ -104,8 +104,8 @@ be reconsidered if subscribers ask for it.
 
 ## Related ADRs
 
-- [ADR-067: Two commercial products](ADR-067-two-commercial-products.md): this ADR replaces its
-  rule that MotifPath-owned content is not sold individually; all other ADR-067 decisions stand.
+- [ADR-071: Two commercial products](ADR-071-two-commercial-products.md): this ADR replaces its
+  rule that MotifPath-owned content is not sold individually; all other ADR-071 decisions stand.
 - [ADR-058: Stripe as the payment provider](ADR-058-stripe-payment-provider.md): one-time
   MotifPath purchases use the same provider.
 - [ADR-059: Commercial authority, audit and idempotency](ADR-059-commercial-authority-audit-and-idempotency.md)
