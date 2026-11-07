@@ -113,6 +113,8 @@ admin removes a created progression that is not `in_drills`:
 - **Still in use:** while any chart's draft or latest published revision tags it, core refuses
   the removal and lists those charts and sections. The admin untags them, saving the draft or
   publishing a new revision, and then removes it.
+  Core also answers which sections tag a progression without removing anything, so the app shows
+  them when the admin chooses Remove and never tries a removal just to find out.
 - **Not in use:** it is deleted. Its mode and numerals are free to be created again.
 - **Older published revisions** don't count. They never change and keep the tag's key, and a
   key that no longer matches a progression is shown as the numerals it spells
