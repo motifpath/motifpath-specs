@@ -187,10 +187,14 @@ plus the five always-on items.
     against it? The criterion is "thread without a reply," never "recent comment." — *Smell:* a
     draft proposing something a thread on this PR already settled.
 
-20. **Concurrent, mutually exclusive changes.** Two changes pulling one decision opposite ways cost
-    a revert. Is another open change taking the same design decision in another direction? Decide
-    the direction first and look for a synthesis. — *Smell:* "known conflict, we'll sort it out
-    later."
+20. **Concurrent changes claiming the same thing.** Changes in flight at once can claim one
+    decision or one identity, and neither diff shows the other. Is another open change taking the
+    same design decision in another direction? Decide the direction first and look for a
+    synthesis. Does this change take the next value of a shared sequence (a version, a sequential
+    number, an ordered name), and is that value still free on the target when it merges? Two
+    branches that pick the same next value merge without a conflict, so nothing flags the
+    collision. — *Smell:* "known conflict, we'll sort it out later"; a long-lived branch whose
+    version or number was chosen against the target as it stood when the branch started.
 
 21. **Does the description describe the current state?** The description is what reviewers trust
     first. Does it still match the diff after mid-review changes? Are instructions for reviewers
