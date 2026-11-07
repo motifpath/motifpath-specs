@@ -38,6 +38,36 @@ is separate from the cover and syllabus. Use descriptive visible diagram titles 
 practice labels. Fretted examples need recognizable instrument/string context and markers
 between frets, with open-string positions distinguished. Keep author IDs in metadata.
 
+## Final learner deck
+
+The final deck is the cleanest form of the lesson. Each slide carries one idea through
+its visual, a short title and at most one short supporting line. Move explanation,
+caveats, common errors and presenter guidance into speaker notes; the article and the
+teacher's review deck keep the complete content. Leave out optional references that the
+platform delivers.
+
+- **Cover:** the lesson title and its promise only. Level, instrument and other catalog
+  metadata belong to the platform, not the cover.
+- **Titles:** phrase lesson and slide titles idiomatically in the target locale. Avoid
+  literal calques that a native speaker would not say.
+- **Progressive reveal:** build a new representation across consecutive slides, one
+  element at a time, ending with a summary. Keep shared elements at identical positions
+  so each slide reads as the next step of the same picture, and let the titles narrate
+  the transition.
+- **Method before demonstration:** state a procedure before the diagram that applies it.
+- **Musical context:** where it helps the learner see why the concept matters, show where
+  it lives in real music making, such as other representations musicians use or how
+  instruments share the pitch range in an ensemble.
+- **Definitions with a picture:** when a unit is defined from another, show the relation
+  visually as well as in words.
+- **One unit per label:** a diagram label states one quantity in one unit and agrees with
+  its legend. Never combine a count from one unit with the symbol of another.
+- **Openings and closings:** the application slide names the learner's goal; the success
+  slide returns to that goal and the step just taken (see the
+  [draft review guidelines](draft-review-guidelines.md)).
+- **Third-party references:** when a reference image inspires a visual, draw an original
+  version and record any convention you could not verify for musical review.
+
 ## Visual standard
 
 Source: `motifpath-brand/tokens.json` and `BRAND.md`, inspected 2026-10-18.
