@@ -1,5 +1,15 @@
 # PR Review — Changelog
 
+## [1.20.0] — 2026-11-07
+
+### Changed
+- `HEURISTICS.md` item 20 is now "concurrent changes claiming the same thing": besides one design
+  decision pulled two ways, it asks whether a change takes the next value of a shared sequence
+  (a version, a sequential number, an ordered name) that is still free on the target when it
+  merges. From the review of motifpath-specs#445, where the monetization epic and main's #446 both
+  set the core-domain API to 0.62.0 and git merged them without a conflict; the epic had earlier
+  collided with main on ADR-067 the same way.
+
 ## [1.19.0] — 2026-11-07
 
 ### Changed
