@@ -1,5 +1,14 @@
 # PR Review — Changelog
 
+## [1.19.0] — 2026-11-07
+
+### Changed
+- `HEURISTICS.md` item 18 (test the real path) now also asks about expected values: when one changes
+  to make a check pass, was its failure asking for other work, and was that work done? From the
+  review of motifpath-core#217, where a knowledge map count moved alone to get CI green, while earlier
+  changes to it had shipped with a regenerated migration, so two new skills never reached the database
+  until the follow-up PR.
+
 ## [1.18.0] — 2026-10-28
 
 ### Changed
