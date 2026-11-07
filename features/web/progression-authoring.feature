@@ -35,8 +35,8 @@ Feature: Create and manage progressions in the app
   Rule: The create form reads numerals as they are typed
 
     Scenario: The form starts from the search, chart only
-      When "ana" chooses "Create “I–♭VII–IV”"
-      Then the form "New progression" shows "Major" and the numerals "I bVII IV"
+      When "ana" searches the picker for "I bVII IV I" and chooses "Create “I–♭VII–IV–I”"
+      Then the form "New progression" shows "Major" and the numerals "I bVII IV I"
       And "Use in drills" is off: "Off: chart only. You can add it to the drills later in Admin › Progressions."
 
     Scenario: The form spells the progression in the chart's key and marks a borrowed chord
