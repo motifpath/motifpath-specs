@@ -381,22 +381,40 @@ class Deck:
         self.prs.save(path)
 
 
-def two_cards(s, left_head, left_body, right_head, right_body, y=200, h=300):
+def two_cards(s, left_head, left_body, right_head, right_body, y=200, h=300, size=22):
     for i, (head, body) in enumerate(((left_head, left_body), (right_head, right_body))):
         cx = 64 + i * 586
         rect(s, cx, y, 564, h, fill=WHITE, line=RULE, shape=MSO_SHAPE.ROUNDED_RECTANGLE,
              radius=0.05, name=f"Cartão {head}")
-        text(s, cx + 28, y + 24, 508, 34, [[(head, {"b": True})]], size=22, color=VIOLET)
-        text(s, cx + 28, y + 72, 508, h - 90, body, size=19, spacing=10)
+        text(s, cx + 32, y + 28, 500, 34, [[(head, {"b": True})]], size=22, color=VIOLET)
+        text(s, cx + 32, y + 80, 500, h - 100, body, size=size, spacing=12)
 
 
-def practice_banner(s, body, y=545):
+def practice_banner(s, body, y=540):
     rect(s, 64, y, 1152, 78, fill=VIOLET, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.12,
          name="Prática no MotifPath")
     text(s, 92, y, 1100, 78, [[("Prática no MotifPath  ", {"b": True}), (body, {})]],
-         size=19, color=WHITE, anchor="m")
+         size=20, color=WHITE, anchor="m")
 
 
+def steps_row(s, steps, y=210):
+    for i, (num, head, body) in enumerate(steps):
+        cx = 64 + i * 292
+        text(s, cx, y, 272, 40, [[(num, {"b": True, "c": LILAC, "sz": 30})]], size=30)
+        text(s, cx, y + 48, 272, 36, [[(head, {"b": True})]], size=22, color=VIOLET)
+        text(s, cx, y + 92, 262, 90, body, size=20)
+
+
+def callout(s, y, h, paras, size=20):
+    rect(s, 64, y, 1152, h, fill=TINT, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.1,
+         name="Destaque")
+    text(s, 96, y, 1100, h, paras, size=size, anchor="m", spacing=6)
+
+
+NAMES = ["Dó", "Ré", "Mi", "Fá", "Sol", "Lá", "Si"]
+LETTERS = ["C", "D", "E", "F", "G", "A", "B"]
+
+# Speaker notes keep text alternatives and presenter detail; slides keep only the essentials.
 NO_EXERCISES = ("Entrega ao estudante: as atividades desta lição são feitas na prática do "
                 "MotifPath; não há perguntas, respostas ou feedback neste arquivo.")
 
@@ -410,167 +428,129 @@ def build_lesson_a(template, out):
     s = d.light("Para que você vai usar isso?",
                 "Abertura de aplicação. Uso imediato: entender um pedido como “toque a nota F” "
                 "e acompanhar E–F–G escrito como Mi–Fá–Sol. Próximos assuntos: melodias, escalas "
-                "e cifras. A lição não exige reconhecer notas de ouvido.")
-    two_cards(s, "Uso agora",
-              ["Alguém pede “toque a nota F”: você reconhece Fá e procura essa nota numa "
-               "referência do instrumento.",
-               "Você acompanha E–F–G mesmo quando outra pessoa escreve Mi–Fá–Sol."],
-              "Nos próximos assuntos",
-              ["Melodias e escalas: os nomes indicam quais notas tocar.",
-               "Cifras: C indica o acorde de Dó maior. Tocar a nota Dó e tocar o acorde "
-               "são ações diferentes."], y=196, h=316)
-    text(s, 64, 540, 1152, 80,
-         [[("Ao terminar: ", {"b": True, "c": VIOLET}),
-           ("você relaciona nomes e letras e localiza exemplos com uma referência, sem "
-            "reconhecer notas de ouvido nem decorar o braço inteiro. Instrumento é opcional.", {})]],
-         size=19)
+                "e cifras; tocar a nota Dó e tocar o acorde C são ações diferentes. Ao terminar, "
+                "a pessoa relaciona nomes e letras e localiza exemplos com uma referência, sem "
+                "reconhecer notas de ouvido nem decorar o braço. Instrumento é opcional.")
+    two_cards(s, "Agora",
+              ["“Toque a nota F” → Fá", "Mi–Fá–Sol = E–F–G"],
+              "Depois",
+              ["Melodias e escalas", "Cifras: C = acorde de Dó maior"], y=210, h=260, size=26)
 
-    s = d.light("Um mesmo nome, duas formas de escrever",
-                "Alternativa textual da tabela: Dó=C, Ré=D, Mi=E, Fá=F, Sol=G, Lá=A, Si=B. "
-                "Exemplo resolvido: Mi–Fá–Sol corresponde a E–F–G.")
-    names = ["Dó", "Ré", "Mi", "Fá", "Sol", "Lá", "Si"]
-    letters = ["C", "D", "E", "F", "G", "A", "B"]
-    text(s, 64, 214, 120, 30, "Nome", size=15, color=MUTED)
-    text(s, 64, 300, 120, 30, "Letra", size=15, color=MUTED)
-    for i, (n, l) in enumerate(zip(names, letters)):
+    s = d.light("Um nome, duas escritas",
+                "Alternativa textual da tabela: Dó=C, Ré=D, Mi=E, Fá=F, Sol=G, Lá=A, Si=B. Leia "
+                "nos dois sentidos: A é Lá. Exemplo resolvido: Mi–Fá–Sol corresponde a E–F–G; "
+                "as notas são as mesmas, muda só a escrita.")
+    text(s, 64, 224, 120, 30, "Nome", size=15, color=MUTED)
+    text(s, 64, 310, 120, 30, "Letra", size=15, color=MUTED)
+    for i, (n, l) in enumerate(zip(NAMES, LETTERS)):
         cx = 184 + i * 147
-        chip(s, cx, 196, 131, 66, n, fill=WHITE, color=INK, size=24, line_color=RULE)
-        chip(s, cx, 278, 131, 72, l, fill=VIOLET, color=WHITE, size=30)
-    text(s, 64, 384, 1152, 70,
-         ["Escolha o nome na primeira linha e leia a letra logo abaixo. No sentido "
-          "contrário também funciona: A é Lá. Cada letra tem seu próprio par."], size=20)
-    rect(s, 64, 482, 1152, 116, fill=TINT, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.1,
-         name="Exemplo resolvido")
-    text(s, 96, 482, 1100, 116,
-         [[("Mi–Fá–Sol  =  E–F–G", {"b": True, "c": VIOLET, "sz": 28})],
-          "As mesmas notas; muda apenas a maneira de escrever seus nomes."],
-         size=19, anchor="m", spacing=6)
+        chip(s, cx, 206, 131, 66, n, fill=WHITE, color=INK, size=24, line_color=RULE)
+        chip(s, cx, 288, 131, 72, l, fill=VIOLET, color=WHITE, size=30)
+    callout(s, 430, 130, [[("Mi–Fá–Sol  =  E–F–G", {"b": True, "c": VIOLET, "sz": 32})],
+                          "Mesmas notas, outra escrita."])
 
     s = d.light("Os nomes no teclado",
                 "Alternativa textual: teclas brancas da esquerda para a direita C4, D4, E4, F4, "
-                "G4, A4, B4, C5. Duas teclas pretas entre C4 e E4 e três entre F4 e B4. A tecla "
-                "F4 está destacada como exemplo resolvido.")
-    keyboard(s, 64, 200, 88, 300, highlight={"F4": LILAC})
-    tx = 790
-    text(s, tx, 200, 426, 330,
-         [[("Encontre o Dó: ", {"b": True}),
-           ("a tecla branca imediatamente à esquerda do grupo de duas teclas pretas.", {})],
-          "Depois dele seguem Ré, Mi, Fá, Sol, Lá e Si.",
-          [("Exemplo: ", {"b": True, "c": VIOLET}),
-           ("F4 → F é Fá → procure a tecla com o rótulo F4.", {"c": VIOLET})]],
-         size=20, spacing=16)
-    text(s, 64, 540, 1152, 60,
-         "As teclas pretas também são notas. Vamos usar seus nomes na próxima lição, "
-         "quando contarmos distâncias.", size=17, color=MUTED)
+                "G4, A4, B4, C5. Duas teclas pretas entre C4 e E4 e três entre F4 e B4. O Dó é a "
+                "tecla branca imediatamente à esquerda do grupo de duas teclas pretas; depois "
+                "seguem Ré, Mi, Fá, Sol, Lá e Si. Exemplo resolvido: F4 → Fá, tecla destacada. "
+                "As teclas pretas também são notas; seus nomes aparecem na próxima lição.")
+    keyboard(s, 64, 210, 88, 320, highlight={"F4": LILAC})
+    text(s, 790, 250, 426, 260,
+         [[("Dó", {"b": True, "c": VIOLET}), (": à esquerda das duas teclas pretas.", {})],
+          [("F4 = Fá", {"b": True, "c": VIOLET, "sz": 30})]],
+         size=24, spacing=28)
 
     s = d.dark("O nome se repete; a altura muda",
                "Depois do Si, os nomes recomeçam em Dó numa outra oitava. C4 e C5 são dois Dós; "
                "C5 está uma oitava acima, mais aguda. O número indica a oitava no sistema de "
-               "referência, não casa, corda ou dedo.")
+               "referência, não casa, corda ou dedo. O nome Dó, sozinho, não diz a oitava.")
     row = ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5"]
     for i, lab in enumerate(row):
         hl = lab in ("C4", "C5")
-        chip(s, 64 + i * 144, 210, 128, 70, lab, fill=LILAC if hl else "1C1F4A",
+        chip(s, 64 + i * 144, 220, 128, 70, lab, fill=LILAC if hl else "1C1F4A",
              color=INDIGO if hl else "E4D6FF", size=24)
-    text(s, 64, 316, 1152, 140,
-         ["C4 e C5 são dois Dós.", "C5 está uma oitava acima, mais aguda."],
-         size=38, color=WHITE, bold=True, spacing=6)
-    text(s, 64, 486, 1152, 110,
-         ["O número identifica a oitava. Ele não indica casa, corda nem dedo.",
-          "O nome Dó, sozinho, não diz em qual oitava a nota está."],
-         size=21, color=LILAC, spacing=8)
+    text(s, 64, 340, 1152, 140,
+         ["C4 e C5 são dois Dós.", "C5 está uma oitava acima."],
+         size=40, color=WHITE, bold=True, spacing=6)
+    text(s, 64, 520, 1152, 50, "O número indica a oitava, não casa, corda ou dedo.",
+         size=22, color=LILAC)
 
     s = d.light("Palavras do braço",
-                "Vocabulário: corda solta, pestana, traste e casa. Os desenhos seguintes usam "
-                "esses termos.")
-    terms = [("Corda solta", "Tocar a corda sem pressionar uma casa."),
-             ("Pestana", "A peça junto ao começo do braço."),
-             ("Traste", "Cada divisão de metal ao longo do braço."),
-             ("Casa", "O espaço entre dois trastes, ou entre a pestana e o primeiro traste.")]
+                "Vocabulário: corda solta (tocar sem pressionar uma casa), pestana (peça junto ao "
+                "começo do braço), traste (divisão de metal) e casa (espaço entre dois trastes, "
+                "ou entre a pestana e o primeiro traste). Nos desenhos, o braço está de frente, "
+                "com a pestana à esquerda e a corda Mi mais grave embaixo, mais grossa.")
+    terms = [("Corda solta", "Sem pressionar casa."),
+             ("Pestana", "Início do braço."),
+             ("Traste", "Divisão de metal."),
+             ("Casa", "Espaço entre trastes.")]
     for i, (term, desc) in enumerate(terms):
         cx = 64 + i * 292
-        rect(s, cx, 200, 272, 250, fill=WHITE, line=RULE, shape=MSO_SHAPE.ROUNDED_RECTANGLE,
+        rect(s, cx, 220, 272, 200, fill=WHITE, line=RULE, shape=MSO_SHAPE.ROUNDED_RECTANGLE,
              radius=0.06, name=f"Termo {term}")
-        text(s, cx + 24, 224, 230, 36, [[(term, {"b": True})]], size=23, color=VIOLET)
-        text(s, cx + 24, 276, 226, 160, desc, size=19)
-    text(s, 64, 488, 1152, 110,
-         ["Nos desenhos, o braço está de frente para você, com a pestana à esquerda. "
-          "A corda Mi mais grave fica embaixo, mais grossa e com o nome indicado."], size=20)
+        text(s, cx + 24, 252, 230, 36, [[(term, {"b": True})]], size=24, color=VIOLET)
+        text(s, cx + 24, 306, 226, 100, desc, size=22)
 
-    s = d.light("O mesmo raciocínio na guitarra e no baixo",
+    s = d.light("Guitarra e baixo: corda Mi",
                 "Alternativa textual. Guitarra, sexta corda em afinação padrão: solta Mi E2, "
                 "casa 1 Fá F2, casa 3 Sol G2. Baixo, quarta corda em afinação padrão: solta Mi E1, "
                 "casa 1 Fá F1, casa 3 Sol G1. A casa 2 fica sem nome nesta etapa, o que não "
-                "significa que ela não tenha nota. Cordas da guitarra de cima para baixo: Mi, Si, "
-                "Sol, Ré, Lá, Mi. Cordas do baixo: Sol, Ré, Lá, Mi.")
+                "significa que ela não tenha nota. Círculo vazio: corda solta. Cada ponto é uma "
+                "posição alternativa na mesma corda, não notas tocadas juntas. O Mi solto do baixo "
+                "(E1) fica uma oitava abaixo do E2 da guitarra. Cordas da guitarra de cima para "
+                "baixo: Mi, Si, Sol, Ré, Lá, Mi. Cordas do baixo: Sol, Ré, Lá, Mi.")
     marks_a = lambda o: [(0, "Mi", f"E{o}"), (1, "Fá", f"F{o}"), (3, "Sol", f"G{o}")]
-    fretboard(s, 64, 192, "Guitarra · 6ª corda, afinação padrão",
+    fretboard(s, 64, 200, "Guitarra · 6ª corda",
               ["Mi", "Si", "Sol", "Ré", "Lá", "Mi"], marks_a(2), width=540, gap=24)
-    fretboard(s, 676, 192, "Baixo · 4ª corda, afinação padrão",
+    fretboard(s, 676, 200, "Baixo · 4ª corda",
               ["Sol", "Ré", "Lá", "Mi"], marks_a(1), width=540, gap=24)
-    text(s, 64, 548, 1152, 80,
-         [[("Círculo vazio: corda solta. ", {"b": True}),
-           ("Cada ponto é uma posição alternativa na mesma corda, não notas tocadas juntas. "
-            "Mesmos nomes, registros diferentes: o Mi solto do baixo (E1) fica uma oitava "
-            "abaixo do E2 da guitarra.", {})]], size=17, color=INK)
+    text(s, 64, 570, 1152, 40, "○ corda solta    ● posição na mesma corda",
+         size=18, color=MUTED)
 
     s = d.light("Para localizar uma nota",
                 "Método em quatro passos, demonstrado com Sol: G, rótulo G, casa 3 na corda Mi "
-                "grave (G2 na guitarra, G1 no baixo). Tocar é opcional e exige afinação padrão.")
-    steps = [("01", "Leia o nome", "Por exemplo, Sol."),
-             ("02", "Encontre a letra", "Na tabela, Sol é G."),
-             ("03", "Procure o rótulo", "Ache G no desenho do instrumento escolhido."),
-             ("04", "Corda e casa", "Corda Mi grave, casa 3: G2 na guitarra, G1 no baixo.")]
-    for i, (num, head, body) in enumerate(steps):
-        cx = 64 + i * 292
-        text(s, cx, 200, 272, 40, [[(num, {"b": True, "c": LILAC, "sz": 30})]], size=30)
-        text(s, cx, 246, 272, 36, [[(head, {"b": True})]], size=22, color=VIOLET)
-        text(s, cx, 290, 262, 130, body, size=19)
-    rect(s, 64, 446, 1152, 2, fill=RULE)
-    text(s, 64, 470, 1152, 150,
-         [[("A casa 3 é uma posição no braço, ", {"b": True}),
-           ("não uma instrução para usar o terceiro dedo.", {})],
-          "Se você já afina e toca, experimente na corda indicada: pressione dentro da casa, "
-          "perto do traste à direita, sem apertar sobre o metal. Se ainda não, faça tudo pela "
-          "figura; tocar não é necessário nesta lição."], size=19, spacing=10)
+                "grave (G2 na guitarra, G1 no baixo). A casa 3 é uma posição no braço, não uma "
+                "instrução para usar o terceiro dedo. Tocar é opcional e exige afinação padrão: "
+                "pressione dentro da casa, perto do traste à direita, sem apertar sobre o metal.")
+    steps_row(s, [("01", "Nome", "Sol"),
+                  ("02", "Letra", "G"),
+                  ("03", "Rótulo", "Ache G no desenho."),
+                  ("04", "Corda e casa", "Corda Mi, casa 3.")])
+    callout(s, 450, 110, [[("Casa 3 ", {"b": True, "c": VIOLET}),
+                           ("é uma posição, não o terceiro dedo.", {})]], size=24)
 
-    s = d.light("Aplicação: uma frase em dois jeitos de escrever",
+    s = d.light("Aplicação: uma frase",
                 "Frase de estudo original: Mi–Fá–Sol–Fá–Mi, ou E–F–G–F–E. Na corda Mi grave da "
-                "guitarra ou do baixo: solta, casa 1, casa 3, casa 1, solta.")
+                "guitarra ou do baixo: solta, casa 1, casa 3, casa 1, solta. A frase começa em "
+                "Mi, sobe até Sol e volta a Mi. Aponte cada nome na ordem; tocar ou cantar é "
+                "opcional. Na guitarra e no baixo as alturas exatas mudam; a ordem dos nomes "
+                "continua a mesma.")
     rows = [("Nomes", ["Mi", "Fá", "Sol", "Fá", "Mi"], WHITE, INK, RULE),
             ("Letras", ["E", "F", "G", "F", "E"], VIOLET, WHITE, None),
-            ("Corda Mi grave", ["solta", "casa 1", "casa 3", "casa 1", "solta"], TINT, VIOLET, None)]
+            ("Corda Mi", ["solta", "casa 1", "casa 3", "casa 1", "solta"], TINT, VIOLET, None)]
     for r_i, (lab, vals, fill, col, ln) in enumerate(rows):
-        ry = 200 + r_i * 92
-        text(s, 64, ry, 220, 72, [[(lab, {"b": True})]], size=19, color=MUTED, anchor="m")
+        ry = 230 + r_i * 104
+        text(s, 64, ry, 220, 80, [[(lab, {"b": True})]], size=20, color=MUTED, anchor="m")
         for c_i, v in enumerate(vals):
-            chip(s, 290 + c_i * 186, ry, 168, 72, v, fill=fill, color=col,
-                 size=26 if r_i < 2 else 21, line_color=ln)
-    text(s, 64, 488, 1152, 130,
-         ["A frase começa em Mi, sobe até Sol e volta a Mi. Aponte cada nome na ordem; "
-          "tocar ou cantar é opcional.",
-          "Na guitarra e no baixo as alturas exatas mudam. A ordem dos nomes continua a mesma."],
-         size=19, spacing=10)
+            chip(s, 290 + c_i * 186, ry, 168, 80, v, fill=fill, color=col,
+                 size=28 if r_i < 2 else 22, line_color=ln)
 
-    s = d.light("O que você já consegue conferir",
-                "Verificação de sucesso com apoio da tabela e dos desenhos. Não mede "
-                "reconhecimento auditivo nem fluência ao tocar. " + NO_EXERCISES)
-    two_cards(s, "Com a tabela",
-              ["Escolha uma letra e diga seu nome em português.",
-               "Se houver um número junto à letra, diga que ele identifica a oitava."],
-              "Com os desenhos",
-              ["Encontre esse rótulo no teclado ou na corda Mi grave.",
-               "Confira a corda e a casa. Volte à referência sempre que precisar."],
-              y=196, h=250)
-    text(s, 64, 466, 1152, 60,
-         "Reconhecer uma nota apenas pelo som e tocar com fluência são outras habilidades.",
-         size=17, color=MUTED)
-    practice_banner(s, "Faça as atividades desta lição, com dica e nova tentativa.")
+    s = d.light("O que você já consegue",
+                "Verificação de sucesso com apoio da tabela e dos desenhos: escolher uma letra e "
+                "dizer seu nome; reconhecer que o número indica a oitava; encontrar o rótulo no "
+                "teclado ou na corda Mi grave e conferir corda e casa. Não mede reconhecimento "
+                "auditivo nem fluência ao tocar. " + NO_EXERCISES)
+    two_cards(s, "Com a tabela", ["Letra → nome", "Número → oitava"],
+              "Com os desenhos", ["Rótulo → tecla", "Rótulo → corda e casa"],
+              y=210, h=260, size=26)
+    practice_banner(s, "Atividades desta lição.")
 
     d.closing(["Próximo passo:", "tons e semitons"],
-              "Os nomes dizem quais notas procurar. Agora vamos contar a distância entre elas "
-              "e entender por que alguns nomes vizinhos ficam mais perto que outros.",
-              "Próxima lição: “Tons e semitons: encontre a próxima nota”.")
+              "Agora, contar a distância entre as notas.",
+              "Próxima lição: “Tons e semitons: encontre a próxima nota”. Os nomes dizem quais "
+              "notas procurar; a próxima lição conta a distância entre elas e mostra por que "
+              "alguns nomes vizinhos ficam mais perto que outros.")
     d.save(out, "Conheça as notas: nomes que você pode encontrar")
 
 
@@ -582,229 +562,148 @@ def build_lesson_b(template, out):
 
     s = d.light("Para que você vai usar isso?",
                 "Abertura de aplicação. Uso imediato: transformar “suba um tom a partir de Fá” em "
-                "uma contagem de teclas ou casas. Próximos assuntos: escalas, transposição, "
-                "intervalos para acordes e campo harmônico. Fora do escopo hoje: construir "
-                "acordes, transpor uma escala inteira e reconhecer intervalos de ouvido.")
-    two_cards(s, "Uso agora",
-              ["“Suba um tom a partir de Fá” vira um movimento concreto: contar teclas ou "
-               "casas até a próxima nota da melodia."],
-              "Nos próximos assuntos",
-              ["Escalas: cada uma organiza distâncias entre notas.",
-               "Transposição: mudar a nota inicial e manter as distâncias.",
-               "Acordes e campo harmônico: os intervalos dependem dessas distâncias."],
-              y=196, h=316)
-    text(s, 64, 540, 1152, 80,
-         [[("Hoje: ", {"b": True, "c": VIOLET}),
-           ("contar um ou dois semitons e usar essa contagem no exemplo de Dó maior. "
-            "Todas as atividades podem ser feitas sem instrumento.", {})]], size=19)
+                "uma contagem de teclas ou casas até a próxima nota da melodia. Próximos assuntos: "
+                "escalas (organizam distâncias), transposição (mudar a nota inicial e manter as "
+                "distâncias), intervalos para acordes e campo harmônico. Hoje: contar um ou dois "
+                "semitons e aplicar em Dó maior, sem instrumento se preferir. Fora do escopo: "
+                "construir acordes, transpor uma escala inteira e reconhecer intervalos de ouvido.")
+    two_cards(s, "Agora",
+              ["“Suba um tom a partir de Fá”", "→ conte teclas ou casas"],
+              "Depois",
+              ["Escalas", "Transposição", "Acordes"], y=210, h=260, size=26)
 
-    s = d.light("Uma referência rápida para começar",
+    s = d.light("Referência rápida",
                 "Ponte com a lição “Conheça as notas”: seções “Um mesmo nome pode aparecer de duas "
                 "formas” (tabela de nomes e letras) e “O nome se repete; a altura muda” (números "
-                "de oitava). A referência essencial está repetida neste slide.")
-    names = ["Dó", "Ré", "Mi", "Fá", "Sol", "Lá", "Si"]
-    letters = ["C", "D", "E", "F", "G", "A", "B"]
-    for i, (n, l) in enumerate(zip(names, letters)):
-        chip(s, 64 + i * 166, 200, 150, 80, f"{n} = {l}", fill=WHITE, color=INK, size=24,
+                "de oitava). Depois do Si, a sequência recomeça em Dó. Esta lição funciona sem "
+                "abrir a anterior.")
+    for i, (n, l) in enumerate(zip(NAMES, LETTERS)):
+        chip(s, 64 + i * 166, 230, 150, 84, f"{n} = {l}", fill=WHITE, color=INK, size=24,
              line_color=RULE)
-    text(s, 64, 310, 1152, 120,
-         ["Depois do Si, a sequência de nomes recomeça em Dó.",
-          [("C4 e C5: ", {"b": True}), ("a letra é a mesma; o número indica outra oitava.", {})]],
-         size=21, spacing=10)
-    rect(s, 64, 470, 1152, 120, fill=TINT, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.1)
-    text(s, 96, 470, 1100, 120,
-         [[("Quer revisar? ", {"b": True, "c": VIOLET}),
-           ("Na lição “Conheça as notas”, veja “Um mesmo nome pode aparecer de duas formas” "
-            "e “O nome se repete; a altura muda”. Esta lição funciona sem abrir a anterior.", {})]],
-         size=19, anchor="m")
+    callout(s, 380, 110, [[("C4 e C5: ", {"b": True, "c": VIOLET}),
+                           ("mesmo nome, outra oitava.", {})]], size=24)
 
-    s = d.dark("A menor contagem que vamos usar",
+    s = d.dark("A menor contagem",
                "Nos exemplos, a oitava está dividida em 12 semitons iguais. Um semitom é um passo "
                "entre alturas vizinhas: a próxima tecla, branca ou preta, ou a próxima casa na "
                "mesma corda. Um tom são dois semitons. Contamos mudanças; o ponto de partida não "
                "é um passo.")
-    for i, (big, small) in enumerate((("1 semitom", "um passo para a próxima tecla, branca ou "
-                                      "preta, ou para a próxima casa na mesma corda"),
-                                     ("1 tom", "dois semitons: dois passos seguidos"))):
-        cy = 200 + i * 150
-        text(s, 64, cy, 330, 70, [[(big, {"b": True})]], size=40, color=LILAC)
-        text(s, 400, cy + 6, 800, 110, small, size=24, color=WHITE)
-    text(s, 64, 512, 1152, 100,
-         ["Nos exemplos, a oitava tem 12 semitons iguais.",
-          "Contamos cada mudança de posição; o ponto de partida não é um passo."], size=20, color="E4D6FF", spacing=6)
+    for i, (big, small) in enumerate((("1 semitom", "próxima tecla ou casa"),
+                                     ("1 tom", "dois semitons"))):
+        cy = 220 + i * 130
+        text(s, 64, cy, 360, 70, [[(big, {"b": True})]], size=44, color=LILAC)
+        text(s, 440, cy + 12, 760, 60, small, size=30, color=WHITE)
+    text(s, 64, 520, 1152, 50, "Conte mudanças, não posições.", size=24, color="E4D6FF")
 
-    s = d.light("Por que Mi–Fá e Dó–Ré são diferentes?",
+    s = d.light("Mi–Fá e Dó–Ré",
                 "Alternativa textual: teclado C4 a C5 com todas as teclas pretas. Mi4 e Fá4 são "
                 "vizinhas: contagem 0 em Mi4 e 1 em Fá4, um semitom. Dó4, Dó sustenido 4 e Ré4: "
-                "contagem 0, 1 e 2, dois semitons ou um tom.")
-    keyboard(s, 64, 214, 84, 300,
+                "contagem 0, 1 e 2, dois semitons ou um tom. A contagem começa em 0 na nota "
+                "inicial.")
+    keyboard(s, 64, 224, 84, 320,
              highlight={"C4": VIOLET, "C♯4": "4C1D95", "D4": VIOLET, "E4": LILAC, "F4": LILAC},
              badges={"C4": "0", "C♯4": "1", "D4": "2", "E4": "0", "F4": "1"},
              black_labels={"C♯4": "C♯/D♭"})
-    tx = 770
-    text(s, tx, 214, 446, 320,
-         [[("Mi4 → Fá4", {"b": True, "c": INK, "sz": 24})],
-          "Teclas vizinhas: 1 semitom.",
-          [("Dó4 → Dó♯4 → Ré4", {"b": True, "c": VIOLET, "sz": 24})],
-          "Duas mudanças: 1 tom.",
-          [("Um tom são dois semitons.", {"c": MUTED, "sz": 18})]],
-         size=20, spacing=12)
-    text(s, 64, 548, 1152, 60,
-         "Os números nas teclas mostram a contagem: começa em 0 na nota inicial.",
-         size=17, color=MUTED)
+    text(s, 770, 250, 446, 280,
+         [[("Mi → Fá", {"b": True, "sz": 28})],
+          "1 semitom",
+          [("Dó → Dó♯ → Ré", {"b": True, "c": VIOLET, "sz": 28})],
+          "1 tom"],
+         size=22, spacing=10)
 
-    s = d.light("Dó♯ ou Ré♭: a tecla entre Dó e Ré",
+    s = d.light("Sustenido e bemol",
                 "Neste sistema de afinação, a tecla entre Dó e Ré pode ser chamada de Dó sustenido "
-                "(C♯) ou Ré bemol (D♭). O sustenido sobe um semitom; o bemol desce um semitom.")
-    two_cards(s, "Sustenido  ♯",
-              ["Sobe um semitom a partir da nota nomeada.",
-               [("Dó + 1 semitom = Dó♯ (C♯)", {"b": True})]],
-              "Bemol  ♭",
-              ["Desce um semitom a partir da nota nomeada.",
-               [("Ré − 1 semitom = Ré♭ (D♭)", {"b": True})]], y=196, h=230)
-    text(s, 64, 452, 1152, 160,
-         [[("Mesma tecla neste exemplo. ", {"b": True, "c": VIOLET}),
-           ("Não é preciso escolher a grafia agora: basta perceber a altura intermediária e "
-            "incluí-la na contagem.", {})],
-          [("Sustenidos e bemóis também podem nomear teclas brancas em outros contextos; "
-            "a cor não define o símbolo.", {"c": MUTED, "sz": 17})]], size=20, spacing=12)
+                "(C♯) ou Ré bemol (D♭). O sustenido sobe um semitom; o bemol desce um semitom. "
+                "Não é preciso escolher a grafia agora: basta incluir a altura intermediária na "
+                "contagem. Sustenidos e bemóis também podem nomear teclas brancas em outros "
+                "contextos; a cor não define o símbolo.")
+    two_cards(s, "♯  sobe 1 semitom", [[("Dó♯ (C♯)", {"b": True, "sz": 30})]],
+              "♭  desce 1 semitom", [[("Ré♭ (D♭)", {"b": True, "sz": 30})]], y=210, h=200)
+    callout(s, 450, 110, [[("Dó♯ e Ré♭: ", {"b": True, "c": VIOLET}),
+                           ("a mesma tecla.", {})]], size=24)
 
-    s = d.light("Um método que você pode repetir",
-                "Método em quatro passos. Exemplo resolvido: Dó recebe 0, Dó sustenido 1, Ré 2; "
-                "distância de dois semitons. Erro comum: contar as três posições em vez das duas "
-                "mudanças.")
-    steps = [("01", "Início e chegada", "Identifique a nota inicial e a nota de chegada."),
-             ("02", "Tudo no caminho", "Veja todas as teclas ou casas entre elas, inclusive "
-                                       "as intermediárias."),
-             ("03", "Conte mudanças", "Comece em zero na nota inicial. Cada passagem para a "
-                                      "posição seguinte vale um."),
-             ("04", "Compare", "Um passo é um semitom. Dois passos são um tom.")]
-    for i, (num, head, body) in enumerate(steps):
-        cx = 64 + i * 292
-        text(s, cx, 196, 272, 40, [[(num, {"b": True, "c": LILAC, "sz": 30})]], size=30)
-        text(s, cx, 240, 272, 36, [[(head, {"b": True})]], size=22, color=VIOLET)
-        text(s, cx, 284, 262, 150, body, size=19)
-    rect(s, 64, 452, 1152, 150, fill=TINT, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.08,
-         name="Exemplo resolvido")
-    text(s, 96, 452, 1100, 150,
-         [[("Dó = 0  ·  Dó♯ = 1  ·  Ré = 2  →  dois semitons", {"b": True, "c": VIOLET, "sz": 24})],
-          [("Contou “três”? ", {"b": True}),
-           ("Você provavelmente contou as três posições exibidas, em vez das duas mudanças "
-            "entre elas.", {})]], size=19, anchor="m", spacing=10)
+    s = d.light("Como contar",
+                "Método em quatro passos: identificar início e chegada; ver todas as teclas ou "
+                "casas entre elas, inclusive as intermediárias; começar em zero e contar cada "
+                "mudança; um passo é semitom, dois são um tom. Exemplo resolvido: Dó recebe 0, "
+                "Dó sustenido 1, Ré 2; dois semitons. Erro comum: contar as três posições em vez "
+                "das duas mudanças.")
+    steps_row(s, [("01", "Início e chegada", "Marque as duas notas."),
+                  ("02", "Caminho", "Inclua as intermediárias."),
+                  ("03", "Conte", "Comece em 0."),
+                  ("04", "Compare", ["1 = semitom", "2 = tom"])])
+    callout(s, 450, 110, [[("Dó 0  ·  Dó♯ 1  ·  Ré 2  →  1 tom",
+                            {"b": True, "c": VIOLET, "sz": 28})]])
 
-    s = d.light("A mesma contagem na corda Mi",
+    s = d.light("Na corda Mi",
                 "Alternativa textual. Guitarra, sexta corda solta E2; casa 1 F2; casa 2 F sustenido "
                 "2; casa 3 G2. Baixo, quarta corda solta E1; casa 1 F1; casa 2 F sustenido 1; casa 3 "
                 "G1. Mi a Fá: solta para casa 1, um semitom. Fá a Sol: casa 1, 2 e 3, dois "
-                "semitons. Contar casas vale só na mesma corda.")
+                "semitons; “suba um tom a partir de Fá” chega a Sol. Contar casas vale só na mesma "
+                "corda; o número da casa indica a posição, não o dedo.")
     marks_b = lambda o: [(0, "Mi", f"E{o}"), (1, "Fá", f"F{o}"), (2, "Fá♯", f"F♯{o}"),
                          (3, "Sol", f"G{o}")]
-    fretboard(s, 64, 186, "Guitarra · 6ª corda (E2 solta)",
+    fretboard(s, 64, 200, "Guitarra · 6ª corda",
               ["Mi", "Si", "Sol", "Ré", "Lá", "Mi"], marks_b(2), width=540, gap=22)
-    fretboard(s, 676, 186, "Baixo · 4ª corda (E1 solta)",
+    fretboard(s, 676, 200, "Baixo · 4ª corda",
               ["Sol", "Ré", "Lá", "Mi"], marks_b(1), width=540, gap=22)
-    text(s, 64, 520, 1152, 110,
-         [[("Mi → Fá: ", {"b": True}), ("solta → casa 1, 1 semitom.   ", {}),
-           ("Fá → Sol: ", {"b": True}), ("casa 1 → 2 → 3, 2 semitons. ", {}),
-           ("“Suba um tom a partir de Fá” chega a Sol.", {"b": True, "c": VIOLET})],
-          [("Conte casas só na mesma corda: trocar de corda muda a referência. O número da casa "
-            "indica a posição, não o dedo.", {"c": MUTED, "sz": 16})]], size=18, spacing=8)
+    text(s, 64, 560, 1152, 40,
+         [[("Mi → Fá: ", {"b": True}), ("1 semitom      ", {}),
+           ("Fá → Sol: ", {"b": True}), ("1 tom      ", {}),
+           ("Só na mesma corda.", {"c": MUTED})]], size=20)
 
-    s = d.dark("Dois pares sem tecla intermediária",
+    s = d.dark("Dois pares mais curtos",
                "Entre as notas naturais consecutivas, Mi–Fá e Si–Dó têm um semitom; os outros "
-               "pares têm um tom. Entre Sol e Lá há Sol sustenido/Lá bemol. De Si3 ao Dó4 "
-               "seguinte, a oitava muda, mas as teclas são vizinhas.")
-    text(s, 64, 206, 1152, 150,
+               "pares têm um tom. “Passar para o próximo nome” nem sempre percorre a mesma "
+               "distância. Entre Sol e Lá há Sol sustenido/Lá bemol. De Si3 ao Dó4 seguinte, a "
+               "oitava muda, mas as teclas são vizinhas.")
+    text(s, 64, 240, 1152, 200,
          [[("Mi–Fá ", {"b": True, "c": LILAC}), ("e ", {"b": True}),
-           ("Si–Dó", {"b": True, "c": LILAC}), (": um semitom.", {"b": True})],
-          [("Os outros pares vizinhos: um tom.", {"b": True})]],
-         size=40, color=WHITE, spacing=8)
-    text(s, 64, 400, 1152, 190,
-         ["“Passar para o próximo nome” nem sempre percorre a mesma distância.",
-          "Entre Sol e Lá há Sol♯/Lá♭. Entre Si3 e o Dó4 seguinte não há tecla: o número "
-          "da oitava muda, mas as teclas são vizinhas."],
-         size=22, color="E4D6FF", spacing=12)
+           ("Si–Dó", {"b": True, "c": LILAC}), (": 1 semitom.", {"b": True})],
+          [("Os outros vizinhos: 1 tom.", {"b": True})]],
+         size=44, color=WHITE, spacing=12)
 
-    s = d.light("Aplicação: as distâncias em Dó maior",
+    s = d.light("Dó maior",
                 "Alternativa textual da régua: de C4 a C5, posições 0 a 12. Notas naturais em "
                 "0 Dó, 2 Ré, 4 Mi, 5 Fá, 7 Sol, 9 Lá, 11 Si, 12 Dó. Distâncias consecutivas: "
                 "Dó–Ré 2, Ré–Mi 2, Mi–Fá 1, Fá–Sol 2, Sol–Lá 2, Lá–Si 2, Si–Dó 1. Padrão "
-                "T–T–S–T–T–T–S; soma 12 semitons.")
-    c_major_ruler(s, 112, 196, 88)
-    text(s, 64, 410, 1152, 40,
-         "Cada espaço da régua é um semitom. T = tom (2 semitons). S = semitom.",
-         size=17, color=MUTED)
-    rect(s, 64, 466, 1152, 132, fill=TINT, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.1)
-    text(s, 96, 466, 1100, 132,
-         [[("Escala de Dó maior:  T–T–S–T–T–T–S", {"b": True, "c": VIOLET, "sz": 26})],
-          "2 + 2 + 1 + 2 + 2 + 2 + 1 = 12 semitons, chegando ao Dó uma oitava acima."],
-         size=20, anchor="m", spacing=8)
+                "T–T–S–T–T–T–S; soma 12 semitons, chegando ao Dó uma oitava acima. Cada espaço "
+                "da régua é um semitom.")
+    c_major_ruler(s, 112, 200, 88)
+    callout(s, 450, 120, [[("T–T–S–T–T–T–S", {"b": True, "c": VIOLET, "sz": 32})],
+                          [("T = tom    S = semitom    total: 12 semitons", {"c": MUTED})]])
 
-    s = d.light("Conferindo o resultado em uma frase",
-                "Dó–Ré–Mi–Fá: um tom, um tom e um semitom. O último deslocamento é menor, embora "
-                "todos avancem para o próximo nome.")
-    notes_row = ["Dó", "Ré", "Mi", "Fá"]
+    s = d.light("Dó–Ré–Mi–Fá",
+                "Dó–Ré–Mi–Fá: um tom, um tom e um semitom. Todos os movimentos avançam para o "
+                "próximo nome, mas o último é menor. Aponte cada nota e explique a distância até "
+                "a seguinte, incluindo a tecla ou casa intermediária quando houver.")
     moves = [("tom", "2"), ("tom", "2"), ("semitom", "1")]
-    for i, n in enumerate(notes_row):
-        chip(s, 64 + i * 300, 220, 190, 100, n, fill=VIOLET, color=WHITE, size=34)
+    for i, n in enumerate(["Dó", "Ré", "Mi", "Fá"]):
+        chip(s, 64 + i * 300, 250, 190, 110, n, fill=VIOLET, color=WHITE, size=36)
     for i, (m, v) in enumerate(moves):
         mx = 254 + i * 300
-        line(s, mx + 14, 270, mx + 96, 270, color=INK, width=2.5)
-        text(s, mx, 216, 110, 30, [[(m, {"b": True})]], size=17,
+        line(s, mx + 14, 305, mx + 96, 305, color=INK, width=2.5)
+        text(s, mx, 250, 110, 30, [[(m, {"b": True})]], size=18,
              color=VIOLET if v == "1" else INK, align="c")
-        text(s, mx - 10, 282, 130, 30, f"{v} semitom" + ("s" if v != "1" else ""), size=14,
-             color=MUTED, align="c")
-    text(s, 64, 372, 1152, 160,
-         ["Todos os movimentos avançam para o próximo nome, mas o último é menor.",
-          "Aponte cada nota e explique a distância até a seguinte, incluindo a tecla ou casa "
-          "intermediária quando houver."], size=21, spacing=12)
+    callout(s, 450, 110, [[("O último passo é menor.", {"b": True, "c": VIOLET})]], size=26)
 
-    s = d.light("O que você já consegue conferir",
-                "Verificação de sucesso com apoio da régua e dos desenhos. Não mede velocidade, "
-                "execução nem reconhecimento das distâncias pelo som. " + NO_EXERCISES)
-    two_cards(s, "Conte mudanças",
-              ["Comece em zero na nota inicial.",
-               "Inclua a tecla ou casa intermediária quando houver."],
-              "Distinga um de dois",
-              ["Um passo é semitom; dois passos são um tom.",
-               "Mi–Fá e Si–Dó têm um semitom."], y=196, h=250)
-    text(s, 64, 466, 1152, 60,
-         "Isso ainda não mede velocidade, execução ou reconhecimento das distâncias pelo som.",
-         size=17, color=MUTED)
-    practice_banner(s, "Faça as atividades desta lição, com dica e nova tentativa.")
-
-    s = d.light("Complementos opcionais",
-                "Links verificados no texto publicado: musictheory.net em 2026-11-03 (inglês, exige "
-                "JavaScript; controles não verificados) e Ableton Learning Music em português em "
-                "2026-11-05 (controles e áudio não verificados). URLs: "
-                "https://www.musictheory.net/lessons/20 e "
-                "https://learningmusic.ableton.com/pt/advanced-topics/building-major-scales.html. "
-                "Nenhum conteúdo externo é copiado.")
-    text(s, 64, 176, 1152, 40, "A lição já contém o método completo. Use estes recursos para "
-         "reforçar ou explorar a mesma ideia.", size=18, color=MUTED)
-    refs = [("Steps and Accidentals", "musictheory.net · inglês · exige JavaScript",
-             "https://www.musictheory.net/lessons/20",
-             "Abertura: teclas vizinhas e dois passos. Use depois da comparação Mi–Fá e Dó–Ré."),
-            ("Construindo escalas maiores", "Ableton Learning Music · português",
-             "https://learningmusic.ableton.com/pt/advanced-topics/building-major-scales.html",
-             "Seção inicial, até o padrão de tons e semitons. Use depois da prática.")]
-    for i, (title, source, url, use) in enumerate(refs):
-        cy = 236 + i * 186
-        rect(s, 64, cy, 1152, 166, fill=WHITE, line=RULE, shape=MSO_SHAPE.ROUNDED_RECTANGLE,
-             radius=0.06, name=f"Referência {title}")
-        tb = text(s, 96, cy + 22, 1090, 36, [[(title, {"b": True})]], size=23, color=VIOLET)
-        tb.text_frame.paragraphs[0].runs[0].hyperlink.address = url
-        text(s, 96, cy + 62, 1090, 28, source, size=16, color=MUTED)
-        text(s, 96, cy + 98, 1090, 60, use, size=19)
-    text(s, 64, 612, 1080, 30, "Se um recurso não abrir, a régua e os exemplos desta lição "
-         "bastam.", size=15, color=MUTED)
+    s = d.light("O que você já consegue",
+                "Verificação de sucesso com apoio da régua e dos desenhos: contar mudanças a partir "
+                "de zero, incluir a tecla ou casa intermediária, distinguir semitom de tom e "
+                "lembrar que Mi–Fá e Si–Dó têm um semitom. Não mede velocidade, execução nem "
+                "reconhecimento das distâncias pelo som. Recursos externos opcionais (musictheory.net "
+                "e Ableton Learning Music) ficam no artigo e no plano do professor. " + NO_EXERCISES)
+    two_cards(s, "Contar", ["Comece em 0", "Inclua as intermediárias"],
+              "Distinguir", ["1 = semitom, 2 = tom", "Mi–Fá, Si–Dó: semitom"],
+              y=210, h=260, size=26)
+    practice_banner(s, "Atividades desta lição.")
 
     d.closing(["Escolha outro par", "e refaça a contagem"],
-              "Depois, use o mesmo raciocínio para estudar outras escalas, transpor pequenas "
-              "melodias e entender os intervalos que formam os acordes.",
-              "Próxima ação de prática: escolher outro par na régua e recontar.")
+              "Depois: escalas, transposição e acordes.",
+              "Próxima ação de prática: escolher outro par na régua e recontar. Depois, usar o "
+              "mesmo raciocínio para estudar outras escalas, transpor pequenas melodias e "
+              "entender os intervalos que formam os acordes.")
     d.save(out, "Tons e semitons: encontre a próxima nota")
-
 
 if __name__ == "__main__":
     template, out_dir = sys.argv[1], Path(sys.argv[2])

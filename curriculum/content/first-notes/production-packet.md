@@ -175,18 +175,22 @@ silently added to make the draft appear installed.
 
 ## Final learner decks
 
-MOT-189 · phase Do/Check · deck version 1 · 2026-11-06. Source: revision 2 of both articles
+MOT-189 · phase Do/Check · deck version 2 · 2026-11-07. Source: revision 2 of both articles
 (PR #436), the 18-slide sequence sketch, and the presentation library from content-production
 1.4.1. The sketch used placeholder styling (cream, teal, Arial). The decks keep its sequence
 and diagram content and rebuild them on the brand library.
 
+Version 2 follows PO feedback: slide copy is reduced to the essentials and the optional-resources
+slide is removed. The full explanation stays in the articles, the teacher's sketch and each
+slide's speaker notes; the external resources stay in the articles and the sketch.
+
 | Deck | Slides | Sequence |
 |---|---|---|
 | [A](slides/lesson-a.pt-BR.pptx) | 11 | Cover · application opening · names/letters · keyboard · octave · fretboard vocabulary · guitar/bass E string · locating method · study phrase · success check and MotifPath practice · next lesson |
-| [B](slides/lesson-b.pt-BR.pptx) | 14 | Cover · application opening · quick reference bridge · semitone/tone · keyboard distances · sharps/flats · counting method · E-string distances · natural half-step pairs · C-major ruler · Dó–Ré–Mi–Fá check · success check and MotifPath practice · optional resources · next practice |
+| [B](slides/lesson-b.pt-BR.pptx) | 13 | Cover · application opening · quick reference bridge · semitone/tone · keyboard distances · sharps/flats · counting method · E-string distances · natural half-step pairs · C-major ruler · Dó–Ré–Mi–Fá check · success check and MotifPath practice · next practice |
 
-Worked demonstrations stay (F4 on the keyboard, Sol on the E string, the counting example and the
-common counting error). The nine questions and their follow-ups are not in the decks; they stay
+Worked demonstrations stay (F4 on the keyboard, Sol on the E string and the counting example);
+the common counting error is in the notes. The nine questions and their follow-ups are not in the decks; they stay
 in MotifPath practice. In A, fret 2 is left unnamed, as in the article.
 
 | Check | Evidence | Status |

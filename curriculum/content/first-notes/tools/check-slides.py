@@ -68,7 +68,9 @@ def problems_in(path, fragments):
 def main(argv):
     activities = json.loads((UNIT_DIR / "activities.json").read_text(encoding="utf-8"))
     fragments = exercise_fragments(activities)
-    decks = [Path(a) for a in argv] or sorted((UNIT_DIR / "slides").glob("*.pptx"))
+    decks = [Path(a) for a in argv] or sorted(
+        p for p in (UNIT_DIR / "slides").glob("*.pptx")
+        if not p.name.startswith("~$"))  # PowerPoint lock files while a deck is open
     failed = False
     for deck in decks:
         problems = problems_in(deck, fragments)

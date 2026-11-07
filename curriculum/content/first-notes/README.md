@@ -41,11 +41,12 @@ a human music/locale review or verify the running MotifPath application.
 One pt_BR PowerPoint per lesson, built from revision 2 and the approved 18-slide sequence:
 
 - [Lesson A deck](slides/lesson-a.pt-BR.pptx): 11 slides, “Conheça as notas”.
-- [Lesson B deck](slides/lesson-b.pt-BR.pptx): 14 slides, “Tons e semitons”.
+- [Lesson B deck](slides/lesson-b.pt-BR.pptx): 13 slides, “Tons e semitons”.
 
 The decks use the MotifPath brand presentation library (content-production 1.4.1). Keyboard,
-fretboard and C-major diagrams are native editable shapes, with text alternatives in the
-speaker notes. The decks contain no exercises: no prompts, options, answers, feedback or
+fretboard and C-major diagrams are native editable shapes. Slide copy is kept to the essentials;
+the full explanation and the diagram text alternatives are in the speaker notes, and the
+articles and the review sketch keep everything, including the optional external resources. The decks contain no exercises: no prompts, options, answers, feedback or
 retries on any slide, hidden slide or note. Each lesson points learners to practice in MotifPath.
 Install the Manrope fonts from the content-production plugin before editing.
 
