@@ -222,7 +222,6 @@ Feature: Admins create progressions for song charts
     When "ana" removes the progression "I-V-vi-IV"
     Then removing is refused because it is in the drills
 
-  @wip
   Scenario: An admin reads which sections tag a progression, and nothing is removed
     Given "ana" has created the major progression "I-bVII-IV-I"
     And the verse of the draft of "Sweet Home" is tagged with "major/I-bVII-IV-I"
@@ -231,7 +230,6 @@ Feature: Admins create progressions for song charts
     Then they are the verse of the draft and the chorus of the published revision of "Sweet Home"
     And the progression "major/I-bVII-IV-I" is still listed
 
-  @wip
   Scenario: Older published revisions aren't among the sections that tag a progression
     Given "ana" has created the major progression "I-bVII-IV-I"
     And revision 1 of "Sweet Home" tags its verse with "major/I-bVII-IV-I"
@@ -239,12 +237,10 @@ Feature: Admins create progressions for song charts
     When "ana" reads which sections tag the progression "major/I-bVII-IV-I"
     Then no section tags it
 
-  @wip
   Scenario: Reading the sections of a progression that doesn't exist finds nothing
     When "ana" reads which sections tag a progression that doesn't exist
     Then the progression is not found
 
-  @wip
   Scenario: Only admins read which sections tag a progression
     Given "ana" has created the major progression "I-IV-I-V-vi"
     When a teacher reads which sections tag the progression "major/I-IV-I-V-vi"
