@@ -9,7 +9,7 @@ implementation passes TDD. PR approval accepts proposed API details, not a deplo
 - [ADR-059: commercial authority, audit and idempotency](../../adrs/ADR-059-commercial-authority-audit-and-idempotency.md), accepted; renumbered from the colliding ADR-057 without changing the decision.
 - [ADR-058: Stripe](../../adrs/ADR-058-stripe-payment-provider.md), accepted.
 - [ADR-060: transactional records and recovery](../../adrs/ADR-060-commercial-records-and-recovery.md), accepted by Gilson Yamada on 2026-10-15.
-- [ADR-067: two commercial products](../../adrs/ADR-067-two-commercial-products.md), accepted 2026-10-29: one platform subscription plus permanent teacher-path purchases; content-scoped subscriptions and the teacher embedding license are removed.
+- [ADR-071: two commercial products](../../adrs/ADR-071-two-commercial-products.md), accepted 2026-10-29: one platform subscription plus permanent teacher-path purchases; content-scoped subscriptions and the teacher embedding license are removed.
 - [ADR-069: commercial activation admin API](../../adrs/ADR-069-commercial-activation-admin-api.md), accepted by Gilson Yamada on 2026-11-06: activation stored in core, changed through a dedicated audited admin API with a kill switch; audiences are users, groups (beta, friends-and-family), services, or all users.
 - [ADR-068: buy once or Plus on MotifPath content](../../adrs/ADR-068-buy-once-motifpath-content.md), accepted 2026-11-01: an administrator may add a one-time offer, with no commission, to a MotifPath-owned course or path; subscribers are not offered it, and owned stays owned.
 - [Commercial architecture and policies](../../openapi/commerce-contract.md): ownership, manifests, grants, ledger/rounding, settlement, refunds/disputes, CMS, delivery, retention and recovery.
@@ -81,7 +81,7 @@ commercial manifests do not replace live path editing with a new publication/ver
 
 Buyer path offers require full manifest/dependency validation. MotifPath premium exercises in a
 paid teacher path are covered by the platform commission; the teacher buys nothing first. MOT-132
-(embedding licenses) closed with ADR-067.
+(embedding licenses) closed with ADR-071.
 Subscription price replacements require expected_offer_id (null for first creation), with
 atomic comparison/promotion. Admin current-offer reads work even when acquisition is OFF.
 

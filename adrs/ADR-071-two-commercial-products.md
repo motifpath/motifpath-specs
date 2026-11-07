@@ -1,10 +1,12 @@
-# ADR-067: Two commercial products — a platform subscription and teacher purchases
+# ADR-071: Two commercial products — a platform subscription and teacher purchases
 
 **Status:** Accepted (partially superseded by ADR-068)
 **Date:** 2026-10-28
 **Deciders:** Gilson Yamada (Product Owner and engineering lead)
 **Task:** MOT-116, under MOT-107 / MOT-108
 **Accepted:** 2026-10-29, by Gilson, as proposed (specs#413).
+**Renumbered:** 2026-11-06, from ADR-067, when the monetization epic merged `main`, which had
+already used ADR-067 for voice samples. Its content and decision are unchanged.
 
 ## Context
 
@@ -126,4 +128,4 @@ dependency accounting the license needed.
 
 ---
 
-*This ADR was accepted on 2026-10-29. To revise, create a new ADR with Status: Supersedes ADR-067.*
+*This ADR was accepted on 2026-10-29. To revise, create a new ADR with Status: Supersedes ADR-071.*

@@ -1,6 +1,6 @@
 # Pattern: Plus and buying content (learner)
 
-**Source:** ADR-067 (two commercial products) · ADR-068 (buy once or Plus on MotifPath content) ·
+**Source:** ADR-071 (two commercial products) · ADR-068 (buy once or Plus on MotifPath content) ·
 MOT-116 (Figma "Monetization — two products r5", PO approval 2026-11-01) · MOT-126 (row H, Plus
 states r1, PO approval 2026-11-02) · [commerce contract](../../openapi/commerce-contract.md)
 
@@ -13,7 +13,7 @@ subscriptions in Account. Teacher sales screens are MOT-130 (Figma "Teacher sale
 ## Why
 
 The learner must always know three things without reading terms: what this item costs, what Plus
-covers, and what they keep. Two products only (ADR-067): **Plus**, one platform subscription for
+covers, and what they keep. Two products only (ADR-071): **Plus**, one platform subscription for
 everything by MotifPath, and **buy once**, permanent access to one course or path. Nothing about
 money may erase progress, and nothing is ever shown as free or included when it is not.
 
@@ -104,11 +104,11 @@ are missing, show the H7 state. A Strapi field can never show an offer core did 
 | D4 | Subscribers are not offered Buy once on MotifPath items | ADR-068 |
 | D5 | A stopped renewal can be resumed before it ends (Keep Plus) | PO 2026-11-01 |
 | D6 | Failed renewal: update the payment method on the provider-hosted page | PO 2026-11-01 |
-| D7 | Flag OFF hides new acquisition, never existing rights or servicing | ADR-067, registry r5 |
+| D7 | Flag OFF hides new acquisition, never existing rights or servicing | ADR-071, registry r5 |
 
 ## Frames
 
-Figma file "MotifPath Experience Language", page "Monetization — two products r5 (ADR-067 +
+Figma file "MotifPath Experience Language", page "Monetization — two products r5 (ADR-071 +
 ADR-068)" (`722:2325`), Compact Light English:
 
 - C1 `722:2754` · C2 `722:2785` · C3 `722:2824` · C4 `722:2844` · C7 `729:2566`

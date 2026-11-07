@@ -3,7 +3,7 @@
 Status: consolidated specification for review, 2026-10-15. Business bundle approved by Gilson
 in chat on this date. ADR-060 was approved by Gilson on 2026-10-15; API additions still require PR review. This is a durable contract,
 not an implementation plan. No runtime readiness or Figma/flag approval is implied.
-Revised 2026-10-29 for ADR-067: two commercial products; course/path-scoped subscriptions and
+Revised 2026-10-29 for ADR-071: two commercial products; course/path-scoped subscriptions and
 the teacher embedding license are removed. Revised 2026-11-01 for ADR-068: a MotifPath-owned
 course or path may also be bought once.
 

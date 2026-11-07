@@ -1343,7 +1343,7 @@ PaymentPage:
 SaleBlocker:
   type: object
   description: One reason core would refuse a paid sale state or new sale now (MOT-130). Never offers a
-    license or purchase as the resolution (ADR-067).
+    license or purchase as the resolution (ADR-071).
   additionalProperties: false
   required:
     - code

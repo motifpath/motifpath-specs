@@ -2,7 +2,7 @@
 Feature: Platform subscription and paid-period lifecycle
   One platform subscription covers MotifPath-owned content; it never covers teacher-priced content.
   Cancellation preserves paid-period access; commercial expiry preserves learning history.
-  # MOT-117; ADR-059, ADR-067. Stripe is selected; monetary values are configured through approved offer revisions.
+  # MOT-117; ADR-059, ADR-071. Stripe is selected; monetary values are configured through approved offer revisions.
 
   Scenario: Both billing periods are available for the platform subscription
     Given a monthly offer and a discounted annual offer are configured for the platform subscription
