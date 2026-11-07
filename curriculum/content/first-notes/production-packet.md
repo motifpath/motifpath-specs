@@ -33,8 +33,8 @@ pending. There is no learner baseline or measured learning improvement.
 
 | Unit | Artifact | Outcome | Participation |
 |---|---|---|---|
-| A | [lesson-a.pt-BR.md](lesson-a.pt-BR.md) | Interpret natural note names/letters, use a labelled position reference and distinguish name from octave/register | Existing `sh-ear-first`, Notas, first planned article “Os nomes das notas: dó, ré, mi e C, D, E”; working draft title “Conheça as notas: nomes que você pode encontrar” |
-| B | [lesson-b.pt-BR.md](lesson-b.pt-BR.md) | Count one/two semitone transitions on a reference and apply them to C major | Standalone; A is preparatory reading with an inline bridge |
+| A | [lesson-a.pt-BR.md](lesson-a.pt-BR.md) | Interpret natural note names/letters, use a labelled position reference and distinguish name from octave/register | Existing `sh-ear-first`, Notas, first planned article “Os nomes das notas: dó, ré, mi e C, D, E”; working draft title “Conheça as notas: nomes que você pode encontrar”; learner title “C, D, E…: o código que todo músico usa” (PO, 2026-11-07) |
+| B | [lesson-b.pt-BR.md](lesson-b.pt-BR.md) | Count one/two semitone transitions on a reference and apply them to C major | Standalone; A is preparatory reading with an inline bridge; learner title “Nem todo passo é igual: o padrão da escala maior” (PO, 2026-11-07) |
 
 Both are beginner and universal (`instruments: []`). Keyboard, guitar and bass are examples.
 No new course/path is created. Their exact source-slot/standalone disposition was approved
@@ -172,6 +172,37 @@ the existing exercise/challenge routes. Do not paste arbitrary reader HTML field
 into PromptDocument or add unsupported hint/rationale fields to the exercise API. Full metadata
 stays in this packet until a supported native mapping is verified. No software feature is
 silently added to make the draft appear installed.
+
+## Final learner decks
+
+MOT-189 · phase Do/Check · deck version 2 · 2026-11-07. Source: revision 2 of both articles
+(PR #436), the 18-slide sequence sketch, and the presentation library from content-production
+1.4.1. The sketch used placeholder styling (cream, teal, Arial). The decks keep its sequence
+and diagram content and rebuild them on the brand library.
+
+Version 2 follows PO feedback: slide copy is reduced to the essentials and the optional-resources
+slide is removed. The full explanation stays in the articles, the teacher's sketch and each
+slide's speaker notes; the external resources stay in the articles and the sketch.
+
+| Deck | Slides | Sequence |
+|---|---|---|
+| [A](slides/lesson-a.pt-BR.pptx) | 11 | Cover · application opening · names/letters · keyboard · octave · fretboard vocabulary · guitar/bass E string · locating method · study phrase · success check and MotifPath practice · next lesson |
+| [B](slides/lesson-b.pt-BR.pptx) | 13 | Cover · application opening · quick reference bridge · semitone/tone · keyboard distances · sharps/flats · counting method · E-string distances · natural half-step pairs · C-major ruler · Dó–Ré–Mi–Fá check · success check and MotifPath practice · next practice |
+
+Worked demonstrations stay (F4 on the keyboard, Sol on the E string and the counting example);
+the common counting error is in the notes. The nine questions and their follow-ups are not in the decks; they stay
+in MotifPath practice. In A, fret 2 is left unnamed, as in the article.
+
+| Check | Evidence | Status |
+|---|---|---|
+| Exercise exclusion | `tools/check-slides.py` compares every slide, table and note with 86 prompt/hint/rationale/feedback fragments and review-state labels, and looks for hidden slides. It fails on the sketch (slides 4, 8, 14) and passes both decks. | Pass |
+| Package structure | The pptx skill's OOXML validator, baselined against the library template: all validations passed for both decks | Pass |
+| Rendered slides | Every slide rendered with macOS Quick Look and inspected. Overflow, collisions and line breaks were corrected and the changed slides re-rendered. | Pass in AI visual inspection |
+| Musical data | Diagrams generated from the article tables: E2/E1 open strings, F/F♯/G at frets 1–3, C4–C5 keyboard with all black keys, C-major positions 0,2,4,5,7,9,11,12 and distances 2-2-1-2-2-2-1 | Pass in AI source inspection; human educator review of the decks pending |
+| Accessibility | Text alternatives for every diagram are in the speaker notes. Pictures have alt text. Color is reinforced by labels, line weight and marker shape. | Screen-reader check in PowerPoint pending |
+| Native applications | Quick Look substitutes some glyphs and fonts; ♯/♭ may fall back to another font. | Open, edit, save and present in PowerPoint and Google Slides: pending |
+
+Publishing or distributing the decks to learners needs separate PO approval.
 
 ## Quality and next phase
 

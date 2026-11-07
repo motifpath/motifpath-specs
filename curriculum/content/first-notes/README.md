@@ -36,6 +36,33 @@ The validator checks classification, questions/retries, musical distances, fret 
 local links, accessible diagram metadata and offline preview structure. It does not replace
 a human music/locale review or verify the running MotifPath application.
 
+## Final learner decks (MOT-189)
+
+One pt_BR PowerPoint per lesson, built from revision 2 and the approved 18-slide sequence:
+
+- [Lesson A deck](slides/lesson-a.pt-BR.pptx): 11 slides, “C, D, E…: o código que todo músico usa”.
+- [Lesson B deck](slides/lesson-b.pt-BR.pptx): 13 slides, “Nem todo passo é igual: o padrão da escala maior”.
+
+The decks use the MotifPath brand presentation library (content-production 1.4.1). Keyboard,
+fretboard and C-major diagrams are native editable shapes. Slide copy is kept to the essentials;
+the full explanation and the diagram text alternatives are in the speaker notes, and the
+articles and the review sketch keep everything, including the optional external resources. The decks contain no exercises: no prompts, options, answers, feedback or
+retries on any slide, hidden slide or note. Each lesson points learners to practice in MotifPath.
+Install the Manrope fonts from the content-production plugin before editing.
+
+Rebuild and check with python-pptx (`pip install python-pptx`):
+
+```bash
+python3 curriculum/content/first-notes/tools/build-slides.py \
+  <content-production>/assets/content-presentation-template.pptx \
+  curriculum/content/first-notes/slides
+python3 curriculum/content/first-notes/tools/check-slides.py
+```
+
+`check-slides.py` fails if exercise text from `activities.json` or a review-state label
+appears anywhere in a deck, or if a deck has a hidden slide. Deck evidence and pending
+checks are in the [production packet](production-packet.md#final-learner-decks).
+
 No audio generation, deployment, app installation or publication is included. The prior
 18-slide [review checkpoint](../../pilots/first-notes-review/README.md) remains the approved
 sequence reference; historical production at `98905d4` remains superseded.
