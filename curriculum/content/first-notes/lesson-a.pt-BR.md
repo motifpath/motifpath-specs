@@ -42,11 +42,13 @@ Use a tabela para responder. O objetivo é aprender a consultar a referência; a
 <fieldset class="practice" data-activity="a-name-f"><legend>Qual letra representa Fá?</legend><label class="choice"><input type="radio" name="a-name-f" value="a"/><span>E</span></label><label class="choice"><input type="radio" name="a-name-f" value="b"/><span>F</span></label><label class="choice"><input type="radio" name="a-name-f" value="c"/><span>G</span></label><details class="hint"><summary>Uma dica</summary><p>Localize Fá na primeira linha da tabela e leia a letra logo abaixo.</p></details><details class="feedback"><summary>Conferir resposta</summary><div><p><strong>Resposta: F.</strong> Fá corresponde a F. As duas formas indicam o mesmo nome de nota.</p><ul><li><strong>Se você escolheu “E”:</strong> E representa Mi. Procure Fá na linha dos nomes.</li><li><strong>Se você escolheu “G”:</strong> G representa Sol. Fá corresponde a outra letra.</li></ul><h4>Pratique de novo</h4><fieldset class="practice" data-activity="a-name-g-retry"><legend>Pratique de novo: qual letra representa Sol?</legend><label class="choice"><input type="radio" name="a-name-g-retry" value="a"/><span>A</span></label><label class="choice"><input type="radio" name="a-name-g-retry" value="b"/><span>F</span></label><label class="choice"><input type="radio" name="a-name-g-retry" value="c"/><span>G</span></label><details class="hint"><summary>Uma dica</summary><p>Consulte a coluna de Sol na tabela.</p></details><details class="feedback"><summary>Conferir resposta</summary><div><p><strong>Resposta: G.</strong> Sol corresponde a G. A consulta funciona nos dois sentidos, nome para letra e letra para nome.</p><ul><li><strong>Se você escolheu “A”:</strong> A corresponde a Lá.</li><li><strong>Se você escolheu “F”:</strong> F corresponde a Fá.</li></ul></div></details></fieldset></div></details></fieldset>
 <!-- /activity -->
 
+## As notas na pauta
+
+Na partitura, os mesmos nomes aparecem na **pauta**, com cinco linhas. Com a **clave de sol**, o Dó central (C4) fica numa linha extra abaixo da pauta. A partir dele, cada nota seguinte sobe um degrau, alternando linha e espaço: Ré abaixo da primeira linha, Mi na primeira linha, Fá no primeiro espaço, Sol na segunda linha, Lá no segundo espaço e Si na terceira linha. Ler partitura não é necessário nesta lição; a pauta mostra que é o mesmo código em outra escrita.
+
 ## O código também nas mãos
 
-O mesmo código aparece fora do papel. No palco, músicos costumam combinar o tom da música com sinais de mão, com a palma voltada para a banda: um dedo levantado para Dó, dois para Ré, três para Mi, quatro para Fá, a mão aberta para Sol, polegar e mínimo para Lá e polegar e indicador para Si. Em geral, a palma para a frente indica maior e o dorso da mão indica menor; maior e menor são assunto de outra lição. As convenções variam entre grupos, então combine os sinais antes de tocar.
-
-<!-- Revisão pendente: confirmar o sinal de Si com a revisão musical antes da publicação. -->
+O mesmo código aparece fora do papel. No palco, músicos costumam combinar o tom da música com sinais de mão, com a palma voltada para a banda: um dedo levantado para Dó, dois para Ré, três para Mi, quatro para Fá, a mão aberta para Sol, polegar e mínimo para Lá e só o mínimo para Si. Em geral, a mão para cima indica maior e a mão virada para baixo indica menor; maior e menor são assunto de outra lição. As convenções variam entre grupos, então combine os sinais antes de tocar.
 
 ## Encontrando os nomes no teclado
 
@@ -72,9 +74,9 @@ Você pode comparar os rótulos mesmo sem ouvir as notas. Por enquanto, queremos
 
 ## O mesmo raciocínio na guitarra e no baixo
 
-A guitarra e o baixo usam cordas e casas. **Corda solta** significa tocar a corda sem pressionar uma casa. A **pestana** é a peça junto ao começo do braço. Os **trastes** são as divisões de metal; a casa fica no espaço entre dois trastes, ou entre a pestana e o primeiro traste.
+A guitarra e o baixo usam cordas e casas. **Corda solta** significa tocar a corda sem pressionar uma casa. O **nut** é a peça junto ao começo do braço; muitos músicos o chamam de pestana, palavra que também nomeia a técnica de prender várias cordas com um dedo. Os **trastes** são as divisões de metal; a casa fica no espaço entre dois trastes, ou entre o nut e o primeiro traste.
 
-Nos desenhos abaixo, o braço está de frente para você, com a pestana à esquerda. A corda Mi mais grave está na parte inferior, destacada por uma linha mais grossa e pelo nome. As marcas mostram **posições alternativas nessa mesma corda**, e não notas que precisam soar juntas. O círculo vazio indica a corda solta.
+Nos desenhos abaixo, o braço está de frente para você, com o nut à esquerda. A corda Mi mais grave está na parte inferior, destacada por uma linha mais grossa e pelo nome. As marcas mostram **posições alternativas nessa mesma corda**, e não notas que precisam soar juntas. O círculo vazio indica a corda solta.
 
 ### Guitarra: sexta corda na afinação padrão
 

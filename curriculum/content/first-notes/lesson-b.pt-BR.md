@@ -72,7 +72,7 @@ Use a figura e responda antes de conferir a explicação. Se preferir, leia a se
 
 ## A mesma contagem na corda Mi
 
-Nos desenhos, a corda Mi grave tem o nome indicado e uma linha mais grossa. O círculo vazio está antes da pestana e representa a corda solta. Os outros pontos ficam dentro das casas. Cada marca é uma posição alternativa na mesma corda.
+Nos desenhos, a corda Mi grave tem o nome indicado e uma linha mais grossa. O círculo vazio está antes do nut e representa a corda solta. Os outros pontos ficam dentro das casas. Cada marca é uma posição alternativa na mesma corda.
 
 Na guitarra com afinação padrão, a sexta corda solta é **E2**. No baixo de quatro cordas com afinação padrão, a quarta corda solta é **E1**. Os nomes se repetem em registros diferentes.
 

@@ -251,7 +251,7 @@ def fretboard(slide, x, y, title, strings, marks, frets=4, width=500, gap=26):
     fret_w = (width - name_w - open_w) / frets
     bottom = top + gap * (len(strings) - 1)
     rect(slide, nut_x, top - 10, frets * fret_w, bottom - top + 20, fill=TINT, name="Braço")
-    rect(slide, nut_x - 6, top - 12, 8, bottom - top + 24, fill=INK, name="Pestana")
+    rect(slide, nut_x - 6, top - 12, 8, bottom - top + 24, fill=INK, name="Nut")
     for f in range(1, frets + 1):
         fx = nut_x + f * fret_w
         line(slide, fx, top - 10, fx, bottom + 10, color=FRET_GRAY, width=2, name=f"Traste {f}")
@@ -280,7 +280,7 @@ def fretboard(slide, x, y, title, strings, marks, frets=4, width=500, gap=26):
     for f, lab in enumerate(labels):
         cx = x + name_w + open_w / 2 if f == 0 else nut_x + (f - 0.5) * fret_w
         text(slide, cx - 45, num_y, 90, 22, lab, size=12, color=MUTED, align="c")
-    text(slide, nut_x - 50, top - 36, 100, 20, "pestana", size=12, color=MUTED, align="c")
+    text(slide, nut_x - 50, top - 36, 100, 20, "nut", size=12, color=MUTED, align="c")
     return num_y + 24
 
 
@@ -322,25 +322,59 @@ def c_major_ruler(slide, x, y, step):
 FINGERS = ("index", "middle", "ring", "pinky")
 
 
+# Finger proportions in palm units: (x offset, width, raised length above the palm).
+FINGER_SHAPE = {"index": (0.12, 0.82, 2.2), "middle": (1.0, 0.84, 2.55),
+                "ring": (1.88, 0.8, 2.3), "pinky": (2.74, 0.66, 1.75)}
+
+
+def _hand_part(slide, x, y, w, h, name, rotation=0):
+    part = rect(slide, x, y, w, h, fill=VIOLET, line=WHITE, line_w=1.25,
+                shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.5, name=name)
+    part.rotation = rotation
+    return part
+
+
 def hand_sign(slide, x, y, w, raised, name):
-    """Original stylized hand (palm facing the viewer): raised fingers are tall, the
-    others are folded stubs. raised: subset of {'thumb', 'index', 'middle', 'ring', 'pinky'}."""
+    """Original stylized hand, palm facing the viewer. Fingers keep natural proportions
+    (middle longest, little finger shortest); folded fingers show as knuckles and a folded
+    thumb lies across the palm. raised: subset of {'thumb', 'index', 'middle', 'ring', 'pinky'}."""
     u = w / 5
-    palm_x, palm_w = x + 1.1 * u, 3.8 * u
-    palm_y, palm_h = y + 2.4 * u, 1.9 * u
-    for i, finger in enumerate(FINGERS):
-        fx = palm_x + 0.1 * u + i * 0.92 * u
+    palm_x, palm_y, palm_w, palm_h = x + 1.1 * u, y + 2.6 * u, 3.8 * u, 2.0 * u
+    for finger in FINGERS:
+        dx, fw, length = FINGER_SHAPE[finger]
         up = finger in raised
-        fy = y if up else palm_y - 0.55 * u
-        fh = (palm_y - y) + 0.5 * u if up else 1.0 * u
-        rect(slide, fx, fy, 0.78 * u, fh, fill=VIOLET, shape=MSO_SHAPE.ROUNDED_RECTANGLE,
-             radius=0.5, name=f"{name}: dedo {finger}{' levantado' if up else ''}")
-    rect(slide, palm_x, palm_y, palm_w, palm_h, fill=VIOLET,
-         shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.3, name=f"{name}: palma")
+        reach = length if up else 0.55
+        _hand_part(slide, palm_x + dx * u, palm_y - reach * u, fw * u, (reach + 0.6) * u,
+                   f"{name}: dedo {finger}{' levantado' if up else ' dobrado'}")
     if "thumb" in raised:
-        t = rect(slide, x + 0.45 * u, palm_y - 0.7 * u, 0.78 * u, 2.0 * u, fill=VIOLET,
-                 shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.5, name=f"{name}: polegar levantado")
-        t.rotation = -35
+        cx, cy = palm_x - 0.2 * u, palm_y + 0.2 * u
+        _hand_part(slide, cx - 0.45 * u, cy - 0.95 * u, 0.9 * u, 1.9 * u,
+                   f"{name}: polegar levantado", rotation=-40)
+    rect(slide, palm_x, palm_y, palm_w, palm_h, fill=VIOLET, line=WHITE, line_w=1.25,
+         shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.3, name=f"{name}: palma")
+    if "thumb" not in raised:
+        _hand_part(slide, palm_x - 0.25 * u, palm_y + 0.75 * u, 1.9 * u, 0.75 * u,
+                   f"{name}: polegar dobrado", rotation=-28)
+
+
+TREBLE_STEPS = {"C4": -2, "D4": -1, "E4": 0, "F4": 1, "G4": 2, "A4": 3, "B4": 4}
+
+
+def treble_staff(slide, x0, x1, bottom, space, notes):
+    """Five-line staff with a treble clef; notes: (center_x, pitch) drawn as whole notes.
+    Steps count diatonic positions from E4 on the bottom line."""
+    for k in range(5):
+        line(slide, x0, bottom - k * space, x1, bottom - k * space, color=INK, width=1.25,
+             name=f"Pauta linha {k + 1}")
+    text(slide, x0 + 2, bottom - 8.4 * space, 5 * space, 12 * space, "\U0001D11E",
+         size=round(9.4 * space * 0.75), color=INK, name="Clave de sol")
+    for cx, pitch in notes:
+        cy = bottom - TREBLE_STEPS[pitch] * space / 2
+        if TREBLE_STEPS[pitch] <= -2:
+            line(slide, cx - 1.25 * space, bottom + space, cx + 1.25 * space, bottom + space,
+                 color=INK, width=1.25, name=f"Linha suplementar {pitch}")
+        rect(slide, cx - 0.8 * space, cy - 0.55 * space, 1.6 * space, 1.1 * space, fill=WHITE,
+             line=INK, line_w=2.5, shape=MSO_SHAPE.OVAL, name=f"Nota {pitch}")
 
 
 PIANO_LOW, PIANO_HIGH = 21, 108  # A0–C8 (MIDI)
@@ -514,8 +548,13 @@ def build_lesson_a(template, out):
 
     s = d.light("As sete notas",
                 "Construção em três slides. Primeiro, os sete nomes em português, na ordem: Dó, Ré, "
-                "Mi, Fá, Sol, Lá, Si.")
+                "Mi, Fá, Sol, Lá, Si. Alternativa textual da pauta em clave de sol, abaixo de "
+                "cada nome: Dó (C4) numa linha suplementar abaixo da pauta, Ré logo abaixo da "
+                "primeira linha, Mi na primeira linha, Fá no primeiro espaço, Sol na segunda "
+                "linha, Lá no segundo espaço e Si na terceira linha.")
     names_and_letters(s, 206, letters=False)  # same positions as the next two slides
+    treble_staff(s, 64, 1216, 450, 18,
+                 [(184 + i * 147 + 65.5, f"{l}4") for i, l in enumerate(LETTERS)])
 
     s = d.light("Cada nota tem uma letra",
                 "Alternativa textual: Dó=C, Ré=D, Mi=E, Fá=F, Sol=G, Lá=A, Si=B. Leia nos dois "
@@ -533,13 +572,12 @@ def build_lesson_a(template, out):
                 "Outra forma do mesmo código: no palco, músicos combinam o tom da música com sinais "
                 "de mão, com a palma voltada para a banda. Desenhos originais e simplificados: Dó, "
                 "indicador levantado; Ré, indicador e médio; Mi, três dedos; Fá, quatro dedos; Sol, "
-                "mão aberta; Lá, polegar e mínimo; Si, polegar e indicador. Em geral, a palma para a "
-                "frente indica maior e o dorso da mão indica menor; maior e menor são assunto de "
-                "outra lição. As convenções variam entre grupos: combine os sinais antes de tocar. "
-                "PENDENTE: confirmar o sinal de Si com a revisão musical antes da publicação.")
+                "mão aberta; Lá, polegar e mínimo; Si, só o mínimo. Em geral, a mão para cima indica "
+                "maior e a mão virada para baixo indica menor; maior e menor são assunto de outra "
+                "lição. As convenções variam entre grupos: combine os sinais antes de tocar.")
     signs = [("Dó", {"index"}), ("Ré", {"index", "middle"}), ("Mi", {"index", "middle", "ring"}),
              ("Fá", set(FINGERS)), ("Sol", {"thumb", *FINGERS}), ("Lá", {"thumb", "pinky"}),
-             ("Si", {"thumb", "index"})]
+             ("Si", {"pinky"})]
     for i, (n, raised) in enumerate(signs):
         cx = 72 + i * 164
         hand_sign(s, cx + 12, 220, 120, raised, f"Sinal de {n}")
@@ -574,12 +612,12 @@ def build_lesson_a(template, out):
          size=22, color=LILAC)
 
     s = d.light("Conhecendo o braço",
-                "Vocabulário: corda solta (tocar sem pressionar uma casa), pestana (peça junto ao "
-                "começo do braço), traste (divisão de metal) e casa (espaço entre dois trastes, "
-                "ou entre a pestana e o primeiro traste). Nos desenhos, o braço está de frente, "
-                "com a pestana à esquerda e a corda Mi mais grave embaixo, mais grossa.")
+                "Vocabulário: corda solta (tocar sem pressionar uma casa), nut, também chamado de pestana (peça junto ao "
+                "começo do braço; “pestana” também nomeia a técnica de prender várias cordas com um dedo), traste (divisão de metal) e casa (espaço entre dois trastes, "
+                "ou entre o nut e o primeiro traste). Nos desenhos, o braço está de frente, "
+                "com o nut à esquerda e a corda Mi mais grave embaixo, mais grossa.")
     terms = [("Corda solta", "Sem pressionar casa."),
-             ("Pestana", "Início do braço."),
+             ("Nut / pestana", "Início do braço."),
              ("Traste", "Divisão de metal."),
              ("Casa", "Espaço entre trastes.")]
     for i, (term, desc) in enumerate(terms):

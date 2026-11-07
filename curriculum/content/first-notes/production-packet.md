@@ -194,7 +194,7 @@ articles carry the same changes.
 
 | Deck | Slides | Sequence |
 |---|---|---|
-| [A](slides/lesson-a.pt-BR.pptx) | 15 | Cover · application opening · names · names and letters · summary · hand signs · keyboard · octave · fretboard vocabulary · locating method · guitar/bass E string · instrument ranges · study phrase · success check and MotifPath practice · next lesson |
+| [A](slides/lesson-a.pt-BR.pptx) | 15 | Cover · application opening · names with treble-clef staff · names and letters · summary · hand signs · keyboard · octave · fretboard vocabulary · locating method · guitar/bass E string · instrument ranges · study phrase · success check and MotifPath practice · next lesson |
 | [B](slides/lesson-b.pt-BR.pptx) | 13 | Cover · application opening · quick reference bridge · semitone as half a tone · keyboard distances · sharps/flats · counting method · E-string distances · natural half-step pairs · C-major ruler · Dó–Ré–Mi–Fá check · success check and MotifPath practice · next practice |
 
 Worked demonstrations stay (F4 on the keyboard, Sol on the E string and the counting example);
@@ -208,8 +208,8 @@ in MotifPath practice. In A, fret 2 is left unnamed, as in the article.
 | Rendered slides | Every slide rendered with macOS Quick Look and inspected. Overflow, collisions and line breaks were corrected and the changed slides re-rendered. | Pass in AI visual inspection |
 | Musical data | Diagrams generated from the article tables: E2/E1 open strings, F/F♯/G at frets 1–3, C4–C5 keyboard with all black keys, C-major positions 0,2,4,5,7,9,11,12 and distances 2-2-1-2-2-2-1 (labelled 1T/1S); sounding ranges piano A0–C8, 22-fret guitar E2–D6, 20-fret bass E1–D♯4 | Pass in AI source inspection; human educator review of the decks pending |
 | Accessibility | Text alternatives for every diagram are in the speaker notes. Pictures have alt text. Color is reinforced by labels, line weight and marker shape. | Screen-reader check in PowerPoint pending |
-| Hand signs | Original stylized icons; the stage convention varies between groups. The Si sign (thumb and index) was read from a third-party reference image and is unconfirmed. | Musical review must confirm Si before publication |
-| Native applications | Quick Look substitutes some glyphs and fonts; ♯/♭ may fall back to another font. | Open, edit, save and present in PowerPoint and Google Slides: pending |
+| Hand signs | Original stylized icons with natural finger proportions; Si (little finger only) confirmed by the PO on 2026-11-07. The stage convention varies between groups. | Pass in PO review; human educator review pending |
+| Native applications | Quick Look substitutes some glyphs and fonts; ♯/♭ may fall back to another font. The treble clef is the Unicode glyph U+1D11E and needs a fallback font with musical symbols (rendered on macOS). | Open, edit, save and present in PowerPoint and Google Slides: pending |
 
 Publishing or distributing the decks to learners needs separate PO approval.
 
