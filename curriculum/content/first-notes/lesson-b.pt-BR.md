@@ -11,7 +11,7 @@ concept_keys: [tones-and-semitones, sharps-and-flats, major-scale]
 curriculum_participation: standalone
 ---
 
-# Tons e semitons: encontre a próxima nota
+# Nem todo passo é igual: o padrão da escala maior
 
 ## Para que você vai usar isso?
 

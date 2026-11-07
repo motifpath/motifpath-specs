@@ -33,8 +33,8 @@ pending. There is no learner baseline or measured learning improvement.
 
 | Unit | Artifact | Outcome | Participation |
 |---|---|---|---|
-| A | [lesson-a.pt-BR.md](lesson-a.pt-BR.md) | Interpret natural note names/letters, use a labelled position reference and distinguish name from octave/register | Existing `sh-ear-first`, Notas, first planned article “Os nomes das notas: dó, ré, mi e C, D, E”; working draft title “Conheça as notas: nomes que você pode encontrar” |
-| B | [lesson-b.pt-BR.md](lesson-b.pt-BR.md) | Count one/two semitone transitions on a reference and apply them to C major | Standalone; A is preparatory reading with an inline bridge |
+| A | [lesson-a.pt-BR.md](lesson-a.pt-BR.md) | Interpret natural note names/letters, use a labelled position reference and distinguish name from octave/register | Existing `sh-ear-first`, Notas, first planned article “Os nomes das notas: dó, ré, mi e C, D, E”; working draft title “Conheça as notas: nomes que você pode encontrar”; learner title “C, D, E…: o código que todo músico usa” (PO, 2026-11-07) |
+| B | [lesson-b.pt-BR.md](lesson-b.pt-BR.md) | Count one/two semitone transitions on a reference and apply them to C major | Standalone; A is preparatory reading with an inline bridge; learner title “Nem todo passo é igual: o padrão da escala maior” (PO, 2026-11-07) |
 
 Both are beginner and universal (`instruments: []`). Keyboard, guitar and bass are examples.
 No new course/path is created. Their exact source-slot/standalone disposition was approved

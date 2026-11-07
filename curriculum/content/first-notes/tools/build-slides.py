@@ -421,7 +421,7 @@ NO_EXERCISES = ("Entrega ao estudante: as atividades desta lição são feitas n
 
 def build_lesson_a(template, out):
     d = Deck(template)
-    d.cover(["Conheça", "as notas"], "Nomes que você pode encontrar",
+    d.cover(["C, D, E…"], "O código que todo músico usa",
             "Iniciante  /  Instrumento opcional",
             "Lição A, pt_BR, versão 2 do artigo (PR #436). " + NO_EXERCISES)
 
@@ -546,17 +546,17 @@ def build_lesson_a(template, out):
               y=210, h=260, size=26)
     practice_banner(s, "Atividades desta lição.")
 
-    d.closing(["Próximo passo:", "tons e semitons"],
-              "Agora, contar a distância entre as notas.",
-              "Próxima lição: “Tons e semitons: encontre a próxima nota”. Os nomes dizem quais "
+    d.closing(["Nem todo passo", "é igual"],
+              "Próxima lição: o padrão da escala maior.",
+              "Próxima lição: “Nem todo passo é igual: o padrão da escala maior”. Os nomes dizem quais "
               "notas procurar; a próxima lição conta a distância entre elas e mostra por que "
               "alguns nomes vizinhos ficam mais perto que outros.")
-    d.save(out, "Conheça as notas: nomes que você pode encontrar")
+    d.save(out, "C, D, E…: o código que todo músico usa")
 
 
 def build_lesson_b(template, out):
     d = Deck(template)
-    d.cover(["Tons e", "semitons"], "Encontre a próxima nota",
+    d.cover(["Nem todo passo", "é igual"], "O padrão da escala maior",
             "Iniciante  /  Instrumento opcional",
             "Lição B, pt_BR, versão 2 do artigo (PR #436). " + NO_EXERCISES)
 
@@ -573,7 +573,7 @@ def build_lesson_b(template, out):
               ["Escalas", "Transposição", "Acordes"], y=210, h=260, size=26)
 
     s = d.light("Referência rápida",
-                "Ponte com a lição “Conheça as notas”: seções “Um mesmo nome pode aparecer de duas "
+                "Ponte com a lição “C, D, E…: o código que todo músico usa”: seções “Um mesmo nome pode aparecer de duas "
                 "formas” (tabela de nomes e letras) e “O nome se repete; a altura muda” (números "
                 "de oitava). Depois do Si, a sequência recomeça em Dó. Esta lição funciona sem "
                 "abrir a anterior.")
@@ -703,7 +703,7 @@ def build_lesson_b(template, out):
               "Próxima ação de prática: escolher outro par na régua e recontar. Depois, usar o "
               "mesmo raciocínio para estudar outras escalas, transpor pequenas melodias e "
               "entender os intervalos que formam os acordes.")
-    d.save(out, "Tons e semitons: encontre a próxima nota")
+    d.save(out, "Nem todo passo é igual: o padrão da escala maior")
 
 if __name__ == "__main__":
     template, out_dir = sys.argv[1], Path(sys.argv[2])

@@ -12,7 +12,7 @@ curriculum_path: sh-ear-first
 curriculum_section: Notas
 ---
 
-# Conheça as notas: nomes que você pode encontrar
+# C, D, E…: o código que todo músico usa
 
 ## Para que você vai usar isso?
 
