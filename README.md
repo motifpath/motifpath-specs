@@ -46,6 +46,7 @@ claude plugin install ai-consultant@motifpath-skills
 claude plugin install plan-writer@motifpath-skills
 claude plugin install product-discovery@motifpath-skills
 claude plugin install pr-review@motifpath-skills
+claude plugin install content-production@motifpath-skills
 
 # 5. Turn on background auto-update for this marketplace (off by default for
 #    non-Anthropic sources): run `/plugin` inside a Claude Code session,

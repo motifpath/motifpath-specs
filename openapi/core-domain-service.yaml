@@ -3094,6 +3094,49 @@ paths:
           type: string
           format: uuid
         description: The progression's identifier.
+    get:
+      operationId: getProgressionUses
+      summary: Read which song chart sections tag a progression
+      description: |
+        The sections of every song chart's draft and latest published revision that tag the
+        progression, the same ones a refused removal lists, so a client can show what to untag
+        without trying to remove it. Older published revisions don't count. Reading changes
+        nothing. Only admins may read them, since a chart's draft is listed.
+      tags:
+        - Practice
+      responses:
+        "200":
+          description: The sections that tag it; empty when no chart does.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProgressionUse'
+        "400":
+          description: The identifier isn't a UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        "401":
+          description: Missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        "403":
+          description: Only admins read where a progression is used.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "404":
+          description: No progression has this identifier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
     patch:
       operationId: updateProgression
       summary: Change a created progression's nickname
