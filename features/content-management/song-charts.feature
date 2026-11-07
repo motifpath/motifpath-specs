@@ -199,20 +199,17 @@ Feature: Author and publish song charts
     When "ana" tags the verse of "Amazing Grace" with the progression "I-IV-V-I"
     Then the draft lists "I-IV-V-I" on the verse as unplayed
 
-  @wip
   Scenario: A major progression in a minor chart is spelled in the relative major key
     Given "ana" has a song chart "Asa Branca" in the concert key "Em" whose verse has the chords "Em C G D"
     When "ana" tags the verse of "Asa Branca" with the progression "vi-IV-I-V"
     Then the draft lists no unplayed progression
 
-  @wip
   Scenario: A minor progression in a minor chart is spelled in the chart's key
     Given "ana" has created the minor progression "i-bVI-bIII-bVII"
     And "ana" has a song chart "Asa Branca" in the concert key "Em" whose verse has the chords "Em C G D"
     When "ana" tags the verse of "Asa Branca" with the progression "minor/i-bVI-bIII-bVII"
     Then the draft lists no unplayed progression
 
-  @wip
   Scenario: A minor progression in a major chart is spelled in the relative minor key
     Given "ana" has created the minor progression "i-bVI-bIII-bVII"
     And "ana" has a song chart "Amazing Grace" in the concert key "G" whose verse has the chords "Em C G D"
