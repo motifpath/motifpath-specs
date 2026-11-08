@@ -1,6 +1,6 @@
 # ADR-056: First-Party Learning Events with PostHog and Hotjar
 
-**Status:** Proposed
+**Status:** Accepted (2026-11-08)
 **Date:** 2026-10-12, revised 2026-11-08
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
 **Task:** MOT-30 (PB-73). Builds on the MOT-8 alpha observation view.
