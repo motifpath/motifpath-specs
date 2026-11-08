@@ -166,7 +166,7 @@ Feature: Admins create progressions for song charts
     Given "ana" has added the minor progression "i-bVI-bIII-bVII" to the drills
     And "ana" has added the minor progression "i-iv-v-i" to the drills
     When a student lists the progressions
-    Then the wrong answers of "minor/i-bVI-bIII-bVII" are only "minor/i-iv-v-i"
+    Then the wrong answers of "minor/i-iv-v-i" are only "minor/i-bVI-bIII-bVII"
 
   @wip
   Scenario: With no drill progression of its length and mode, a progression lists no wrong answer
