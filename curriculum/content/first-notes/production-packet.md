@@ -208,8 +208,8 @@ in MotifPath practice. In A, fret 2 is left unnamed, as in the article.
 | Rendered slides | Every slide rendered with macOS Quick Look and inspected. Overflow, collisions and line breaks were corrected and the changed slides re-rendered. | Pass in AI visual inspection |
 | Musical data | Diagrams generated from the article tables: E2/E1 open strings, F/F♯/G at frets 1–3, C4–C5 keyboard with all black keys, C-major positions 0,2,4,5,7,9,11,12 and distances 2-2-1-2-2-2-1 (labelled 1T/1S); sounding ranges piano A0–C8, 22-fret guitar E2–D6, 20-fret bass E1–D♯4 | Pass in AI source inspection; human educator review of the decks pending |
 | Accessibility | Text alternatives for every diagram are in the speaker notes. Pictures have alt text. Color is reinforced by labels, line weight and marker shape. | Screen-reader check in PowerPoint pending |
-| Hand signs | Original stylized icons with natural finger proportions; Si (little finger only) confirmed by the PO on 2026-11-07. The stage convention varies between groups. | Pass in PO review; human educator review pending |
-| Native applications | Quick Look substitutes some glyphs and fonts; ♯/♭ may fall back to another font. The treble clef is the Unicode glyph U+1D11E and needs a fallback font with musical symbols (rendered on macOS). | Open, edit, save and present in PowerPoint and Google Slides: pending |
+| Hand signs and staff | Original line-art hands and an engraved treble staff, rendered to PNG by `tools/build-figures.mjs` (alt text on each picture; Bravura glyphs, SIL OFL 1.1, Steinberg). Hands use natural finger proportions; Si (little finger only) confirmed by the PO on 2026-11-07. The stage convention varies between groups. | Pass in PO review; human educator review pending |
+| Native applications | Quick Look substitutes some glyphs and fonts; ♯/♭ may fall back to another font. | Open, edit, save and present in PowerPoint and Google Slides: pending |
 
 Publishing or distributing the decks to learners needs separate PO approval.
 

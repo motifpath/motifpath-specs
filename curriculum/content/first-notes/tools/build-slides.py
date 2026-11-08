@@ -319,62 +319,14 @@ def c_major_ruler(slide, x, y, step):
              [[(label, {"b": True, "c": VIOLET if d == 1 else INK})]], size=17, align="c")
 
 
-FINGERS = ("index", "middle", "ring", "pinky")
+FIGURES = Path(__file__).resolve().parent.parent / "slides" / "figures"
 
 
-# Finger proportions in palm units: (x offset, width, raised length above the palm).
-FINGER_SHAPE = {"index": (0.12, 0.82, 2.2), "middle": (1.0, 0.84, 2.55),
-                "ring": (1.88, 0.8, 2.3), "pinky": (2.74, 0.66, 1.75)}
-
-
-def _hand_part(slide, x, y, w, h, name, rotation=0):
-    part = rect(slide, x, y, w, h, fill=VIOLET, line=WHITE, line_w=1.25,
-                shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.5, name=name)
-    part.rotation = rotation
-    return part
-
-
-def hand_sign(slide, x, y, w, raised, name):
-    """Original stylized hand, palm facing the viewer. Fingers keep natural proportions
-    (middle longest, little finger shortest); folded fingers show as knuckles and a folded
-    thumb lies across the palm. raised: subset of {'thumb', 'index', 'middle', 'ring', 'pinky'}."""
-    u = w / 5
-    palm_x, palm_y, palm_w, palm_h = x + 1.1 * u, y + 2.6 * u, 3.8 * u, 2.0 * u
-    for finger in FINGERS:
-        dx, fw, length = FINGER_SHAPE[finger]
-        up = finger in raised
-        reach = length if up else 0.55
-        _hand_part(slide, palm_x + dx * u, palm_y - reach * u, fw * u, (reach + 0.6) * u,
-                   f"{name}: dedo {finger}{' levantado' if up else ' dobrado'}")
-    if "thumb" in raised:
-        cx, cy = palm_x - 0.2 * u, palm_y + 0.2 * u
-        _hand_part(slide, cx - 0.45 * u, cy - 0.95 * u, 0.9 * u, 1.9 * u,
-                   f"{name}: polegar levantado", rotation=-40)
-    rect(slide, palm_x, palm_y, palm_w, palm_h, fill=VIOLET, line=WHITE, line_w=1.25,
-         shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.3, name=f"{name}: palma")
-    if "thumb" not in raised:
-        _hand_part(slide, palm_x - 0.25 * u, palm_y + 0.75 * u, 1.9 * u, 0.75 * u,
-                   f"{name}: polegar dobrado", rotation=-28)
-
-
-TREBLE_STEPS = {"C4": -2, "D4": -1, "E4": 0, "F4": 1, "G4": 2, "A4": 3, "B4": 4}
-
-
-def treble_staff(slide, x0, x1, bottom, space, notes):
-    """Five-line staff with a treble clef; notes: (center_x, pitch) drawn as whole notes.
-    Steps count diatonic positions from E4 on the bottom line."""
-    for k in range(5):
-        line(slide, x0, bottom - k * space, x1, bottom - k * space, color=INK, width=1.25,
-             name=f"Pauta linha {k + 1}")
-    text(slide, x0 + 2, bottom - 8.4 * space, 5 * space, 12 * space, "\U0001D11E",
-         size=round(9.4 * space * 0.75), color=INK, name="Clave de sol")
-    for cx, pitch in notes:
-        cy = bottom - TREBLE_STEPS[pitch] * space / 2
-        if TREBLE_STEPS[pitch] <= -2:
-            line(slide, cx - 1.25 * space, bottom + space, cx + 1.25 * space, bottom + space,
-                 color=INK, width=1.25, name=f"Linha suplementar {pitch}")
-        rect(slide, cx - 0.8 * space, cy - 0.55 * space, 1.6 * space, 1.1 * space, fill=WHITE,
-             line=INK, line_w=2.5, shape=MSO_SHAPE.OVAL, name=f"Nota {pitch}")
+def figure(slide, file, x, y, w, alt):
+    """Place a pre-rendered figure (tools/build-figures.mjs) with its alt text."""
+    pic = slide.shapes.add_picture(str(FIGURES / file), px(x), px(y), width=px(w))
+    pic._element.nvPicPr.cNvPr.set("descr", alt)
+    return pic
 
 
 PIANO_LOW, PIANO_HIGH = 21, 108  # A0–C8 (MIDI)
@@ -553,8 +505,9 @@ def build_lesson_a(template, out):
                 "primeira linha, Mi na primeira linha, Fá no primeiro espaço, Sol na segunda "
                 "linha, Lá no segundo espaço e Si na terceira linha.")
     names_and_letters(s, 206, letters=False)  # same positions as the next two slides
-    treble_staff(s, 64, 1216, 450, 18,
-                 [(184 + i * 147 + 65.5, f"{l}4") for i, l in enumerate(LETTERS)])
+    figure(s, "staff-treble.png", 64, 300, 1152,
+           "Pauta em clave de sol com Dó4, Ré4, Mi4, Fá4, Sol4, Lá4 e Si4 em semibreves, "
+           "cada nota abaixo do seu nome")
 
     s = d.light("Cada nota tem uma letra",
                 "Alternativa textual: Dó=C, Ré=D, Mi=E, Fá=F, Sol=G, Lá=A, Si=B. Leia nos dois "
@@ -575,14 +528,14 @@ def build_lesson_a(template, out):
                 "mão aberta; Lá, polegar e mínimo; Si, só o mínimo. Em geral, a mão para cima indica "
                 "maior e a mão virada para baixo indica menor; maior e menor são assunto de outra "
                 "lição. As convenções variam entre grupos: combine os sinais antes de tocar.")
-    signs = [("Dó", {"index"}), ("Ré", {"index", "middle"}), ("Mi", {"index", "middle", "ring"}),
-             ("Fá", set(FINGERS)), ("Sol", {"thumb", *FINGERS}), ("Lá", {"thumb", "pinky"}),
-             ("Si", {"pinky"})]
-    for i, (n, raised) in enumerate(signs):
-        cx = 72 + i * 164
-        hand_sign(s, cx + 12, 220, 120, raised, f"Sinal de {n}")
-        text(s, cx, 360, 140, 40, [[(n, {"b": True})]], size=26, align="c")
-    text(s, 64, 470, 1152, 50, "No palco, a banda combina o tom com as mãos.", size=24)
+    signs = [("Dó", "do", "indicador levantado"), ("Ré", "re", "indicador e médio"),
+             ("Mi", "mi", "três dedos"), ("Fá", "fa", "quatro dedos"), ("Sol", "sol", "mão aberta"),
+             ("Lá", "la", "polegar e mínimo"), ("Si", "si", "só o mínimo")]
+    for i, (n, key, shape) in enumerate(signs):
+        cx = 64 + i * 166
+        figure(s, f"hand-{key}.png", cx, 200, 150, f"Sinal de {n}: {shape}")
+        text(s, cx, 380, 150, 40, [[(n, {"b": True})]], size=26, align="c")
+    text(s, 64, 480, 1152, 50, "No palco, a banda combina o tom com as mãos.", size=24)
 
     s = d.light("Os nomes no teclado",
                 "Alternativa textual: teclas brancas da esquerda para a direita C4, D4, E4, F4, "

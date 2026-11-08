@@ -53,11 +53,16 @@ Install the Manrope fonts from the content-production plugin before editing.
 Rebuild and check with python-pptx (`pip install python-pptx`):
 
 ```bash
+node curriculum/content/first-notes/tools/build-figures.mjs <Bravura.otf>  # hand signs, staff
 python3 curriculum/content/first-notes/tools/build-slides.py \
   <content-production>/assets/content-presentation-template.pptx \
   curriculum/content/first-notes/slides
 python3 curriculum/content/first-notes/tools/check-slides.py
 ```
+
+`build-figures.mjs` renders the hand-sign and treble-staff figures to `slides/figures/` with the
+local Playwright Chromium. The staff uses [Bravura](https://github.com/steinbergmedia/bravura)
+(SIL Open Font License 1.1) for the clef and notes; pass the downloaded `Bravura.otf`.
 
 `check-slides.py` fails if exercise text from `activities.json` or a review-state label
 appears anywhere in a deck, or if a deck has a hidden slide. Deck evidence and pending
