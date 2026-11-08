@@ -1,4 +1,4 @@
-# ADR-056: First-Party Product Analytics Through Our Own Event Pipeline
+# ADR-056: First-Party Learning Events with PostHog and Hotjar
 
 **Status:** Proposed
 **Date:** 2026-10-12, revised 2026-11-08
@@ -42,14 +42,15 @@ from raw arrival order or the immediate session summary.
 
 ## Decision
 
-MotifPath will use first-party analytics to support a weekly product review. Start with existing
-domain data and add bounded usage observations where a named decision requires them. Reuse the
-MOT-8 admin surface and give MOT-30 ownership of the new views and measurement definitions.
+MotifPath will keep authoritative learning events and derived outcomes in its own pipeline and use
+**PostHog for quantitative product analytics** and **Hotjar for targeted web UX research**. MOT-30
+owns the measurement definitions and vendor integrations. MOT-8 continues to provide the existing
+alpha observation metrics and access to authoritative learning records.
 
 ### 1. Start with decisions the existing evidence supports
 
-Add an aggregate weekly view over existing events and folded state. Show weekly finished-session
-and first-path targets, session outcomes, and exercise and drill diagnostics. Join planned items
+Use MOT-8 for weekly finished-session and first-path targets. Derive session outcomes and exercise
+and drill diagnostics from existing events and folded state. Join planned items
 to practice activity using student and practice session IDs and the planned item identity. Where
 the same identity recurs, preserve occurrence and order when the data supports that attribution.
 Keep ambiguously matched items in an explicit unknown bucket. Preserve attempt context, exercise or
@@ -116,9 +117,30 @@ samples of sessions to investigate. Report small cohorts with counts and avoid c
 from observational comparisons. Validate with scripted journeys including retries, skipped items,
 opt-out, and reloads, then reconcile a sample of real observations against source records.
 Success means the team can answer the weekly questions and document a priority decision from the
-admin view without custom SQL.
+saved reports and MOT-8 without custom SQL.
 
-### 4. Keep usage data separate from learning obligations
+### 4. Give each tool a distinct job
+
+- **PostHog** provides saved activation funnels, paths, retention cohorts, and breakdowns for the
+  weekly product review. Feed it an allowlisted projection of milestones and derived outcomes from
+  MotifPath's first-party pipeline. Use a vendor-specific pseudonymous identifier where a
+  student-level join is necessary. Exclude raw answers and student profile data. Disable
+  autocapture and session replay for this integration.
+- **Hotjar** supports time-boxed investigations on approved web screens when a funnel shows where
+  students stall and the team needs to see the interaction. Use scoped recordings, heatmaps or
+  feedback as appropriate. Begin with signed-in onboarding or navigation screens approved for the
+  pilot. Exclude authentication forms, account and payment screens, and exercise answer surfaces.
+  Verify suppression and collection boundaries before recording real sessions. Use Hotjar findings
+  alongside the quantitative reports in the weekly review.
+
+First validate PostHog with synthetic journeys for first usable item and practice abandonment.
+Reconcile the saved reports against source events and verify breakdowns by surface and exercise
+type. Test Hotjar independently with synthetic web sessions to verify route eligibility,
+suppression, and recording behavior. Approve each integration separately before real student data
+is collected or transferred. The follow-up spec must define each vendor's data allowlist,
+environments, access, preference enforcement, retention, deletion, and disable control.
+
+### 5. Keep usage data separate from learning obligations
 
 Keep usage observations separately identifiable and enforce an independently testable collection,
 access, retention, and deletion policy. Reuse the ingestion boundary while choosing the storage
@@ -146,16 +168,19 @@ enabling collection.
   pre-answer friction or provide reliable denominators for screen and item exposure.
 - **Bounded first-party instrumentation.** Authenticated milestones can be joined to learning
   outcomes with a controlled schema. The team owns the reports, validation and retention.
-- **Hosted or self-hosted general-purpose analytics.** Defer a tool such as PostHog until the
-  weekly view demonstrates a material reporting gap or maintenance cost. Reassess hosting,
-  integrations, access, privacy and operating cost against that gap before selecting a vendor.
+- **PostHog for exploration.** Saved funnels and retention reports let the team change segments
+  and compare cohorts without building a bespoke reporting interface for every question.
+- **Hotjar for focused investigation.** Recordings and feedback provide context for specific web
+  interaction problems. Treat those observations as qualitative evidence alongside funnel counts.
+- **Custom reporting only.** This would centralize presentation in MOT-8 and require MotifPath to
+  build and maintain exploratory funnels, paths, and cohort reports.
 - **Aggregate page-view tools.** Page counts can show traffic distribution. They cannot answer
   whether a particular practice attempt followed an eligible exposure.
 
 ## Consequences
 
-- MOT-8's existing PB-8 metrics can anchor the weekly review. New MOT-30 work adds decision views
-  and fills the exposure gaps in stages.
+- The weekly review combines MOT-8 learning metrics, PostHog reports, and Hotjar findings from
+  scoped investigations. Two vendor integrations add access, privacy, and lifecycle work.
 - App, visit, practice session, item attempt and evidence identities need separate definitions.
   Correlation coverage will vary by client version, surface and usage preference.
 - New events add ingestion, storage and maintenance cost. Bound the event allowlist and validate
