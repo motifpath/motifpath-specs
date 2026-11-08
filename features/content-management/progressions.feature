@@ -148,27 +148,23 @@ Feature: Admins create progressions for song charts
     Then adding is refused because "unsupported_bar_count"
     And "major/I" is still not in the drills
 
-  @wip
   Scenario: A progression of a length no other drill progression has enters the drills
     Given "ana" has created the major progression "I-IV-V"
     When "ana" adds it to the drills, practising the concept "common-progressions"
     Then the progression "major/I-IV-V" is in the drills
     And practice offers it as a subject on the concept "common-progressions"
 
-  @wip
   Scenario: A minor progression enters the drills
     Given "ana" has created the minor progression "i-bVI-bIII-bVII"
     When "ana" adds it to the drills, practising the concept "common-progressions"
     Then the progression "minor/i-bVI-bIII-bVII" is in the drills
 
-  @wip
   Scenario: Drills never offer as a wrong answer a progression of the other mode
     Given "ana" has added the minor progression "i-bVI-bIII-bVII" to the drills
     And "ana" has added the minor progression "i-iv-v-i" to the drills
     When a student lists the progressions
     Then the wrong answers of "minor/i-iv-v-i" are only "minor/i-bVI-bIII-bVII"
 
-  @wip
   Scenario: With no drill progression of its length and mode, a progression lists no wrong answer
     Given "ana" has added the major progression "I-IV-V" to the drills
     When a student lists the progressions

@@ -230,13 +230,11 @@ Feature: Grade a practice answer into evidence
     When "alice" taps the sevenths "B C G# G" within their bars in a take of "major/Imaj7-iih7-viio7-bVImaj7" in C at 120 BPM
     Then "alice" has auto-graded evidence for that guide tone that is right
 
-  @wip
   Scenario: In a minor progression, a chord with no written seventh asks natural minor's seventh
     Given the drills have the created progression "minor/i-bVII-bVI-V" with the bars i ♭VII ♭VI V
     When "alice" taps the sevenths "G F E D" within their bars in a take of "minor/i-bVII-bVI-V" in Am at 120 BPM
     Then "alice" has auto-graded evidence for that guide tone that is right
 
-  @wip
   Scenario: A made-up wrong answer picked is graded wrong
     Given the drills have the created progression "major/I-IV-V" with the bars I IV V
     When "alice" answers the chart progression "major/I-IV-V" in C, asked chart_to_numbers, by picking "major/I-ii-V" among "major/I-IV-V", "major/I-ii-V", "major/I-IV-I" and "major/vi-IV-V"
@@ -321,7 +319,6 @@ Feature: Grade a practice answer into evidence
     Then the answer is rejected because the choices are invalid
     And "alice" has no evidence for that question
 
-  @wip
   Scenario: A made-up wrong answer of another length yields no evidence
     Given the drills have the created progression "major/I-IV-V" with the bars I IV V
     When "alice" answers the chart progression "major/I-IV-V" in C, asked chart_to_numbers, by picking "major/I-IV-V" among "major/I-IV-V" and "major/I-IV-V-I"

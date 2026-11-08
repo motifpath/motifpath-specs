@@ -593,14 +593,12 @@ Feature: Compose a practice session
     When the progression key tour is picked for "alice"'s session with "guitar" in hand
     Then it plays 1 time through in each of at most 3 takes
 
-  @wip
   Scenario: A two-bar progression's tour plays it 8 times a take
     Given the drills have the created progression "major/I-V" with the bars I V
     And "alice" has never played the progression key tour of "major/I-V" on guitar
     When the progression key tour is picked for "alice"'s session with "guitar" in hand
     Then it plays 8 times through in each of at most 3 takes
 
-  @wip
   Scenario: A minor progression's tour goes through the relative minors, from A minor
     Given the drills have the created progression "minor/i-bVII-bVI-V" with the bars i ♭VII ♭VI V
     And "alice" has never played the progression key tour of "minor/i-bVII-bVI-V" on guitar
