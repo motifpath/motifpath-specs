@@ -1,165 +1,176 @@
 # ADR-056: First-Party Product Analytics Through Our Own Event Pipeline
 
 **Status:** Proposed
-**Date:** 2026-10-12
+**Date:** 2026-10-12, revised 2026-11-08
 **Deciders:** Gilson Yamada (Product Owner, solo engineering)
-**Task:** MOT-30 (PB-73). Related: MOT-8 (alpha observation view).
-
----
+**Task:** MOT-30 (PB-73). Builds on the MOT-8 alpha observation view.
 
 ## Context
 
-Our domain events (`lesson.*`, `exercise.*`, `practice.*`, `song_chart.*`) record what a student
-learned and practised. They do not record how the student moved through the app: when they opened
-it, which screens they visited, what they opened and left, or how many taps an item took. ADR-049
-§10 needs those numbers for its friction baseline ("taps per item, time from opening the app to the
-first item, and the share of sessions left early or abandoned"). Retention is the platform's job
-(platform-first premise), so the alpha must find the steps that make students leave before day 90.
+MotifPath needs to decide each week whether to improve onboarding, navigation, exercise content,
+practice composition, or reliability. ADR-049 calls for a friction baseline covering interactions
+per item, time to the first item, and early exits or abandonment. The current events can answer more
+than the original proposal assumed. They also have limits that can make a technical failure look
+like a hard exercise or a missing event look like a student leaving.
 
-MOT-30 asks for the questions first and a tool second. These are the questions the alpha must
-answer, and what the current events already cover:
+The baseline below is a source audit of motifpath-specs `origin/main` (0558381), motifpath-core
+`origin/dev` (800f3c4), and motifpath-web `origin/dev` (e481a73). Availability in these revisions
+does not establish deployment, event coverage in production, or enough data to draw conclusions.
 
-| # | Question | Covered today? |
-|---|---|---|
-| Q1 | What share of practice sessions are left early or abandoned? (ADR-049 §10) | Yes: `practice.session_ended` and the abandonment rule (ADR-046) |
-| Q2 | Do students reach ≥3 practice sessions a week? (PB-8 metric) | Yes, through MOT-8 |
-| Q3 | What share of first-path concept nodes is completed? (PB-8 metric) | Yes, through MOT-8 |
-| Q4 | Do students come back at day 7, 30 and 90, and after a broken streak? (ADR-051) | Yes: active days come from any event |
-| Q5 | How long from opening the app to the first item? (ADR-049 §10) | No: there is no app-open event |
-| Q6 | How many taps does an item take? (ADR-049 §10) | No: `tap_ms` measures answer speed, not taps |
-| Q7 | Where do students drop between sign-up, starting point and first lesson or practice? | Partly: the first `lesson.started` is known, the steps before it are not |
-| Q8 | Which screens are opened and left with nothing done (Discover, a song chart, a lesson)? | Partly: song charts have `opened`/`completed`; other screens have nothing |
-| Q9 | Phone, tablet or desktop? Installed PWA or browser tab? (ADR-049 §9, MOT-91) | No |
+| Question and decision it supports | Existing evidence | Remaining work |
+| --- | --- | --- |
+| Q1. Where do students leave practice, and should we shorten or reorder sessions? | `practice.session_started` records the ordered plan and pick reasons. `practice.session_ended` records answered count and explicit early exit. Missing ends can be inferred under the planned minutes plus 15 rule, and late events can reopen the session. | Report finished, explicitly ended early, inferred abandoned, and still open separately. Last recorded answer can locate a stopping region, but the plan alone cannot establish which item was shown. |
+| Q2. Are students reaching three finished sessions per week? | MOT-8 counts finished sessions by their start week in São Paulo time and shows cohort and student results. | Reuse its metric and cohort. Show starts and early exits alongside it to distinguish getting students into practice from helping them finish. |
+| Q3. Where does first-path progress stall? | MOT-8 shows completed nodes over all first-path nodes, including locked nodes, and preserves the original path when a later path replaces it. | Use node status and exposure to distinguish blocked access from poor completion after a start. Keep the original PB-8 metric as its own measure. |
+| Q4. Are students returning to learn? | MOT-8 reports last activity and quiet students. ADR-051 defines practice days and streaks. | Define signup or first eligible signed-in visit as the cohort anchor before reporting D7/D30/D90. Use qualifying learning activity for learning return and report app return separately. Include only cohorts old enough to reach each milestone. Measure return after a streak break separately. |
+| Q5. Is it slow to get to the first usable item? | Session start, lesson start, and first committed answer are available milestones. They include different amounts of setup and learning time. | Measure signed-in app ready to first usable item shown, with the share reaching it in the same visit. Also measure start to first item separately to distinguish navigation from loading. |
+| Q6. Which exercises or drills should we fix, and why? | `practice.item_answered` includes a committed response or a `not_answered` reason. Grading results and folded progress add learning evidence. The event can belong to a composed practice session or an exercise reached through `trigger_context`. | Compare exposure, answerability, incorrect outcomes, and interaction effort separately by exercise or drill and context. The current stream omits exposures with no answer, and does not count general UI interactions. |
+| Q7. Where does first-run activation stall? | Lesson and practice starts provide downstream milestones. Onboarding, starting points and enrollment have their own product state and contracts. MOT-8's first-path cohort misses students who never receive a path. | Start with all eligible new signed-in students. Verify which successful starting-point and enrollment milestones have durable, timestamped records. Instrument only missing steps. Treat direct entry and resumed students separately. |
+| Q8. Which screens are worth improving? | `song_chart.opened`, `song_chart.chord_viewed`, and `song_chart.completed` provide chart-specific evidence. Lesson and exercise lifecycle events cover some actions. | Define meaningful actions for each selected screen. Measure visits without an observed action separately from exits, deliberate reading or browsing, and unknown outcomes. |
+| Q9. Is friction concentrated in a particular app surface? | ADR-063 adds native iOS and Android shells to browser and installed PWA. | Capture coarse runtime surface and viewport class on eligible visits. Use these to explain differences in activation, load failure, or abandonment. Viewport class cannot identify physical device type. |
 
-Four questions are answered already; five need data we do not collect. The gaps are small and
-specific. The data concerns identified people, so it falls under the LGPD: we need a legal basis,
-a way to opt out, and a retention limit.
-
-Constraints: one engineer; one EC2 VM for staging and production at about $45–65 a month
-(ADR-039); an event pipeline that already exists (ingestion → MongoDB + Kafka → worker; ADR-006,
-ADR-008, ADR-011). We considered four options: our own usage events in that pipeline; PostHog
-Cloud; self-hosted PostHog; and a cookieless page-view tool (Plausible or Umami).
+Exercise lifecycle events and item evidence represent different units. `exercise.ended` describes
+an exercise lifecycle outcome. An option answer is committed when the student moves on or finishes.
+Selections changed before commit and later revisions after going back do not create additional
+evidence. The current `tap_ms` field is a server-enriched motor baseline from a tap check. Response
+`latency_ms` has type-specific timing, including a different start point for audio options.
+Timed musical taps are part of the task itself. Warm-up takes intentionally omit answer evidence.
+One multi-cell drill response can produce several evidence records under ADR-057. Use a committed
+item attempt for interaction metrics and graded evidence for learning metrics. For results after
+practice, use the folded state and the catch-up signal in ADR-066 rather than inferring progress
+from raw arrival order or the immediate session summary.
 
 ## Decision
 
-**MotifPath will collect product analytics as first-party usage events in its own event pipeline,
-limited to questions Q5–Q9 above.** No third-party analytics SDK is added. A usage event is
-collected only if it answers a listed question; a new question needs a change to this ADR's list
-first.
+MotifPath will use first-party analytics to support a weekly product review. Start with existing
+domain data and add bounded usage observations where a named decision requires them. Reuse the
+MOT-8 admin surface and give MOT-30 ownership of the new views and measurement definitions.
 
-1. **New event types** in the existing `TrackingEventBase` envelope (same `student_id`,
-   `session_id`, `occurred_at`, idempotent `event_id`):
-   - `app.opened`: sent once per browser session (`session_id`), when the signed-in app first
-     renders. Carries `window_class` (`compact` | `medium` | `expanded`, the ADR-049 size classes,
-     taken at open) and `display_mode` (`browser` | `standalone`). This answers Q5 (paired with
-     the first item event in the same `session_id`) and Q9.
-   - `app.screen_viewed`: sent on each route change. Carries `screen` (the route name, for
-     example `discover`, `song-chart`, `lesson`; never the URL, query or free text) and an optional
-     `subject_id` (the course, path, node or chart the screen shows). This answers Q7 and Q8: a
-     screen counts as "left with nothing done" when no domain event follows it before the next
-     `app.screen_viewed`.
-   - `screen` is a string with a pattern (`^[a-z][a-z0-9-]{0,63}$`), not an enum, so a new route
-     does not need a spec change.
-2. **Taps per item (Q6)** is a new optional `taps` integer on `practice.item_answered`: the number
-   of pointer-downs inside the Practice Shell from the moment the item is shown until the answer is
-   committed (ADR-049 commit rules), including the committing tap.
-3. **The funnel starts at sign-in (Q7).** Events need an authenticated `student_id`, so nothing is
-   collected before sign-up. Landing visits are counted only in aggregate from the web server's
-   access log, never linked to a person. Sign-ups come from Clerk.
-4. **The pipeline is unchanged.** Ingestion validates and stores `app.*` events like any other and
-   publishes them to the same topic (ADR-006). The Aggregation Worker ignores them, as it already
-   ignores event types it has no rule for. `taps` does not change grading or evidence (ADR-046).
-5. **Privacy (LGPD):**
-   - *Legal basis:* legitimate interest (improving the service the student uses), stated in the
-     privacy notice. Domain events stay under contract performance, since the product needs them.
-   - *Opt-out:* a "Share usage data" setting, on by default. When it is off, the client sends no
-     `app.*` events and leaves out `taps`. Domain events are not affected.
-   - *Minimisation:* no IP address, user-agent string, URL, coordinates or free text in usage
-     events. Device information is reduced to `window_class` and `display_mode`.
-   - *Retention:* `app.*` events are deleted 12 months after `occurred_at` (a TTL index in
-     MongoDB); weekly aggregates without identities may be kept. Deleting an account deletes them
-     along with the student's other events.
-6. **Answers are read in MOT-8.** The alpha observation view shows Q1–Q9 weekly, so the team
-   needs no custom SQL (MOT-30's success metric). Building those views is MOT-8's scope; this ADR
-   only provides the data.
+### 1. Start with decisions the existing evidence supports
+
+Add an aggregate weekly view over existing events and folded state. Show weekly finished-session
+and first-path targets, session outcomes, and exercise and drill diagnostics. Join planned items
+to practice activity using student and practice session IDs and the planned item identity. Where
+the same identity recurs, preserve occurrence and order when the data supports that attribution.
+Keep ambiguously matched items in an explicit unknown bucket. Preserve attempt context, exercise or
+drill kind, subject, and relevant rung when available. Keep missing dimensions visible.
+
+Show `not_answered` reasons independently of grading failures and incorrect answers. Compare
+results by modality and content or plan revision when identifiable. Separate authored exercises
+from generated drills, warm-ups, and self-rated or instrument work. Do not count a multi-cell
+response as several attempts or use the number of stored evidence rows as a denominator for UX
+rates. Verify the coverage of each active client path before publishing comparable rates.
+
+### 2. Instrument the missing journey milestones
+
+Use the existing authenticated ingestion boundary and idempotent event identity. Define a small
+allowlist of usage milestones in the follow-up spec:
+
+- Signed-in app ready, once per authenticated app instance, with coarse runtime surface
+  (browser, installed PWA, native iOS, native Android, or unknown) and viewport class.
+- Entry into selected screens, using a stable route category and a typed subject reference where
+  needed. Record initial entry and meaningful screen or subject changes. Assign a visit identity
+  so repeated visits to the same screen can be distinguished.
+- First usable presentation of an eligible item attempt. Link it to the screen visit and, when
+  available, the practice session or exercise context. Distinguish presented, failed to render,
+  and unknown when calculating exposure-based rates.
+- Successful onboarding or starting-point milestones only where a timestamped authoritative
+  record cannot answer the funnel question.
+
+Define the join between a presentation and a committed answer in the contract. The current
+`session_id` is scoped to an SPA load and changes on reload. `practice_session_id` identifies the
+practice run. Neither identifies a screen visit or a repeated item exposure. Keep the initial
+measurement bounded to a single authenticated app instance and define what happens on reload,
+backgrounding, and account changes. Use authenticated student identity for cohort return.
+
+Pilot interaction counting only on comparable authored choice items where it can inform a design
+change. Count deliberate UI actions from usable presentation to commit, including explicit
+submission when applicable. Define keyboard, touch, and pointer treatment and separate audio
+playback controls and musical input. Keep this optional usage data outside grading and learning
+evidence. Compare only instrumented item types and show the measured share. Extend collection to
+uncommitted attempts only when an exit can be observed reliably and the data changes a decision.
+
+### 3. Make the weekly view useful for prioritization
+
+For each actionable rate, show the count, denominator, cohort, observation window, data coverage,
+and comparison period. Report median and a tail percentile for latency only when volume supports
+it. Use event occurrence time for behavior and ingestion time for lag and completeness checks.
+Deduplicate retries by event ID, allow a reporting grace window, and revise recent periods when
+late data changes outcomes. Keep ambiguous joins, open visits, and missing observations visible.
+The current web emitter retries briefly and can lose pending events on close. An offline delivery
+guarantee needs its own contract and verification.
+
+Use the following interpretation in weekly review:
+
+| Pattern | Decision it informs |
+| --- | --- |
+| Many eligible students stall before the first usable item, while students who reach it finish | Prioritize the entry or setup step with the largest observed loss. |
+| Render or media failures cluster by surface or exercise | Prioritize the affected reliability or compatibility fix. |
+| Comparable exposures produce many wrong answers with little technical failure | Inspect the prompt, answer options and prerequisite material before revising content. |
+| Early exits cluster at a plan position, pick reason, or session duration | Inspect composition and session pacing. Compare similar cohorts and modalities. |
+| A flow is slow or interaction-heavy, but completion and return are stable | Estimate affected students and compare against higher-impact work before prioritizing it. |
+
+For a priority decision, record the affected students, severity, confidence in the measurement,
+and a candidate change with a metric to check afterward. Use aggregate drill-down and small
+samples of sessions to investigate. Report small cohorts with counts and avoid causal claims
+from observational comparisons. Validate with scripted journeys including retries, skipped items,
+opt-out, and reloads, then reconcile a sample of real observations against source records.
+Success means the team can answer the weekly questions and document a priority decision from the
+admin view without custom SQL.
+
+### 4. Keep usage data separate from learning obligations
+
+Keep usage observations separately identifiable and enforce an independently testable collection,
+access, retention, and deletion policy. Reuse the ingestion boundary while choosing the storage
+and routing in the follow-up spec. Learning folds must remain independent of optional usage
+events. If an optional usage field travels on a domain event, its retention and deletion must be
+enforced independently. Prefer separable usage records where mixed retention would make that hard.
+
+Before rollout, approve the legal basis, default and preference behavior, notice, retention, and
+processor and region inventory. ADR-062 documents AWS resources in Ohio and use of Atlas. The
+original assumption that first-party analytics avoids international transfers cannot be used as
+approval evidence. The original 12-month raw-data period is a proposal to evaluate against the
+cohort windows, access needs and deletion obligations.
+
+Specify authenticated preference enforcement for new and queued usage data, including opt-out and
+account switches. Preserve learning activity when usage collection is disabled. Exclude URLs,
+query terms, free text, raw IPs, user agents, and coordinates from the usage payload. Restrict
+identifiable drill-down to authorized administrators and show usage coverage next to opt-in or
+opt-out affected rates. Define deletion across raw data, derived views and applicable copies before
+enabling collection.
 
 ## Rationale
 
-- **The gaps are five narrow questions, not a general need for analytics.** Two event types and one
-  field close them. A full analytics product mostly adds what we said we would not do: "tracking
-  everything with no question in mind" (MOT-30 business risk).
-- **The answers come from joining usage with learning.** Q5 pairs `app.opened` with the first
-  item; Q8 asks whether a domain event followed a screen. In our own store this is a query on one
-  collection keyed by `student_id` and `session_id`. With an external tool we would have to send
-  learning events there too, or join two systems.
-- **No personal data leaves our infrastructure.** This keeps the LGPD position simple: no
-  international transfer, no processor agreement, no consent banner for a third-party SDK, and one
-  place to delete data from.
-- **It fits the budget and the stack.** It uses the ingestion service, envelope, idempotency rules
-  and offline outbox (ADR-049 §9, ADR-012) we already have, at no extra cost.
-
-Rejected alternatives:
-
-- **PostHog Cloud.** It has ready-made funnels, retention charts and session replay, so it would
-  meet the "no custom SQL" metric with no view work. It was rejected for now because it sends
-  student behaviour to a third party outside Brazil (international transfer, processor agreement,
-  consent banner), adds an SDK to a PWA that must work offline, and duplicates learning events we
-  would need for the joins. **Revisit** if the MOT-8 views become a maintenance burden, or if a
-  question needs session replay or heatmaps.
-- **Self-hosted PostHog.** It keeps the data in-house, but its stack (ClickHouse, Kafka, PostgreSQL,
-  Redis) needs much more memory than the single ADR-039 VM has. That means a second machine and a
-  second system to run, for one engineer.
-- **Plausible or Umami (cookieless page views).** They are cheap and need no consent, but they are
-  anonymous by design. They can count screens, but they cannot answer Q5–Q8, which need to tie a
-  screen to the same student's next learning event.
-- **Domain events only.** No new data and no privacy work, but it leaves the ADR-049 baseline
-  (Q5, Q6) and the funnel (Q7, Q8) without numbers, so the redesign could not be compared before
-  and after.
+- **Existing domain data first.** It answers several prioritization questions at lower
+  instrumentation cost and preserves established practice and path semantics. It cannot show
+  pre-answer friction or provide reliable denominators for screen and item exposure.
+- **Bounded first-party instrumentation.** Authenticated milestones can be joined to learning
+  outcomes with a controlled schema. The team owns the reports, validation and retention.
+- **Hosted or self-hosted general-purpose analytics.** Defer a tool such as PostHog until the
+  weekly view demonstrates a material reporting gap or maintenance cost. Reassess hosting,
+  integrations, access, privacy and operating cost against that gap before selecting a vendor.
+- **Aggregate page-view tools.** Page counts can show traffic distribution. They cannot answer
+  whether a particular practice attempt followed an eligible exposure.
 
 ## Consequences
 
-### Positive
+- MOT-8's existing PB-8 metrics can anchor the weekly review. New MOT-30 work adds decision views
+  and fills the exposure gaps in stages.
+- App, visit, practice session, item attempt and evidence identities need separate definitions.
+  Correlation coverage will vary by client version, surface and usage preference.
+- New events add ingestion, storage and maintenance cost. Bound the event allowlist and validate
+  volume before rollout.
+- The next spec must define cohort rules, eligible milestones, joins, missingness, privacy and
+  admin access, with Gherkin cases before implementation.
 
-- The ADR-049 friction baseline and the first-run funnel become measurable with no new vendor or
-  cost.
-- Usage and learning data sit in one store and can be joined by `student_id` and `session_id`.
-- Personal data stays on our infrastructure. Opt-out, retention and deletion are each implemented
-  in one place.
-- The question list keeps collection bounded: every event type has a named question.
+## Related ADRs and contracts
 
-### Negative / Trade-offs
-
-- We build and maintain the charts ourselves (in MOT-8). There are no ready-made funnels, cohorts,
-  session replay or heatmaps.
-- Before sign-up we see only aggregate access-log counts, so we cannot follow one visitor from
-  the landing page to sign-up.
-- Usage events from a student who opted out are missing. Q5–Q9 then describe only the students who
-  share data, and the share of students who opt out has to be reported next to them.
-- `app.screen_viewed` is the most frequent event. It increases ingestion traffic and MongoDB size
-  (bounded by the 12-month TTL).
-- Legitimate interest with opt-out is our reading of the LGPD, not legal advice. It should be
-  checked with someone qualified before production (PB-8a).
-
-### Neutral
-
-- `TrackingEventBase` gains `app.opened` and `app.screen_viewed` in its closed `event_type` enum
-  (with the matching schemas); `practice.item_answered` gains optional `taps`.
-- The privacy notice and the settings page gain a "Share usage data" entry.
-- ADR-003 observability (traces, logs, metrics) stays separate. It is about the system's health,
-  not how students use the app.
-
-## Related ADRs
-
-- ADR-003: Observability stack — operational telemetry, deliberately separate from product analytics.
-- ADR-006 / ADR-008 / ADR-011: Kafka topology, MongoDB event storage, aggregation worker — the
-  pipeline the usage events reuse; the worker ignores them.
-- ADR-012: Idempotency — usage events keep the `event_id` contract.
-- ADR-039: Single-VM hosting — the budget that rules out self-hosted PostHog.
-- ADR-046: Evidence-based practice — source of Q1; `taps` does not affect evidence.
-- ADR-049: Practice-first experience language — §10 baseline (Q5, Q6), §9 offline outbox, size
-  classes used by `window_class`.
-- ADR-051: Home minutes and day streak — the streak-return question in Q4.
-
----
-
-*This ADR was proposed on 2026-10-12. To revise, create a new ADR with Status: Supersedes ADR-056.*
+- ADR-006, ADR-008, ADR-011, ADR-012 and ADR-014 cover the event pipeline, storage, aggregation,
+  idempotency and identity.
+- ADR-046, ADR-049, ADR-051, ADR-052 and ADR-057 cover practice evidence, friction, streaks,
+  starting points and the current drill model.
+- ADR-061, ADR-062, ADR-063 and ADR-066 cover timed practice, hosting, native shells and
+  asynchronous practice summary reads.
+- Current contracts reviewed include `openapi/components/schemas/events.yaml`,
+  `openapi/components/schemas/practice.yaml`, and
+  `features/core-domain/alpha-observation.feature`.
