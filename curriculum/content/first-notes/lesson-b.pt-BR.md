@@ -11,15 +11,15 @@ concept_keys: [tones-and-semitones, sharps-and-flats, major-scale]
 curriculum_participation: standalone
 ---
 
-# Tons e semitons: encontre a próxima nota
+# Nem todo passo é igual: o padrão da escala maior
 
 ## Para que você vai usar isso?
 
-Uma orientação como **“suba um tom a partir de Fá”** precisa virar um movimento concreto. Ao contar tons e semitons, você encontra a próxima nota de uma melodia usando as teclas ou as casas de uma referência.
+Você quer improvisar, criar seus próprios solos e tocar uma música no tom de quem canta. Para isso, precisa saber quais notas cabem na música. A **escala maior** é o primeiro mapa, e ela nasce de passos de **tom** e **semitom**.
 
-Esse raciocínio também ajuda a entender **escalas**, porque cada uma organiza distâncias entre notas. Depois, ao estudar **transposição**, você poderá mudar a nota inicial preservando as distâncias de uma melodia. Os **intervalos** usados para estudar acordes e campo harmônico também dependem dessas distâncias.
+Contar esses passos também transforma uma orientação como **“suba um tom a partir de Fá”** em um movimento concreto no teclado ou no braço. Depois, ao estudar **transposição**, você poderá mudar a nota inicial preservando as distâncias de uma melodia. Os **intervalos** usados para estudar acordes e campo harmônico também dependem dessas distâncias.
 
-**Hoje você vai contar um ou dois semitons e usar essa contagem no exemplo de Dó maior.** Não precisa construir acordes, transpor uma escala inteira nem reconhecer intervalos de ouvido. Todas as atividades têm uma forma de responder sem instrumento.
+**Hoje você vai contar um ou dois semitons e usar essa contagem no exemplo de Dó maior.** Não precisa improvisar ainda, construir acordes, transpor uma escala inteira nem reconhecer intervalos de ouvido. Todas as atividades têm uma forma de responder sem instrumento.
 
 ## Uma referência rápida para começar
 
@@ -29,7 +29,7 @@ A referência essencial também está aqui: **Dó=C, Ré=D, Mi=E, Fá=F, Sol=G, 
 
 ## A menor contagem que vamos usar
 
-Nos exemplos desta lição, a oitava está dividida em **12 semitons iguais**. Um **semitom** corresponde a um passo entre alturas vizinhas nesse sistema. Um **tom** corresponde a dois desses passos.
+Nos exemplos desta lição, a oitava está dividida em **12 semitons iguais**. Um **semitom** é **meio tom**: um passo entre alturas vizinhas nesse sistema. Um **tom** corresponde a dois desses passos.
 
 No teclado, siga para a **próxima tecla**, seja ela branca ou preta. Na mesma corda da guitarra ou do baixo, siga para a **próxima casa**. Cada um desses movimentos sobe um semitom nos exemplos mostrados.
 
@@ -72,7 +72,7 @@ Use a figura e responda antes de conferir a explicação. Se preferir, leia a se
 
 ## A mesma contagem na corda Mi
 
-Nos desenhos, a corda Mi grave tem o nome indicado e uma linha mais grossa. O círculo vazio está antes da pestana e representa a corda solta. Os outros pontos ficam dentro das casas. Cada marca é uma posição alternativa na mesma corda.
+Nos desenhos, a corda Mi grave tem o nome indicado e uma linha mais grossa. O círculo vazio está antes do nut e representa a corda solta. Os outros pontos ficam dentro das casas. Cada marca é uma posição alternativa na mesma corda.
 
 Na guitarra com afinação padrão, a sexta corda solta é **E2**. No baixo de quatro cordas com afinação padrão, a quarta corda solta é **E1**. Os nomes se repetem em registros diferentes.
 
@@ -135,6 +135,8 @@ Não precisamos transpor essa escala agora. Primeiro, vamos usar a referência p
 Leia **Dó–Ré–Mi–Fá** na referência. Os movimentos são um tom, um tom e um semitom. O último deslocamento é menor, embora todos avancem para o próximo nome da sequência.
 
 Aponte cada nota e explique a distância até a seguinte. Se você conta cada mudança, inclui a tecla ou casa intermediária e distingue um de dois semitons, realizou o objetivo desta lição com apoio. Isso ainda não mede sua velocidade, sua execução ou sua capacidade de identificar essas distâncias apenas pelo som.
+
+Lembra do objetivo do começo: improvisar e tocar no tom de quem canta? Você já vê o padrão que organiza a escala maior, T–T–S–T–T–T–S. É com esse mapa que, nas próximas lições, você vai montar escalas em outros tons e improvisar com elas.
 
 Para continuar, escolha outro par na régua e refaça a contagem. Depois você poderá usar o mesmo raciocínio para estudar outras escalas, transpor pequenas melodias e compreender os intervalos que formam os acordes.
 
