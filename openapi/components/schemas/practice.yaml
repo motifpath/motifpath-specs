@@ -22,12 +22,12 @@ PracticeItemKey:
     - chord_function:<key>:<numeral> — a numeral's harmonic function in a major key: picking
       the function of its chord, or its chord for the function.
     - chart_progression:<progression key> — a drill progression read
-      as a chart: picking the progression for four chords, or its chart for the progression.
+      as a chart: picking the progression for its chords, or its chart for the progression.
       The key is picked each time it is asked, so one item covers every key.
     - heard_chord:<numeral> — a numeral recognised by ear in a key a cadence sets. The key is
       picked each time.
-    - heard_progression:<progression key> — a progression recognised by ear. The key is
-      picked each time.
+    - heard_progression:<progression key> — a drill progression of 2 to 4 bars recognised by
+      ear. The key is picked each time.
     - chord_voicing:<diagram id> — playing one chord voicing cleanly, untimed.
     - root_fifth:<layout instrument id>:<chord> — playing a chord's root and fifth on a bass
       layout, cleanly, untimed.
@@ -285,19 +285,21 @@ GeneratedChoiceResponse:
       items:
         type: string
         minLength: 1
-        maxLength: 120
+        maxLength: 200
       description: |
         The options as shown, in the order shown. What an option is depends on the way: a
         chord symbol (a root, then m, dim or nothing: G, Em, F#dim) for numeral_to_chord and
         function_to_chord; a numeral (I ii iii IV V vi viio) for chord_to_numeral,
         cadence_then_chord and see_then_name; tonic, subdominant or dominant for chord_to_function; a progression
-        key for chart_to_numbers and progression_by_number; a chart, the progression's chord
+        key for chart_to_numbers and progression_by_number (a drill progression's, or the key a
+        wrong answer the server made up would have if an admin created it, such as
+        major/I-ii-IV-V); a chart, the progression's chord
         symbols one per bar separated by single spaces (G D Em C), for numbers_to_chart. A
         chord's root may be spelled either way (F# or Gb).
     choice:
       type: string
       minLength: 1
-      maxLength: 120
+      maxLength: 200
       description: The option the student picked, spelled as shown.
     latency_ms:
       type: integer
@@ -350,9 +352,12 @@ GeneratedChoiceWay:
 
 MusicKey:
   type: string
-  enum: [C, Db, D, Eb, E, F, F#, G, Ab, A, Bb, B]
+  enum: [C, Db, D, Eb, E, F, F#, G, Ab, A, Bb, B, Cm, Dbm, Dm, Ebm, Em, Fm, F#m, Gm, Abm, Am, Bbm, Bm]
   description: |
-    A major key. In a response, the key a question was asked in or a take was played in when
+    A major key, written as its tonic (C), or a minor key, written as its tonic chord (Am). Roots
+    are spelled as the chord catalog spells them, in minor keys too (Dbm, not C#m). A minor
+    progression is asked and played only in minor keys, a major one only in major keys. In a
+    response, the key a question was asked in or a take was played in when
     its item doesn't fix one: a chart progression, a heard chord, a heard progression, a guide
     tone or a progression key tour; absent in a response to any other item. A planned question
     always names its key.
@@ -379,8 +384,11 @@ TimedTapsResponse:
       description: |
         The chord tone asked for every chord: 3 = its third; 7 = its seventh:
         a written suffix decides (maj7 is the major seventh, 7 and ø7 the minor seventh, °7 the
-        diminished seventh); a chord with no written seventh takes the major seventh on I and IV
-        and the minor seventh on any other numeral, in or out of the key.
+        diminished seventh); a chord with no written seventh takes its key's seventh. In a major
+        progression, the major seventh on I and IV and the minor seventh on any other numeral. In
+        a minor progression, the seventh natural minor gives it: m7 on i, iv and v, ø7 on ii°,
+        maj7 on ♭III and ♭VI, 7 on ♭VII; 7 on V and °7 on vii°, from harmonic minor; on any other
+        numeral, maj7 on a major chord, m7 on a minor one and ø7 on a diminished one.
     tempo_bpm:
       type: integer
       minimum: 1
@@ -1026,9 +1034,9 @@ GeneratedChordDrawing:
   description: |
     How the question draws its chords, in the stimulus and in the options. chord_boxes = a
     chord box per chord, unnamed until answered, from the voicing the plan names (guitar,
-    four-bar charts); chord_symbols = the chord symbol (bass, and every 12-bar chart). A 12-bar
-    chart is laid out in three lines of four bars. A session in the head reads chords the way
-    of the student's fretboard layout: guitar or bass, taking turns from one session in the
+    charts of up to four bars); chord_symbols = the chord symbol (bass, and every chart of more
+    than four bars). A chart of more than four bars is laid out in lines of four bars. A
+    session in the head reads chords the way of the student's fretboard layout: guitar or bass, taking turns from one session in the
     head to the next for a student who plays both, and chord symbols for a student who plays
     neither. Every generated harmony question of a session reads them the same way.
 
@@ -1088,7 +1096,7 @@ GeneratedChoicePlayback:
       description: |
         The bars in the order they play. cadence_then_chord: the cadence I IV V I with their
         numerals, or only I with its numeral once the student is accurate on the item, then the
-        asked chord with no numeral. progression_by_number: the progression's four bars, none
+        asked chord with no numeral. progression_by_number: the progression's bars, 2 to 4, none
         with a numeral.
   additionalProperties: false
   required:
@@ -1154,7 +1162,7 @@ GeneratedChoiceQuestion:
         type: string
         pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
       description: |
-        The chart the question shows, one chord symbol per bar (four or twelve), for
+        The chart the question shows, one chord symbol per bar (2 to 16), for
         chart_to_numbers. Empty for every other way.
     drawn_as:
       $ref: '#/GeneratedChordDrawing'
@@ -1168,7 +1176,7 @@ GeneratedChoiceQuestion:
           value:
             type: string
             minLength: 1
-            maxLength: 120
+            maxLength: 200
             description: |
               The option as the response sends it back: a chord symbol, a numeral, a function, a
               progression key, or a chart (its chord symbols one per bar, separated by single
@@ -1197,9 +1205,13 @@ GeneratedChoiceQuestion:
       description: |
         The options in the order to show them, already shuffled; all seven numerals come in scale
         order instead, since where one sits then says nothing. Different from one another,
-        each a possible answer to the way, the right one among them: four, two for a 12-bar
-        progression, and all seven numerals for a heard chord once the student is fluent on it.
-        Which are offered follows the drill catalog's harmony and ear rules.
+        each a possible answer to the way, the right one among them: four, two for a progression
+        of more than four bars, and all seven numerals for a heard chord once the student is
+        fluent on it. Which are offered follows the drill catalog's harmony and ear rules: a
+        progression's wrong answers are drill progressions of its length and mode, then, when
+        those are too few, progressions the server makes up by changing one of its bars. A
+        made-up one is offered as the progression it would be if an admin created it: its key,
+        its name (its numerals joined by –) and its chart.
     voicings:
       type: array
       items:
@@ -1422,8 +1434,9 @@ PlannedProgressionKeys:
       type: integer
       minimum: 1
       description: |
-        How many times one take plays the progression after its bar of count-in: 4 for a
-        four-bar progression, 1 for a 12-bar blues.
+        How many times one take plays the progression after its bar of count-in: as many whole
+        times as fit in 16 bars, at least once (8 for a two-bar progression, 4 for a four-bar
+        one, 1 for a 12-bar blues).
     takes:
       type: integer
       minimum: 1
@@ -1461,7 +1474,8 @@ PlannedProgressionKeys:
             description: Whether the key is clean at the tour tempo.
           chart:
             type: array
-            minItems: 4
+            minItems: 2
+            maxItems: 16
             items:
               type: string
               pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
@@ -1564,8 +1578,11 @@ PlannedGuideTone:
         The chord tone asked of every chord: 3 = its third, until the student is accurate on the
         item; 7 = its seventh from then on:
         a written suffix decides (maj7 is the major seventh, 7 and ø7 the minor seventh, °7 the
-        diminished seventh); a chord with no written seventh takes the major seventh on I and IV
-        and the minor seventh on any other numeral, in or out of the key.
+        diminished seventh); a chord with no written seventh takes its key's seventh. In a major
+        progression, the major seventh on I and IV and the minor seventh on any other numeral. In
+        a minor progression, the seventh natural minor gives it: m7 on i, iv and v, ø7 on ii°,
+        maj7 on ♭III and ♭VI, 7 on ♭VII; 7 on V and °7 on vii°, from harmonic minor; on any other
+        numeral, maj7 on a major chord, m7 on a minor one and ø7 on a diminished one.
     tempo_bpm:
       type: integer
       minimum: 20
@@ -1588,8 +1605,8 @@ PlannedGuideTone:
       $ref: '#/FretWindow'
     bars:
       type: array
-      minItems: 4
-      maxItems: 12
+      minItems: 2
+      maxItems: 16
       items:
         type: object
         properties:

@@ -25,7 +25,7 @@ Each file holds:
     family and member, and its positions with their intervals.
   - `shape_families`: each shape family's members, in the order they are offered.
   - `progressions`: the drill progressions by key, catalog and created alike, with their
-    numerals one bar each. Keys, numerals, chords and chord tones are computed, so they have no reference.
+    numerals one bar each and their `mode` (major when absent). Keys, numerals, chords and chord tones are computed, so they have no reference.
   - `song_charts`: the song charts that exist, by id.
 - `cases`: each case is an `item_key`, a raw `response` (as a client sends it in
   `practice.item_answered`) and the `expected` result. The result is either
@@ -43,8 +43,9 @@ Each file holds:
     `progression_keys` and `song` → `self_rating.v1`
   - `diagram_shape` → `diagram_shape.v1`
   - `diatonic_chord`, `chord_function`, `chart_progression`, `heard_chord` and
-    `heard_progression` → `generated_choice.v1`
-  - `guide_tone` → `timed_taps.v1`
+    `heard_progression` → `generated_choice.v2` (`generated_choice.v1` before the release that
+    took any created progression into the drills; its file stays for the evidence it graded)
+  - `guide_tone` → `timed_taps.v2` (`timed_taps.v1` before that release)
 - **Checks run in this order, and the first failure is the rejection:**
   1. The response type fits the item kind (`response_does_not_fit_item`).
   2. What the key points at exists (`unknown_reference`).
@@ -83,7 +84,11 @@ Each file holds:
 ### Music in the new graders
 
 - **A key** is a major key, spelled as the chord catalog spells roots (C D♭ D E♭ E F F# G A♭ A
-  B♭ B, written `Db`, `Eb`, `Ab`, `Bb`).
+  B♭ B, written `Db`, `Eb`, `Ab`, `Bb`). From the v2 graders on, it may also be a minor key,
+  written as its tonic chord with the same root names (`Cm Dbm Dm Ebm Em Fm F#m Gm Abm Am Bbm
+  Bm`). A minor progression is asked in a minor key and a major one in a major key; any other
+  pairing is `response_does_not_fit_item`. A minor key's chart is spelled from its tonic with
+  the same root names: `i–♭VII–♭VI–V` in D♭ minor is `Dbm B A Ab`.
 - **The numerals** are I ii iii IV V vi viio (vii°), and their chords are the key's triads:
   major on I IV V, minor on ii iii vi, diminished on viio.
 - **A progression's bars** also take any numeral `progression_numeral.v1` reads, in a major key:
@@ -193,6 +198,23 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
 - Right when the pick is the right answer.
 - `latency_ms` and `audio_ms` are copied as for every auto-graded answer.
 
+### `generated_choice.v2`
+
+Every `generated_choice.v1` rule, with minor keys (above), and with these possible answers for
+a progression question, since the server makes up wrong answers when too few drill
+progressions fit:
+
+- `chart_to_numbers` and `progression_by_number`: a drill progression's key, or a made-up
+  progression's: a created progression's key form (`major/I-ii-V`) whose numerals read under
+  `progression_numeral.v1`, whether or not a progression has it;
+- `numbers_to_chart`: a chart in `music_key` whose chords read as chord symbols;
+- either way, of the asked progression's bar count and mode. A drill progression of another
+  length or mode, or a made-up one, is `invalid_choices`. A catalog-form key no drill
+  progression has is still `invalid_choices`.
+
+So a chart of the right length that no drill progression has, which `generated_choice.v1`
+refused, is a possible answer.
+
 ### `timed_taps.v1`
 
 - The layout in the key and the progression must exist (`unknown_reference`). A tap on a
@@ -214,6 +236,14 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
   `note_name` and `hit`.
 - The evidence carries no tempo of its own: a right take's fluency is measured from the
   `tempo_bpm` and `note_value` of the response it keeps (see the drill catalog's "Guide tones").
+
+### `timed_taps.v2`
+
+Every `timed_taps.v1` rule, with minor keys (above). In a minor progression, a chord with no
+written seventh takes the seventh natural minor gives it: m7 on i, iv and v, ø7 on ii°, maj7 on
+♭III and ♭VI, 7 on ♭VII; harmonic minor's 7 on V and °7 on vii°; on any other numeral, the
+seventh of its quality (maj7 on a major chord, m7 on a minor one, ø7 on a diminished one). A
+written seventh still decides. Major progressions are graded exactly as by `timed_taps.v1`.
 
 ### `multi_tap.v2`
 

@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.64.1
+  version: 0.65.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -3253,10 +3253,11 @@ paths:
       summary: Add a created progression to the drills
       description: |
         Makes a chart-only progression a drill progression, practising the given skills and
-        concepts. It is refused, with every reason, unless the progression has 4 or 12 bars, is
-        in a mode the drills support (major), and at least one other drill progression has the
-        same bar count. Drills offer as its wrong answers the drill progressions with the same
-        bar count that share the most chords with it, bar by bar, those in the same mode first.
+        concepts. It is refused, with every reason, when the progression has a single bar, which
+        is a chord, not a progression. Its wrong answers are the drill progressions with its bar
+        count and its mode that share the most chords with it, bar by bar; when those are too
+        few, drills make up the rest each time they ask it, by changing one of its bars. Drills
+        ask it in keys of its mode, and by ear only when it has 2 to 4 bars.
         There is no way back: a drill progression stays in the drills. Only admins may add a
         progression to the drills.
       tags:
@@ -14204,7 +14205,7 @@ components:
             $ref: '#/components/schemas/ProgressionNumeral'
           description: |
             One numeral per bar, such as I V vi IV, or I7 IV7 V7 for a dominant seventh. A
-            four-bar progression has four, a 12-bar form twelve.
+            four-bar progression has four, a 12-bar form twelve. Drills take 2 to 16.
         borrowed_bars:
           type: array
           uniqueItems: true
@@ -14224,8 +14225,9 @@ components:
           items:
             $ref: '#/components/schemas/ProgressionKey'
           description: |
-            The keys of the drill progressions drills offer as its wrong answers, closest first;
-            empty for a progression that isn't in the drills.
+            The keys of the drill progressions drills offer as its wrong answers, closest first,
+            all with its bar count and mode; empty for a progression that isn't in the drills, and
+            possibly empty for one that is, whose wrong answers drills then make up.
         names:
           $ref: '#/components/schemas/LocalizedNames'
           description: The progression's name in each language, such as "I–V–vi–IV (pop)".
@@ -14404,10 +14406,9 @@ components:
               - unsupported_mode
               - no_other_drill_progression
           description: |
-            already_in_drills: it is a drill progression already. unsupported_bar_count: drills
-            ask 4- and 12-bar progressions only. unsupported_mode: drills don't ask its mode yet.
-            no_other_drill_progression: no other drill progression has its bar count, so drills
-            have no wrong answer to offer.
+            already_in_drills: it is a drill progression already. unsupported_bar_count: it has a
+            single bar. unsupported_mode and no_other_drill_progression are no longer returned:
+            drills ask both modes, and make up wrong answers when too few drill progressions fit.
       additionalProperties: false
       required:
         - message

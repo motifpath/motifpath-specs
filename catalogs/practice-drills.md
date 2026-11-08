@@ -137,7 +137,11 @@ and the progression catalog, never authored, and recalled in the head on every i
     a question about it would answer itself. The I chord still appears as an option and in
     every chart.
   - `chart_progression`: every progression of the progression catalog, asked in a key picked
-    each time.
+    each time. A drill progression has 2 to 16 bars, in a major or a minor key.
+  - **A minor progression is asked in minor keys, a major one in major keys.** A minor key is
+    written as its tonic chord, with the roots spelled as the chord catalog spells them: `Cm
+    Dbm Dm Ebm Em Fm F#m Gm Abm Am Bbm Bm`. Its chart is spelled from that tonic, so in A minor
+    `i–♭VII–♭VI–V` is Am–G–F–E. Apps show a minor key by its name, "A minor" ("Lá menor").
   - They roll up to the nodes of the families table, and a chart progression also to its
     progression's nodes. They suit every instrument, so a student who plays guitar and bass
     practises one set. Like fretboard cells, they are practised in the head only.
@@ -157,9 +161,18 @@ and the progression catalog, never authored, and recalled in the head on every i
   - chord to function: tonic, subdominant and dominant;
   - function to chord: one chord of the key with the asked function, and three of the key's
     chords with other functions;
-  - read the chart and pick the chart: the progression, then its confusables, then theirs, up
-    to four, all with as many bars as the progression. The two 12-bar forms are confusable
-    only with each other, so they offer two.
+  - read the chart and pick the chart: four options for a progression of up to four bars, two
+    for a longer one. They are the progression, then its confusables, then theirs, all with as
+    many bars as the progression and in its mode; then, when those are too few, wrong answers
+    made up for this question (below).
+  - **A made-up wrong answer** is the asked progression with one bar changed, picked at random
+    each time the question is planned. The new chord is first one the progression already plays
+    in another bar, so a blues keeps its dominant sevenths; when those give too few, a triad of
+    the mode: `I ii iii IV V vi vii°` in major, `i ii° ♭III iv v ♭VI ♭VII` in minor. Its chart
+    is never the answer's, another option's or any drill progression's of that length. It is
+    offered as the progression it would be if an admin created it: its key (`major/I-ii-IV-V`),
+    its name (its numerals joined by –) and its chart. It is never an item, and never asked next
+    to its progression in a session.
 
   A tie between equally near options is broken at random.
 - **The prompt** names the key and what the question gives (the numeral, the chord, the
@@ -169,8 +182,8 @@ and the progression catalog, never authored, and recalled in the head on every i
     box: its open voicing if the chord catalog has one, else its lowest-difficulty voicing,
     the lowest fret on a tie. The plan names the voicing, so every client draws the same box.
   - On bass, a chord is its chord symbol.
-  - A four-bar chart is drawn as boxes on guitar and as symbols on bass. A 12-bar chart is
-    drawn as symbols on every instrument, in three lines of four, as a blues is written.
+  - A chart of up to four bars is drawn as boxes on guitar and as symbols on bass. A longer
+    chart is drawn as symbols on every instrument, in lines of four, as a blues is written.
   - **Which reading a session uses:** harmony items are recalled in the head, where no
     instrument is in hand, so a session takes its reading from the student's fretboard
     layouts. With one of `guitar` and `electric-bass`, always that one. With both, sessions in
@@ -180,7 +193,8 @@ and the progression catalog, never authored, and recalled in the head on every i
 - **New items come key by key,** around the circle of fifths from C (C G F D B♭ A E♭ E A♭ B D♭
   F#). A student is offered the new numerals of a key before any of the next key.
 - **The key of a chart question** (rule 5) is picked among C G D F A while the student is new
-  or learning on the item, and among all 12 keys from accurate on.
+  or learning on the item, and among all 12 keys from accurate on. A minor progression's key is
+  picked among their relative minors, Am Em Bm Dm F#m, then among all 12 minor keys.
 - **Ways:** each family's two templates are each other's second way. With no right answers
   yet, numeral to chord, chord to function and read the chart come first.
 
@@ -192,8 +206,9 @@ catalog, like the harmony drills, and recognised by ear in the head on every ins
 - **Items:**
   - `heard_chord`: the numerals ii iii IV V vi viio, 6 items, each asked in a key picked each
     time among all 12. The tonic is never an item, since the cadence ends on it.
-  - `heard_progression`: every 4-bar progression of the progression catalog. The 12-bar forms
-    are never asked by ear: twelve bars are too long to hold before answering.
+  - `heard_progression`: every progression of the progression catalog with 2 to 4 bars, in a
+    key of its mode picked each time among all 12. Longer ones are never asked by ear: they are
+    too long to hold before answering.
   - They roll up to the nodes of the families table, and a heard progression also to its
     progression's nodes. Like the harmony drills, they count toward their nodes from the day
     they are installed, and suit every instrument.
@@ -202,7 +217,8 @@ catalog, like the harmony drills, and recognised by ear in the head on every ins
   - `cadence_then_chord`: I IV V I, then the asked chord, while the student is new or learning
     on the item. From accurate on, the tonic chord alone, for one bar, then the asked chord: a
     numeral still needs a key, and the tonic is the least it takes.
-  - `progression_by_number`: the progression's four bars.
+  - `progression_by_number`: the progression's bars, with no cadence, in either mode: the
+    progression sets its own key.
   - The bars that set the key show their numerals; the asked chord's bar shows "?", and a
     progression's bars show nothing. The chords are sounded, never named.
   - On a session that reads chords on bass, each chord's root also plays under it in the bass
@@ -216,8 +232,9 @@ catalog, like the harmony drills, and recognised by ear in the head on every ins
   - `cadence_then_chord` and `see_then_name`: the answer and the three numerals nearest it
     around the scale (one step away, then two), until the student is fluent on the item; then
     all seven numerals, the tonic included, in scale order.
-  - `progression_by_number`: the progression, then its confusables, then theirs, up to four,
-    all of four bars. Confusable progressions are asked next to each other in a session.
+  - `progression_by_number`: four, chosen like a chart question's: the progression, then its
+    confusables, then theirs, all of its length and mode, then made-up wrong answers. Confusable
+    progressions are asked next to each other in a session.
 - **`see_then_name`** names the key and draws the chord, a box on guitar and a symbol on bass,
   by the session's reading (the harmony drills' rule). It plays nothing. It is the ear drill's
   second way, so a lucky guess by ear meets the chord's numeral by sight; the item also comes
@@ -289,13 +306,15 @@ fourths, and so learns it by number instead of by one fingering (MOT-150).
   - at most 1 a session, played over up to 3 takes;
   - it is sized like a play-along. Each take is a bar of count-in plus its bars at the start
     tempo, then about 10 seconds to rate it.
-- **A take** plays the progression four times through (16 bars) when it has four bars, and once
-  when it is a 12-bar blues.
+- **A take** plays the progression as many whole times as fit in 16 bars, and at least once: 8
+  times for a two-bar progression, four times for a four-bar one, once for a 12-bar blues.
   - It is in 4/4, one chord a bar, after a bar of count-in.
   - The backing plays the chords in their voicings (the harmony drills' voicing rule) at the
     take's tempo and note value.
 - **The key order** is the cycle of fourths from C, the same on every instrument: C F B♭ E♭ A♭
-  D♭ F# B E A D G. Keys are spelled as the chord catalog spells roots.
+  D♭ F# B E A D G. Keys are spelled as the chord catalog spells roots. A minor progression tours
+  the minor keys, each major key replaced by its relative minor: Am Dm Gm Cm Fm B♭m E♭m A♭m D♭m
+  F#m Bm Em. "C" below is then "Am".
 - **The tour** keeps one tempo for the item, across sessions.
   - **A clean key:** a key is clean when a take in it is rated clean at an effective speed at or
     above the tour tempo. A clean take slower than the tour tempo, at a tempo the student chose,
@@ -317,7 +336,8 @@ fourths, and so learns it by number instead of by one fingering (MOT-150).
 - **How it is drawn** (Figma 17k; bass 18z):
   - the progression's name; the last clean key and tempo with the key to play ("Clean in G at
     84 BPM · now in A");
-  - the chart in chord symbols, in the take's key (a 12-bar blues in three lines of four);
+  - the chart in chord symbols, in the take's key (a chart of more than four bars in lines of
+    four);
   - the key line: five keys of the cycle around the current one, with the clean ones ticked;
   - the tempo control.
   - **On guitar**, each chord's box is shown on demand (the chord card), from the harmony drills'
@@ -346,8 +366,8 @@ improvising over changes.
     `play-chord-tone-lines` on bass.
   - An item suits the instruments of its layout.
   - Items are offered like any node's: a path skill's as new, with no prerequisite in practice.
-    A 12-bar blues is planned only once the student is accurate on `target-chord-tones`; until
-    then the four-bar progressions stand in.
+    A progression of more than four bars is planned only once the student is accurate on
+    `target-chord-tones`; until then the shorter progressions stand in.
 - **In a session**, a guide tone is a focus item of a session in the head, on a layout of the
   student's instruments:
   - never in an in-hand session: nothing is played on the instrument;
@@ -356,10 +376,13 @@ improvising over changes.
     once, then 5 seconds to see the result.
 - **What is asked** is picked each time the item is planned:
   - **the tone:** each chord's third until the student is accurate on the item, then its seventh
-    in the key (the major seventh of I and IV, the minor seventh of every other chord and of a
-    dominant seventh);
-  - **the key:** one of the 12 major keys at random, never the key of the item's last take. Every
-    take of the item in a session is in the same key;
+    in the key. A written seventh decides. A chord with no written seventh takes its key's: in a
+    major progression, the major seventh of I and IV and the minor seventh of every other chord;
+    in a minor progression, natural minor's (m7 on i, iv and v, ø7 on ii°, maj7 on ♭III and ♭VI,
+    7 on ♭VII), with harmonic minor's 7 on V and °7 on vii°. Any other numeral takes the seventh
+    its quality suggests: maj7 on a major chord, m7 on a minor one, ø7 on a diminished one;
+  - **the key:** one of the 12 keys of the progression's mode at random, never the key of the
+    item's last take. Every take of the item in a session is in the same key;
   - **the tempo:** by the student's level on the item: 60 BPM while new or learning, 72 once
     accurate, 90 once fluent. The student may change the tempo and the note value (a speed
     factor) before a take. A tempo is never graded, but it sets the take's fluency.
