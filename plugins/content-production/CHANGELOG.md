@@ -8,6 +8,7 @@
   full explanation in notes and the teacher's materials, platform resources left out.
 - Add deck principles: progressive reveal, method before demonstration, musical context,
   pictured definitions, one unit per diagram label, idiomatic titles and original art.
+- Require engraved notation and properly drawn figures instead of shape approximations.
 
 ## 1.4.1 — 2026-11-05
 

@@ -65,6 +65,11 @@ platform delivers.
 - **Openings and closings:** the application slide names the learner's goal; the success
   slide returns to that goal and the step just taken (see the
   [draft review guidelines](draft-review-guidelines.md)).
+- **Figure quality:** draw music notation with an openly licensed engraving font (for
+  example a SMuFL font under the SIL OFL) and draw organic figures such as hands as
+  proper vector line art. Do not approximate notation, anatomy or other detailed figures
+  with basic shapes or system glyphs; render them to images when native shapes fall short,
+  keep the source and alt text, and record the font licence.
 - **Third-party references:** when a reference image inspires a visual, draw an original
   version and record any convention you could not verify for musical review.
 
