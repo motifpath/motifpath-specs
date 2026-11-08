@@ -110,14 +110,12 @@ Feature: Admins create progressions for song charts
     Then the progression "major/I-iii-IV-V" is in the drills
     And it practises the concept "common-progressions"
 
-  @wip
   Scenario: An admin adds a chart-only progression to the drills later
     Given "ana" has created the major progression "I-iii-IV-V"
     When "ana" adds it to the drills, practising the concept "common-progressions"
     Then the progression "major/I-iii-IV-V" is in the drills
     And practice offers it as a subject on the concept "common-progressions"
 
-  @wip
   Scenario: Drills offer as wrong answers the drill progressions sharing the most chords
     Given "ana" has created the major progression "I-iii-IV-V"
     When "ana" adds it to the drills, practising the concept "common-progressions"
@@ -142,20 +140,17 @@ Feature: Admins create progressions for song charts
     When student "alice" starts a practice session
     Then no practice subject or song is on "major/I-bVII-IV-I"
 
-  @wip
   Scenario: A bar count drills don't ask is refused
     Given "ana" has created the major progression "I-IV-V"
     When "ana" adds it to the drills, practising the concept "common-progressions"
     Then adding is refused because "unsupported_bar_count"
     And "major/I-IV-V" is still not in the drills
 
-  @wip
   Scenario: A minor progression can't reach the drills yet
     Given "ana" has created the minor progression "i-bVI-bIII-bVII"
     When "ana" adds it to the drills, practising the concept "common-progressions"
     Then adding is refused because "unsupported_mode"
 
-  @wip
   Scenario: Adding to the drills needs a skill or a concept
     Given "ana" has created the major progression "I-iii-IV-V"
     When "ana" adds it to the drills with no skill and no concept
@@ -166,7 +161,6 @@ Feature: Admins create progressions for song charts
     Then the creation is refused because "unsupported_bar_count"
     And no progression is created
 
-  @wip
   Scenario: A drill progression can't be added again
     When "ana" adds "I-V-vi-IV" to the drills, practising the concept "common-progressions"
     Then adding is refused because "already_in_drills"
