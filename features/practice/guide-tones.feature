@@ -88,7 +88,6 @@ Feature: Tap the guide tones of a progression in time
     When "alice" composes a session with no instrument in hand
     Then the session plans the guide tone of "12-bar-blues" with 12 bars
 
-  @wip
   Scenario: A progression of more than four bars waits for target-chord-tones, as the blues does
     Given the drills have the created progression "major/I-vi-IV-V-I-vi-IV-V" with the bars I vi IV V I vi IV V
     And "alice" is learning "target-chord-tones"
@@ -96,7 +95,6 @@ Feature: Tap the guide tones of a progression in time
     When "alice" composes 10 sessions with no instrument in hand
     Then no session plans the guide tone of "major/I-vi-IV-V-I-vi-IV-V"
 
-  @wip
   Scenario: A minor progression's guide tone is planned in a minor key, never the last one
     Given the drills have the created progression "minor/i-bVII-bVI-V" with the bars i ♭VII ♭VI V
     And "alice"'s last take of the guide tone of "minor/i-bVII-bVI-V" on guitar was in Am
@@ -104,7 +102,6 @@ Feature: Tap the guide tones of a progression in time
     Then it is never planned in Am
     And every key it is planned in is a minor key
 
-  @wip
   Scenario: The plan spells a minor progression from its tonic
     Given the drills have the created progression "minor/i-bVII-bVI-V" with the bars i ♭VII ♭VI V
     And "alice" has never practised the guide tone of "minor/i-bVII-bVI-V" on guitar
