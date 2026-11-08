@@ -1,4 +1,3 @@
-@wip
 Feature: Administer and evaluate commercial activation
   Administrators change monetization flags and rollout groups through an audited admin API.
   Core decides whether a flag allows an operation's subject; the default answer is no.
