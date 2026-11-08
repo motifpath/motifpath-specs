@@ -147,6 +147,77 @@ Feature: Generated drill questions challenge the student
     Then there is one for each 4-bar progression of the progression catalog
     And none is for "12-bar-blues" or "12-bar-blues-quick-change"
 
+  @wip
+  Scenario: A heard progression has 2 to 4 bars
+    Given the drills have the created progression "major/I-V" with the bars I V
+    And the drills have the created progression "major/I-vi-IV-V-I-vi-IV-V" with the bars I vi IV V I vi IV V
+    When every heard progression item is listed
+    Then there is one for "major/I-V"
+    And none is for "major/I-vi-IV-V-I-vi-IV-V"
+
+  # Made-up wrong answers (ADR-072): when too few drill progressions share the asked one's length
+  # and mode, the rest change one of its bars, to a chord it already plays, then to a triad of its
+  # mode. Each is offered as the progression it would be if an admin created it.
+  @wip
+  Scenario: A progression question fills its options with made-up wrong answers
+    Given the drills have the created progression "major/I-IV-V" with the bars I IV V
+    When the progression "major/I-IV-V" is planned as chart_to_numbers in C
+    Then it offers four progressions of three bars, all major
+    And every option but "major/I-IV-V" differs from it in exactly one bar
+    And every option is named by its numerals
+
+  @wip
+  Scenario: A made-up chart question offers made-up charts in the key
+    Given the drills have the created progression "major/I-IV-V" with the bars I IV V
+    When the progression "major/I-IV-V" is planned as numbers_to_chart in G
+    Then it offers four charts of three chords, one of them "G C D"
+
+  @wip
+  Scenario: A made-up wrong answer keeps the progression's chords
+    Given the drills have the created progression "major/I7-IV7-I7-V7-IV7-I7-V7-I7" with the bars I7 IV7 I7 V7 IV7 I7 V7 I7
+    When the progression "major/I7-IV7-I7-V7-IV7-I7-V7-I7" is planned as chart_to_numbers in C
+    Then it offers two progressions of eight bars
+    And every bar of the other option is one of I7, IV7 and V7
+
+  @wip
+  Scenario: A made-up wrong answer is never a drill progression
+    Given the drills have the created progression "major/I-IV-V" with the bars I IV V
+    And the drills have the created progression "major/I-IV-I" with the bars I IV I
+    When the progression "major/I-IV-V" is planned as chart_to_numbers 20 times
+    Then every option but "major/I-IV-V" and "major/I-IV-I" is a progression no drill has
+
+  @wip
+  Scenario: A chart of eight bars is read as chord symbols, two lines of four
+    Given the drills have the created progression "major/I-vi-IV-V-I-vi-IV-V" with the bars I vi IV V I vi IV V
+    When the progression "major/I-vi-IV-V-I-vi-IV-V" is planned as chart_to_numbers in G for a session that reads chords on "guitar"
+    Then its chart is drawn as chord symbols in two lines of four bars
+
+  @wip
+  Scenario: A minor progression is asked in a minor key, spelled from its tonic
+    Given the drills have the created progression "minor/i-bVII-bVI-V" with the bars i ♭VII ♭VI V
+    When the progression "minor/i-bVII-bVI-V" is planned as chart_to_numbers in Am
+    Then its chart is "Am G F E"
+
+  @wip
+  Scenario: A minor key keeps the catalog's root names
+    Given the drills have the created progression "minor/i-bVII-bVI-V" with the bars i ♭VII ♭VI V
+    When the progression "minor/i-bVII-bVI-V" is planned as chart_to_numbers in Dbm
+    Then its chart is "Dbm B A Ab"
+
+  @wip
+  Scenario: A heard minor progression is only ever asked in minor keys, with no cadence
+    Given the drills have the created progression "minor/i-bVII-bVI-V" with the bars i ♭VII ♭VI V
+    When the heard progression "minor/i-bVII-bVI-V" is planned as progression_by_number 20 times
+    Then every key it is planned in is a minor key
+    And every time it plays only its four bars
+
+  @wip
+  Scenario: A minor chart question is asked in an easy minor key while the student is learning it
+    Given the drills have the created progression "minor/i-bVII-bVI-V" with the bars i ♭VII ♭VI V
+    And "alice" is learning the chart progression "minor/i-bVII-bVI-V"
+    When it is planned for "alice"
+    Then it is asked in one of Am, Em, Bm, Dm and F#m
+
   Scenario: On bass, a root line plays under a heard question's chords
     When the heard progression "I-V-vi-IV" is planned as progression_by_number in G for a session that reads chords on "electric-bass"
     Then its playback has a bass line

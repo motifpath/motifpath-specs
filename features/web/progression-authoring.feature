@@ -1,4 +1,4 @@
-# What the app shows when admins create, add to the drills and remove progressions (ADR-070;
+# What the app shows when admins create, add to the drills and remove progressions (ADR-070, ADR-072;
 # Figma "Song charts" row 9, MOT-184, D1–D10 decided 2026-11-05). What core accepts is in
 # content-management/progressions.feature; numerals are read as golden/progression-numerals pins.
 
@@ -72,12 +72,16 @@ Feature: Create and manage progressions in the app
       Then the skills and concepts picker of the exercise and diagram editors is shown
       And "Create and tag Verse 1" is disabled until a skill or concept is picked
 
-    Scenario: A minor progression can't use the drills yet
-      When "ana" chooses "Minor" in the form
-      Then "Use in drills" is disabled and says "Drills don't use minor keys yet, so it stays chart only."
+    Scenario: A minor progression can use the drills
+      When "ana" chooses "Minor" and types the numerals "i bVII bVI V" in the form
+      Then "Use in drills" can be turned on
 
-    Scenario: A bar count drills don't ask can't use the drills
+    Scenario: A progression of 2 to 16 bars can use the drills
       When "ana" types the numerals "I IV V" in the form
+      Then "Use in drills" can be turned on
+
+    Scenario: A single bar can't use the drills, since it is a chord
+      When "ana" types the numerals "I" in the form
       Then "Use in drills" is disabled and says why
 
   Rule: Admin › Progressions lists every progression and is the only place one is removed

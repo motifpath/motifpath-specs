@@ -16,8 +16,9 @@ holds the rules it follows and what an installation must guarantee.
   blues adds `blues-form`. A progression drill rolls up to its template's nodes and to these.
 - **Names** say the numbers, with a common nickname when there is one ("I–V–vi–IV (pop)"). A name
   never says a key, so a name shown as an option never gives a chord away.
-- v1 holds 10 progressions, major keys only. Minor-key progressions come with
-  `minor-key-harmony`.
+- v1 holds 10 progressions, major keys only, and takes no new rows. Admins create other
+  progressions, of 1 to 16 bars and in a major or minor key, and add those of 2 to 16 bars to the
+  drills (ADR-070, ADR-072).
 
 ## Confusable progressions
 
@@ -28,7 +29,9 @@ holds the rules it follows and what an installation must guarantee.
 - **Distinguishable:** a confusable pair never sounds the same in some key. A rotation that is the
   same chords in its relative minor (`vi–IV–I–V` against a minor `i–VI–III–VII`) is not listed.
 - A progression question offers the asked progression and its confusable ones first, then others
-  of the same length, so no option can be ruled out by its length.
+  of the same length and mode, so no option can be ruled out by its length or its first chord.
+  When those are too few, the drills make up the rest by changing one bar of the asked
+  progression (`practice-drills.md`, the harmony drills' options).
 - Drills interleave confusable progressions within a session on purpose (ADR-057).
 
 ## Acceptance

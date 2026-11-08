@@ -9,10 +9,13 @@ Feature: Tap the guide tones of a progression in time
   # item is planned:
   # - the tone is each chord's third until the student is accurate on the item, then its seventh;
   # - a seventh follows what is written: maj7 major, 7 and ø7 minor, °7 diminished; a chord with
-  #   no written seventh takes the major seventh on I and IV and the minor seventh elsewhere;
-  # - the key is one of the 12 major keys at random, never the key of the item's last take;
+  #   no written seventh takes its key's: in major, the major seventh on I and IV and the minor
+  #   seventh elsewhere; in minor, natural minor's, with 7 on V and °7 on vii° (ADR-072);
+  # - the key is one of the 12 keys of the progression's mode at random, never the key of the
+  #   item's last take;
   # - the tempo starts at 60 BPM while new or learning, 72 once accurate, 90 once fluent;
-  # - a 12-bar blues is planned only once the student is accurate on target-chord-tones.
+  # - a progression of more than four bars, such as a 12-bar blues, is planned only once the
+  #   student is accurate on target-chord-tones.
   # A right take's fluency is its effective speed over 90 BPM (knowledge-state.feature).
 
   Background:
@@ -84,6 +87,29 @@ Feature: Tap the guide tones of a progression in time
     And the only guide tone "alice" has left to practise on guitar is "12-bar-blues"
     When "alice" composes a session with no instrument in hand
     Then the session plans the guide tone of "12-bar-blues" with 12 bars
+
+  @wip
+  Scenario: A progression of more than four bars waits for target-chord-tones, as the blues does
+    Given the drills have the created progression "major/I-vi-IV-V-I-vi-IV-V" with the bars I vi IV V I vi IV V
+    And "alice" is learning "target-chord-tones"
+    And "alice" has new guide tones of every progression on guitar
+    When "alice" composes 10 sessions with no instrument in hand
+    Then no session plans the guide tone of "major/I-vi-IV-V-I-vi-IV-V"
+
+  @wip
+  Scenario: A minor progression's guide tone is planned in a minor key, never the last one
+    Given the drills have the created progression "minor/i-bVII-bVI-V" with the bars i ♭VII ♭VI V
+    And "alice"'s last take of the guide tone of "minor/i-bVII-bVI-V" on guitar was in Am
+    When the guide tone of "minor/i-bVII-bVI-V" is picked for "alice"'s session 20 times
+    Then it is never planned in Am
+    And every key it is planned in is a minor key
+
+  @wip
+  Scenario: The plan spells a minor progression from its tonic
+    Given the drills have the created progression "minor/i-bVII-bVI-V" with the bars i ♭VII ♭VI V
+    And "alice" has never practised the guide tone of "minor/i-bVII-bVI-V" on guitar
+    When the guide tone is picked for "alice"'s session in Am
+    Then its bars are i ♭VII ♭VI V with the chords "Am G F E"
 
   Scenario: A 12-bar blues keeps its dominant seventh chords in the bars
     Given "alice" is accurate on the guide tone of "12-bar-blues" on guitar
