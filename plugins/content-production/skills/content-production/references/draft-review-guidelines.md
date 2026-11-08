@@ -24,14 +24,28 @@ opening application slide. A course cover, syllabus, subtitle or closing summary
 replace it. For other formats, use a clearly separate opening section.
 
 Explain both:
-- **Use now:** what the learner can do with today's content, in a concrete musical situation.
-- **Future learning:** which later subjects this foundation supports and how it helps there.
+- **Learner goal:** a musical result the learner already wants and can picture reaching,
+  such as playing songs with other people, following chord charts or improvising. The
+  opening should make the learner think “I need this”.
+- **First step:** how today's content moves the learner toward that goal, and which later
+  subjects it supports on the way.
 
-For example, note names help someone interpret “play F” and locate Fá using a reference.
-Later, those names help identify notes in melodies and scales and read chord names in a cifra.
-Distinguish a note from an entire chord. Tones and semitones turn “go up a tone” into a
-count of keys or frets. Later, distance patterns support scales, transposition and the
-intervals used to study chords and harmony.
+Anchor the opening in the goal, not in an intermediate skill or a technical instruction.
+Learners rarely want scales for their own sake; they want to improvise, and scales are a
+step on that path. A literal instruction the lesson teaches to decode is evidence of use,
+not a goal. Keep the claim honest: show the step, not the arrival.
+
+## Close with the goal
+
+The success check mirrors the opening. Name what the learner can now do, return to the
+goal from the opening and recognize the step just taken on the way to becoming a musician.
+Keep the limits of the evidence explicit: a completed lesson is progress, not mastery.
+
+## Title lessons so learners open them
+
+Learners decide whether to skip a lesson from its title. A topic label can read as trivial
+or already known. Name the payoff or a puzzle the lesson resolves, in idiomatic locale
+language, and promise only what the lesson delivers.
 
 Use later topics to explain relevance without requiring their mastery or teaching them all
 in this lesson. Avoid vague claims such as “this will be important later.” Do not withhold
@@ -121,8 +135,10 @@ Record the reason and result in the production packet's selected checks.
    the preview and the delivery format. Record pending runtime checks separately.
 
 - The short visual draft exposes the syllabus, transitions, diagrams and resource map.
-- Each lesson has a dedicated opening application slide or section with immediate use and
-  a concrete connection to later subjects.
+- Each lesson has a dedicated opening application slide or section anchored in a learner
+  goal, with today's first step and a concrete connection to later subjects.
+- The success check returns to that goal and recognizes the step taken.
+- The lesson title names a payoff or puzzle and promises only what the lesson delivers.
 - Each transition follows from knowledge already introduced and motivates the next step.
 - Diagram titles are understandable; instrument, string, positions and movements are clear.
 - Practice prompts explain the action, purpose, support and feedback in the target locale.

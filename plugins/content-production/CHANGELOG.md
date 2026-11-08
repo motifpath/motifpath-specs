@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.0 — 2026-11-07
+
+- Anchor lesson openings in a learner goal and make the success check return to it.
+- Title lessons by payoff or puzzle, honestly, so learners do not skip them as trivial.
+- Define the final learner deck: one idea per slide, minimal copy, title-and-promise cover,
+  full explanation in notes and the teacher's materials, platform resources left out.
+- Add deck principles: progressive reveal, method before demonstration, musical context,
+  pictured definitions, one unit per diagram label, idiomatic titles and original art.
+- Require engraved notation and properly drawn figures instead of shape approximations.
+
 ## 1.4.1 — 2026-11-05
 
 - Make editorial walkthroughs and applicable shared validators the default lesson checks.

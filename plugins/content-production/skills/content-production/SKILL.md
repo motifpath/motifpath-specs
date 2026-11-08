@@ -1,6 +1,6 @@
 ---
 name: content-production
-version: 1.4.1
+version: 1.5.0
 description: Plan, produce, check and improve MotifPath lessons, exercises and practice resources with practical outcomes, knowledge-map classification and locale-specific language. Use for editorial content production and content presentation storyboards; software implementation and curriculum redesign remain separate tasks.
 ---
 
@@ -24,6 +24,12 @@ Propose exercises in the review draft with their prompts, answers or rubrics, fe
 and retries. Author the approved exercises separately in MotifPath. Exclude all
 exercise material from the final PowerPoint, including hidden slides and speaker
 notes. Keep worked demonstrations and references that direct learners to platform practice.
+
+The final learner deck is the clean version of the lesson: one idea per slide, carried by the
+visual, with only the words a learner needs on screen. The article and the teacher's review
+deck keep the full explanation; speaker notes carry the presenter detail and text alternatives.
+Optional references that MotifPath delivers stay out of the learner deck. Read the
+[presentation guide](references/presentation-guide.md) before building a final deck.
 
 Read [draft review guidelines](references/draft-review-guidelines.md) when planning or
 revising a visual draft, its lesson openings, diagrams, practice prompts or resource map.
@@ -98,9 +104,13 @@ continue independent work. Declare curriculum participation explicitly:
 ## Author for practical value
 
 1. Start every lesson with a dedicated application summary before explanation or practice.
-   In slide drafts, give each lesson its own opening application slide. State concrete use
-   now and explain how it supports specific later subjects. Then show something the learner
-   can hear, play, recognize or solve. See the draft review guidelines for examples.
+   In slide drafts, give each lesson its own opening application slide. Anchor it in a goal
+   the learner already wants and can picture reaching, such as playing with others or
+   improvising, rather than in an intermediate skill or a technical instruction. Show how
+   today's content is the first step toward that goal and which later subjects it supports.
+   Then show something the learner can hear, play, recognize or solve. Title the lesson so
+   the learner wants to open it: name the payoff or a puzzle the lesson resolves, never a bare
+   topic label that reads as trivial, and promise only what the lesson delivers.
 2. Give the complete useful method now. Remove padding, teasers and withheld steps. Keep scope
    narrow rather than deleting necessary explanation. A shorter unit is not better if unusable.
 3. Demonstrate the method, then ask for an active attempt and provide actionable feedback,
@@ -114,6 +124,8 @@ continue independent work. Declare curriculum participation explicitly:
    References complete the unit; they must not hide its central technique elsewhere.
 5. Apply it to a musical phrase, groove, lick or repertoire fragment. Finish with an observable
    success check and a useful next practice action, without withholding today's payoff.
+   Mirror the opening: name what the learner can now do, return to the goal it serves and
+   recognize the step taken toward it, without claiming mastery.
 
 ## Choose modalities by learning purpose
 
@@ -160,7 +172,8 @@ Explain the risk it covers and follow the target repository's testing requiremen
 Treat custom preview behavior as software work and validate changes to that behavior.
 
 For final PowerPoint delivery, inspect the rendered slides and check all slides and notes
-for exercise material. Verify platform exercise behavior in its native delivery route.
+for exercise material. Check every diagram label against its legend and use one unit per
+label. Verify platform exercise behavior in its native delivery route.
 Record the checks selected, evidence and pending review in the production packet.
 
 ## Review and deliver
