@@ -1,6 +1,6 @@
 # ADR-072: Progression drills take any created progression, in any length and in minor keys
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-11-08
 **Deciders:** Gilson (Product Owner)
 **Input:** MOT-187 (epic MOT-182). PO decisions, 2026-11-08:
@@ -268,4 +268,4 @@ which makes the tonic unmistakable. Two alternatives were rejected:
 
 ---
 
-*This ADR was proposed on 2026-11-08. To revise, create a new ADR with Status: Supersedes ADR-072.*
+*This ADR was decided on 2026-11-08. To revise, create a new ADR with Status: Supersedes ADR-072.*
