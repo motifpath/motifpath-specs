@@ -35,35 +35,82 @@ const FINGERS = {
   pinky: { x: 129, w: 23, top: 66, splay: 9 },
 };
 const FINGER_BASE = 150;
-const FOLDED_TOP = 104;
+
+const PALM = 'M50 122 H146 Q160 122 160 140 V196 Q160 238 116 244 H82 Q36 238 36 196 V140 Q36 122 50 122 Z';
+// The thumb's root sits in the mound at the lower left of the palm (thenar).
+const THUMB_ROOT = { x: 54, y: 196 };
+const TUCKED_ROOT = { x: 22, y: 216 };
 
 function capsule(x, y, w, h, extra = '') {
   return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${Math.min(w, h) / 2}" ${extra}/>`;
 }
 
-function handParts(raised) {
+const pt = (p) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+
+// A tapered limb from root to tip with a rounded tip. `closed` adds the root edge; an open
+// outline lets the root blend into the palm it grows from.
+function limb(root, tip, rootW, tipW, closed) {
+  const len = Math.hypot(tip.x - root.x, tip.y - root.y);
+  const u = { x: (tip.x - root.x) / len, y: (tip.y - root.y) / len };
+  const n = { x: -u.y, y: u.x };
+  const at = (p, s) => ({ x: p.x + n.x * s, y: p.y + n.y * s });
+  const r = tipW / 2;
+  const d = `M${pt(at(root, rootW / 2))} L${pt(at(tip, r))} A${r} ${r} 0 0 0 ${pt(at(tip, -r))} L${pt(at(root, -rootW / 2))}`;
+  return closed ? `${d} Z` : d;
+}
+
+function silhouette(raised) {
   const parts = [];
   for (const [name, f] of Object.entries(FINGERS)) {
-    const top = raised.has(name) ? f.top : FOLDED_TOP + (name === 'pinky' ? 8 : 0);
-    const pivot = `rotate(${raised.has(name) ? f.splay : 0} ${f.x + f.w / 2} ${FINGER_BASE})`;
-    parts.push(capsule(f.x, top, f.w, FINGER_BASE + 10 - top, `transform="${pivot}"`));
+    if (!raised.has(name)) continue;
+    const pivot = `rotate(${f.splay} ${f.x + f.w / 2} ${FINGER_BASE})`;
+    parts.push(capsule(f.x, f.top, f.w, FINGER_BASE + 10 - f.top, `transform="${pivot}"`));
   }
-  if (raised.has('thumb')) {
-    parts.push(capsule(14, 118, 30, 92, 'transform="rotate(-38 29 200)"'));
-  }
-  parts.push('<path d="M52 122 H140 Q160 122 160 142 V188 Q160 236 118 242 H80 Q38 236 36 190 V142 Q36 122 52 122 Z"/>');
+  if (raised.has('thumb')) parts.push(`<path d="${limb(THUMB_ROOT, { x: -4, y: 126 }, 46, 28, true)}"/>`);
+  parts.push(`<path d="${PALM}"/>`);
   return parts.join('');
+}
+
+// Fingers curled onto the palm: seen from the palm side, the bent segments lie over its upper part.
+function foldedFingers(raised) {
+  return Object.entries(FINGERS).filter(([name]) => !raised.has(name)).map(([, f]) =>
+    capsule(f.x + 1, 112, f.w - 2, 58, `fill="${TINT}" stroke="${VIOLET}" stroke-width="6"`)).join('');
+}
+
+// The folded thumb crosses the palm and rests on the curled fingertips; its lower edge sweeps
+// down into the thumb mound so it grows from the palm instead of lying on it.
+function foldedThumb(raised) {
+  const curled = Object.entries(FINGERS).filter(([name]) => !raised.has(name)).map(([, f]) => f.x + f.w / 2);
+  const tipX = curled.length ? curled.reduce((a, b) => a + b, 0) / curled.length : 112;
+  const tip = { x: tipX, y: 166 };
+  // Rooted outside the palm and masked to its inside, so the thumb leaves the palm's own outline.
+  const thumb = limb(TUCKED_ROOT, tip, 46, 28, true);
+  return `<mask id="palm-inside" maskUnits="userSpaceOnUse" x="-40" y="0" width="230" height="262">
+    <path d="${PALM}" fill="white"/>
+  </mask>
+  <g mask="url(#palm-inside)">
+    <path d="${thumb}" fill="${TINT}" stroke="${VIOLET}" stroke-width="6" stroke-linejoin="round"/>
+  </g>`;
+}
+
+// Palm creases mark that the palm faces the viewer.
+function creases(raised) {
+  const line = `fill="none" stroke="${VIOLET}" stroke-width="3.5" stroke-linecap="round" opacity="0.55"`;
+  const life = `<path d="M54 152 Q80 186 84 232" ${line}/>`;
+  const heart = `<path d="M152 168 Q122 162 96 176" ${line}/>`;
+  // A curled little finger covers the end of the heart line.
+  return (raised.has('thumb') ? life : '') + (raised.has('pinky') ? heart : '');
 }
 
 function handSvg(raised) {
   const set = new Set(raised);
-  const parts = handParts(set);
-  const foldedThumb = set.has('thumb') ? '' :
-    capsule(28, 172, 92, 32, `transform="rotate(-22 30 188)" fill="${TINT}" stroke="${VIOLET}" stroke-width="7"`);
+  const parts = silhouette(set);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 0 230 262" width="230" height="262">
   <g fill="${VIOLET}" stroke="${VIOLET}" stroke-width="14" stroke-linejoin="round">${parts}</g>
   <g fill="${TINT}">${parts}</g>
-  ${foldedThumb}
+  ${creases(set)}
+  ${foldedFingers(set)}
+  ${set.has('thumb') ? '' : foldedThumb(set)}
 </svg>`;
 }
 
