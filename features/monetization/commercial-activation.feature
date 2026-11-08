@@ -78,16 +78,12 @@ Feature: Administer and evaluate commercial activation
     Given "content_ownership" is enabled with no subjects
     Then "content_ownership" does not allow "user:Bea"
 
-  Scenario: A flag open to all users allows every user but no unlisted service
-    When Ada sets "plus_catalog" to enabled for all users at revision 0
-    Then "plus_catalog" allows "user:Bea"
-    And "plus_catalog" allows "user:Cleo"
-    And "plus_catalog" does not allow "service:core-domain"
-
-  Scenario: A flag open to all users still allows a listed service
-    When Ada sets "plus_webhooks" to enabled for all users and "service:core-domain" at revision 0
-    Then "plus_webhooks" allows "user:Cleo"
-    And "plus_webhooks" allows "service:core-domain"
+  Scenario: A flag open to all users allows every user and only listed services
+    When Ada sets "content_ownership" to enabled for all users and "service:core-domain" at revision 0
+    Then "content_ownership" allows "user:Bea"
+    And "content_ownership" allows "user:Cleo"
+    And "content_ownership" allows "service:core-domain"
+    And "content_ownership" does not allow "service:strapi-sync"
 
   Scenario: Opening a flag to all users is recorded like any other change
     When Ada sets "plus_catalog" to enabled for all users at revision 0 with reason "General availability"
@@ -123,18 +119,18 @@ Feature: Administer and evaluate commercial activation
 
   Scenario: A group entry allows its members and no one else
     Given group "beta" has member Cleo
-    And "plus_checkout" is enabled for "group:beta"
-    Then "plus_checkout" allows "user:Cleo"
-    And "plus_checkout" does not allow "user:Bea"
+    And "private_beta" is enabled for "group:beta"
+    Then "private_beta" allows "user:Cleo"
+    And "private_beta" does not allow "user:Bea"
 
   Scenario: Adding a member admits them to every flag that lists the group
     Given group "friends-and-family" exists with no members
-    And "plus_catalog" is enabled for "group:friends-and-family"
-    And "plus_checkout" is enabled for "group:friends-and-family"
+    And "private_beta" is enabled for "group:friends-and-family"
+    And "content_ownership" is enabled for "group:friends-and-family"
     When Ada adds Cleo to group "friends-and-family" with reason "Invited"
     Then the change is applied with a new activation revision and an evidence entry
-    And "plus_catalog" allows "user:Cleo"
-    And "plus_checkout" allows "user:Cleo"
+    And "private_beta" allows "user:Cleo"
+    And "content_ownership" allows "user:Cleo"
 
   Scenario: A membership change needs no expected revision
     Given group "beta" has member Cleo
@@ -188,10 +184,10 @@ Feature: Administer and evaluate commercial activation
 
   Scenario: Removing a member fences their new intents and keeps earlier ones
     Given group "beta" has member Cleo
-    And "plus_checkout" is enabled for "group:beta" at activation revision 2
-    And a commercial intent for "plus_checkout" and "user:Cleo" was authorized at revision 2
+    And "private_beta" is enabled for "group:beta" at activation revision 2
+    And a commercial intent for "private_beta" and "user:Cleo" was authorized at revision 2
     When Ada removes Cleo from group "beta"
-    Then a new commercial intent for "plus_checkout" and "user:Cleo" is refused
+    Then a new commercial intent for "private_beta" and "user:Cleo" is refused
     And the earlier intent still records activation revision 2 and can be completed
 
   # ── Kill switch and fencing ────────────────────────────────────────────────
