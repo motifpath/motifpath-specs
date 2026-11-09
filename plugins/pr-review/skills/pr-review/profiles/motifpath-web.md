@@ -28,6 +28,7 @@
 | Tailwind utility classes only — no inline `style="..."`, no hardcoded color/spacing outside `tailwind.config.ts` tokens | `motifpath-web/CLAUDE.md` — Styling |
 | Named routes only via Vue Router — no hardcoded path strings in components | `motifpath-web/CLAUDE.md` — Key Rules |
 | Every data-fetching component handles both loading and error states explicitly | `motifpath-web/CLAUDE.md` — Key Rules |
+| Each feature's locale loads only when one of its routes is entered. Does every route that renders a component reading another feature's messages load that feature's locale too? Component tests merge every locale up front, so a missed one passes them and shows raw message keys; only a router locale-loading test can catch it | `src/router/index.ts` — each route's `beforeEnter: () => ensure…LocaleLoaded()`; `src/shared/testUtils/setupI18n.ts:16` — "all known feature locales merged in eagerly" |
 
 ## Boundaries
 
