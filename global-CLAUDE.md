@@ -3,10 +3,10 @@
 # Applies to all projects on this machine.
 
 ## Active Skills
-Installed via the `motifpath-skills` Claude Code plugin marketplace (see
-`motifpath-specs/README.md` for onboarding) — no manual file import needed here.
-Installed plugins load automatically: git, adr-writer, ai-consultant, plan-writer,
-product-discovery, pr-review.
+Installed via the `motifpath-skills` Claude Code plugin marketplace, which lives in the
+`motifpath/motifpath-skills` repository (see `motifpath-specs/README.md` for onboarding) — no
+manual file import needed here. Installed plugins load automatically: git, adr-writer,
+ai-consultant, plan-writer, product-discovery, pr-review, content-production.
 
 ## Communication
 Always respond in English.

@@ -16,7 +16,6 @@ No feature is ready for implementation until its spec exists in this repository.
 | `/curriculum` | Pedagogical principles: what we teach, in what order, and why — read before planning courses, paths or lessons |
 | `/prompts` | Versioned AI task prompts |
 | `/evals` | Golden sets for PromptFoo evaluation |
-| `/plugins` | Claude Code skills for the whole team, distributed as a plugin marketplace |
 
 ## Onboarding
 
@@ -31,13 +30,15 @@ git clone git@github.com:motifpath/motifpath-specs.git
 git clone git@github.com:motifpath/motifpath-core.git
 git clone git@github.com:motifpath/motifpath-web.git
 git clone git@github.com:motifpath/motifpath-infra.git
+git clone git@github.com:motifpath/motifpath-skills.git   # team skills (plugin marketplace)
+git clone git@github.com:motifpath/motifpath-content.git  # lesson content
 
 # 2. Install global CLAUDE.md (first time only — machine-level, not committed)
 mkdir -p ~/.claude
 cp motifpath-specs/global-CLAUDE.md ~/.claude/CLAUDE.md
 
 # 3. Add the MotifPath skills marketplace (one-time per machine)
-claude plugin marketplace add git@github.com:motifpath/motifpath-specs.git
+claude plugin marketplace add git@github.com:motifpath/motifpath-skills.git
 
 # 4. Install each skill
 claude plugin install git@motifpath-skills
@@ -56,8 +57,10 @@ claude plugin install content-production@motifpath-skills
 claude plugin list
 ```
 
-Skills each version independently — check `plugins/<name>/CHANGELOG.md` for what
-changed. With auto-update on, Claude Code checks for newer versions shortly after
+Skills live in [motifpath-skills](https://github.com/motifpath/motifpath-skills) and version
+independently — check its `plugins/<name>/CHANGELOG.md` for what changed. If you added the
+marketplace from motifpath-specs before 2026-11-09, re-point it once:
+`claude plugin marketplace remove motifpath-skills`, then step 3 and step 4 again. With auto-update on, Claude Code checks for newer versions shortly after
 each session starts and updates them on disk; run `/reload-plugins` (or start a
 new session) to pick up the update. Without auto-update, run
 `/plugin marketplace update motifpath-skills` manually after a `git pull`.

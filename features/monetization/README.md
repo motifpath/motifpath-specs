@@ -1,8 +1,8 @@
 # Monetization contracts — MOT-117
 
 This directory is the consolidated contract index for the monetization epic. Business decisions
-from 2026-10-13 through 2026-10-15 are incorporated; scenarios remain `@wip` until runtime
-implementation passes TDD. PR approval accepts proposed API details, not a deployment.
+from 2026-10-13 through 2026-10-15 are incorporated; scenarios remain `@wip` (parked) until the
+runtime ticket that implements them retags them `@MOT-NNN` in its spec PR (ADR-073). PR approval accepts proposed API details, not a deployment.
 
 ## Operations not yet built
 

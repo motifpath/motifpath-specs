@@ -2,7 +2,7 @@
 
 **Current status:** Do; on 2026-11-03 the product owner accepted the 18-slide
 sequence and diagram direction and authorized two complete pt_BR lesson drafts.
-Review the [full lesson packet](../content/first-notes/README.md). Educator review,
+Review the [full lesson packet](https://github.com/motifpath/motifpath-content/blob/main/first-notes/README.md). Educator review,
 native delivery verification and publication remain separate gates.
 
 ## Current review target
