@@ -1,5 +1,13 @@
 # PR Review — Changelog
 
+## [1.21.0] — 2026-11-09
+
+### Added
+- `profiles/motifpath-web.md` norm: a component that reads another feature's messages needs that
+  feature's locale loaded on every route that renders it, and only a router locale-loading test
+  catches a miss, since component tests merge every locale up front. From the review of
+  motifpath-web#215, which fixed drill pickers on two admin pages showing raw teacher message keys.
+
 ## [1.20.0] — 2026-11-07
 
 ### Changed
