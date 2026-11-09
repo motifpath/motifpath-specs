@@ -88,6 +88,9 @@ skill — that skill is the source of truth for authoring ADRs. At minimum every
 carries a Status line and `## Context`, `## Decision`, `## Consequences` sections;
 `## Rationale` (naming at least one rejected alternative) is expected for any
 non-trivial decision.
+Push an ADR only after the PO has approved it in the working session; it lands with
+`Status: Accepted` and names the approval in its `Input` line. Never push a `Proposed` ADR
+for review, and never open a PR only to change an ADR's status (ADR-073).
 NEVER delete an ADR. Superseded decisions get a note: "Superseded by ADR-NNN".
 
 ## CI Checks (must pass before merge)

@@ -1,9 +1,9 @@
 # ADR-073: One spec PR per ticket; core switches scenarios on; skills and content move out
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-11-09
 **Deciders:** Gilson (Product Owner)
-**Input:** MOT-192. PO decisions, 2026-11-09:
+**Input:** MOT-192. PO decisions, 2026-11-09 (approved by Gilson on 2026-11-09):
 - move skills and content to two new repositories;
 - core switches a ticket's scenarios on from a list it keeps, keyed by ticket tags;
 - contract fixes found during TDD land in one batched follow-up PR per ticket.
@@ -45,6 +45,8 @@ picks a parked scenario up retags it `@MOT-NNN` in its own spec PR. `@web` is un
 PR. Fixes found in review are pushed to that PR. Contract fixes found later, during core or web
 TDD, are collected and land in **one** follow-up spec PR per ticket. Core CI keeps running against
 specs `main`.
+An ADR is pushed only after the PO has approved it in the working session, and it lands with
+`Status: Accepted`. No PR carries a `Proposed` ADR, so no later PR only changes its status.
 
 **3. Skills move to `motifpath/motifpath-skills`.** It holds the same `plugins/<name>/` layout,
 marketplace manifest and history (`git subtree split`). The marketplace and plugin names are
@@ -102,6 +104,9 @@ ticket's spec PR targets `main` directly.
   `MOTIFPATH_SPECS_DIR` / `MOTIFPATH_SKILLS_DIR` overrides.
 - The new repositories start private. Making them public, as motifpath-specs is, is a separate
   choice.
+
+- The PO approves an ADR before it is pushed, outside GitHub. The approval is recorded in the
+  ADR's `Input` line (who approved it and when) rather than in a PR review.
 
 ### Neutral
 - Existing parked `@wip` scenarios keep their tag until a ticket picks them up. The monetization
