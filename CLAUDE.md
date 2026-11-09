@@ -10,13 +10,15 @@ Changes here propagate to all consuming repositories before any implementation b
                 openapi/components/schemas/events.yaml
 /features     → Business rule specs (Gherkin .feature files, nested per domain)
 /adrs         → Architecture Decision Records
-/curriculum   → Pedagogical principles that guide planning courses, paths and lessons
+/curriculum   → Pedagogical principles and the plan that guide courses, paths and lessons
+                (lesson content itself lives in motifpath-content)
 /prompts      → Versioned AI task prompts
 /evals        → Golden sets for PromptFoo evaluation
 /golden       → Language-neutral golden cases shared by core and web (e.g. practice graders),
                 validated by `npm run validate:golden`
-/plugins      → Claude Code skills for the whole team (plugin marketplace)
 ```
+Not here (ADR-073): the team's Claude Code skills live in `motifpath/motifpath-skills`
+(the `motifpath-skills` plugin marketplace), and lesson content in `motifpath/motifpath-content`.
 
 ## Spec-First Discipline
 ALWAYS write or update specs BEFORE any implementation begins in other repos.
@@ -39,11 +41,22 @@ practice.tap_check_completed, song_chart.opened, song_chart.chord_viewed,
 song_chart.completed.
 One scenario = one behavior. Never test multiple behaviors in a single scenario.
 Steps must be concrete and specific — avoid vague steps like "the system processes the request".
-Two tags keep motifpath-core's strict godog runs honest; both are skipped there:
-- `@wip`: the behaviour is specified but not yet implemented in core. Remove the tag in the PR that
-  follows the core implementation's merge.
+Tags keep motifpath-core's strict godog runs honest (ADR-073):
+- `@MOT-NNN`: the ticket that implements the scenario, at feature or scenario level. Every new
+  scenario core does not run yet carries it, for good — never remove it. Core skips a ticket's
+  scenarios until its implementing PR lists the ticket in core's `bdd/implemented-tickets.txt`,
+  so **never open a PR here just to un-tag**.
+- `@wip`: parked — specified, no ticket scheduled. Skipped in core. A ticket that picks a parked
+  scenario up retags it `@MOT-NNN` in that ticket's spec PR.
 - `@web`: the behaviour is the client's (what the app sends, and when), so a service could only test
-  it vacuously. motifpath-web's own tests pin it.
+  it vacuously. motifpath-web's own tests pin it. Skipped in core.
+
+## One Spec PR per Ticket
+A ticket's ADR, OpenAPI change, Gherkin scenarios and golden cases go in **one** PR (ADR-073).
+Review fixes are pushed to that PR while it is open. Contract fixes found later, during core or web
+TDD, are collected into **one** follow-up PR per ticket — never one PR per finding.
+Epic branches with stacked slice PRs are for multi-milestone efforts only (e.g. MOT-107); a regular
+ticket's spec PR targets `main`.
 
 ## OpenAPI Standards
 - operationId: camelCase verb + noun (e.g. submitExerciseAnswer, getStudentPath)
@@ -82,21 +95,9 @@ NEVER delete an ADR. Superseded decisions get a note: "Superseded by ADR-NNN".
 - Gherkin syntax validation
 - Golden-case validation (`npm run validate:golden`)
 
-## Skills (/plugins/)
-Skills are Claude Code behavioral guides used by the whole team, distributed as the
-`motifpath-skills` plugin marketplace (`.claude-plugin/marketplace.json` at the repo
-root). Each skill is its own plugin under `plugins/<name>/`, with its own
-`.claude-plugin/plugin.json`, `skills/<name>/SKILL.md`, and `CHANGELOG.md`.
-ALWAYS bump the `version` field in both SKILL.md and plugin.json when modifying a skill
-— the marketplace's update check depends on the plugin.json version moving.
-ALWAYS add a CHANGELOG.md entry for every skill change.
-A skill that's no longer used can be deleted outright — git history already preserves the
-full definition and its CHANGELOG, so there's no separate "deprecate forever" step. Remove its
-`plugins/<name>/` directory and its `marketplace.json` entry in the same commit, and reference
-the reason (an ADR, a decision) in the commit message rather than in a file that's being deleted.
-Team members run `/plugin marketplace update motifpath-skills` (or rely on
-auto-update, if enabled) then `/reload-plugins` to pick up changes — see the
-repo README for first-time setup.
+## Skills
+The team's skills moved to `motifpath/motifpath-skills` (ADR-073) — change them there, not here.
+The marketplace name is unchanged: `/plugin marketplace update motifpath-skills`.
 
 ## Reusable Workflows (.github/workflows/)
 This repo defines reusable GitHub Actions workflows consumed by all service repos.
