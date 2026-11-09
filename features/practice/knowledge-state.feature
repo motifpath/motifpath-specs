@@ -146,7 +146,7 @@ Feature: Derive a student's knowledge of an item from evidence
     Then "alice"'s level for the song is "fluent"
 
   # Parked until ADR-046 follow-up slice 5 (teacher notes): no teacher review exists yet.
-  @wip
+  @MOT-52
   Scenario: A teacher review resets the student's own best clean tempo
     Given "alice" rated "pentatonic-run" clean at 120 BPM
     When a teacher reviews "alice"'s "pentatonic-run" as clean at 100 BPM and verified

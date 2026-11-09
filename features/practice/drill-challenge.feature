@@ -7,8 +7,8 @@ Feature: Generated drill questions challenge the student
   # distractors; the answer is never in the wording; every item asked among options is asked a
   # second way or comes back later in the session; variants harden as the student's level on the
   # item rises. They bind generated drills only: authored exercises are their author's
-  # responsibility. The drill families v2 are built slice by slice (P1–P7), so their scenarios
-  # stay @wip until core implements them.
+  # responsibility. The drill families v2 are built slice by slice (P1–P7); a scenario core
+  # doesn't run yet carries its ticket's tag until core lists that ticket as implemented.
 
   Background:
     Given student "alice" plays "guitar" and "electric-bass"

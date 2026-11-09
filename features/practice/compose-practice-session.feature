@@ -30,7 +30,7 @@ Feature: Compose a practice session
     Then about 60% of the focus time goes to due items, 25% to weak items and 15% to new items
 
   # Parked until ADR-046 follow-up slice 5 (teacher notes): no teacher note exists yet to suggest from.
-  @wip
+  @MOT-52
   Scenario: A teacher's suggestion comes before everything else
     Given a teacher suggested the play-along "pentatonic-run" to "alice"
     When "alice" composes a 10-minute session with "guitar" in hand
