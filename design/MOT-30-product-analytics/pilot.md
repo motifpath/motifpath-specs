@@ -59,3 +59,21 @@ Before live rollout, the implementation contracts must specify the production ev
 delivery and retry rules, preference enforcement, vendor access, retention, deletion and an
 independent disable control for each integration. The pilot does not set the live collection
 default or retention period.
+
+## Running the fixture
+
+From this directory, run `node --test posthog-fixture.test.mjs` and
+`node posthog-fixture.mjs > /tmp/mot30-posthog-fixture.json`. The generator prints synthetic
+data and makes no network requests. It adds a fixture batch key for isolation and reuses the
+event UUID for the intentional retry. Submit the `events` array to the isolated project's
+[batch capture endpoint](https://posthog.com/docs/getting-started/install) using its project token.
+Filter both reports by the generated batch key. Require the same `visit_key` across funnel
+steps. Filter the practice report by one `snapshot` at a time and count distinct run keys.
+The fixture tests the presentation of source-derived outcome snapshots. It does not exercise the
+source abandonment calculation or vendor ingestion.
+
+For Hotjar, use an isolated site and two synthetic SPA routes. Add the sentinel to a masked
+element on onboarding and another sentinel to the excluded exercise route. In a fresh session,
+check approved entry, excluded navigation, re-entry, direct excluded entry and window expiry.
+Review the browser capture requests and resulting recording for both sentinels. Record the
+project, route, expected behavior and observed behavior for each check.
