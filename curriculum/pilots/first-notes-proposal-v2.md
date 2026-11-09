@@ -1,7 +1,7 @@
 # First notes — proposal v2 for review
 
 **Current handoff (2026-11-03):** The product owner accepted the visual direction
-and authorized full lesson drafts. See the [complete lesson packet](../content/first-notes/README.md).
+and authorized full lesson drafts. See the [complete lesson packet](https://github.com/motifpath/motifpath-content/blob/main/first-notes/README.md).
 The review-stage restrictions below describe this earlier checkpoint; audio and
 publication still require separate authorization.
 
