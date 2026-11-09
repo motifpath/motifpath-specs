@@ -3,10 +3,10 @@
 # Applies to all projects on this machine.
 
 ## Active Skills
-Installed via the `motifpath-skills` Claude Code plugin marketplace, which lives in the
-`motifpath/motifpath-skills` repository (see `motifpath-specs/README.md` for onboarding) — no
-manual file import needed here. Installed plugins load automatically: git, adr-writer,
-ai-consultant, plan-writer, product-discovery, pr-review, content-production.
+Every MotifPath repository's `.claude/settings.json` adds the `motifpath-skills` plugin
+marketplace (the `motifpath/motifpath-skills` repository) and turns the team skills on once you
+trust the folder — nothing to install or import here: git, adr-writer, ai-consultant,
+plan-writer, product-discovery, pr-review, and content-production in motifpath-content.
 
 ## Communication
 Always respond in English.

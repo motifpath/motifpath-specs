@@ -97,7 +97,8 @@ NEVER delete an ADR. Superseded decisions get a note: "Superseded by ADR-NNN".
 
 ## Skills
 The team's skills moved to `motifpath/motifpath-skills` (ADR-073) — change them there, not here.
-The marketplace name is unchanged: `/plugin marketplace update motifpath-skills`.
+`.claude/settings.json` registers that marketplace and enables the team skills for everyone who
+trusts this folder; every MotifPath repository carries the same file (MOT-193).
 
 ## Reusable Workflows (.github/workflows/)
 This repo defines reusable GitHub Actions workflows consumed by all service repos.

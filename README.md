@@ -37,33 +37,27 @@ git clone git@github.com:motifpath/motifpath-content.git  # lesson content
 mkdir -p ~/.claude
 cp motifpath-specs/global-CLAUDE.md ~/.claude/CLAUDE.md
 
-# 3. Add the MotifPath skills marketplace (one-time per machine)
-claude plugin marketplace add git@github.com:motifpath/motifpath-skills.git
+# 3. Skills: nothing to install. Open any MotifPath repository in Claude Code and
+#    accept the "trust this folder" prompt. The repository's .claude/settings.json
+#    adds the motifpath-skills marketplace, with auto-update on, and turns the team
+#    skills on (content-production only in motifpath-content).
 
-# 4. Install each skill
-claude plugin install git@motifpath-skills
-claude plugin install adr-writer@motifpath-skills
-claude plugin install ai-consultant@motifpath-skills
-claude plugin install plan-writer@motifpath-skills
-claude plugin install product-discovery@motifpath-skills
-claude plugin install pr-review@motifpath-skills
-claude plugin install content-production@motifpath-skills
-
-# 5. Turn on background auto-update for this marketplace (off by default for
-#    non-Anthropic sources): run `/plugin` inside a Claude Code session,
-#    open the Marketplaces tab, select motifpath-skills, and enable auto-update.
-
-# 6. Verify
+# 4. Verify, from inside a MotifPath repository
 claude plugin list
 ```
 
 Skills live in [motifpath-skills](https://github.com/motifpath/motifpath-skills) and version
-independently — check its `plugins/<name>/CHANGELOG.md` for what changed. If you added the
-marketplace from motifpath-specs before 2026-11-09, re-point it once:
-`claude plugin marketplace remove motifpath-skills`, then step 3 and step 4 again. With auto-update on, Claude Code checks for newer versions shortly after
-each session starts and updates them on disk; run `/reload-plugins` (or start a
-new session) to pick up the update. Without auto-update, run
-`/plugin marketplace update motifpath-skills` manually after a `git pull`.
+independently — check its `plugins/<name>/CHANGELOG.md` for what changed. You need read access
+to that repository, which is private. With auto-update on, Claude Code checks for newer versions
+shortly after each session starts; run `/reload-plugins` (or start a new session) to pick them up.
+
+If you added the marketplace from motifpath-specs before 2026-11-09, `claude plugin marketplace
+list` shows `motifpath-skills` with a `Folder (…/motifpath-specs)` source. Remove that entry
+once, then reopen a MotifPath repository and accept its prompts:
+
+```bash
+claude plugin marketplace remove motifpath-skills
+```
 
 **Next:** set up the local development stack — follow
 [motifpath-core README → Getting Started](../motifpath-core/README.md#getting-started-first-time-on-this-machine)
