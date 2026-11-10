@@ -223,9 +223,11 @@ catalog, like the harmony drills, and recognised by ear in the head on every ins
     progression's bars show nothing. The chords are sounded, never named.
   - On a session that reads chords on bass, each chord's root also plays under it in the bass
     voice. The chords keep their guitar voicing.
-- **The tempo** starts by the student's level on the item (`hear_tempo_bpm`): 70 BPM while new
-  or learning, 90 once accurate, 110 once fluent. The student may change the tempo and the note
-  value (quarters, eighths, triplets, sixteenths) before or between plays. A note value is a
+- **The tempo** starts at 70 BPM in eighths, two chords a bar (as fast as 140 in quarters), for
+  every question and every level: the tempo is never graded, so a faster start by level would
+  not make the question harder. The level hardens what is asked instead (the cadence, the
+  options). The student may change the tempo and the note value (quarters, eighths, triplets,
+  sixteenths) before or between plays. A note value is a
   speed factor, as for play-alongs: eighths play two chords a bar. Neither is graded; the
   latency is judged net of the sound heard once, at the speed it was played (`audio_ms`).
 - **The options:**
@@ -596,7 +598,7 @@ places the note has is never shown, since it would let a student rule places out
 
 - Every template names a rung of the ladder, and a `second_way` names another template of the
   same item kind.
-- `hear_tempo_bpm` gives a tempo for every knowledge level.
+- Every heard question starts at the same tempo and note value, whatever the level.
 - Every chord drill names an open voicing of the chord catalog that exists, every change pair
   names two of the chord drills' voicings, and no pair is listed twice in either order.
 - The chord drills' chord symbols are the chords of their voicings.

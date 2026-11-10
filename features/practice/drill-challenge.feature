@@ -124,20 +124,40 @@ Feature: Generated drill questions challenge the student
     When it is planned for "alice"
     Then it offers I, ii, iii, IV, V, vi and viio
 
-  Scenario Outline: A heard question starts at the tempo of the student's level
+  # A heard question's tempo is never graded, so it starts at the same speed at every level:
+  # 70 BPM in eighths, two chords a bar. The level hardens what is asked instead.
+  @MOT-195
+  Scenario: A heard progression never answered starts at 70 BPM in eighths
+    When the heard progression "I-V-vi-IV" is planned as progression_by_number in G
+    Then its playback starts at 70 BPM in eighths
+
+  @MOT-195
+  Scenario Outline: A heard progression starts at 70 BPM in eighths at every level
     Given "alice" is <level> on the heard progression "I-V-vi-IV"
     When it is planned for "alice"
-    Then its playback starts at <bpm> BPM
+    Then its playback starts at 70 BPM in eighths
 
     Examples:
-      | level    | bpm |
-      | learning | 70  |
-      | accurate | 90  |
-      | fluent   | 110 |
+      | level    |
+      | learning |
+      | accurate |
+      | fluent   |
+
+  @MOT-195
+  Scenario Outline: A heard chord starts at 70 BPM in eighths at every level
+    Given "alice" is <level> on the heard chord vi in G
+    When it is planned for "alice"
+    Then its playback starts at 70 BPM in eighths
+
+    Examples:
+      | level    |
+      | learning |
+      | accurate |
+      | fluent   |
 
   @web
   Scenario: A heard question's tempo and note value can be changed without changing the grade
-    Given the heard progression "I-V-vi-IV" was planned for "alice" at 70 BPM
+    Given the heard progression "I-V-vi-IV" was planned for "alice" at 70 BPM in eighths
     When "alice" plays it at 120 BPM in eighths and picks "I-V-vi-IV"
     Then the answer is graded right
     And the answer carries the sound it played at that speed as its audio time
