@@ -85,7 +85,7 @@ Metronome tool page (inside the Practice Shell):
   |---|---|---|---|
   | Metronome tool | yes | every value | yes, on demand |
   | Play-along take, lesson diagram player | yes | the four suggested | set by the diagram (shown locked) |
-  | Progression playback (hear drills, guide tones) | the level's tempo, changeable | the four suggested | 4/4, one chord a bar (locked) |
+  | Progression playback (hear drills, guide tones) | the planned tempo (hear drills: 70 in eighths; guide tones: the level's), changeable | the four suggested | 4/4, one chord a bar (locked) |
   | Chord / root changes, song chart reader | yes | — | — |
   | Single-chord playback | — | — | — |
 
