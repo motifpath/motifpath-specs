@@ -1,4 +1,4 @@
-@wip
+@MOT-118
 Feature: Record and protect content ownership
   Every course, path, content node and exercise has one authoritative rights holder in core.
   Ownership is recorded when content is created, survives edits and learner copies, and only an
