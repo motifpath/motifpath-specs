@@ -81,6 +81,17 @@ Feature: Ingest practice events
     When "alice" submits a practice.item_answered event naming the note "C" for the guitar cell on string 5 at fret 3
     Then the stored and published practice.item_answered event carries a tap time of 350 milliseconds
 
+  @MOT-197
+  Scenario: An answer carries the time the session was visible since the previous event
+    When "alice" submits a practice.item_answered event naming the note "C" for the guitar cell on string 5 at fret 3, with 95000 milliseconds visible
+    Then the event is accepted and stored in the event log
+    And the stored and published practice.item_answered event keeps 95000 milliseconds visible
+
+  @MOT-197
+  Scenario: A chord change take is accepted with its tempo and clean share
+    When "alice" submits a practice.item_answered event rating a take of the chord change "a-minor-open" to "c-open" at 60 BPM with 75 percent of the changes clean
+    Then the event is accepted and stored in the event log
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   Scenario: A timed answer from a student who never did a tap check carries no tap time
@@ -152,6 +163,18 @@ Feature: Ingest practice events
     When "alice" submits a practice.item_answered event rating a take of a play-along "clean" at 60 BPM in the note value "fifths"
     Then the submission is rejected as invalid
     And the rejection identifies "note_value" as the source of the error
+
+  @MOT-197
+  Scenario: A negative visible time is rejected
+    When "alice" submits a practice.session_ended event with 2 items answered, left early, no felt ratings and -1 milliseconds visible
+    Then the submission is rejected as invalid
+    And the rejection identifies "visible_ms" as the source of the error
+
+  @MOT-197
+  Scenario: A chord change take with a clean share that isn't one of the four is rejected
+    When "alice" submits a practice.item_answered event rating a take of the chord change "a-minor-open" to "c-open" at 60 BPM with 90 percent of the changes clean
+    Then the submission is rejected as invalid
+    And the rejection identifies "response" as the source of the error
 
   Scenario: A take rated in a key that isn't one is rejected
     When "alice" submits a practice.item_answered event rating a take of the progression key tour of "I-V-vi-IV" on guitar "clean" at 85 BPM in the key "H"

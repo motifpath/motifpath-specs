@@ -85,6 +85,41 @@ Feature: Generated drill questions challenge the student
     Then the bars play "G", "D", "Em" and "C"
     And no bar shows a numeral
 
+  # A heard progression's options name every bar heard, in order, so the numerals shown always
+  # match the chords played (MOT-197, ADR-074). The catalog names are unchanged elsewhere.
+  @MOT-197
+  Scenario: A heard progression's options are named by every bar heard
+    When the heard progression "IV-V-I" is planned as progression_by_number in G
+    Then the bars play "C", "D", "G" and "G"
+    And its own option is named "IV–V–I–I"
+    And every option's name has four numerals
+
+  @MOT-197
+  Scenario: A read chart keeps the catalog's name for its progression
+    When the progression "IV-V-I" is planned as chart_to_numbers in G
+    Then its own option is named "IV–V–I"
+
+  # A heard chord quality: one chord alone, on a root picked each time, its quality picked
+  # (MOT-197, ADR-074).
+  @MOT-197
+  Scenario: A heard chord quality plays one chord alone and offers three qualities
+    Given "alice" is learning the heard chord quality "minor"
+    When it is planned for "alice"
+    Then its playback has one bar, a minor triad, with no numeral
+    And it is asked in no key
+    And it offers major, minor and dominant7, in that order
+
+  @MOT-197
+  Scenario: A heard chord quality offers five qualities once the student is fluent on it
+    Given "alice" is fluent on the heard chord quality "minor"
+    When it is planned for "alice"
+    Then it offers major, minor, dominant7, diminished and augmented, in that order
+
+  @MOT-197
+  Scenario: A heard chord quality's root changes from one time to the next
+    When the heard chord quality "major" is planned 20 times
+    Then its chord is played on more than one root
+
   # ── Edge cases ─────────────────────────────────────────────────────────────
 
   Scenario: A drill with no second way brings its item back later in the session
@@ -154,6 +189,20 @@ Feature: Generated drill questions challenge the student
       | learning |
       | accurate |
       | fluent   |
+
+  @web @MOT-197
+  Scenario: A heard chord quality plays its chord and offers the qualities by name
+    Given "alice"'s session in the head plans the heard chord quality "minor"
+    When the item is shown
+    Then "Which kind of chord is it?" is asked, with no chord name and no key shown
+    And the chord plays once, and can be played again
+    And the options read "Major", "Minor" and "With a seventh (7)"
+
+  @web @MOT-197
+  Scenario: A heard progression's options read every bar heard
+    Given "alice"'s session in the head plans the heard progression "IV-V-I" in G
+    When the item is shown
+    Then four chords play, and every option shows four numerals, one of them "IV–V–I–I"
 
   @web
   Scenario: A heard question's tempo and note value can be changed without changing the grade
@@ -227,6 +276,12 @@ Feature: Generated drill questions challenge the student
     And "alice" is learning the chart progression "minor/i-bVII-bVI-V"
     When it is planned for "alice"
     Then it is asked in one of Am, Em, Bm, Dm and F#m
+
+  @MOT-197
+  Scenario: A heard chord quality is never planned for a session with an instrument in hand
+    Given "alice" has the heard chord quality "minor" due
+    When "alice" composes a session with "guitar" in hand
+    Then no heard chord quality is in the session
 
   Scenario: On bass, a root line plays under a heard question's chords
     When the heard progression "I-V-vi-IV" is planned as progression_by_number in G for a session that reads chords on "electric-bass"

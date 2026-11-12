@@ -466,12 +466,13 @@ Feature: Compose a practice session
     Then "I-V-vi-IV" and "I-vi-IV-V" are asked with no other heard progression between them
 
   # ── Chords played in hand ──────────────────────────────────────────────────
-  # Single chords (play clean) and minutes of changes between two chords (play in time) are focus
-  # items of an in-hand session: at most 4 single chords and 2 changes, 20 and 90 seconds each. On
-  # bass they are a chord's root and fifth, and changes between two roots. A change is one minute
-  # at a tempo, one change on every beat; its ladder runs across sessions: the tempo of its last
-  # minute, 5 BPM up after two clean minutes in a row, 5 down after a struggled one, never below
-  # 20, and 40 for a change never played. Its target is the catalog's: 60 clean changes a minute.
+  # Single chords (play clean) and changes between two chords (play in time) are focus items of
+  # an in-hand session: at most 4 single chords and 2 changes, 20 and 45 seconds each. On bass
+  # they are a chord's root and fifth, and changes between two roots, in a five-fret window that
+  # starts on a fret from 0 to 9 (MOT-197). A change is ten cycles at a tempo, one change on
+  # every beat (MOT-197, ADR-074); its ladder runs across sessions: the tempo of its last take,
+  # 5 BPM up after two clean takes in a row, 5 down after a struggled one, never below 20, and 40
+  # for a change never played. Its target is the catalog's: 60 BPM, every change clean.
 
   Scenario: An in-hand guitar session plays single chords of a path skill
     Given "alice"'s path skill "play-open-chords" has new single chords on guitar
@@ -484,16 +485,33 @@ Feature: Compose a practice session
     When the single chord "a-minor-open" is picked for "alice"'s session with "guitar" in hand
     Then it names the voicing diagram of "a-minor-open" and the chord "Am"
 
-  Scenario: A chord change is planned with both chords and its minute
+  @MOT-197
+  Scenario: A chord change is planned with both chords and a take of ten cycles
     Given "alice"'s path skill "change-chords" has new chord changes on guitar
     When "alice" composes a 10-minute session with "guitar" in hand
     Then the session includes a chord change of "change-chords" at the play_in_time rung
-    And it names both chords' voicing diagrams and symbols, and a target of 60 clean changes a minute
+    And it names both chords' voicing diagrams and symbols, a take of 10 cycles and a target of 60 BPM
 
-  Scenario: An in-hand bass session plays a chord's root and fifth, both marked
+  @MOT-197
+  Scenario: An in-hand bass session plays a chord's root and fifth in the window it starts at
     Given "alice"'s path skill "play-root-fifth-lines" has new root and fifth items on electric bass
-    When the root and fifth of "Am" is picked for "alice"'s session with "electric-bass" in hand
-    Then its root is on string 3 at fret 0 and its fifth on string 4 at fret 0 of the "electric-bass" layout
+    When the root and fifth of "Am" is picked for "alice"'s session with "electric-bass" in hand, in the window starting at fret 5
+    Then its root is on string 4 at fret 5 and its fifth on string 3 at fret 7 of the "electric-bass" layout
+    And it marks no fifth below the root, since the open E string is outside frets 5 to 9
+    And it starts at the catalog's root and fifth tempo
+
+  @MOT-197
+  Scenario: A root and fifth at the nut keeps its open places
+    Given "alice"'s path skill "play-root-fifth-lines" has new root and fifth items on electric bass
+    When the root and fifth of "Am" is picked for "alice"'s session with "electric-bass" in hand, in the window starting at fret 0
+    Then its root is on string 3 at fret 0 and its fifth on string 2 at fret 2 of the "electric-bass" layout
+    And the fifth below its root is on string 4 at fret 0
+
+  @MOT-197
+  Scenario: Bass chord items don't always start at the nut
+    Given "alice" has new root and fifth items on electric bass
+    When the root and fifth of "Am" is picked for 20 of "alice"'s sessions with "electric-bass" in hand
+    Then its window starts on more than one fret between 0 and 9
 
   Scenario: A session with the instrument in hand plays at most 4 single chords and 2 changes
     Given "alice" has 8 new single chords and 10 new chord changes on guitar, and nothing else
@@ -506,46 +524,60 @@ Feature: Compose a practice session
     When both are picked for "alice"'s session with "guitar" in hand
     Then the single chord "a-minor-open" comes before the chord change
 
-  Scenario: A single chord takes 20 seconds of the session and a change 90
+  @MOT-197
+  Scenario: A single chord takes 20 seconds of the session and a change 45
     Given "alice" has new single chords and new chord changes on guitar
     When "alice" composes a 10-minute session with "guitar" in hand
     Then every single chord in the session is estimated at 20 seconds
-    And every chord change in the session is estimated at 90 seconds
+    And every chord change in the session is estimated at 45 seconds
 
+  @MOT-197
   Scenario: A chord change never played starts at 40 BPM
     Given "alice" has never played the chord change "a-minor-open" to "c-open"
     When the chord change is picked as a new item
-    Then its minute starts at 40 BPM, with no best clean count and no last count
+    Then its take starts at 40 BPM, with no best clean tempo
 
-  Scenario: A chord change starts at the tempo of its last minute
-    Given "alice"'s last minute of "a-minor-open" to "c-open" was almost, 40 clean changes at 55 BPM
+  @MOT-197
+  Scenario: A chord change starts at the tempo of its last take
+    Given "alice"'s last take of "a-minor-open" to "c-open" was almost, 75 percent clean at 55 BPM
     When the chord change is picked as a due item
-    Then its minute starts at 55 BPM, and its last count is 40
+    Then its take starts at 55 BPM
 
-  Scenario: Two clean minutes in a row raise the next minute by 5 BPM
-    Given "alice"'s last two minutes of "a-minor-open" to "c-open" were clean, the last at 50 BPM
+  @MOT-197
+  Scenario: Two clean takes in a row raise the next take by 5 BPM
+    Given "alice"'s last two takes of "a-minor-open" to "c-open" were clean, the last at 50 BPM
     When the chord change is picked as a due item
-    Then its minute starts at 55 BPM
+    Then its take starts at 55 BPM
 
-  Scenario: A single clean minute keeps the tempo
-    Given "alice"'s minutes of "a-minor-open" to "c-open" were struggled, then clean at 50 BPM
+  @MOT-197
+  Scenario: A single clean take keeps the tempo
+    Given "alice"'s takes of "a-minor-open" to "c-open" were struggled, then clean at 50 BPM
     When the chord change is picked as a due item
-    Then its minute starts at 50 BPM
+    Then its take starts at 50 BPM
 
-  Scenario: A struggled minute lowers the next minute by 5 BPM
-    Given "alice"'s last minute of "a-minor-open" to "c-open" was struggled at 50 BPM
+  @MOT-197
+  Scenario: A struggled take lowers the next take by 5 BPM
+    Given "alice"'s last take of "a-minor-open" to "c-open" was struggled at 50 BPM
     When the chord change is picked as a due item
-    Then its minute starts at 45 BPM
+    Then its take starts at 45 BPM
 
+  @MOT-197
   Scenario: The change ladder never goes below 20 BPM
-    Given "alice"'s last minute of "a-minor-open" to "c-open" was struggled at 20 BPM
+    Given "alice"'s last take of "a-minor-open" to "c-open" was struggled at 20 BPM
     When the chord change is picked as a due item
-    Then its minute starts at 20 BPM
+    Then its take starts at 20 BPM
 
-  Scenario: A chord change carries the best clean count since the latest teacher review
-    Given "alice" counted 30, then 38, then 34 clean changes of "a-minor-open" to "c-open", each minute clean
+  @MOT-197
+  Scenario: A chord change carries the best clean tempo since the latest teacher review
+    Given "alice" played clean takes of "a-minor-open" to "c-open" at 45, then 55, then 50 BPM
     When the chord change is picked as a due item
-    Then its best clean count is 38 and its last count is 34
+    Then its best clean tempo is 55 BPM
+
+  @MOT-197
+  Scenario: A minute counted before ten-cycle takes still sets the next take's tempo
+    Given "alice"'s last change of "a-minor-open" to "c-open" was a minute at 50 BPM with 30 clean changes
+    When the chord change is picked as a due item
+    Then its take starts at 45 BPM, since 60 percent of the beats reads as a 50 percent share and a struggle
 
   Scenario: A session in the head never plays chords
     Given "alice" has new single chords and new chord changes on guitar
@@ -567,7 +599,9 @@ Feature: Compose a practice session
   # backing, key after key around the cycle of fourths (rung move, MOT-150). It is a focus item of
   # an in-hand session only, at most one a session, sized like a play-along over 3 takes. On
   # guitar the chart is in chord symbols, with a voicing per chord; on bass the board marks each
-  # chord's root, third and fifth. A tour takes about 4 minutes, so a session shorter than about
+  # chord's root and its third and fifth above and below it, in a five-fret window per key that
+  # starts on a fret from 0 to 9, and the take plays a pattern by the student's level (MOT-197,
+  # ADR-074). A tour takes about 4 minutes, so a session shorter than about
   # 30 minutes has no room for one in its new share. The tour itself is in
   # progression-key-tour.feature.
 
@@ -613,11 +647,59 @@ Feature: Compose a practice session
     And the key of A has the chart "A E F#m D" and a voicing for each of its chords
     And no key has chord tones
 
-  Scenario: On bass, the tour marks each chord's root, third and fifth
+  @MOT-197
+  Scenario: On bass, the tour marks each chord's root and its third and fifth above and below
     Given "alice" has never played the progression key tour of "I-V-vi-IV" on electric bass
+    When the progression key tour is picked for "alice"'s session with "electric-bass" in hand, the key of G in the window starting at fret 3
+    Then in the key of G, the chord "Em" has its root on string 3 at fret 7
+    And its third above on string 2 at fret 5 and its fifth above on string 1 at fret 4
+    And its third below on string 4 at fret 3 and its fifth below on string 4 at fret 7
+
+  @MOT-197
+  Scenario: On bass, a tone no string reaches in the window is left out
+    Given "alice" has never played the progression key tour of "I-V-vi-IV" on electric bass
+    When the progression key tour is picked for "alice"'s session with "electric-bass" in hand, the key of G in the window starting at fret 3
+    Then in the key of G, the chord "G" has its root on string 4 at fret 3
+    And it has no third below and no fifth below, since they are lower than the bass's lowest note
+
+  @MOT-197
+  Scenario: On bass, a tour's keys don't always start at the nut
+    Given "alice" has never played the progression key tour of "I-V-vi-IV" on electric bass
+    When the progression key tour is picked for 20 of "alice"'s sessions with "electric-bass" in hand
+    Then its keys' windows start on more than one fret between 0 and 9
+
+  @MOT-197
+  Scenario Outline: On bass, the tour's pattern follows the student's level on it
+    Given "alice" is <level> on the progression key tour of "12-bar-blues" on electric bass
     When the progression key tour is picked for "alice"'s session with "electric-bass" in hand
-    Then in the key of G, the chord "Em" has its root on string 4 at fret 0, its third on string 1 at fret 0 and its fifth on string 3 at fret 2
-    And in the key of G, the chord "G" has its root on string 1 at fret 0, its third on string 3 at fret 2 and its fifth on string 2 at fret 0
+    Then its bass pattern is <pattern>
+
+    Examples:
+      | level    | pattern                  |
+      | new      | root                     |
+      | learning | root                     |
+      | accurate | root_fifth               |
+      | fluent   | root_third_fifth_third   |
+      | retained | root_third_fifth_seventh |
+
+  @MOT-197
+  Scenario: The seventh pattern marks each chord's own seventh
+    Given "alice" is retained on the progression key tour of "12-bar-blues" on electric bass
+    When the progression key tour is picked for "alice"'s session with "electric-bass" in hand
+    Then in the key of A, the chord "A7" has its seventh at a G
+    And in every key, every chord has a seventh marked
+
+  @MOT-197
+  Scenario: Below the seventh pattern, no seventh is marked
+    Given "alice" is fluent on the progression key tour of "12-bar-blues" on electric bass
+    When the progression key tour is picked for "alice"'s session with "electric-bass" in hand
+    Then no chord of any key has a seventh marked
+
+  @MOT-197
+  Scenario: On guitar, a tour has no bass pattern and no windows
+    Given "alice" has never played the progression key tour of "I-V-vi-IV" on guitar
+    When the progression key tour is picked for "alice"'s session with "guitar" in hand
+    Then it has no bass pattern, and no key has a window
 
   Scenario: A session in the head never plays a progression key tour
     Given "alice" has new progression key tours on guitar
