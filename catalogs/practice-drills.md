@@ -49,8 +49,8 @@ questions are per template, never per item.
   is measured in tempo, like a play-along (see "Guide tones"), so it has no fluent time and no
   felt question.
 - **Play-alongs and chord changes** have no template. A play-along is measured in tempo,
-  against the target its music sets; a chord change in clean changes per minute, against the
-  catalog's change target (see "Chord drills").
+  against the target its music sets; a chord change in the tempo of its clean takes, against
+  the catalog's change target (see "Chord drills").
 - An answer's template comes from its item kind and response type (and, for exercises, the
   exercise's type; for a generated question asked among options, the way it was asked:
   `diatonic_chord:numeral_to_chord`). Keys never change.
@@ -95,9 +95,10 @@ on the bass fretboard, at positions computed from the chord's formula and the tu
 | `chord_function` | a numeral in a major key | `chord_to_function` (know): "In G, D is…", pick tonic, subdominant or dominant · `function_to_chord` (know): pick a chord with the asked function | each other | `chord-function` | P1 |
 | `chart_progression` | a progression (`progressions.yaml`) | `chart_to_numbers` (know): its chart in a key, pick the progression · `numbers_to_chart` (know): a progression and a key, pick its chart | each other | `read-chord-charts`, `common-progressions` | P1 |
 | `heard_chord` | a numeral in a major key | `cadence_then_chord` (hear): a cadence sets the key, a chord plays, pick the numeral; the tonic alone once accurate · `see_then_name` (hear): a key and the chord drawn, pick the numeral | each other, and comes back by ear | `hear-chord-quality`, `hear-progressions` | P2 |
-| `heard_progression` | a 4-bar progression | `progression_by_number` (hear): four chords in a random key, pick the progression; confusable progressions offered | comes back | `hear-progressions`, `common-progressions` | P2 |
+| `heard_progression` | a 4-bar progression | `progression_by_number` (hear): four chords in a random key, pick the progression, each option named by every bar heard; confusable progressions offered | comes back | `hear-progressions`, `common-progressions` | P2 |
+| `heard_chord_quality` | a chord quality: major, minor, dominant7, diminished or augmented | `chord_quality_by_ear` (hear): one chord alone, on a root picked each time, pick its quality | comes back | `hear-chord-quality` | MOT-197 |
 | `chord_voicing` | a chord voicing (bass: a chord's root and fifth) | none, self-rated (play_clean) | — | `play-open-chords` (bass: `play-root-fifth-lines`) | P3 |
-| `chord_change` | two chords (bass: their roots) | none, changes per minute (play_in_time) | — | `change-chords` (bass: `play-root-notes`) | P3 |
+| `chord_change` | two chords (bass: their roots) | none, ten cycles at a tempo rated by their clean share (play_in_time) | — | `change-chords` (bass: `play-root-notes`) | P3 |
 | `progression_keys` | a progression (`progressions.yaml`) on a layout | none, self-rated at a tempo; the key moves on after a clean take (move) | — | `common-progressions`, `play-shapes-in-any-key` (bass: `play-chord-tone-lines`) | P4 |
 | `guide_tone` | a progression on a layout | `tap_the_third` (target): over the playback, tap the 3rd of each chord as it arrives; the 7th once accurate | — (not asked among options) | `target-chord-tones`, `voice-lead` (bass: `play-chord-tone-lines`) | P5 |
 | `song` | a published song chart whose sections are tagged with the progressions they play, on a layout | none, self-rated (use) | — | its sections' progressions' nodes (`common-progressions`, and `cadences` or `blues-form`) | P6 |
@@ -115,12 +116,13 @@ and for a fretboard cell's fret window.
 | `chart_progression` | `chart_progression:<progression key>` | key | `generated_choice` | `generated_choice.v1` |
 | `heard_chord` | `heard_chord:<numeral>` | key | `generated_choice` | `generated_choice.v1` |
 | `heard_progression` | `heard_progression:<progression key>` | key | `generated_choice` | `generated_choice.v1` |
-| `chord_voicing` | `chord_voicing:<diagram id>` | — | `self_rating`, no measure | `self_rating.v1` |
-| `root_fifth` (bass) | `root_fifth:<layout id>:<chord>` | — | `self_rating`, no measure | `self_rating.v1` |
-| `root_change` (bass) | `root_change:<layout id>:<from chord>:<to chord>` | — | `self_rating` + changes per minute | `self_rating.v1` |
-| `progression_keys` | `progression_keys:<layout id>:<progression key>` | key (the tour's) | `self_rating` + tempo and key | `self_rating.v1` |
+| `heard_chord_quality` | `heard_chord_quality:<quality>` | root (no key) | `generated_choice` | `generated_choice.v2` |
+| `chord_voicing` | `chord_voicing:<diagram id>` | — | `self_rating`, no measure | `self_rating.v2` |
+| `root_fifth` (bass) | `root_fifth:<layout id>:<chord>` | window | `self_rating` + tempo | `self_rating.v2` |
+| `root_change` (bass) | `root_change:<layout id>:<from chord>:<to chord>` | window | `self_rating` + tempo and clean share | `self_rating.v2` |
+| `progression_keys` | `progression_keys:<layout id>:<progression key>` | key (the tour's); on bass, each key's window | `self_rating` + tempo and key | `self_rating.v2` |
 | `guide_tone` | `guide_tone:<layout id>:<progression key>` | key, tone, tempo and note value | `timed_taps` | `timed_taps.v1` |
-| `song` | `song:<layout id>:<song chart id>` | — | `self_rating`, no measure | `self_rating.v1` |
+| `song` | `song:<layout id>:<song chart id>` | — | `self_rating`, no measure | `self_rating.v2` |
 | `fretboard_cell` (find every instance) | `fretboard_cell:<layout id>:<string>:<fret>` | fret window | `multi_tap` | `multi_tap.v2`, on every cell in the window |
 
 The bass versions of the harmony and ear families are the same items: only how an option is
@@ -202,6 +204,7 @@ and the progression catalog, never authored, and recalled in the head on every i
 
 `heard_chord` and `heard_progression` are generated from the major keys and the progression
 catalog, like the harmony drills, and recognised by ear in the head on every instrument.
+`heard_chord_quality` (MOT-197) is the simplest of them: one chord alone, its quality picked.
 
 - **Items:**
   - `heard_chord`: the numerals ii iii IV V vi viio, 6 items, each asked in a key picked each
@@ -209,6 +212,9 @@ catalog, like the harmony drills, and recognised by ear in the head on every ins
   - `heard_progression`: every progression of the progression catalog with 2 to 4 bars, in a
     key of its mode picked each time among all 12. Longer ones are never asked by ear: they are
     too long to hold before answering.
+  - `heard_chord_quality`: the qualities major, minor, dominant7, diminished and augmented, 5
+    items, each asked on a root picked each time among all 12, in no key. It rolls up to
+    `hear-chord-quality` only, beside that node's heard chords.
   - They roll up to the nodes of the families table, and a heard progression also to its
     progression's nodes. Like the harmony drills, they count toward their nodes from the day
     they are installed, and suit every instrument.
@@ -219,6 +225,7 @@ catalog, like the harmony drills, and recognised by ear in the head on every ins
     numeral still needs a key, and the tonic is the least it takes.
   - `progression_by_number`: the progression's bars, with no cadence, in either mode: the
     progression sets its own key.
+  - `chord_quality_by_ear`: one bar, the chord alone, in root position; nothing sets a key.
   - The bars that set the key show their numerals; the asked chord's bar shows "?", and a
     progression's bars show nothing. The chords are sounded, never named.
   - On a session that reads chords on bass, each chord's root also plays under it in the bass
@@ -236,7 +243,11 @@ catalog, like the harmony drills, and recognised by ear in the head on every ins
     all seven numerals, the tonic included, in scale order.
   - `progression_by_number`: four, chosen like a chart question's: the progression, then its
     confusables, then theirs, all of its length and mode, then made-up wrong answers. Confusable
-    progressions are asked next to each other in a session.
+    progressions are asked next to each other in a session. Each option is named by every bar's
+    numeral in order (IV–V–I–I), never by the catalog name, so the numerals shown always match
+    the chords heard (MOT-197).
+  - `chord_quality_by_ear`: major, minor and dominant7 until the student is fluent on the item;
+    then diminished and augmented too. Always in that order: where one sits says nothing.
 - **`see_then_name`** names the key and draws the chord, a box on guitar and a symbol on bass,
   by the session's reading (the harmony drills' rule). It plays nothing. It is the ear drill's
   second way, so a lucky guess by ear meets the chord's numeral by sight; the item also comes
@@ -254,7 +265,7 @@ instrument in hand and rated, never recalled in the head.
     `chord_voicing:<voicing diagram id>`;
   - changes: ten pairs of those chords (Am–C, C–G, G–D, D–A, A–E, Am–E, Em–G, D–Em, Am–Dm,
     Em–C), keyed `chord_change:<from diagram id>:<to diagram id>` in the order listed. A pair is
-    one item, practised both ways in the same minute;
+    one item, practised both ways in the same take;
   - on bass, the same chords by symbol on the `electric-bass` layout:
     `root_fifth:<layout id>:<chord>` and `root_change:<layout id>:<from chord>:<to chord>`.
   - They roll up to the nodes of the families table: `play-open-chords` and `change-chords` on
@@ -265,29 +276,41 @@ instrument in hand and rated, never recalled in the head.
     not tracked.
 - **In a session** they are focus items of an in-hand session, never in the head, never the
   warm-up or the application ending. At most 4 single chords and 2 changes a session. A single
-  chord takes 20 seconds, a change 90 (a bar of count-in, the minute and the count). On guitar,
+  chord takes 20 seconds, a change 45 (a bar of count-in, ten cycles and the share). On guitar,
   a single chord comes before a change that uses it in the same session.
 - **How they are drawn:** a guitar chord is its voicing's chord box, named (playing it is the
-  skill, so the name gives nothing away). On bass, the root and fifth are marked on the bass
-  board, at the positions ADR-057 computes (lowest fret, then lowest string), inside frets 0–5;
-  a root change marks both roots.
+  skill, so the name gives nothing away). On bass, every place is inside a five-fret window
+  whose first fret the plan picks each time from 0 to 9 (`bass_window_start_frets`), so a
+  student doesn't always play at the nut; the root is on the lowest string that holds it in the
+  window (for a root and fifth, with the fifth above it in the window too, which a five-fret
+  window always allows on a four-string bass). A root and fifth marks the root, the fifth above it (played) and the fifth below it
+  (marked only, when the window reaches it); a root change marks both roots (MOT-197).
+- **How they sound:** every chord drill shows the Metronome tool's row (beat dots, tempo control
+  with note values). On bass, a drill sounds only the notes it asks for, in the bass's voice,
+  never a chord: a root and fifth plays the root then the fifth, a half note each, from
+  `root_fifth_tempo_bpm`; a root change plays each root on its beat. On guitar, a change keeps
+  the metronome alone.
 - **A single chord** is fretted, strummed once and rated clean, almost or struggled by the
   student. It has no measure, so a clean take is fully fluent and accuracy alone decides its
-  level.
-- **A change** is one minute at a tempo, one change on every beat:
-  - the student sets the tempo before the minute (the metronome ticks while they try it), starts
-    it after a bar of count-in, and counts the changes that rang clean when it is over. The count
-    starts at the item's last count;
-  - the take sends the tempo and the count. Its rating follows from the share of the beats that
-    changed cleanly, count ÷ tempo: clean from 0.9, almost from 0.6, struggled below. The student
-    doesn't rate it, so the count and the rating never disagree;
+  level. **A root and fifth** is rated the same way and also sends the tempo it was played at;
+  the tempo isn't graded.
+- **A change** is ten cycles at a tempo, one change on every beat (MOT-197, ADR-074): a cycle is
+  from, to and back, so a take is 20 changes:
+  - the student sets the tempo before the take (the metronome ticks while they try it), starts
+    it after a bar of count-in, and when the tenth cycle ends picks the share of changes that
+    rang clean from four buttons: 25, 50, 75 or 100 %. Nothing is counted while playing;
+  - the take sends the tempo and the share. Its rating follows from the share: clean at 100,
+    almost at 75, struggled at 50 or 25. The student doesn't rate it, so the share and the
+    rating never disagree;
   - **the ladder** runs across sessions, since a session plays a change once. The plan starts a
-    change at the tempo of its last minute: 5 BPM up after two clean minutes in a row, 5 down
-    after a struggled one, never below 20. A change never played starts at 40;
-  - **the target** is the catalog's change target, the same for every pair and instrument: 60
-    clean changes a minute (version 1). A minute's fluency is its count ÷ the target. The best
-    clean count is the student's edge: a minute that isn't clean above it doesn't count against
-    them, as for a play-along's tempo.
+    change at the tempo of its last take: 5 BPM up after two clean takes in a row, 5 down after
+    a struggled one, never below 20. A change never played starts at 40;
+  - **the target** is the catalog's change target, the same for every pair and instrument, read
+    as a tempo: a clean take at 60 BPM (version 1). A clean take's fluency is its tempo ÷ the
+    target. The best clean tempo is the student's edge: a take that isn't clean above it doesn't
+    count against them, as for a play-along's tempo;
+  - **a minute kept before ten-cycle takes** reads as a take at its tempo whose share is
+    changes ÷ tempo, rounded down to a share (below 25 % reads as 25), and is rated from that.
 - **Not asked among options**, so the challenge rules on options and second ways don't apply.
 
 ## Progression key tours
@@ -344,11 +367,19 @@ fourths, and so learns it by number instead of by one fingering (MOT-150).
   - the tempo control.
   - **On guitar**, each chord's box is shown on demand (the chord card), from the harmony drills'
     voicing rule, so every client draws the same box.
-  - **On bass**, the board marks each chord's root, third and fifth, so the line says whether
-    the chord is major or minor. Each tone sits at its lowest fret, then its lowest string,
-    inside frets 0–5: the rule of a root and fifth. A dominant seventh keeps root, third and
-    fifth on the board, and its symbol shows the 7.
-- **Rating:** the student rates each take clean, almost or struggled (`self_rating.v1`). The take
+  - **On bass** (MOT-197, ADR-074), the board marks each chord's root, and its third and fifth
+    both above and below it, so the student sees each interval up and down and whether the
+    chord is major or minor. Every tone is inside the key's five-fret window, whose first fret
+    the plan picks from 0 to 9 for each key; the root is on the lowest string that holds it
+    there, and a tone no string reaches in the window is left out. The seventh is marked only
+    for the seventh pattern: the chord's own (♭7 on a 7 chord, 7 on a maj7, the key's seventh on
+    a triad).
+  - **The bass pattern:** a bass take plays one pattern on every bar, by the student's level on
+    the tour (`progression_keys.bass_patterns`): the root, a whole note (new, learning); root
+    and fifth, half notes (accurate); root, third, fifth, third, quarters (fluent); root,
+    third, fifth, seventh, quarters (retained). The line above the chart names it. The take
+    sounds exactly those notes in the bass's voice, over the metronome, and never a chord.
+- **Rating:** the student rates each take clean, almost or struggled (`self_rating.v2`). The take
   sends its tempo, its note value and the key it was played in. As for a play-along, a take's
   fluency is its effective speed ÷ the target.
 - **The summary** says how many keys are clean at the tour tempo: "Clean in 3 of 12 keys at
@@ -565,6 +596,7 @@ places the note has is never shown, since it would let a student rule places out
     | `heard_chord:cadence_then_chord` | 3 s after the sound |
     | `heard_chord:see_then_name` | 4 s |
     | `heard_progression:progression_by_number` | 5 s after the sound |
+    | `heard_chord_quality:chord_quality_by_ear` | 2.5 s after the sound |
 
     The fretboard, diagram shape, harmony and ear defaults stand in until the team benchmarks the drill,
     which needs the drill built first; the benchmark is their version 2.
@@ -606,7 +638,11 @@ places the note has is never shown, since it would let a student rule places out
 - `guide_tones` gives a tempo for every knowledge level, and its fret window holds every pitch
   class on each of its layouts.
 - `progression_keys.key_order` holds each of the 12 major keys once. Its layouts exist, and
-  every bass tour's chord tones fall inside frets 0–5 of the `electric-bass` layout.
+  every bass tour's chord tones fall inside their key's window on the `electric-bass` layout.
+- `progression_keys.bass_patterns` names a pattern for every knowledge level.
+- For every start in `chord_drills.bass_window_start_frets`, every bass chord drill's root and
+  the fifth above it, and both roots of every root change, fit one window of the
+  `electric-bass` layout.
 
 - Installing on an empty database twice gives identical template and threshold IDs.
 - The generated cells for a layout are exactly the strings and frets listed. A string the
