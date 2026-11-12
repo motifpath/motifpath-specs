@@ -40,10 +40,11 @@ Each file holds:
     for the evidence it graded), or `multi_tap.v2` when the response is `multi_tap`
   - `exercise` → `exercise_option.v1`
   - `play_along`, `chord_change`, `chord_voicing`, `root_fifth`, `root_change`,
-    `progression_keys` and `song` → `self_rating.v1`
+    `progression_keys` and `song` → `self_rating.v2` (`self_rating.v1` before the release that
+    made a change ten cycles rated by its clean share; its file stays for the evidence it graded)
   - `diagram_shape` → `diagram_shape.v1`
-  - `diatonic_chord`, `chord_function`, `chart_progression`, `heard_chord` and
-    `heard_progression` → `generated_choice.v2` (`generated_choice.v1` before the release that
+  - `diatonic_chord`, `chord_function`, `chart_progression`, `heard_chord`,
+    `heard_progression` and `heard_chord_quality` → `generated_choice.v2` (`generated_choice.v1` before the release that
     took any created progression into the drills; its file stays for the evidence it graded)
   - `guide_tone` → `timed_taps.v2` (`timed_taps.v1` before that release)
 - **Checks run in this order, and the first failure is the rejection:**
@@ -77,9 +78,9 @@ Each file holds:
   Adding it to `exercise_option.v1`'s cases changes no grading rule.
 - **Self-assessed evidence** is `source`, `rating` and the measure its kind takes:
   `tempo_bpm` (and its `note_value`, when sent) for a play-along, the same plus `music_key`
-  for a progression key tour take, `tempo_bpm` and
-  `changes_per_minute` for a chord change or a root change, none for a chord voicing or a root
-  and fifth.
+  for a progression key tour take, `tempo_bpm` and `clean_share_percent` for a chord change or
+  a root change (`changes_per_minute` under `self_rating.v1`), `tempo_bpm` for a root and fifth
+  (none under `self_rating.v1`), none for a chord voicing or a song.
 
 ### Music in the new graders
 
@@ -165,6 +166,24 @@ Every `fretboard_cell.v1` rule, plus four choices for name the note:
   beats that changed cleanly, `changes_per_minute / tempo_bpm`. `clean` from 0.9, `almost` from
   0.6, `struggled` below. The evidence keeps the derived rating, the tempo and the count.
 
+### `self_rating.v2`
+
+Everything in `self_rating.v1` holds, except the change and the root and fifth:
+
+- **A change is ten cycles at `tempo_bpm`, one change on every beat** (one cycle is from, to and
+  back: 20 changes). The student picks the share of the changes that rang clean from four
+  buttons, sent as `clean_share_percent`: 25, 50, 75 or 100 (the response schema allows no
+  other). A change needs both `tempo_bpm` and `clean_share_percent`
+  (`measure_missing`), and takes no `changes_per_minute` or `note_value`
+  (`response_does_not_fit_item`).
+- **A change's rating follows from its share**, whatever rating was sent: `clean` at 100,
+  `almost` at 75, `struggled` at 50 or 25. The evidence keeps the derived rating, the tempo and
+  the share.
+- **A root and fifth needs its `tempo_bpm`** (`measure_missing`): it is played under the
+  metronome, a half note each. It takes no other measure, and no `note_value`.
+- `clean_share_percent` on any kind but a change is `response_does_not_fit_item`, as
+  `changes_per_minute` now is on every kind.
+
 ### `generated_choice.v1`
 
 - **The way must be one of the kind's ways:** `numeral_to_chord` or `chord_to_numeral` for a
@@ -214,6 +233,14 @@ progressions fit:
 
 So a chart of the right length that no drill progression has, which `generated_choice.v1`
 refused, is a possible answer.
+
+- **A heard chord quality** (`heard_chord_quality:<quality>`, added to this version as a new
+  kind; no rule above changes) is asked `chord_quality_by_ear` only, any other way is
+  `response_does_not_fit_item`. Its quality is one of `major`, `minor`, `dominant7`,
+  `diminished` and `augmented`, as its key says. It is asked on a root picked
+  each time and in no key, so a `music_key` is `response_does_not_fit_item`. Every option is
+  one of those qualities, with the item's own among them (`invalid_choices`). The right answer
+  is the item's quality, and the answer key has no `music_key`.
 
 ### `timed_taps.v1`
 
