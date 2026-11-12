@@ -112,27 +112,32 @@ Feature: Derive a student's knowledge of an item from evidence
     When "alice" rates a take of "pentatonic-run" as "struggled" at 110 BPM
     Then the take is counted as a miss
 
-  # A chord change's fluency is its clean count over the catalog's change target, 60 clean changes
-  # a minute; a single chord has no measure, so a clean take is fully fluent (MOT-79).
-  Scenario: Five clean minutes near the target make a chord change fluent
+  # A chord change's fluency is the tempo of its clean takes over the catalog's change target,
+  # 60 BPM with every change clean (MOT-197, ADR-074; before it, a clean count over 60 a minute,
+  # MOT-79). A single chord has no measure, so a clean take is fully fluent.
+  @MOT-197
+  Scenario: Five clean takes near the target tempo make a chord change fluent
     Given "alice" practises the chord change "a-minor-open" to "c-open"
-    When "alice" plays 5 clean minutes of it on 5 different days, each 54 clean changes at 60 BPM
+    When "alice" plays 5 takes of it on 5 different days, each at 54 BPM with every change clean
     Then "alice"'s level for the chord change is "fluent"
 
-  Scenario: Clean minutes far below the target leave a chord change accurate, not fluent
+  @MOT-197
+  Scenario: Clean takes far below the target tempo leave a chord change accurate, not fluent
     Given "alice" practises the chord change "a-minor-open" to "c-open"
-    When "alice" plays 5 clean minutes of it on 5 different days, each 30 clean changes at 30 BPM
+    When "alice" plays 5 takes of it on 5 different days, each at 30 BPM with every change clean
     Then "alice"'s level for the chord change is "accurate"
 
-  Scenario: A struggled minute above the best clean count doesn't count against the student
-    Given "alice"'s best clean count on the chord change "a-minor-open" to "c-open" is 40
-    When "alice" plays a minute of it with 45 clean changes at 90 BPM
-    Then the minute is not counted as a miss
+  @MOT-197
+  Scenario: A struggled take above the best clean tempo doesn't count against the student
+    Given "alice"'s best clean tempo on the chord change "a-minor-open" to "c-open" is 40 BPM
+    When "alice" plays a take of it at 90 BPM with 50 percent of the changes clean
+    Then the take is not counted as a miss
 
-  Scenario: A struggled minute at or below the best clean count is a real miss
-    Given "alice"'s best clean count on the chord change "a-minor-open" to "c-open" is 40
-    When "alice" plays a minute of it with 30 clean changes at 60 BPM
-    Then the minute is counted as a miss
+  @MOT-197
+  Scenario: A struggled take at or below the best clean tempo is a real miss
+    Given "alice"'s best clean tempo on the chord change "a-minor-open" to "c-open" is 40 BPM
+    When "alice" plays a take of it at 40 BPM with 50 percent of the changes clean
+    Then the take is counted as a miss
 
   Scenario: Five clean takes make a single chord fluent
     Given "alice" practises the single chord "a-minor-open"

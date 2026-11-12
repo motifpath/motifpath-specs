@@ -30,12 +30,19 @@ Feature: Grade a practice answer into evidence
     When "alice" rates a take of play-along "pentatonic-run" as "clean" at 90 BPM
     Then "alice" has self-assessed evidence for play-along "pentatonic-run" rated "clean" at 90 BPM
 
-  # A chord change is one minute at a tempo, one change on every beat; the student counts the
-  # changes that rang clean, and the share of the beats that did rates the minute (MOT-79).
-  Scenario: A minute of chord changes is rated by the share of beats that changed cleanly
+  # A chord change is ten cycles at a tempo, one change on every beat (20 changes); the student
+  # picks the share of changes that rang clean, 25, 50, 75 or 100 %, and the share rates the take
+  # (MOT-197, ADR-074; before it, a minute rated by a count, MOT-79).
+  @MOT-197
+  Scenario: A take of chord changes is rated by the share of changes that rang clean
     Given the chord voicing diagrams "a-minor-open" and "c-open"
-    When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 60 BPM with 42 clean changes
-    Then "alice" has self-assessed evidence for that chord change rated "almost" at 60 BPM with 42 clean changes
+    When "alice" sends a take of changes between "a-minor-open" and "c-open" at 60 BPM with 75 percent clean
+    Then "alice" has self-assessed evidence for that chord change rated "almost" at 60 BPM with 75 percent clean
+
+  @MOT-197
+  Scenario: A chord's root and fifth on bass keeps the tempo it was played at
+    When "alice" rates a take of the root and fifth of "Am" on the "electric-bass" layout "clean" at 60 BPM
+    Then "alice" has self-assessed evidence for that root and fifth rated "clean" at 60 BPM
 
   # A progression key tour take is rated like a play-along, and also sends the key it was played
   # in (MOT-150).
@@ -148,15 +155,23 @@ Feature: Grade a practice answer into evidence
     When "alice" answers that shape by finding the degree "3" on string 4 at fret 2 after 3000 milliseconds
     Then "alice" has auto-graded evidence for that shape that is wrong with a latency of 3000 milliseconds
 
-  Scenario: A chord change's rating follows its count, whatever rating was sent
+  @MOT-197
+  Scenario: A chord change's rating follows its share, whatever rating was sent
     Given the chord voicing diagrams "a-minor-open" and "c-open"
-    When "alice" sends a minute of changes between "a-minor-open" and "c-open" rated "clean" at 60 BPM with 20 clean changes
-    Then "alice" has self-assessed evidence for that chord change rated "struggled" at 60 BPM with 20 clean changes
+    When "alice" sends a take of changes between "a-minor-open" and "c-open" rated "clean" at 60 BPM with 50 percent clean
+    Then "alice" has self-assessed evidence for that chord change rated "struggled" at 60 BPM with 50 percent clean
 
-  Scenario: Nine clean changes in ten beats is a clean minute
+  @MOT-197
+  Scenario: Every change clean is a clean take
     Given the chord voicing diagrams "a-minor-open" and "c-open"
-    When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 60 BPM with 54 clean changes
-    Then "alice" has self-assessed evidence for that chord change rated "clean" at 60 BPM with 54 clean changes
+    When "alice" sends a take of changes between "a-minor-open" and "c-open" at 60 BPM with 100 percent clean
+    Then "alice" has self-assessed evidence for that chord change rated "clean" at 60 BPM with 100 percent clean
+
+  @MOT-197
+  Scenario: A minute counted before the change kept its evidence, read as a share
+    Given "alice" has evidence from before ten-cycle takes for the change between "a-minor-open" and "c-open": 54 clean changes at 60 BPM
+    When the change's record is read
+    Then that minute reads as a take at 60 BPM with 75 percent clean
 
   # ── Failure cases ──────────────────────────────────────────────────────────
 
@@ -240,6 +255,17 @@ Feature: Grade a practice answer into evidence
     When "alice" answers the chart progression "major/I-IV-V" in C, asked chart_to_numbers, by picking "major/I-ii-V" among "major/I-IV-V", "major/I-ii-V", "major/I-IV-I" and "major/vi-IV-V"
     Then "alice" has auto-graded evidence for that question that is wrong
 
+  # A heard chord quality is one chord heard alone, its quality picked; asked in no key (MOT-197).
+  @MOT-197
+  Scenario: A chord's quality picked right by ear is graded right
+    When "alice" answers the heard chord quality "minor", asked chord_quality_by_ear, by picking "minor" among "major", "minor" and "dominant7"
+    Then "alice" has auto-graded evidence for that question that is right
+
+  @MOT-197
+  Scenario: A dominant seventh heard as major is graded wrong
+    When "alice" answers the heard chord quality "dominant7", asked chord_quality_by_ear, by picking "major" among "major", "minor" and "dominant7"
+    Then "alice" has auto-graded evidence for that question that is wrong
+
   # A song is rated once, whole, with no measure (MOT-152).
   Scenario: A self-rated song is kept with its rating alone
     When "alice" rates the song "Amazing Grace" on guitar as "almost"
@@ -274,17 +300,25 @@ Feature: Grade a practice answer into evidence
     Then the answer is rejected because its measure is missing
     And "alice" has no evidence for play-along "pentatonic-run"
 
-  Scenario: A minute of chord changes without its tempo yields no evidence
+  @MOT-197
+  Scenario: A take of chord changes without its tempo yields no evidence
     Given the chord voicing diagrams "a-minor-open" and "c-open"
-    When "alice" sends a minute of changes between "a-minor-open" and "c-open" with 40 clean changes and no tempo
+    When "alice" sends a take of changes between "a-minor-open" and "c-open" with 100 percent clean and no tempo
     Then the answer is rejected because its measure is missing
     And "alice" has no evidence for that chord change
 
-  Scenario: More clean changes than beats in the minute yields no evidence
+  @MOT-197
+  Scenario: A take of chord changes sent as a count yields no evidence
     Given the chord voicing diagrams "a-minor-open" and "c-open"
-    When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 40 BPM with 41 clean changes
+    When "alice" sends a minute of changes between "a-minor-open" and "c-open" at 40 BPM with 40 clean changes
     Then the answer is rejected because the response does not fit the item
     And "alice" has no evidence for that chord change
+
+  @MOT-197
+  Scenario: A root and fifth without its tempo yields no evidence
+    When "alice" rates a take of the root and fifth of "Am" on the "electric-bass" layout "clean" with no tempo
+    Then the answer is rejected because its measure is missing
+    And "alice" has no evidence for that root and fifth
 
   Scenario: A cell on a string the instrument doesn't have yields no evidence
     When "alice" answers the guitar cell on string 7 at fret 3 by naming the note "C" after 1800 milliseconds
@@ -312,6 +346,12 @@ Feature: Grade a practice answer into evidence
   Scenario: A heard chord named by sight among options that aren't all numerals yields no evidence
     When "alice" answers the heard chord vi in G, asked see_then_name, by picking "vi" among "vi", "IV", "Em" and "iii"
     Then the answer is rejected because the choices are invalid
+    And "alice" has no evidence for that question
+
+  @MOT-197
+  Scenario: A chord quality answered in a key yields no evidence
+    When "alice" answers the heard chord quality "major" in C, asked chord_quality_by_ear, by picking "major" among "major", "minor" and "dominant7"
+    Then the answer is rejected because the response does not fit the item
     And "alice" has no evidence for that question
 
   Scenario: A chord picked that isn't among a generated question's options yields no evidence

@@ -28,9 +28,11 @@ PracticeItemKey:
       picked each time.
     - heard_progression:<progression key> — a drill progression of 2 to 4 bars recognised by
       ear. The key is picked each time.
+    - heard_chord_quality:<quality> — a chord's quality recognised by ear, one chord heard
+      alone: major, minor, dominant7, diminished or augmented. The root is picked each time.
     - chord_voicing:<diagram id> — playing one chord voicing cleanly, untimed.
     - root_fifth:<layout instrument id>:<chord> — playing a chord's root and fifth on a bass
-      layout, cleanly, untimed.
+      layout, cleanly, a half note each at a tempo.
     - root_change:<layout instrument id>:<from chord>:<to chord> — changing between two
       chords' roots on a bass layout.
     - guide_tone:<layout instrument id>:<progression key> — tapping a chord tone of each chord
@@ -50,7 +52,7 @@ PracticeItemKey:
 
     Item kinds are an open set: a new kind adds its own prefix and key scheme here, a
     grader, and its golden cases.
-  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diagram_shape:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diatonic_chord:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chord_function:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chart_progression:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|heard_chord:(I|ii|iii|IV|V|vi|viio)|heard_progression:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|chord_voicing:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|root_fifth:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|root_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|guide_tone:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|progression_keys:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|song:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$'
+  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diagram_shape:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diatonic_chord:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chord_function:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chart_progression:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|heard_chord:(I|ii|iii|IV|V|vi|viio)|heard_progression:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|heard_chord_quality:(major|minor|dominant7|diminished|augmented)|chord_voicing:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|root_fifth:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|root_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|guide_tone:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|progression_keys:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|song:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$'
   example: 'fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:3'
 
 PracticeResponse:
@@ -205,14 +207,14 @@ OptionChoiceResponse:
 SelfRatingResponse:
   type: object
   description: |
-    The student's own rating of a take they played: a play-along at a tempo, chord changes
-    counted over a minute, one chord played cleanly, a progression in one key of its tour, or a
-    whole song. A
-    play-along rating carries tempo_bpm and no changes_per_minute, and may carry the note_value
-    it was played at (quarters when absent); a progression key tour take carries the same and
-    the music_key it was played in; a chord-change or root-change take carries both tempo_bpm and changes_per_minute,
-    and its rating is derived from them (see rating); a single chord voicing, a chord's root
-    and fifth (play clean) or a song carries neither.
+    The student's own rating of a take they played: a play-along at a tempo, ten cycles of
+    chord changes at a tempo, one chord played cleanly, a chord's root and fifth at a tempo, a
+    progression in one key of its tour, or a whole song. A play-along rating carries tempo_bpm,
+    and may carry the note_value it was played at (quarters when absent); a progression key
+    tour take carries the same and the music_key it was played in; a chord-change or
+    root-change take carries both tempo_bpm and clean_share_percent, and its rating is derived
+    from the share (see rating); a chord's root and fifth carries tempo_bpm only; a single
+    chord voicing or a song carries no measure.
   properties:
     response_type:
       type: string
@@ -228,28 +230,35 @@ SelfRatingResponse:
       description: |
         How the take went, in the student's judgement. struggled = fell apart or needed to
         stop; almost = got through with slips; clean = no slips at this measure. For a chord
-        change or a root change the rating is not the student's: it follows from the share of
-        the minute's beats that changed cleanly (changes_per_minute / tempo_bpm), clean from
-        0.9, almost from 0.6, struggled below. The server derives it whatever is sent, and a
-        client sends the same.
+        change or a root change the rating is not the student's: it follows from
+        clean_share_percent, clean at 100, almost at 75, struggled at 50 or 25. The server
+        derives it whatever is sent, and a client sends the same.
     tempo_bpm:
       type: integer
       minimum: 1
       maximum: 400
       description: |
         The tempo of the take, in beats per minute, as played: the click's tempo. Present for a
-        play-along and a progression key tour take, and for a chord change or a root change,
-        where the student changes on every
-        beat, so it is also the number of changes the minute asked for.
+        play-along, a progression key tour take, a chord's root and fifth (a half note each),
+        and a chord change or a root change, where the student changes on every beat.
     note_value:
       $ref: '#/NoteValue'
+    clean_share_percent:
+      type: integer
+      enum: [25, 50, 75, 100]
+      description: |
+        The share of the take's changes that rang clean, picked by the student from four
+        buttons once the take's ten cycles (20 changes) are over. Present for a chord change
+        and a root change only.
     changes_per_minute:
       type: integer
       minimum: 0
       maximum: 600
+      deprecated: true
       description: |
-        The number of chord changes in one minute that rang clean, counted by the student. Present
-        for a chord change and a root change, and never more than tempo_bpm.
+        The clean changes counted over a minute, sent by apps released before a change became
+        ten cycles rated by clean_share_percent. Kept so their evidence still reads; a current
+        client never sends it, and the server rejects it on a new answer.
     music_key:
       $ref: '#/MusicKey'
   additionalProperties: false
@@ -294,7 +303,8 @@ GeneratedChoiceResponse:
         key for chart_to_numbers and progression_by_number (a drill progression's, or the key a
         wrong answer the server made up would have if an admin created it, such as
         major/I-ii-IV-V); a chart, the progression's chord
-        symbols one per bar separated by single spaces (G D Em C), for numbers_to_chart. A
+        symbols one per bar separated by single spaces (G D Em C), for numbers_to_chart; a
+        quality (major, minor, dominant7, diminished, augmented) for chord_quality_by_ear. A
         chord's root may be spelled either way (F# or Gb).
     choice:
       type: string
@@ -312,7 +322,8 @@ GeneratedChoiceResponse:
       minimum: 0
       description: |
         Milliseconds of sound the question plays once before it can be answered (the cadence,
-        or the tonic chord alone, then the chord; or the progression), at the tempo and note
+        or the tonic chord alone, then the chord; the progression; or the one chord whose
+        quality is asked), at the tempo and note
         value it was played at. It is taken off the
         latency before the answer is judged against the drill's fluent time. Present for
         questions asked by ear only.
@@ -336,6 +347,7 @@ GeneratedChoiceWay:
     - cadence_then_chord
     - progression_by_number
     - see_then_name
+    - chord_quality_by_ear
   description: |
     How a generated question was asked, which fixes what its options are and which one is
     right. numeral_to_chord = a key and a numeral are named, pick its chord; chord_to_numeral
@@ -345,10 +357,12 @@ GeneratedChoiceWay:
     numbers_to_chart = a progression and a key are named, pick its chart; cadence_then_chord =
     a cadence sets the key and a chord plays, pick its numeral; progression_by_number = a
     progression plays, pick it; see_then_name = a key is named and a chord is shown, pick its
-    numeral. A diatonic chord is asked numeral_to_chord or
+    numeral; chord_quality_by_ear = one chord plays alone, pick its quality. A diatonic chord is
+    asked numeral_to_chord or
     chord_to_numeral; a chord function chord_to_function or function_to_chord; a chart
     progression chart_to_numbers or numbers_to_chart; a heard chord cadence_then_chord or
-    see_then_name; a heard progression progression_by_number.
+    see_then_name; a heard progression progression_by_number; a heard chord quality
+    chord_quality_by_ear.
 
 MusicKey:
   type: string
@@ -360,7 +374,7 @@ MusicKey:
     response, the key a question was asked in or a take was played in when
     its item doesn't fix one: a chart progression, a heard chord, a heard progression, a guide
     tone or a progression key tour; absent in a response to any other item. A planned question
-    always names its key.
+    names its key, except a heard chord quality, asked in none.
 
 TimedTapsResponse:
   type: object
@@ -697,6 +711,7 @@ PracticeItemKind:
     - chart_progression
     - heard_chord
     - heard_progression
+    - heard_chord_quality
     - chord_voicing
     - root_fifth
     - root_change
@@ -815,13 +830,22 @@ PracticeEvidence:
     tempo_bpm:
       type: integer
       minimum: 1
-      description: The tempo of a rated play-along take, in beats per minute, as played.
+      description: |
+        The tempo of a rated take, in beats per minute, as played: a play-along, a progression
+        key tour take, a chord's root and fifth, or a chord or root change.
     note_value:
       $ref: '#/NoteValue'
+    clean_share_percent:
+      type: integer
+      enum: [25, 50, 75, 100]
+      description: The share of a rated change take's changes that rang clean.
     changes_per_minute:
       type: integer
       minimum: 0
-      description: The chord changes made in a rated minute.
+      description: |
+        The clean changes counted in a rated minute, on evidence kept before a change became ten
+        cycles rated by clean_share_percent. Reads as that share: changes_per_minute / tempo_bpm,
+        rounded down to 25, 50, 75 or 100 percent (below 25 % reads as 25).
     music_key:
       $ref: '#/MusicKey'
     verified:
@@ -1044,7 +1068,7 @@ GeneratedChoicePlayback:
   type: object
   description: |
     The sound of a question asked by ear: bars in 4/4, one chord a bar, played in the voicings
-    the question lists. The student may change the tempo and the note value before or between
+    the question lists. A chord quality plays one bar: its chord alone. The student may change the tempo and the note value before or between
     plays; the answer is never graded on either. A note value is a speed factor: eighths play
     two chords a bar, at twice the speed.
   properties:
@@ -1076,14 +1100,14 @@ GeneratedChoicePlayback:
         in the head has no instrument of its own, so the client can't find it any other way.
     bars:
       type: array
-      minItems: 2
+      minItems: 1
       maxItems: 5
       items:
         type: object
         properties:
           chord:
             type: string
-            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
+            pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|aug|7|maj7|m7|m7b5|dim7)?$'
             description: |
               The bar's chord symbol, spelled as the chord catalog spells roots. It is sounded,
               never shown.
@@ -1102,7 +1126,8 @@ GeneratedChoicePlayback:
         The bars in the order they play. cadence_then_chord: the cadence I IV V I with their
         numerals, or only I with its numeral once the student is accurate on the item, then the
         asked chord with no numeral. progression_by_number: the progression's bars, 2 to 4, none
-        with a numeral.
+        with a numeral. chord_quality_by_ear: one bar, the chord whose quality is asked, with no
+        numeral.
   additionalProperties: false
   required:
     - tempo_bpm
@@ -1119,13 +1144,17 @@ GeneratedChoiceQuestion:
     parts the way needs are present; the others are null or empty. Nothing in it marks the
     answer, and the prompt never names it: the client shows the options as given and sends
     back the way, the options as shown and the pick, with music_key when the item is a chart
-    progression, a heard chord or a heard progression. A question asked by ear also carries
-    the playback the client sounds before the options can be picked.
+    progression, a heard chord or a heard progression (never for a heard chord quality, which is
+    asked in no key; its music_key is null). A question asked by ear also carries the playback
+    the client sounds before the options can be picked.
   properties:
     way:
       $ref: '#/GeneratedChoiceWay'
     music_key:
-      $ref: '#/MusicKey'
+      oneOf:
+        - $ref: '#/MusicKey'
+        - type: 'null'
+      description: The key the question is asked in; null for a heard chord quality only.
     numeral:
       oneOf:
         - $ref: '#/ChordNumeral'
@@ -1185,16 +1214,20 @@ GeneratedChoiceQuestion:
             maxLength: 200
             description: |
               The option as the response sends it back: a chord symbol, a numeral, a function, a
-              progression key, or a chart (its chord symbols one per bar, separated by single
-              spaces), by way.
+              progression key, a chart (its chord symbols one per bar, separated by single
+              spaces), or a chord quality (major, minor, dominant7, diminished, augmented), by
+              way.
           name:
             type:
               - string
               - 'null'
             description: |
               The option's name in the student's language where its value is a key: a function
-              ("Dominant — pulls home") or a progression ("I – V – vi – IV"). Null for a chord, a
-              numeral or a chart, which are shown as they are.
+              ("Dominant — pulls home"), a progression, or a chord quality ("Menor"). A
+              progression is named by its catalog name, except for progression_by_number,
+              where it is named by every bar's numeral in order, joined by – ("IV–V–I–I"), so
+              the numerals shown always match the bars heard. Null for a chord, a numeral or a
+              chart, which are shown as they are.
           chart:
             type: array
             items:
@@ -1217,7 +1250,9 @@ GeneratedChoiceQuestion:
         progression's wrong answers are drill progressions of its length and mode, then, when
         those are too few, progressions the server makes up by changing one of its bars. A
         made-up one is offered as the progression it would be if an admin created it: its key,
-        its name (its numerals joined by –) and its chart.
+        its name (its numerals joined by –) and its chart. A heard chord quality offers major,
+        minor and dominant7 until the student is fluent on the item, then diminished and
+        augmented too, in that order rather than shuffled.
     voicings:
       type: array
       items:
@@ -1246,8 +1281,8 @@ GeneratedChoiceQuestion:
         - $ref: '#/GeneratedChoicePlayback'
         - type: 'null'
       description: |
-        What the client plays before the options can be picked, for cadence_then_chord and
-        progression_by_number. Null for every other way.
+        What the client plays before the options can be picked, for cadence_then_chord,
+        progression_by_number and chord_quality_by_ear. Null for every other way.
   additionalProperties: false
   required:
     - way
@@ -1295,8 +1330,11 @@ PlannedChordVoicing:
 PlannedRootFifth:
   type: object
   description: |
-    A chord's root and fifth to play on a bass layout and rate (kind root_fifth). Both places
-    are marked: playing them is the skill. The take is rated by the student and has no measure.
+    A chord's root and fifth to play on a bass layout and rate (kind root_fifth). The root and
+    both fifths, above and below it, are marked: playing them is the skill. The take plays the
+    root then the fifth above it, a half note each, in the bass's voice under the metronome,
+    over and over until the student stops it; the student rates it, and the take sends the
+    tempo it was played at.
   properties:
     layout_instrument_id:
       type: string
@@ -1309,55 +1347,134 @@ PlannedRootFifth:
       $ref: '#/FretPlace'
     fifth:
       $ref: '#/FretPlace'
-  additionalProperties: false
-  required: [layout_instrument_id, chord_symbol, root, fifth]
-
-ChangeMinute:
-  type: object
-  description: |
-    The tempo ladder and the student's record for a minute of changes between two chords (or
-    two roots), one change on every beat, so a tempo is also the number of changes the minute
-    asks for. The take sends the tempo played and the clean changes counted.
-  properties:
+      description: The fifth above the root, the one played.
+    fifth_below:
+      oneOf:
+        - $ref: '#/FretPlace'
+        - type: 'null'
+      description: |
+        The fifth below the root, marked and not played, inside window_start_fret's window;
+        null when no string reaches it there.
+    window_start_fret:
+      type: integer
+      minimum: 0
+      maximum: 9
+      description: |
+        The lowest fret of the five-fret window every place is in (frets window_start_fret to
+        window_start_fret + 4, open strings counting as fret 0): the plan picks it from 0 to 9
+        each time, so the root is not always at the bottom of the neck. The root is on the
+        lowest string that holds it in the window with the fifth above it there too.
     start_tempo_bpm:
       type: integer
       minimum: 20
       description: |
-        The tempo to start the minute at, from the ladder: the tempo of the item's last minute,
-        5 higher after two clean minutes in a row and 5 lower after a struggled one, never below
-        20; 40 when the item was never played. The student may set another before starting.
-    target_changes_per_minute:
+        The tempo the take starts at, in quarters, from the catalog: the student may set another
+        before starting.
+  additionalProperties: false
+  required: [layout_instrument_id, chord_symbol, root, fifth, fifth_below, window_start_fret, start_tempo_bpm]
+
+BassChordTones:
+  type: object
+  description: |
+    Where a chord's tones are on a bass layout, inside a five-fret window, for the board that
+    shows them: the root, and the third and fifth both above and below it, so the student sees
+    each interval up and down. A place is null when no string reaches it inside the window.
+    The seventh is the chord's own (the minor seventh on a dominant seventh, the major seventh
+    on a major seventh, the key's seventh on a triad) and is null unless the pattern plays it.
+  properties:
+    chord:
+      type: string
+      pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
+      description: The chord symbol, as it appears in the chart.
+    root:
+      $ref: '#/FretPlace'
+    third_above:
+      oneOf:
+        - $ref: '#/FretPlace'
+        - type: 'null'
+      description: The third above the root.
+    third_below:
+      oneOf:
+        - $ref: '#/FretPlace'
+        - type: 'null'
+      description: The third an octave lower, below the root.
+    fifth_above:
+      oneOf:
+        - $ref: '#/FretPlace'
+        - type: 'null'
+      description: The fifth above the root.
+    fifth_below:
+      oneOf:
+        - $ref: '#/FretPlace'
+        - type: 'null'
+      description: The fifth an octave lower, below the root.
+    seventh:
+      oneOf:
+        - $ref: '#/FretPlace'
+        - type: 'null'
+      description: The seventh above the root, for the root_third_fifth_seventh pattern only.
+  additionalProperties: false
+  required: [chord, root, third_above, third_below, fifth_above, fifth_below, seventh]
+
+BassPattern:
+  type: string
+  enum:
+    - root
+    - root_fifth
+    - root_third_fifth_third
+    - root_third_fifth_seventh
+  description: |
+    What a bass key tour plays on every bar of 4/4, chosen by the student's level on the tour:
+    root = the root, a whole note (new, learning); root_fifth = the root then the fifth above,
+    a half note each (accurate); root_third_fifth_third = root, third, fifth, third, quarters
+    (fluent); root_third_fifth_seventh = root, third, fifth, seventh, quarters (retained). The
+    take sounds exactly these notes in the bass's voice, and no chords.
+
+ChangeTake:
+  type: object
+  description: |
+    The tempo ladder and the student's record for a take of changes between two chords (or two
+    roots): ten cycles, one cycle being from, to and back, one change on every beat, so 20
+    changes after a bar of count-in. When it ends the student picks the share of changes that
+    rang clean (25, 50, 75 or 100 %); the take sends the tempo played and that share.
+  properties:
+    cycles:
       type: integer
-      minimum: 1
-      description: The clean changes a minute that count as fully fluent, the same for every pair.
-    best_clean_changes_per_minute:
+      enum: [10]
+      description: The cycles one take plays, from the catalog.
+    start_tempo_bpm:
+      type: integer
+      minimum: 20
+      description: |
+        The tempo to start the take at, from the ladder: the tempo of the item's last take,
+        5 higher after two clean takes in a row and 5 lower after a struggled one, never below
+        20; 40 when the item was never played. The student may set another before starting.
+    target_tempo_bpm:
+      type: integer
+      minimum: 20
+      description: |
+        The tempo a clean take counts as fully fluent at, every change clean, the same for every
+        pair.
+    best_clean_tempo_bpm:
       type:
         - integer
         - 'null'
-      minimum: 0
+      minimum: 20
       description: |
-        The most clean changes the student counted in a clean minute since their latest teacher
-        review. Null when they have no clean minute yet.
-    last_changes_per_minute:
-      type:
-        - integer
-        - 'null'
-      minimum: 0
-      description: |
-        The clean changes counted in the item's last minute, where the count starts. Null when
-        the item was never played.
+        The fastest tempo the student played a clean take at since their latest teacher review.
+        Null when they have no clean take yet.
   additionalProperties: false
   required:
+    - cycles
     - start_tempo_bpm
-    - target_changes_per_minute
-    - best_clean_changes_per_minute
-    - last_changes_per_minute
+    - target_tempo_bpm
+    - best_clean_tempo_bpm
 
 PlannedChordChange:
   type: object
   description: |
-    A minute of changes between two chords, back and forth (kind chord_change). Both chords are
-    named and drawn as their chord boxes.
+    Changes between two chords, back and forth, ten cycles at a tempo (kind chord_change). Both
+    chords are named and drawn as their chord boxes.
   properties:
     from_diagram_id:
       type: string
@@ -1373,16 +1490,17 @@ PlannedChordChange:
     to_chord_symbol:
       type: string
       description: The second chord's symbol.
-    minute:
-      $ref: '#/ChangeMinute'
+    take:
+      $ref: '#/ChangeTake'
   additionalProperties: false
-  required: [from_diagram_id, to_diagram_id, from_chord_symbol, to_chord_symbol, minute]
+  required: [from_diagram_id, to_diagram_id, from_chord_symbol, to_chord_symbol, take]
 
 PlannedRootChange:
   type: object
   description: |
-    A minute of changes between two chords' roots on a bass layout (kind root_change). Both
-    roots are marked.
+    Changes between two chords' roots on a bass layout, ten cycles at a tempo (kind
+    root_change). Both roots are marked, inside one five-fret window, and the take sounds each
+    root in the bass's voice on its beat, with the metronome; no chord sounds.
   properties:
     layout_instrument_id:
       type: string
@@ -1398,10 +1516,16 @@ PlannedRootChange:
       $ref: '#/FretPlace'
     to_root:
       $ref: '#/FretPlace'
-    minute:
-      $ref: '#/ChangeMinute'
+    window_start_fret:
+      type: integer
+      minimum: 0
+      maximum: 9
+      description: |
+        The lowest fret of the five-fret window both roots are in, picked from 0 to 9 each time.
+    take:
+      $ref: '#/ChangeTake'
   additionalProperties: false
-  required: [layout_instrument_id, from_chord_symbol, to_chord_symbol, from_root, to_root, minute]
+  required: [layout_instrument_id, from_chord_symbol, to_chord_symbol, from_root, to_root, window_start_fret, take]
 
 PlannedProgressionKeys:
   type: object
@@ -1421,8 +1545,9 @@ PlannedProgressionKeys:
       format: uuid
       description: |
         The instrument whose fretboard layout the tour is played on: guitar (chord symbols, chord
-        boxes on demand) or electric bass (chord symbols and each chord's root, third and fifth
-        on the board).
+        boxes on demand, the backing strumming each chord) or electric bass (chord symbols, each
+        chord's tones on the board, and a backing that sounds only bass_pattern's notes in the
+        bass's voice, never a chord).
     progression:
       type: object
       properties:
@@ -1458,6 +1583,13 @@ PlannedProgressionKeys:
         to 5 BPM, for a tour never played.
     start_note_value:
       $ref: '#/NoteValue'
+    bass_pattern:
+      oneOf:
+        - $ref: '#/BassPattern'
+        - type: 'null'
+      description: |
+        On bass, what every bar of a take plays, by the student's level on the tour. Null on
+        guitar.
     target_tempo_bpm:
       type: integer
       minimum: 20
@@ -1501,35 +1633,31 @@ PlannedProgressionKeys:
                   type: string
                   format: uuid
                   description: |
-                    The chord catalog voicing the backing sounds, and the box shown on demand on
-                    guitar: the chord's open voicing if the catalog has one, else its
-                    lowest-difficulty voicing.
+                    The chord catalog voicing the backing sounds on guitar, and the box shown
+                    on demand: the chord's open voicing if the catalog has one, else its
+                    lowest-difficulty voicing. Never sounded on bass.
               additionalProperties: false
               required: [chord, diagram_id]
             description: One voicing per distinct chord of chart.
+          window_start_fret:
+            type:
+              - integer
+              - 'null'
+            minimum: 0
+            maximum: 9
+            description: |
+              On bass, the lowest fret of the five-fret window this key's tones are in, picked
+              from 0 to 9 when the tour is planned, so a tour doesn't always start at the open
+              strings. Null on guitar.
           chord_tones:
             type: array
             items:
-              type: object
-              properties:
-                chord:
-                  type: string
-                  pattern: '^(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7|maj7|m7|m7b5|dim7)?$'
-                  description: The chord symbol, as it appears in chart.
-                root:
-                  $ref: '#/FretPlace'
-                third:
-                  $ref: '#/FretPlace'
-                fifth:
-                  $ref: '#/FretPlace'
-              additionalProperties: false
-              required: [chord, root, third, fifth]
+              $ref: '#/BassChordTones'
             description: |
-              On a bass layout, the places of each distinct chord's root, third and fifth, each
-              at its lowest fret, then its lowest string, inside frets 0–5. A dominant seventh
-              keeps its root, third and fifth. Empty on guitar.
+              On a bass layout, the tones of each distinct chord of chart inside the key's
+              window, the root on the lowest string that holds it there. Empty on guitar.
         additionalProperties: false
-        required: [music_key, clean, chart, voicings, chord_tones]
+        required: [music_key, clean, chart, voicings, window_start_fret, chord_tones]
       description: |
         The tour's 12 keys in its order, the cycle of fourths from C: C F Bb Eb Ab Db F# B E A D
         G, each with whether it is clean and the progression drawn in it.
@@ -1542,6 +1670,7 @@ PlannedProgressionKeys:
     - start_music_key
     - tour_tempo_bpm
     - start_note_value
+    - bass_pattern
     - target_tempo_bpm
     - min_tempo_bpm
     - keys

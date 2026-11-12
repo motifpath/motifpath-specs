@@ -82,6 +82,9 @@ Feature: Show the student's practice overview across instruments
   # ── Minutes, day streak and skills up ──────────────────────────────────────
   # Effort, consistency and improvement for the home's "This week" tiles. All three come from the
   # activity already kept: session starts, answers and ends, and the daily item snapshots.
+  # A session's minutes are the time it was visible to the student (MOT-197, ADR-074): each
+  # practice event carries visible_ms, the visible time since the session's previous event. In the
+  # scenarios below, "practised from A to B" means the session was on screen the whole time.
 
   Scenario: Minutes practised add up every session this week
     Given "alice" practised from 18:00 to 18:12 on Monday and from 19:00 to 19:20 on Wednesday
@@ -108,6 +111,36 @@ Feature: Show the student's practice overview across instruments
     Given "alice" practised for 7 minutes and 50 seconds yesterday
     When "alice" reads their practice overview
     Then the overview shows 7 minutes practised in the last 7 days
+
+  @MOT-197
+  Scenario: Time with the session in the background doesn't count
+    Given "alice" started a session at 18:00 yesterday
+    And sent an answer at 18:03 with 3 minutes visible
+    And sent an answer at 20:00 with 1 minute visible, the app having been in the background in between
+    When "alice" reads their practice overview
+    Then the overview shows 4 minutes practised in the last 7 days
+
+  @MOT-197
+  Scenario: The end of a session counts its visible time too
+    Given "alice" started a session at 18:00 yesterday
+    And sent an answer at 18:02 with 2 minutes visible
+    And ended the session at 18:10 with 5 minutes visible
+    When "alice" reads their practice overview
+    Then the overview shows 7 minutes practised in the last 7 days
+
+  @MOT-197
+  Scenario: An event without visible time counts its gap, at most 2 minutes
+    Given "alice" started a session at 18:00 yesterday
+    And sent answers without visible time at 18:01 and at 18:45
+    When "alice" reads their practice overview
+    Then the overview shows 3 minutes practised in the last 7 days
+
+  @MOT-197
+  Scenario: Visible time never counts more than the session lasted
+    Given "alice" started a session at 18:00 yesterday
+    And sent an answer at 18:05 with 20 minutes visible
+    When "alice" reads their practice overview
+    Then the overview shows 5 minutes practised in the last 7 days
 
   Scenario: The day streak counts consecutive practice days up to today
     Given "alice" finished a session on each of the last 3 days, today included

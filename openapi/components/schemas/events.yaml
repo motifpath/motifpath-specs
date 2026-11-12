@@ -436,6 +436,16 @@ PracticeItemAnsweredEvent:
             answer: how long a tap takes them when they already know where to tap. Set by the
             server on timed answers (those with a latency_ms) when the student has done a tap
             check; absent otherwise. A value sent by a client is ignored.
+        visible_ms:
+          type: integer
+          minimum: 0
+          description: |
+            Milliseconds the session was visible to the student since its previous practice
+            event (practice.item_answered or practice.session_ended), or since it started: the
+            practice screen in the foreground, the app neither hidden nor in the background.
+            Minutes practised are the sum of these. Sent by every current client; absent from
+            events sent before it existed, where the gap since the previous event counts
+            instead, never more than 2 minutes.
       required:
         - event_type
         - item_key
@@ -487,6 +497,16 @@ PracticeSessionEndedEvent:
           description: |
             The student's answers to "How did it feel?" for at most two of the session's
             timed drills. Empty when the session asked none, or the student skipped them.
+        visible_ms:
+          type: integer
+          minimum: 0
+          description: |
+            Milliseconds the session was visible to the student since its previous practice
+            event (practice.item_answered or practice.session_ended), or since it started: the
+            practice screen in the foreground, the app neither hidden nor in the background.
+            Minutes practised are the sum of these. Sent by every current client; absent from
+            events sent before it existed, where the gap since the previous event counts
+            instead, never more than 2 minutes.
       required:
         - event_type
         - practice_session_id

@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Core Domain Service
-  version: 0.66.0
+  version: 0.67.0
   license:
     name: Proprietary — MotifPath internal use only
     identifier: UNLICENSED
@@ -14484,7 +14484,7 @@ components:
         chord_voicing, chord_change, root_fifth, root_change, progression_keys, guide_tone and
         song is present, matching kind:
         generated_choice for a diatonic chord, a chord function, a chart progression, a heard
-        chord or a heard progression.
+        chord, a heard progression or a heard chord quality.
       properties:
         item_key:
           $ref: './components/schemas/practice.yaml#/PracticeItemKey'
@@ -14843,9 +14843,12 @@ components:
           minimum: 0
           description: |
             Whole minutes practised in sessions that started on the last 7 calendar days,
-            today included, in the given time zone, on any instrument or without one. Each
-            session counts from its start to its last practice event, including a session
-            left early or abandoned. The sum is rounded down to whole minutes.
+            today included, in the given time zone, on any instrument or without one,
+            including a session left early or abandoned. A session counts only the time it was
+            visible to the student: the sum of its practice events' visible_ms, where an event
+            without one counts the gap since the session's previous event (or its start),
+            never more than 2 minutes; and never more than its start to its last practice
+            event. The sum is rounded down to whole minutes.
         minutes_practised_previous_7:
           type: integer
           minimum: 0

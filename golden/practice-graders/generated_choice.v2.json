@@ -1580,6 +1580,194 @@
         "result": "rejected",
         "reason": "response_does_not_fit_item"
       }
+    },
+    {
+      "name": "chord quality by ear: right, a minor chord picked as minor",
+      "item_key": "heard_chord_quality:minor",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_quality_by_ear",
+        "options": [
+          "major",
+          "minor",
+          "dominant7"
+        ],
+        "choice": "minor",
+        "latency_ms": 2100,
+        "audio_ms": 1700
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2100,
+          "audio_ms": 1700,
+          "answer_key": {
+            "way": "chord_quality_by_ear",
+            "answer": "minor",
+            "offered": [
+              "major",
+              "minor",
+              "dominant7"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "chord quality by ear: wrong, a dominant seventh picked as major",
+      "item_key": "heard_chord_quality:dominant7",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_quality_by_ear",
+        "options": [
+          "major",
+          "minor",
+          "dominant7"
+        ],
+        "choice": "major",
+        "latency_ms": 2100,
+        "audio_ms": 1700
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2100,
+          "audio_ms": 1700,
+          "answer_key": {
+            "way": "chord_quality_by_ear",
+            "answer": "dominant7",
+            "offered": [
+              "major",
+              "minor",
+              "dominant7"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "chord quality by ear: five qualities once fluent",
+      "item_key": "heard_chord_quality:augmented",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_quality_by_ear",
+        "options": [
+          "major",
+          "minor",
+          "dominant7",
+          "diminished",
+          "augmented"
+        ],
+        "choice": "augmented",
+        "latency_ms": 2100,
+        "audio_ms": 1700
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2100,
+          "audio_ms": 1700,
+          "answer_key": {
+            "way": "chord_quality_by_ear",
+            "answer": "augmented",
+            "offered": [
+              "major",
+              "minor",
+              "dominant7",
+              "diminished",
+              "augmented"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "rejected: an option that is not a chord quality",
+      "item_key": "heard_chord_quality:minor",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_quality_by_ear",
+        "options": [
+          "major",
+          "minor",
+          "V"
+        ],
+        "choice": "minor",
+        "latency_ms": 2100,
+        "audio_ms": 1700
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
+      }
+    },
+    {
+      "name": "rejected: the right quality is not among the options",
+      "item_key": "heard_chord_quality:diminished",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_quality_by_ear",
+        "options": [
+          "major",
+          "minor",
+          "dominant7"
+        ],
+        "choice": "minor",
+        "latency_ms": 2100,
+        "audio_ms": 1700
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
+      }
+    },
+    {
+      "name": "rejected: a key sent for a chord quality",
+      "item_key": "heard_chord_quality:major",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_quality_by_ear",
+        "options": [
+          "major",
+          "minor",
+          "dominant7"
+        ],
+        "choice": "major",
+        "latency_ms": 2100,
+        "audio_ms": 1700,
+        "music_key": "C"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: chord quality by ear asked of a heard chord",
+      "item_key": "heard_chord:vi",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_quality_by_ear",
+        "options": [
+          "major",
+          "minor",
+          "dominant7"
+        ],
+        "choice": "minor",
+        "latency_ms": 2100,
+        "audio_ms": 1700,
+        "music_key": "C"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
     }
   ]
 }

@@ -33,6 +33,7 @@ templates:
   - {key: "heard_chord:cadence_then_chord", rung: hear, second_way: "heard_chord:see_then_name", comes_back: true, item_kind: heard_chord, response_type: generated_choice, timed: true, names: {en: "Hear the chord", pt_BR: "Ouça o acorde"}, id: 001c9d1a-6bcb-5d1b-8656-b65a9a8dddfb}
   - {key: "heard_chord:see_then_name", rung: hear, second_way: "heard_chord:cadence_then_chord", item_kind: heard_chord, response_type: generated_choice, timed: true, names: {en: "See the chord", pt_BR: "Veja o acorde"}, id: 91209c2d-71e8-52b2-a19b-f286d85f1c07}
   - {key: "heard_progression:progression_by_number", rung: hear, comes_back: true, item_kind: heard_progression, response_type: generated_choice, timed: true, names: {en: "Hear the progression", pt_BR: "Ouça a progressão"}, id: c236ecad-5bd5-5755-b012-fd1999ee46b8}
+  - {key: "heard_chord_quality:chord_quality_by_ear", rung: hear, comes_back: true, item_kind: heard_chord_quality, response_type: generated_choice, timed: true, names: {en: "Hear the chord quality", pt_BR: "Ouça o tipo de acorde"}, id: 75d75102-aedc-5eb6-924e-b4fc1a6a065c}
   - {key: "guide_tone:tap_the_third", rung: target, item_kind: guide_tone, response_type: timed_taps, timed: false, names: {en: "Guide tones", pt_BR: "Notas-guia"}, id: 448900eb-6410-554f-9e2e-dd96621008f6}
 
 # Which generated fretboard cells serve which skill, per fretboard layout. A layout is
@@ -133,15 +134,17 @@ thresholds:
   - {template: "heard_chord:cadence_then_chord", version: 1, effective_from: "2026-10-16", fluent_net_ms: 3000, source: default, sessions: 0, students: 0, id: 5f5c21a4-5763-5f40-8e48-94d0803d760b}
   - {template: "heard_chord:see_then_name", version: 1, effective_from: "2026-10-16", fluent_net_ms: 4000, source: default, sessions: 0, students: 0, id: 39073f67-3437-52fa-85d0-da2945a41600}
   - {template: "heard_progression:progression_by_number", version: 1, effective_from: "2026-10-16", fluent_net_ms: 5000, source: default, sessions: 0, students: 0, id: 85f712d5-a4cb-5057-bae4-4db002e17974}
+  - {template: "heard_chord_quality:chord_quality_by_ear", version: 1, effective_from: "2026-11-12", fluent_net_ms: 2500, source: default, sessions: 0, students: 0, id: 678dbc5c-d046-50b6-8d49-29cd909e97dd}
 
 # The tempo a question asked by ear starts at, in quarter notes per minute, by the student's
 # level on the item. The student may change it, and the answer is never graded on it.
 hear_tempo_bpm: {new: 70, learning: 70, accurate: 90, fluent: 110, retained: 110}
 
-# Chords played in hand (MOT-79): single chords played clean, and minutes of changes between two
-# chords, one change on every beat. A chord is an open voicing of the chord catalog, by its key;
-# on bass, the same chord's symbol, played as its root and fifth (or its root, in a change) on
-# the electric-bass layout. A change is one item for both directions, keyed in the order listed.
+# Chords played in hand (MOT-79, MOT-197): single chords played clean, and takes of changes
+# between two chords, ten cycles with one change on every beat. A chord is an open voicing of the
+# chord catalog, by its key; on bass, the same chord's symbol, played as its root and fifth (or
+# its root, in a change) on the electric-bass layout, in a five-fret window that starts on a fret
+# picked each time, sounded in the bass's voice. A change is one item for both directions, keyed in the order listed.
 # IDs are UUID v5 from "chord-drill/<voicing key>" and "chord-change/<from key>/<to key>".
 chord_drills:
   bass_layout: electric-bass
@@ -168,19 +171,33 @@ chord_drills:
   # At most this many of each in one session.
   max_voicings_per_session: 4
   max_changes_per_session: 2
-  # Seconds each takes in a session: a change is a bar of count-in, the minute and the count.
+  # Seconds each takes in a session: a change is a bar of count-in, the ten cycles at the first
+  # tempo (20 beats at 40 BPM) and the share picked.
   voicing_seconds: 20
-  change_seconds: 90
-  # The change ladder, in BPM (one change on every beat): the first minute's tempo, the step,
+  change_seconds: 45
+  # A change take: its cycles (one cycle is from, to and back, so two changes), and the shares
+  # of clean changes the student picks from, in percent.
+  change_cycles: 10
+  change_clean_shares: [25, 50, 75, 100]
+  # The change ladder, in BPM (one change on every beat): the first take's tempo, the step,
   # and the floor.
   change_first_tempo_bpm: 40
   change_tempo_step_bpm: 5
   change_min_tempo_bpm: 20
-  # A minute's rating, from the share of its beats that changed cleanly.
-  change_rating_from: {clean: 0.9, almost: 0.6}
+  # A take's rating, from its clean share in percent; below almost is struggled. A minute kept
+  # before ten-cycle takes reads as the share changes_per_minute / tempo_bpm, rounded down to a
+  # share (below 25 % reads as 25).
+  change_rating_from: {clean: 100, almost: 75}
+  # A root and fifth on bass: its starting tempo, in quarters, each note a half note.
+  root_fifth_tempo_bpm: 60
+  # Bass places: the window's first fret is picked from this range each time, and the window
+  # spans this many frets from it (an open string counts as fret 0).
+  bass_window_start_frets: {from: 0, to: 9}
+  bass_window_frets: 5
 
 # Versioned targets for chord and root changes: the clean changes a minute that count as fully
-# fluent, for every pair, on every instrument. Versioned like the fluent times; never edit an
+# fluent, for every pair, on every instrument. Since ten-cycle takes (MOT-197) the same number is
+# read as a tempo: a clean take (every change clean) at 60 BPM is fully fluent. Versioned like the fluent times; never edit an
 # installed one. IDs are UUID v5 from "change-target/v<version>".
 change_targets:
   - {version: 1, effective_from: "2026-10-18", changes_per_minute: 60, source: default, id: 02685c89-9b1e-5fd8-bd54-a733ce804181}
@@ -204,6 +221,13 @@ progression_keys:
   first_tempo_share: 0.6
   tempo_step_bpm: 5
   min_tempo_share: 0.6
+  # On bass, what a take plays on every bar of 4/4, by the student's level on the tour (MOT-197).
+  bass_patterns:
+    new: root
+    learning: root
+    accurate: root_fifth
+    fluent: root_third_fifth_third
+    retained: root_third_fifth_seventh
 
 # Guide tones (MOT-151): a progression of the progression catalog played once in a key, the
 # student tapping a chord tone of each chord on the fretboard as it sounds, on the guitar and

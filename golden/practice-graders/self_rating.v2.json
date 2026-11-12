@@ -1,0 +1,748 @@
+{
+  "grader": "self_rating.v2",
+  "description": "Takes the student rates themselves: a play-along at a tempo, a progression in one key of its tour at a tempo, one chord voicing played cleanly, a chord's root and fifth at a tempo, or a whole song; the grader checks the take fits the item and keeps the rating and its measure as they are. A take of chord or root changes, ten cycles at a tempo, one change on every beat, is rated by the share of its changes that rang clean instead: 25, 50, 75 or 100 percent.",
+  "reference": {
+    "diagrams": {
+      "00000000-0000-4000-8000-0000000000f1": {
+        "name": "Minor pentatonic run (play-along)"
+      },
+      "00000000-0000-4000-8000-0000000000f2": {
+        "name": "A minor chord"
+      },
+      "00000000-0000-4000-8000-0000000000f3": {
+        "name": "C major chord"
+      },
+      "00000000-0000-4000-8000-0000000000f4": {
+        "name": "G major chord (open)"
+      }
+    },
+    "instruments": {
+      "00000000-0000-4000-8000-0000000000b1": {
+        "name": "Electric bass (standard tuning)",
+        "tuning": [
+          "E1",
+          "A1",
+          "D2",
+          "G2"
+        ]
+      },
+      "00000000-0000-4000-8000-0000000000a1": {
+        "name": "Guitar (standard tuning)",
+        "tuning": [
+          "E2",
+          "A2",
+          "D3",
+          "G3",
+          "B3",
+          "E4"
+        ]
+      }
+    },
+    "progressions": {
+      "I-V-vi-IV": {
+        "bars": [
+          "I",
+          "V",
+          "vi",
+          "IV"
+        ]
+      },
+      "12-bar-blues": {
+        "bars": [
+          "I7",
+          "I7",
+          "I7",
+          "I7",
+          "IV7",
+          "IV7",
+          "I7",
+          "I7",
+          "V7",
+          "IV7",
+          "I7",
+          "V7"
+        ]
+      }
+    },
+    "song_charts": {
+      "00000000-0000-4000-8000-0000000000c1": {
+        "name": "Amazing Grace"
+      }
+    }
+  },
+  "cases": [
+    {
+      "name": "play-along: a clean take with its tempo",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 90
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "clean",
+          "tempo_bpm": 90
+        }
+      }
+    },
+    {
+      "name": "play-along: a take the student struggled with",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "struggled",
+        "tempo_bpm": 60
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "struggled",
+          "tempo_bpm": 60
+        }
+      }
+    },
+    {
+      "name": "play-along: a clean take in eighths keeps its tempo and note value as played",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 60,
+        "note_value": "eighths"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "clean",
+          "tempo_bpm": 60,
+          "note_value": "eighths"
+        }
+      }
+    },
+    {
+      "name": "rejected: a play-along rating without its tempo",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "measure_missing"
+      }
+    },
+    {
+      "name": "rejected: a play-along rating with a clean share",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 90,
+        "clean_share_percent": 75
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a play-along of a diagram that doesn't exist",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000ff",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 90
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: naming a note doesn't answer a play-along",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "name_the_note",
+        "note_name": "C",
+        "latency_ms": 1000
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "chord voicing: a clean chord, with no measure",
+      "item_key": "chord_voicing:00000000-0000-4000-8000-0000000000f4",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "clean"
+        }
+      }
+    },
+    {
+      "name": "chord voicing: a chord the student struggled with",
+      "item_key": "chord_voicing:00000000-0000-4000-8000-0000000000f4",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "struggled"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "struggled"
+        }
+      }
+    },
+    {
+      "name": "rejected: a chord voicing rated with a tempo",
+      "item_key": "chord_voicing:00000000-0000-4000-8000-0000000000f4",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 80
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a chord voicing rated with a clean share",
+      "item_key": "chord_voicing:00000000-0000-4000-8000-0000000000f4",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "clean_share_percent": 75
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a chord voicing that doesn't exist",
+      "item_key": "chord_voicing:00000000-0000-4000-8000-0000000000ff",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "progression key tour: a clean take in A keeps its tempo and key",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000a1:I-V-vi-IV",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 85,
+        "music_key": "A"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "clean",
+          "tempo_bpm": 85,
+          "music_key": "A"
+        }
+      }
+    },
+    {
+      "name": "progression key tour: a take in eighths keeps its note value",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000a1:I-V-vi-IV",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "almost",
+        "tempo_bpm": 60,
+        "note_value": "eighths",
+        "music_key": "Bb"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "almost",
+          "tempo_bpm": 60,
+          "note_value": "eighths",
+          "music_key": "Bb"
+        }
+      }
+    },
+    {
+      "name": "progression key tour: a struggled 12-bar blues on bass",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000b1:12-bar-blues",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "struggled",
+        "tempo_bpm": 70,
+        "music_key": "F#"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "struggled",
+          "tempo_bpm": 70,
+          "music_key": "F#"
+        }
+      }
+    },
+    {
+      "name": "rejected: a progression key tour take without its key",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000a1:I-V-vi-IV",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 85
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a progression key tour take without its tempo",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000a1:I-V-vi-IV",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "music_key": "C"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "measure_missing"
+      }
+    },
+    {
+      "name": "rejected: a progression key tour take with a clean share",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000a1:I-V-vi-IV",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 85,
+        "music_key": "C",
+        "clean_share_percent": 75
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a progression key tour of a progression the catalog doesn't have",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000a1:I-II-III",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 85,
+        "music_key": "C"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: a progression key tour on a layout that doesn't exist",
+      "item_key": "progression_keys:00000000-0000-4000-8000-0000000000c9:I-V-vi-IV",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 85,
+        "music_key": "C"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: a play-along rating with a key",
+      "item_key": "play_along:00000000-0000-4000-8000-0000000000f1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 90,
+        "music_key": "G"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "song: a clean take of the whole song on guitar, with no measure",
+      "item_key": "song:00000000-0000-4000-8000-0000000000a1:00000000-0000-4000-8000-0000000000c1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "clean"
+        }
+      }
+    },
+    {
+      "name": "song: an almost-clean take of the song's roots on bass",
+      "item_key": "song:00000000-0000-4000-8000-0000000000b1:00000000-0000-4000-8000-0000000000c1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "almost"
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "almost"
+        }
+      }
+    },
+    {
+      "name": "rejected: a song rated with a tempo",
+      "item_key": "song:00000000-0000-4000-8000-0000000000a1:00000000-0000-4000-8000-0000000000c1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 80
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a song rated with a key",
+      "item_key": "song:00000000-0000-4000-8000-0000000000a1:00000000-0000-4000-8000-0000000000c1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "music_key": "G"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a song rated with a clean share",
+      "item_key": "song:00000000-0000-4000-8000-0000000000a1:00000000-0000-4000-8000-0000000000c1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "clean_share_percent": 75
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a song chart that doesn't exist",
+      "item_key": "song:00000000-0000-4000-8000-0000000000a1:00000000-0000-4000-8000-0000000000cf",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "rejected: a song on a layout that doesn't exist",
+      "item_key": "song:00000000-0000-4000-8000-0000000000ff:00000000-0000-4000-8000-0000000000c1",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "chord change: every change clean at 60 BPM is clean",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 60,
+        "clean_share_percent": 100
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "clean",
+          "tempo_bpm": 60,
+          "clean_share_percent": 100
+        }
+      }
+    },
+    {
+      "name": "chord change: three quarters clean is almost",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "almost",
+        "tempo_bpm": 50,
+        "clean_share_percent": 75
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "almost",
+          "tempo_bpm": 50,
+          "clean_share_percent": 75
+        }
+      }
+    },
+    {
+      "name": "chord change: half clean is a struggle",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "struggled",
+        "tempo_bpm": 40,
+        "clean_share_percent": 50
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "struggled",
+          "tempo_bpm": 40,
+          "clean_share_percent": 50
+        }
+      }
+    },
+    {
+      "name": "chord change: a quarter clean is a struggle",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "struggled",
+        "tempo_bpm": 40,
+        "clean_share_percent": 25
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "struggled",
+          "tempo_bpm": 40,
+          "clean_share_percent": 25
+        }
+      }
+    },
+    {
+      "name": "chord change: the rating follows the share, whatever rating was sent",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 60,
+        "clean_share_percent": 50
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "struggled",
+          "tempo_bpm": 60,
+          "clean_share_percent": 50
+        }
+      }
+    },
+    {
+      "name": "rejected: a chord-change take without its tempo",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "clean_share_percent": 100
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "measure_missing"
+      }
+    },
+    {
+      "name": "rejected: a chord-change take without its clean share",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 60
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "measure_missing"
+      }
+    },
+    {
+      "name": "rejected: a chord-change take with a note value",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000f3",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 60,
+        "note_value": "eighths",
+        "clean_share_percent": 100
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a chord change to a diagram that does not exist",
+      "item_key": "chord_change:00000000-0000-4000-8000-0000000000f2:00000000-0000-4000-8000-0000000000ff",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 60,
+        "clean_share_percent": 100
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    },
+    {
+      "name": "root change: every change clean on bass",
+      "item_key": "root_change:00000000-0000-4000-8000-0000000000b1:C:G",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 30,
+        "clean_share_percent": 100
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "clean",
+          "tempo_bpm": 30,
+          "clean_share_percent": 100
+        }
+      }
+    },
+    {
+      "name": "rejected: a root-change take without its clean share",
+      "item_key": "root_change:00000000-0000-4000-8000-0000000000b1:C:G",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 30
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "measure_missing"
+      }
+    },
+    {
+      "name": "rejected: a root-change take without its tempo",
+      "item_key": "root_change:00000000-0000-4000-8000-0000000000b1:C:G",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "clean_share_percent": 100
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "measure_missing"
+      }
+    },
+    {
+      "name": "root and fifth: an almost-clean take on bass keeps its tempo",
+      "item_key": "root_fifth:00000000-0000-4000-8000-0000000000b1:Am",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "almost",
+        "tempo_bpm": 60
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "self_assessed",
+          "rating": "almost",
+          "tempo_bpm": 60
+        }
+      }
+    },
+    {
+      "name": "rejected: a root and fifth without its tempo",
+      "item_key": "root_fifth:00000000-0000-4000-8000-0000000000b1:Am",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "measure_missing"
+      }
+    },
+    {
+      "name": "rejected: a root and fifth rated with a clean share",
+      "item_key": "root_fifth:00000000-0000-4000-8000-0000000000b1:Am",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 60,
+        "clean_share_percent": 100
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a root and fifth with a note value",
+      "item_key": "root_fifth:00000000-0000-4000-8000-0000000000b1:Am",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 60,
+        "note_value": "eighths"
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a root and fifth on a layout that does not exist",
+      "item_key": "root_fifth:00000000-0000-4000-8000-0000000000ff:Am",
+      "response": {
+        "response_type": "self_rating",
+        "rating": "clean",
+        "tempo_bpm": 60
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "unknown_reference"
+      }
+    }
+  ]
+}

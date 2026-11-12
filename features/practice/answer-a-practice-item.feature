@@ -104,83 +104,95 @@ Feature: Answer a practice item the way it can be graded honestly
     And the answer is sent with a latency of 0 milliseconds and no audio length
 
   # ── Chords played in hand ──────────────────────────────────────────────────
-  # A single chord is fretted, strummed once and rated (Figma 17h; bass 18h). A chord change is a
-  # minute at a tempo, one change on every beat (17i ready, 17i2 running, 17j count; bass 18i):
-  # the student counts the changes that rang clean, and the share of the beats that did rates it.
+  # A single chord is fretted, strummed once and rated (Figma 17h; bass 18h). A chord change is
+  # ten cycles at a tempo, one change on every beat (MOT-197, ADR-074): the student picks the share
+  # of changes that rang clean from four buttons, and the share rates it. Every drill that keeps a
+  # beat shows the same metronome row as the Metronome tool: the beat dots and the tempo control
+  # with its note values. On bass, a drill sounds only the notes it asks for, in the bass's voice.
 
   @web
   Scenario: A single chord shows its chord box, named, and is answered by a self-rating
     Given "alice"'s session plans the single chord "a-minor-open"
     When the item is shown
     Then the chord box of "a-minor-open" is drawn with the name "Am"
-    And rating it "almost" sends a self_rating of "almost" with no tempo and no count
+    And rating it "almost" sends a self_rating of "almost" with no tempo and no clean share
 
-  @web
-  Scenario: On bass, a root and fifth marks both places and is answered by a self-rating
+  @web @MOT-197
+  Scenario: On bass, a root and fifth marks the root and both fifths
     Given "alice"'s session plans the root and fifth of "Am" on the "electric-bass" layout
     When the item is shown
-    Then the bass board marks the root and the fifth at the places the plan gives
-    And rating it "clean" sends a self_rating of "clean" with no tempo and no count
+    Then the bass board marks the root, the fifth above it and the fifth below it at the places the plan gives
+    And the Metronome tool's row is shown at the plan's start tempo
 
-  @web
+  @web @MOT-197
+  Scenario: On bass, a root and fifth sounds the root then the fifth, a half note each
+    Given "alice"'s session plans the root and fifth of "Am" on the "electric-bass" layout at 60 BPM
+    When "alice" starts the take
+    Then the bass voice plays A then E, two beats each, over the metronome
+    And no chord sounds
+
+  @web @MOT-197
+  Scenario: A root and fifth sends the tempo it was played at with the rating
+    Given "alice" set the tempo of a root and fifth to 70 BPM and played it
+    When "alice" rates it "clean"
+    Then the practice.item_answered response is a self_rating of "clean" at 70 BPM
+
+  @web @MOT-197
   Scenario: A chord change is ready at the plan's tempo, which the student may change first
-    Given "alice"'s session plans the chord change "a-minor-open" to "c-open" starting at 45 BPM, with a best clean count of 16
+    Given "alice"'s session plans the chord change "a-minor-open" to "c-open" starting at 45 BPM, with a best clean tempo of 50 BPM
     When the item is shown
     Then both chord boxes are drawn with their names
-    And the tempo is set to 45 BPM, the metronome ticks while it is tried, and the best of 16 clean changes is shown
-    And nothing is sent until the minute is over
+    And the Metronome tool's row is shown at 45 BPM, ticking while it is tried, with the best clean tempo of 50 BPM marked
+    And the line above the chords reads "10 cycles · change on every beat"
+    And nothing is sent until the take is over
 
-  @web
-  Scenario: Starting the minute gives a bar of count-in, then 60 seconds with nothing to tap but Restart
+  @web @MOT-197
+  Scenario: Starting the take gives a bar of count-in, then ten cycles with nothing to tap but Restart
     Given "alice" is ready on a chord change at 60 BPM
-    When "alice" starts the minute
-    Then the metronome counts in one bar, then the timer runs 60 seconds at 60 BPM
-    And no control but Restart and leaving the session can be used until the minute is over
+    When "alice" starts the take
+    Then the metronome counts in one bar, then 20 beats follow at 60 BPM, the cycles counted down from 10
+    And no control but Restart and leaving the session can be used until the take is over
 
-  @web
-  Scenario: Restarting the minute throws it away and is ready again at the same tempo
-    Given "alice" set the tempo to 50 BPM and started the minute of chord changes
-    When "alice" restarts it during the minute
-    Then the metronome stops and the timer shows the whole minute again
+  @web @MOT-197
+  Scenario: Restarting the take throws it away and is ready again at the same tempo
+    Given "alice" set the tempo to 50 BPM and started a take of chord changes
+    When "alice" restarts it during the take
+    Then the metronome stops and the cycles show 10 again
     And the tempo is still 50 BPM and can be changed
     And no practice.item_answered event is sent for the chord change
 
-  @web
-  Scenario: When the minute is up, the count starts at the item's last count
-    Given "alice"'s session plans a chord change whose last count was 18
-    When "alice"'s minute is over
-    Then the clean changes count shows 18
+  @web @MOT-197
+  Scenario: When the take is over, four buttons ask how many changes rang clean
+    Given "alice" is playing a take of chord changes
+    When the tenth cycle ends
+    Then the metronome stops
+    And four buttons offer 25 %, 50 %, 75 % and 100 % of the changes clean, none picked
 
-  @web
-  Scenario: A chord change never counted starts its count at 0
-    Given "alice"'s session plans a chord change never played
-    When "alice"'s minute is over
-    Then the clean changes count shows 0
+  @web @MOT-197
+  Scenario: Picking a share sends the tempo, the share and the rating it gives
+    Given "alice" played a take of chord changes at 60 BPM
+    When "alice" picks 75 %
+    Then the practice.item_answered response is a self_rating of "almost" at 60 BPM with 75 percent clean
 
-  @web
-  Scenario: The count can't go above the tempo
-    Given "alice" played a minute of changes at 40 BPM
-    When "alice" raises the count to 40
-    Then the count can't be raised further
-
-  @web
-  Scenario: Saving the count sends the tempo, the count and the rating they give
-    Given "alice" played a minute of changes at 60 BPM
-    When "alice" saves 42 clean changes
-    Then the practice.item_answered response is a self_rating of "almost" at 60 BPM with 42 changes per minute
-
-  @web
+  @web @MOT-197
   Scenario: The tempo the student set is the one sent, not the plan's
     Given "alice"'s session plans a chord change starting at 45 BPM
-    And "alice" sets the tempo to 50 BPM before starting the minute
-    When "alice" saves 48 clean changes after the minute
-    Then the practice.item_answered response is a self_rating of "clean" at 50 BPM with 48 changes per minute
+    And "alice" sets the tempo to 50 BPM before starting the take
+    When "alice" picks 100 % after the take
+    Then the practice.item_answered response is a self_rating of "clean" at 50 BPM with 100 percent clean
 
-  @web
-  Scenario: Leaving the session during the minute sends no answer for the change
-    Given "alice"'s minute of chord changes is running
+  @web @MOT-197
+  Scenario: Leaving the session during the take sends no answer for the change
+    Given "alice"'s take of chord changes is running
     When "alice" leaves the session
     Then no practice.item_answered event is sent for the chord change
+
+  @web @MOT-197
+  Scenario: On bass, a root change sounds each root on its beat
+    Given "alice"'s session plans the root change "C" to "G" on the "electric-bass" layout at 60 BPM
+    When "alice" starts the take
+    Then after the count-in, the bass voice plays C and G on alternate beats over the metronome
+    And no chord sounds
 
   # ── Progression key tours ──────────────────────────────────────────────────
   # A progression is played along with, key after key around the cycle of fourths (Figma 17k;
@@ -206,12 +218,32 @@ Feature: Answer a practice item the way it can be graded honestly
     When "alice" opens the chord card of "F#m"
     Then the box of the voicing the plan gives for "F#m" is drawn
 
-  @web
-  Scenario: On bass, the board marks each chord's root, third and fifth
+  @web @MOT-197
+  Scenario: On bass, the board marks each chord's root and its third and fifth above and below
     Given "alice"'s session plans the progression key tour of "I-V-vi-IV" on the "electric-bass" layout starting in G
     When the item is shown
     Then the chart reads "G D Em C" in chord symbols
-    And the bass board marks the root, third and fifth of each chord at the places the plan gives
+    And the bass board marks each chord's root, its third and fifth above, and its third and fifth below, at the places the plan gives
+    And the root is marked apart from the other tones, and each third and fifth says whether it is above or below
+
+  @web @MOT-197
+  Scenario: On bass, a take sounds the pattern's notes and never a chord
+    Given "alice"'s session plans the progression key tour of "12-bar-blues" on the "electric-bass" layout with the pattern root_fifth, in A at 80 BPM
+    When "alice" starts the take
+    Then after the count-in, the bass voice plays each bar's root then its fifth, a half note each, over the metronome
+    And no chord sounds
+
+  @web @MOT-197
+  Scenario: On bass, the line above the chart names the pattern to play
+    Given "alice"'s session plans the progression key tour of "12-bar-blues" on the "electric-bass" layout with the pattern root_third_fifth_seventh
+    When the item is shown
+    Then the line above the chart reads "Root, 3rd, 5th and 7th of each chord"
+
+  @web @MOT-197
+  Scenario: Every drill that keeps a beat shows the Metronome tool's row
+    Given "alice"'s session plans a play-along, a chord change, a root and fifth, a progression key tour and a guide tone
+    When each item is shown
+    Then each shows the same metronome row as the Metronome tool, with its beat dots and its tempo control
 
   @web
   Scenario: A take is a bar of count-in, then the progression over its backing
