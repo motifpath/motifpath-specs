@@ -8,6 +8,10 @@ deploys as free-form SSM Run Command; the instance role reading the media bucket
 
 > **2026-10-20 (amended):** production releases are `vX.Y.Z` git tags on `main`. Pushing a tag
 > starts the production deploy; see *Production releases are tags* below.
+>
+> **2026-11-13 (amended):** merging to `main` is the release. A required `release:*` label on the
+> PR sets the version, a workflow tags and deploys with no approval, and empty syncs merge
+> themselves; see *Amendment (2026-11-13)* at the end.
 
 ---
 
@@ -224,3 +228,54 @@ image that staging already ran.
 ---
 
 *This ADR was decided on 2026-10-20 and amended the same day (release tags). To revise, create a new ADR with Status: Supersedes ADR-062.*
+
+## Amendment (2026-11-13) — merging to main releases
+
+**Status:** Accepted
+
+The first annotated release tag (`v0.7.0`) failed both production deploys. The run started by the
+tag push stored the tag as a lightweight ref, and its `git fetch --tags` then refused to replace it.
+Tagging by hand was also an extra step after the merge, and the production approval asked again
+for a decision the `stage → main` merge had already made. The sync PRs that a promotion opens
+change no files, yet each one waited for a person to approve its CI and merge it.
+*Production releases are tags* changes as follows:
+
+- **A label on the PR sets the version.** Every PR into `main`, whether a `stage → main`
+  promotion or a hotfix, carries exactly one of `release:major`, `release:minor` or
+  `release:patch`. A required check fails until it does, so the PR cannot merge without one. The
+  label is the only input to the version: PR titles and branch names don't affect it. `stage` is
+  not versioned, so PRs into `stage` need no label.
+- **A merge to `main` is the release.** When the merge commit is ready to deploy, a workflow reads
+  the merged PR's label and bumps the newest `vX.Y.Z` tag by it. It then tags the merge commit and
+  deploys that release to production. In core, the commit is ready once `Build images` has
+  finished; in web, it is ready at the merge. A merge without exactly one label releases nothing,
+  and the workflow fails with an error. Nobody pushes release tags by hand anymore.
+- **No deploy approval.** The `production` environment has no required reviewers. Whoever can
+  merge into `main` can release, and the review of the release PR is the human check. The
+  environment is limited to `main`; the `v*` tag pattern is no longer needed, since nothing
+  deploys from a tag push.
+- **Tags stay immutable; creating them is open.** The release workflow creates the tag with
+  GitHub Actions' built-in token. A repository ruleset cannot exempt GitHub Actions, so the
+  release-tag ruleset no longer restricts creating `v*` tags. Updating or deleting one stays
+  blocked for everyone, and a tag created by hand deploys nothing, since tag pushes no longer
+  start a deploy.
+- **Tag fetches are forced** (`git fetch --tags --force`), so a tag stored locally can't fail a
+  deploy.
+- **Rollbacks and redeploys are unchanged:** run Deploy by hand with an earlier tag.
+- **Empty syncs merge themselves.** After a merge to `main`, the sync workflow merges `main` into
+  `dev` and `stage`. If that merge changes no files, as after every `stage → main` promotion, it
+  pushes the merge commit directly instead of opening a PR. A sync that brings changes, such as a
+  hotfix or a conflict, still opens a PR for review.
+- **Core and web still release independently.** Each repository versions on its own. When web
+  depends on a core change, merge core's release PR first and wait for its deploy to finish.
+
+The rest of *Production releases are tags* stands: how the images are chosen, the `vX.Y.Z` ECR
+tag, and the GitHub Release published once production runs the release.
+
+**Rejected: working out the bump from PR titles.** Conventional Commit titles (`feat` for minor,
+`!` for a breaking change) could set the version with no input. But mixing that with a label
+override gives two sources for one decision. A required label makes the decision explicit, in the
+PR where the release is reviewed.
+
+**Trade-off:** a merge to `main` now reaches production with no second check, so the review of
+the release PR has to be the real one.

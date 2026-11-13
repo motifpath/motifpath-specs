@@ -6,6 +6,10 @@ name: Reusable — Sync main → dev (and stage)
 # missing from the next release candidate, and promoting that `stage` to main
 # would ship a release without it. Callers stay unchanged; a repository with
 # no `stage` branch skips that target.
+#
+# A sync that changes no files (every sync after a `stage → main` promotion)
+# has nothing to review: the merge is pushed straight to the target. Only a
+# sync that brings changes (a hotfix, or a conflict) opens a PR.
 
 on:
   workflow_call:
@@ -43,12 +47,38 @@ jobs:
             echo "$TARGET is already up to date with main. Skipping."
           fi
 
+      # The target's rules block force-pushes and deletion, not this push: it
+      # only adds a merge commit (or fast-forwards `stage` to main's promotion
+      # merge). If the target moved meanwhile, the push is refused and the
+      # sync falls back to a PR.
+      - name: Merge directly when the sync changes no files
+        id: direct
+        if: steps.check.outputs.commits_ahead != '0'
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --quiet --detach "origin/$TARGET"
+          if git merge --quiet --no-edit -m "chore: sync main → $TARGET" origin/main 2>/dev/null \
+              && git diff --quiet "origin/$TARGET" HEAD; then
+            if git push origin "HEAD:refs/heads/$TARGET"; then
+              echo "main merged into $TARGET directly: the merge changes no files."
+              echo "merged=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "::notice::$TARGET moved during the sync; opening a PR instead"
+          fi
+          git merge --abort 2>/dev/null || true
+          echo "merged=false" >> "$GITHUB_OUTPUT"
+
       # The PR's head is a branch at main's head, not main itself: merging it
       # (and the automatic deletion of a merged PR's branch) never touches
       # main. While its PR is open the branch only moves forward, so conflict
       # fixes pushed to it are kept.
       - name: Open or update the sync PR (main → ${{ matrix.target }})
-        if: steps.check.outputs.commits_ahead != '0'
+        if: steps.check.outputs.commits_ahead != '0' && steps.direct.outputs.merged != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           TARGET: ${{ matrix.target }}
