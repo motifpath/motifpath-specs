@@ -254,8 +254,11 @@ change no files, yet each one waited for a person to approve its CI and merge it
   merge into `main` can release, and the review of the release PR is the human check. The
   environment is limited to `main`; the `v*` tag pattern is no longer needed, since nothing
   deploys from a tag push.
-- **Only the workflow creates tags.** The release-tag ruleset lets GitHub Actions create `v*`
-  tags. Updating or deleting a tag stays blocked for everyone.
+- **Tags stay immutable; creating them is open.** The release workflow creates the tag with
+  GitHub Actions' built-in token. A repository ruleset cannot exempt GitHub Actions, so the
+  release-tag ruleset no longer restricts creating `v*` tags. Updating or deleting one stays
+  blocked for everyone, and a tag created by hand deploys nothing, since tag pushes no longer
+  start a deploy.
 - **Tag fetches are forced** (`git fetch --tags --force`), so a tag stored locally can't fail a
   deploy.
 - **Rollbacks and redeploys are unchanged:** run Deploy by hand with an earlier tag.
