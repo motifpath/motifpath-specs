@@ -100,7 +100,8 @@ Feature: Generated drill questions challenge the student
     Then its own option is named "IV–V–I"
 
   # A heard chord quality: one chord alone, on a root picked each time, its quality picked
-  # (MOT-197, ADR-074).
+  # (MOT-197, ADR-074). Diminished and augmented wait until the student is fluent on major, minor
+  # and dominant7, and are always offered among all five.
   @MOT-197
   Scenario: A heard chord quality plays one chord alone and offers three qualities
     Given "alice" is learning the heard chord quality "minor"
