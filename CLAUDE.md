@@ -105,7 +105,7 @@ trusts this folder; every MotifPath repository carries the same file (MOT-193).
 
 ## Reusable Workflows (.github/workflows/)
 This repo defines reusable GitHub Actions workflows consumed by all service repos.
-`reusable-sync-main-to-dev.yml` — auto-opens a PR from main to dev, and to stage where that branch exists, after any merge to main.
+`reusable-sync-main-to-dev.yml` — after any merge to main, syncs main into dev, and into stage where that branch exists: merged directly when the sync changes no files, otherwise through an auto-opened PR.
 NEVER edit caller workflows in other repos to add logic — keep logic here, callers stay minimal.
 
 <!-- BEGIN AWS Agent Toolkit rules -->
