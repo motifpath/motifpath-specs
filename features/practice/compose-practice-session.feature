@@ -460,6 +460,8 @@ Feature: Compose a practice session
     When "alice" composes a 10-minute session with "guitar" in hand
     Then every item in the session carries one of the rungs know, hear, play_clean, play_in_time, move, target or use
 
+  # The student already knows the heard chord qualities, which "hear-progressions" requires, so
+  # the session's heard slots go to progressions.
   Scenario: Confusable progressions are asked next to each other
     Given "alice" has new heard progressions "I-V-vi-IV" and "I-vi-IV-V", and other new heard progressions
     When "alice" composes a 10-minute session with no instrument in hand and "hear-progressions" is a focus node
