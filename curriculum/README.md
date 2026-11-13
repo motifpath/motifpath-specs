@@ -64,10 +64,14 @@ model, so a planned entry can be authored field by field:
 | Track | `key`, `title`, `description`, `styles`, `base` (true for the track every other one builds on) |
 | Course | `key`, `track`, `title`, `language`, `level`, `instruments`, `status`, `checkpoints` (path keys, in order) |
 | Path | `key`, `title`, `language`, `level`, `instruments`, `status`, `intent`, `lessons` (in order) |
-| Lesson | `title`, `type` (`video` or `article`), `section` (the path item's section label), `skills` and `concepts` (its classification, at least one of each), optional `level` (defaults to the path's) |
+| Lesson | optional `key`, `title`, `type` (`video` or `article`), `section` (the path item's section label), `skills` and `concepts` (its classification, at least one of each), optional `level` (defaults to the path's) |
 
 - **`key`** is a planning handle. It is never installed; the app gives each entity its own id.
   Prefixes say where a path belongs: `sh-` shared, `ac-` violão, `el-` guitarra, `ba-` baixo.
+- **Lesson `key`:** optional; give one when a lesson goes into production. It names the
+  lesson's folder in motifpath-content. The same lesson key in two paths means one lesson
+  that both paths list, as the app lets two paths' items point to one content node; repeat
+  its entry unchanged.
 - **`language`**: one per course or path. A translation is another course or path.
 - **`level`**: `beginner`, `early_intermediate`, `intermediate`, `advanced` or `expert`.
 - **`instruments`**: catalog instrument keys (`guitar`, `electric-guitar`, `electric-bass`).

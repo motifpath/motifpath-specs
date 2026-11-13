@@ -53,11 +53,29 @@ paths:
       assumes: []
       ends_with: play-along-recording
     lessons:
-      - {title: "Os nomes das notas: dó, ré, mi e C, D, E", type: article, section: Notas, skills: [interpret-note-names], concepts: [note-names, octaves]}
+      - {key: note-names, title: "C, D, E…: o código que todo músico usa", type: article, section: Notas, skills: [interpret-note-names], concepts: [note-names, octaves]}
       - {title: "Achando uma nota de ouvido", type: video, section: Ouvido, skills: [match-pitch], concepts: [note-names, octaves]}
       - {title: "Cantando o que você toca", type: video, section: Ouvido, skills: [sing-what-you-play], concepts: [major-scale]}
       - {title: "Repetindo frases curtas de ouvido", type: video, section: Ouvido, skills: [echo-phrases], concepts: [call-and-response]}
       - {title: "Pergunta e resposta com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form, call-and-response]}
+
+  - key: sh-first-notes
+    title: "Toque no tom de quem canta"
+    language: pt_BR
+    level: beginner
+    instruments: []
+    status: planned
+    intent:
+      anchor: transpose-chord-chart
+      supporting: [interpret-note-names, count-semitone-steps, build-major-scale]
+      assumes: []
+      ends_with: play-along-recording
+    lessons:
+      - {key: note-names, title: "C, D, E…: o código que todo músico usa", type: article, section: Notas, skills: [interpret-note-names], concepts: [note-names, octaves]}
+      - {key: tones-and-semitones, title: "Nem todo passo é igual: o padrão da escala maior", type: article, section: Escala maior, skills: [count-semitone-steps], concepts: [tones-and-semitones, sharps-and-flats, major-scale]}
+      - {key: major-scale-keys, title: "Toque no tom de quem canta: o primeiro passo", type: article, section: Escala maior, skills: [build-major-scale], concepts: [major-scale, tones-and-semitones, sharps-and-flats, key-center]}
+      - {key: transpose-chord-chart, title: "Leve a cifra para o tom de quem canta", type: article, section: Cifra, skills: [transpose-chord-chart], concepts: [transposition, key-center, chord-charts]}
+      - {key: play-in-singers-key, title: "A música no tom de quem canta, com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form, transposition]}
 
   - key: sh-rhythm-groove
     title: "Sinta o groove: subdivisões e contratempo"
