@@ -168,6 +168,41 @@ and every practice event of a session (practice.item_answered, practice.session_
 - ADR-061: Metronome tool and effective speed — the shared row of §1 is that tool's.
 - ADR-073: One spec PR per ticket — this ADR ships in MOT-197's spec PR.
 
+## Amendment (2026-11-13) — rules the implementation settled (MOT-197)
+
+**Status:** Accepted
+
+Building core#232 and web#222 met five cases the decisions above leave open. Each is settled here
+as shipped.
+
+- **§5 A triad's seventh is its key's.** On the seventh pattern, a chord written with a seventh
+  (A7, Cmaj7) keeps its own. A major, minor or diminished triad takes the seventh its key's scale
+  gives it:
+  - in a major key, a major 7th on I and IV and a minor 7th on every other numeral;
+  - in a minor key, natural minor's (a major 7th on ♭III and ♭VI, a minor 7th on i, ii°, iv, v and
+    ♭VII), with harmonic minor's on V (a minor 7th, so V7) and vii° (a diminished 7th);
+  - on a numeral outside these, a major 7th on a major triad and a minor 7th on the others.
+
+  Any other chord, such as an augmented or suspended one, has no seventh.
+- **§6 A tour's window holds its pattern.** A bass key tour picks each key's window only among the
+  windows where every chord's pattern tones sit above its root. Only when no window does is it
+  picked among all of them, and a tone that doesn't fit is left off. So a tour on the seventh
+  pattern marks a seventh on every chord. The PO chose this on 2026-11-12. *Rejected:* any window,
+  leaving some chords without their seventh.
+- **§5 A tone the window can't hold sounds the root.** In the rare tour whose window can't hold a
+  tone of the pattern, that beat sounds the chord's root, so every bar keeps the pattern's rhythm.
+- **§3 A root and fifth plays four bars.** After the bar of count-in, the take plays root then
+  fifth for four bars, then asks for the rating. Stopping early also asks for it, and Restart
+  drops the take unrated. *Rejected:* looping until Stop, which gives the rating no take of a set
+  length behind it.
+- **§8 Diminished and augmented wait for the first three.** A heard diminished or augmented chord
+  isn't asked until the student is fluent on major, minor and dominant 7. Before then, it could
+  only be asked among options that leave it out. Once asked, it is always offered among all five.
+  Major, minor and dominant 7 are offered among those three until the student is fluent on that
+  item, then among all five. The order is always major, minor, dominant 7, diminished,
+  augmented. *Rejected:* adding a fourth option only when it is the answer, which gives the
+  answer away.
+
 ---
 
 *This ADR was proposed and accepted on 2026-11-12. To revise, create a new ADR with Status: Supersedes ADR-074.*
