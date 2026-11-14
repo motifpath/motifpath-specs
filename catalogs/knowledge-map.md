@@ -9,7 +9,7 @@ follows and what an installation must guarantee.
 - **Three instruments, beginner to solid intermediate:** electric guitar, acoustic guitar
   (steel-string and nylon violão, in popular styles) and 4-string electric bass. The core is
   blues/rock plus Brazilian popular music. Style is a tag on content, never a branch of the tree.
-- **346 nodes: 221 skills under 16 roots, 125 concepts under 11 roots.**
+- **348 nodes: 223 skills under 16 roots, 125 concepts under 11 roots.**
   - Built from two 2026-10-02 research maps:
     - electric guitar: RSL, Trinity, RGT@LCM, Berklee Online, MI, JustinGuitar, Guitar
       Tricks, Fender Play, Pickup Music, EM&T;
@@ -26,7 +26,7 @@ follows and what an installation must guarantee.
   - plus Use modal interchange.
   - A placeholder concept needn't be applied or required: it marks what comes after solid
     intermediate, and no beginner-to-intermediate skill uses it yet.
-- **Edges: 370 `applies` and 144 `requires`.**
+- **Edges: 377 `applies` and 147 `requires`.**
   - `requires` comes only from the research's sourced dependencies (syllabus or method
     order, research or stated synthesis), one edge per target.
   - Not encoded:
@@ -161,6 +161,32 @@ performance. No new `requires` edges follow from the editorial lesson order.
 This source catalog amendment still needs installed-map reconciliation and reference-data
 delivery before app content may resolve the new keys to IDs. It does not establish native
 exercise behavior or mastery.
+
+### First-notes scale and transposition amendment (MOT-196, MOT-199)
+
+The product owner approved two more universal beginner skills on 2026-11-14, for lessons 03
+and 04 of `sh-first-notes`:
+
+- `build-major-scale` (Reading) applies `major-scale`, `tones-and-semitones`,
+  `sharps-and-flats` and `key-center`. It requires `count-semitone-steps` at `accurate`.
+- `transpose-chord-chart` (Chords and rhythm) applies `transposition`, `key-center` and
+  `chord-charts`. It requires `build-major-scale` and `read-chord-charts` at `accurate`.
+
+The learner writes both answers, so authored `exercise` items can assess them. Rewriting a
+chart in a new key needs no instrument; the transposition skills already in the map are
+instrument-specific or EI.
+
+The three edges are `basis: Syn` because each method uses its prerequisite directly. A
+scale is spelled by counting semitones, and a chart is transposed through two major scales,
+one chord symbol at a time. Lesson order alone adds no edge.
+
+`transposition` is still EI although this beginner skill applies it. Whether written
+transposition makes the concept B is an open curator question, so lesson 04 does not list it
+in its `concept_keys` yet. `chord-construction` is not required: the method moves a chord's
+root and copies its type, and never uses the chord's notes.
+
+As with MOT-160, the installed map needs a new reference-data migration before app content
+may resolve these keys to IDs.
 
 ## Delivery
 

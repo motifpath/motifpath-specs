@@ -68,7 +68,7 @@ paths:
     intent:
       anchor: transpose-chord-chart
       supporting: [interpret-note-names, count-semitone-steps, build-major-scale]
-      assumes: []
+      assumes: [read-chord-charts]
       ends_with: play-along-recording
     lessons:
       - {key: note-names, title: "C, D, E…: o código que todo músico usa", type: article, section: Notas, skills: [interpret-note-names], concepts: [note-names, octaves]}
