@@ -552,15 +552,19 @@ Release:
   post:
     operationId: publishCommercialRelease
     summary: Freeze validated commercial dependency references
-    description: Registered owner or admin only. Validate existing content revision and complete
-      transitive dependency graph, reject cycles, missing rights, stale critical metadata and
-      unsupported third-party dependencies. Platform premium exercises in a paid teacher path are
-      recorded as platform_premium dependencies, covered by the platform commission on each sale
-      without a separate license. Check each
-      referenced revision. Concurrent same-intent publication creates one immutable manifest. This
-      operation does not publish a path, alter course checkpoints or update learner copies; existing
-      authoring/update endpoints retain their semantics. A changed manifest invalidates new-sale
-      validation until rechecked.
+    description: The item's current owner or an admin only; anyone else, and every caller while the
+      content-versions rollout is OFF, gets 403. Releases the item and every transitive dependency
+      (a course's published-version paths, a path's lessons, a lesson's exercises) in one
+      transaction, reusing a dependency's latest release when its content digest is unchanged. A
+      path must be published, and a course or lesson must have a published version, as the item or
+      as a dependency; unresolved ownership anywhere in the graph, or a stale expected_revision,
+      returns 409. A dependency with another rights holder returns 409 naming it until commercial
+      validation adds reuse permissions, platform_premium dependencies, cycle checks and
+      revalidation after a dependency changes. When the manifest digest equals the latest
+      release's, nothing is created and that release is returned, so identical and concurrent
+      publications converge on one release. This operation does not publish a path, alter course
+      checkpoints or update learner copies; existing authoring/update endpoints retain their
+      semantics.
     tags:
       - Commerce
     parameters:
@@ -943,10 +947,11 @@ HistoricalRelease:
   get:
     operationId: getCommercialRelease
     summary: Read an authorized immutable commercial manifest
-    description: Owner/admin or a holder whose existing purchase/copy references the release only. Other
-      callers receive 404. Resolve historical immutable references after withdrawal; never
-      substitute the latest manifest. This read does not deliver protected lesson content or update
-      the caller copy.
+    description: An admin, the item's current owner, the owner recorded in the release, or a holder whose
+      existing purchase references the release only. Other callers receive 404. Works whatever the
+      rollout state, and after the item is deleted or its ownership corrected. Returns the stored
+      immutable manifest, never one rebuilt from current content or the latest manifest. This read
+      does not deliver protected lesson content or update the caller copy.
     tags:
       - Commerce
     parameters:
