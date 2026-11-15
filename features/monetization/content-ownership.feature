@@ -1,4 +1,4 @@
-@wip
+@MOT-118
 Feature: Record and protect content ownership
   Every course, path, content node and exercise has one authoritative rights holder in core.
   Ownership is recorded when content is created, survives edits and learner copies, and only an
@@ -58,6 +58,18 @@ Feature: Record and protect content ownership
     When Dan reads the commercial content of "Jazz foundations"
     Then the response is 404
 
+  Scenario: A deleted path has no commercial content
+    Given Bea created the path "Jazz foundations"
+    And Bea deleted the path "Jazz foundations"
+    When Ada reads the commercial content of "Jazz foundations"
+    Then the response is 404
+
+  Scenario: A deleted path's ownership cannot be corrected
+    Given Bea created the path "Jazz foundations"
+    And Bea deleted the path "Jazz foundations"
+    When Ada corrects the ownership of "Jazz foundations" to the platform at ownership revision 1
+    Then the response is 404
+
   # ── Corrections ────────────────────────────────────────────────────────────
 
   Scenario: An admin corrects ownership and history is kept
@@ -88,6 +100,20 @@ Feature: Record and protect content ownership
     When Ada sends the same correction again with idempotency key K
     Then the response repeats the original command result
     And the ownership revision of "Jazz foundations" is still 2
+
+  Scenario: A correction can name an admin as the rights holder
+    Given Bea created the path "Jazz foundations"
+    And Eve is an admin
+    When Ada corrects the ownership of "Jazz foundations" to teacher Eve at ownership revision 1
+    Then the command is applied with an evidence entry
+    And the ownership of "Jazz foundations" has owner kind "teacher", Eve as owner and ownership revision 2
+
+  Scenario: A correction cannot name a student as the rights holder
+    Given Bea created the path "Jazz foundations"
+    And Carl is a student
+    When Ada corrects the ownership of "Jazz foundations" to teacher Carl at ownership revision 1
+    Then the response is 400
+    And the ownership of "Jazz foundations" still has Bea as owner and ownership revision 1
 
   Scenario: Request fields cannot set ownership when creating content
     When Bea creates the path "Jazz foundations" with an extra field naming the platform as owner

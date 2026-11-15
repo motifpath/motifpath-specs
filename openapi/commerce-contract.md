@@ -101,7 +101,11 @@ Decided by Gilson Yamada on 2026-11-02.
 - **Who may change ownership.** Only an administrator, through correctCommercialOwnership, with a
   reason. The item's owner cannot transfer it, and no editorial, CMS or request field can set
   owner_kind, owner_id, creator_id or copied_from. A correction appends history: the previous
-  owner, creator and evidence stay readable, and creator_id is never rewritten.
+  owner, creator and evidence stay readable, and creator_id is never rewritten. A correction to
+  owner_kind teacher names a core user whose role is teacher or admin when the correction is
+  applied; a student, or an id that is not a core user, is refused with 400.
+- **Deleted content.** Ownership records are kept when their item is deleted, as evidence, but a
+  deleted item has no commercial content: reading it or correcting its ownership returns 404.
 - **Feature flag.** monetization.content_ownership gates the correction command only; while it is
   OFF the command returns 403 and changes nothing. Recording ownership for new content, the
   backfill and the owner/admin read always run, because withholding them would only create more

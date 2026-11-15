@@ -6,6 +6,7 @@ Content:
       course, path, content_node or exercise. Public editorial metadata is not ownership proof.
       sale_blockers lists, for the caller, why a paid change or new sale would be refused now,
       including new_sales_paused when the rollout denies it; the teacher UI mirrors it (MOT-130).
+      A deleted item returns 404, although its ownership history is kept as evidence.
     tags:
       - Commerce
     parameters:
@@ -484,7 +485,8 @@ Ownership:
       append provenance correction without rewriting original creator or transferring existing
       financial obligations. Returns 403 while the content-ownership rollout is OFF. CMS/user claims cannot establish ownership. Same-intent retry returns
       the original result; conflicting reuse or stale revision returns 409. Durable audit failure
-      prevents mutation.
+      prevents mutation. owner_kind teacher must name a core user whose role is teacher or admin;
+      a student or unknown user returns 400. A deleted item returns 404.
     tags:
       - Commerce
     parameters:
