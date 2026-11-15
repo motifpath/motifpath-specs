@@ -149,6 +149,55 @@ never resolve an old commercial manifest by reconstructing it from a mutable cur
 This archived rights/source evidence does not change existing live lesson rendering or copy updates. Removed media cannot be deleted while
 retained buyer obligations reference it; legal takedowns require a separately reviewed case.
 
+### Commercial release rules (MOT-119)
+
+Decided by Gilson Yamada on 2026-11-15.
+
+- **What a release is.** A commercial release is evidence of exactly what an item's owner offered
+  for sale at one moment: the item's learner-visible state, its rights holder and every item it
+  depends on. It is not what learners read. Courses keep their published versions, lessons their
+  published versions, and paths and exercises stay live; learner copies follow the existing copy
+  and update rules. So editing, republishing, correcting the ownership of or deleting an item
+  after a release never changes that release.
+- **Who builds what.** MOT-119 creates releases (publishCommercialRelease), reads them
+  (getCommercialRelease) and fills CommercialContent.release with the latest one. MOT-121 adds
+  the validation that paid publication needs: reuse permissions on other owners' content,
+  platform_premium dependencies, cycles and invalidation after a dependency changes. Until then a
+  release accepts only dependencies with the same rights holder as the item (permission own) and
+  is refused, naming the dependency, when any dependency has another rights holder.
+- **What each kind covers.** content_sha256 is the canonical digest of the item's learner-visible
+  state:
+  - a course: its latest published course version, which is also its core_version_ref;
+  - a lesson (content node): its latest published version, which is its core_version_ref;
+  - a path: its title, summary, level, language, instruments, thumbnail and ordered items with
+    their section labels; core_version_ref is null;
+  - an exercise: its learner-visible content and answer key; core_version_ref is null.
+- **Dependencies.** A course depends on the paths its published version's checkpoints name, a path
+  on its lessons, and a lesson on the exercises it contains. Exercises have no dependencies. One
+  publication releases the item and every transitive dependency in the same transaction, reusing
+  a dependency's latest release when its content digest is unchanged. dependencies lists every
+  transitive dependency with its own release; dependency_release_ids lists those releases.
+- **Only what learners can get.** A path must be published, and a course and a lesson must have a
+  published version, to be released, either as the item or as a dependency. Exercises have no
+  published state. A release is refused while the item or a dependency has unresolved ownership.
+- **Revisions.** Release.revision starts at 1 for each item and increases by one with each new
+  manifest. Publishing when the manifest digest equals the latest release's creates nothing and
+  returns that release, so identical or concurrent publications converge on one release.
+  CommercialContent.revision starts at 1 and increases by one each time a new release becomes the
+  item's latest; publication states the commercial revision it observed, and a stale one is
+  refused. A same-intent replay returns the original result.
+- **Who may publish.** The item's current owner, or an administrator, while the
+  monetization.content_versions rollout allows them. While it is OFF publication is refused and
+  changes nothing; reading releases, recording ownership and existing learner copies keep working.
+- **Who may read a release.** An administrator, the item's current owner, and the owner recorded
+  in the release. Anyone else cannot tell it exists. A release stays readable after its item is
+  deleted or its ownership is corrected, and always returns its stored manifest, never one rebuilt
+  from current content. Buyers whose purchase references a release gain read access with
+  purchases (MOT-131).
+- **Not here.** Mapping CMS drafts and publications to core releases, and making CMS webhook retries
+  idempotent, belong to the CMS integration (MOT-120). Sale state, offers and purchases keep their
+  own tickets; a release alone sells nothing.
+
 ## Grants, access and time
 
 Store separate grants rather than one user-wide entitlement flag. Each grant names holder,

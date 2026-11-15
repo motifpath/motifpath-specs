@@ -136,7 +136,8 @@ Release:
       description: Stable sale scope.
     revision:
       type: integer
-      description: Monotonic manifest revision for this content.
+      description: Manifest revision for this content, 1 for its first release and one more for each
+        new manifest; an unchanged republication creates none.
       minimum: 1
     manifest_sha256:
       type: string
@@ -164,13 +165,13 @@ Release:
     content_sha256:
       type: string
       pattern: ^[a-f0-9]{64}$
-      description: Immutable digest of the referenced content state.
+      description: Immutable digest of the item's learner-visible state when released.
     core_version_ref:
       type:
         - string
         - "null"
-      description: Existing core version reference where one exists; null for live path content, whose
-        digest is captured.
+      description: The released published version of a course or lesson; null for a path or an
+        exercise, which have no versions and whose digest is captured.
     dependencies:
       type: array
       description: Complete validated dependency records, including transitive rights evidence.
@@ -193,7 +194,8 @@ CommercialContent:
       description: Reviewed ownership/provenance.
     revision:
       type: integer
-      description: Optimistic commercial state revision.
+      description: Optimistic commercial state revision, 1 until the item's first release and one more
+        each time a new release becomes its latest.
       minimum: 1
     sale_state:
       type: string
@@ -945,7 +947,7 @@ PublishRelease:
   properties:
     expected_revision:
       type: integer
-      description: Observed commercial revision.
+      description: Observed commercial revision (CommercialContent.revision), not a manifest revision.
       minimum: 1
     reason:
       type: string

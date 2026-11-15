@@ -65,9 +65,9 @@ or settlement obligations. UI mirrors decisions. Plus and teacher commerce have 
 |---|---|---|
 | MOT-181 | none (foundation) | Commercial audit write path and hot-store admin read, durable idempotent commands, rollout API and evaluation; audit, controls and activation scenarios |
 | MOT-118 | content_ownership | Commerce ownership read/correction; content ownership scenarios |
-| MOT-119 | content_versions | Immutable commercial release manifests; preserve existing course/path copies and ADR-055 |
+| MOT-119 | content_versions | Release publication and historical release read, immutable manifests of own-holder dependencies, CommercialContent.release; content versions scenarios. Preserves existing course/path copies and ADR-055 |
 | MOT-120 | strapi_rights | CMS hint API, field authority/mapping/reconciliation; integration contracts |
-| MOT-121 | commercial_validation | Release and sale-state commands, transitive dependency validation; content contracts |
+| MOT-121 | commercial_validation | Sale-state commands; release validation of other holders' dependencies (reuse permissions, platform premium, cycles, invalidation); content contracts |
 | MOT-122 | entitlement_resolution | Commercial access API and grant schema; access scenarios |
 | MOT-123 | access_grants | Typed grant/payment/purchase facts; acquisition, refund and reconciliation scenarios |
 | MOT-124 | progress_retention | Existing worker-owned progress, completed-lesson retention; lifecycle/access scenarios |
