@@ -280,6 +280,7 @@ skills:
   - {key: change-chords, parent: chords-rhythm, names: {en: "Change chords smoothly", pt_BR: "Trocar acordes com fluidez"}, instruments: guitars, level: B, applies: [open-chord-shapes, pulse-and-tempo]}
   - {key: strum-steady, parent: chords-rhythm, names: {en: "Strum steady rhythms", pt_BR: "Levadas com ritmo constante"}, instruments: guitars, level: B, applies: [strumming-patterns, note-values, pulse-and-tempo]}
   - {key: read-chord-charts, parent: chords-rhythm, names: {en: "Read chord charts", pt_BR: "Ler cifras"}, instruments: all, level: B, applies: [chord-charts, song-form]}
+  - {key: transpose-chord-chart, parent: chords-rhythm, names: {en: "Transpose a chord chart to another key", pt_BR: "Passar uma cifra para outro tom"}, instruments: all, level: B, applies: [transposition, key-center, chord-charts]}
   - {key: play-power-chords, parent: chords-rhythm, names: {en: "Play power chords", pt_BR: "Tocar power chords (acordes de quinta)"}, instruments: guitars, level: B, applies: [power-chord, interval-shapes]}
   - {key: play-riffs, parent: chords-rhythm, names: {en: "Play riffs", pt_BR: "Tocar riffs"}, instruments: fretted, level: B, applies: [power-chord, note-values, tablature]}
   - {key: play-barre-chords, parent: chords-rhythm, names: {en: "Play barre chords", pt_BR: "Fazer acordes com pestana"}, instruments: guitars}
@@ -319,6 +320,7 @@ skills:
   - {key: reading, names: {en: "Reading", pt_BR: "Leitura"}, instruments: all}
   - {key: interpret-note-names, parent: reading, names: {en: "Interpret note names", pt_BR: "Interpretar os nomes das notas"}, instruments: all, level: B, applies: [note-names, octaves]}
   - {key: count-semitone-steps, parent: reading, names: {en: "Count semitone steps from a visual reference", pt_BR: "Contar semitons com uma referência visual"}, instruments: all, level: B, applies: [tones-and-semitones, sharps-and-flats]}
+  - {key: build-major-scale, parent: reading, names: {en: "Build the major scale from any note", pt_BR: "Montar a escala maior a partir de qualquer nota"}, instruments: all, level: B, applies: [major-scale, tones-and-semitones, sharps-and-flats, key-center]}
   - {key: read-tab, parent: reading, names: {en: "Read tab", pt_BR: "Ler tablatura"}, instruments: fretted, level: B, applies: [tablature, tab-symbols]}
   - {key: read-rhythm-notation, parent: reading, names: {en: "Read rhythm notation", pt_BR: "Ler divisão rítmica"}, instruments: all, level: EI, applies: [rhythm-notation, note-values, dotted-notes]}
   - {key: follow-road-map, parent: reading, names: {en: "Follow a song road map", pt_BR: "Seguir o roteiro da música (ritornelo, casas, coda)"}, instruments: all, level: EI, applies: [road-map-symbols, song-form]}
@@ -488,6 +490,9 @@ requires:
   - {from: mix-pentatonics, to: play-all-pentatonic-positions, level: accurate, basis: Syn}
   - {from: mix-pentatonics, to: improvise-one-chord, level: fluent, basis: Syn}
   - {from: improvise-rhythm-part, to: read-chord-charts, level: fluent, basis: S}
+  - {from: build-major-scale, to: count-semitone-steps, level: accurate, basis: Syn}
+  - {from: transpose-chord-chart, to: build-major-scale, level: accurate, basis: Syn}
+  - {from: transpose-chord-chart, to: read-chord-charts, level: accurate, basis: Syn}
   - {from: improvise-rhythm-part, to: strum-steady, level: fluent, basis: S}
   - {from: play-lick-in-time, to: learn-lick, level: fluent, basis: Syn}
   - {from: move-lick, to: play-all-pentatonic-positions, level: accurate, basis: Syn}
