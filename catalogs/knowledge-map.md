@@ -127,7 +127,7 @@ for each area; the skills after it have none yet.
 | Instrument basics | `play_along` (finger strength, capo and tunings, 5-string, fretless, 7-string, open tunings), `exercise` (choosing a capo for a singer) |
 | Fretboard fluency | `fretboard_cell`, `play_along`, `root_fifth` |
 | Fretting-hand, picking and muting technique | `play_along` |
-| Chords and rhythm | `chord_voicing`, `chord_change`, `diagram_shape`, `chart_progression`, `play_along` |
+| Chords and rhythm | `chord_voicing`, `chord_change`, `diagram_shape`, `chart_progression`, `play_along`, `exercise` (written chart and chord answers) |
 | Time and groove | `play_along` |
 | Reading | `play_along`, `song_chart`, `exercise` |
 | Ear | `heard_chord`, `heard_progression`, `exercise` |
@@ -187,6 +187,32 @@ root and copies its type, and never uses the chord's notes.
 
 As with MOT-160, the installed map needs a new reference-data migration before app content
 may resolve these keys to IDs.
+
+### Chord-notes path amendment (MOT-200)
+
+The product owner approved the path `sh-chord-notes` on 2026-11-18. It follows
+`sh-first-notes` and adds three universal skills, each named as something a musician does
+with the music:
+
+- `find-intervals` (Reading, B) applies `interval-names`, `interval-quality` and
+  `tones-and-semitones`. It requires `count-semitone-steps` at `accurate`.
+- `find-chord-notes` (Chords and rhythm, B) applies `major-triads`, `minor-triads`,
+  `chord-construction` and `root-note`. It requires `find-intervals` at `accurate`.
+- `find-chords-of-key` (Chords and rhythm, EI) applies `diatonic-chords`, `major-scale` and
+  `key-center`. It requires `find-chord-notes` and `build-major-scale` at `accurate`.
+
+The four edges are `basis: Syn` because each method uses its prerequisite directly: an
+interval is counted in semitones, a chord is a root plus two intervals, and the chords of a
+key are a triad on each note of its major scale.
+
+`interval-names`, `interval-quality` and `chord-construction` move from EI to B: the path
+teaches every interval in the octave and builds major and minor chords from them at beginner
+level. `diatonic-chords` stays EI, as "Theory enters through use" above says, so the lesson
+that teaches it is EI inside a beginner path and is shared with `sh-harmony-in-use`.
+
+The learner answers in writing or by choosing, so authored `exercise` items can assess all
+three skills. As before, the installed map needs a new reference-data migration before app
+content may resolve these keys to IDs.
 
 ## Delivery
 

@@ -49,8 +49,8 @@ concepts:
   # Intervals
   - {key: intervals, names: {en: "Intervals", pt_BR: "Intervalos"}, instruments: all}
   - {key: root-note, parent: intervals, names: {en: "Root", pt_BR: "Tônica (fundamental)"}, instruments: all, level: B}
-  - {key: interval-names, parent: intervals, names: {en: "Interval names", pt_BR: "Nomes dos intervalos"}, instruments: all, level: EI}
-  - {key: interval-quality, parent: intervals, names: {en: "Interval quality (major, minor, perfect)", pt_BR: "Qualidade dos intervalos (maior, menor, justo)"}, instruments: all, level: EI}
+  - {key: interval-names, parent: intervals, names: {en: "Interval names", pt_BR: "Nomes dos intervalos"}, instruments: all, level: B}
+  - {key: interval-quality, parent: intervals, names: {en: "Interval quality (major, minor, perfect)", pt_BR: "Qualidade dos intervalos (maior, menor, justo)"}, instruments: all, level: B}
   - {key: interval-shapes, parent: intervals, names: {en: "Interval shapes on the fretboard", pt_BR: "Desenhos de intervalos no braço"}, instruments: fretted, level: EI}
 
   # Keys and tonality
@@ -79,7 +79,7 @@ concepts:
 
   # Chords
   - {key: chords, names: {en: "Chords", pt_BR: "Acordes"}, instruments: all}
-  - {key: chord-construction, parent: chords, names: {en: "Chord construction (stacked thirds)", pt_BR: "Formação de acordes (empilhamento de terças)"}, instruments: all, level: EI}
+  - {key: chord-construction, parent: chords, names: {en: "Chord construction (stacked thirds)", pt_BR: "Formação de acordes (empilhamento de terças)"}, instruments: all, level: B}
   - {key: major-triads, parent: chords, names: {en: "Major triads", pt_BR: "Tríades maiores"}, instruments: all, level: B}
   - {key: minor-triads, parent: chords, names: {en: "Minor triads", pt_BR: "Tríades menores"}, instruments: all, level: B}
   - {key: diminished-augmented-triads, parent: chords, names: {en: "Diminished and augmented triads", pt_BR: "Tríades diminutas e aumentadas"}, instruments: all, level: I}
@@ -281,6 +281,8 @@ skills:
   - {key: strum-steady, parent: chords-rhythm, names: {en: "Strum steady rhythms", pt_BR: "Levadas com ritmo constante"}, instruments: guitars, level: B, applies: [strumming-patterns, note-values, pulse-and-tempo]}
   - {key: read-chord-charts, parent: chords-rhythm, names: {en: "Read chord charts", pt_BR: "Ler cifras"}, instruments: all, level: B, applies: [chord-charts, song-form]}
   - {key: transpose-chord-chart, parent: chords-rhythm, names: {en: "Transpose a chord chart to another key", pt_BR: "Passar uma cifra para outro tom"}, instruments: all, level: B, applies: [transposition, key-center, chord-charts]}
+  - {key: find-chord-notes, parent: chords-rhythm, names: {en: "Find the notes of major and minor chords", pt_BR: "Achar as notas de acordes maiores e menores"}, instruments: all, level: B, applies: [major-triads, minor-triads, chord-construction, root-note]}
+  - {key: find-chords-of-key, parent: chords-rhythm, names: {en: "Find the chords of a major key", pt_BR: "Achar os acordes de um tom maior"}, instruments: all, level: EI, applies: [diatonic-chords, major-scale, key-center]}
   - {key: play-power-chords, parent: chords-rhythm, names: {en: "Play power chords", pt_BR: "Tocar power chords (acordes de quinta)"}, instruments: guitars, level: B, applies: [power-chord, interval-shapes]}
   - {key: play-riffs, parent: chords-rhythm, names: {en: "Play riffs", pt_BR: "Tocar riffs"}, instruments: fretted, level: B, applies: [power-chord, note-values, tablature]}
   - {key: play-barre-chords, parent: chords-rhythm, names: {en: "Play barre chords", pt_BR: "Fazer acordes com pestana"}, instruments: guitars}
@@ -320,6 +322,7 @@ skills:
   - {key: reading, names: {en: "Reading", pt_BR: "Leitura"}, instruments: all}
   - {key: interpret-note-names, parent: reading, names: {en: "Interpret note names", pt_BR: "Interpretar os nomes das notas"}, instruments: all, level: B, applies: [note-names, octaves]}
   - {key: count-semitone-steps, parent: reading, names: {en: "Count semitone steps from a visual reference", pt_BR: "Contar semitons com uma referência visual"}, instruments: all, level: B, applies: [tones-and-semitones, sharps-and-flats]}
+  - {key: find-intervals, parent: reading, names: {en: "Find intervals from any note", pt_BR: "Achar intervalos a partir de qualquer nota"}, instruments: all, level: B, applies: [interval-names, interval-quality, tones-and-semitones]}
   - {key: build-major-scale, parent: reading, names: {en: "Build the major scale from any note", pt_BR: "Montar a escala maior a partir de qualquer nota"}, instruments: all, level: B, applies: [major-scale, tones-and-semitones, sharps-and-flats, key-center]}
   - {key: read-tab, parent: reading, names: {en: "Read tab", pt_BR: "Ler tablatura"}, instruments: fretted, level: B, applies: [tablature, tab-symbols]}
   - {key: read-rhythm-notation, parent: reading, names: {en: "Read rhythm notation", pt_BR: "Ler divisão rítmica"}, instruments: all, level: EI, applies: [rhythm-notation, note-values, dotted-notes]}
@@ -493,6 +496,10 @@ requires:
   - {from: build-major-scale, to: count-semitone-steps, level: accurate, basis: Syn}
   - {from: transpose-chord-chart, to: build-major-scale, level: accurate, basis: Syn}
   - {from: transpose-chord-chart, to: read-chord-charts, level: accurate, basis: Syn}
+  - {from: find-intervals, to: count-semitone-steps, level: accurate, basis: Syn}
+  - {from: find-chord-notes, to: find-intervals, level: accurate, basis: Syn}
+  - {from: find-chords-of-key, to: find-chord-notes, level: accurate, basis: Syn}
+  - {from: find-chords-of-key, to: build-major-scale, level: accurate, basis: Syn}
   - {from: improvise-rhythm-part, to: strum-steady, level: fluent, basis: S}
   - {from: play-lick-in-time, to: learn-lick, level: fluent, basis: Syn}
   - {from: move-lick, to: play-all-pentatonic-positions, level: accurate, basis: Syn}
