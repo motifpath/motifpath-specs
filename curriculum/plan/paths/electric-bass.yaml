@@ -183,12 +183,13 @@ paths:
     status: idea
     intent:
       anchor: play-chord-tone-lines
-      supporting: [find-notes-top-strings, find-octaves, hear-chord-quality]
+      supporting: [find-notes-top-strings, find-octaves, find-intervals-on-fretboard, hear-chord-quality]
       assumes: [play-root-fifth-octave-lines]
       ends_with: play-along-recording
     lessons:
       - {title: "As notas da corda Ré para cima", type: video, section: O braço, skills: [find-notes-top-strings], concepts: [note-names, sharps-and-flats]}
       - {title: "As oitavas de qualquer nota", type: video, section: O braço, skills: [find-octaves], concepts: [octaves]}
+      - {title: "Intervalos no braço: o desenho de cada distância", type: video, section: O braço, skills: [find-intervals-on-fretboard], concepts: [interval-shapes, interval-names]}
       - {title: "Maior, menor ou com sétima?", type: video, section: Ouvido, skills: [hear-chord-quality], concepts: [major-triads, minor-triads, dominant-seventh]}
       - {title: "Linhas com as notas do acorde", type: video, section: A linha, skills: [play-chord-tone-lines], concepts: [chord-tones, major-triads, minor-triads]}
       - {title: "A linha com a gravação", type: video, section: A música, skills: [play-along-recording], concepts: [song-form]}

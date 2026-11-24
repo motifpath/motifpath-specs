@@ -127,7 +127,7 @@ for each area; the skills after it have none yet.
 | Instrument basics | `play_along` (finger strength, capo and tunings, 5-string, fretless, 7-string, open tunings), `exercise` (choosing a capo for a singer) |
 | Fretboard fluency | `fretboard_cell`, `play_along`, `root_fifth` |
 | Fretting-hand, picking and muting technique | `play_along` |
-| Chords and rhythm | `chord_voicing`, `chord_change`, `diagram_shape`, `chart_progression`, `play_along` |
+| Chords and rhythm | `chord_voicing`, `chord_change`, `diagram_shape`, `chart_progression`, `play_along`, `exercise` (written chart and chord answers) |
 | Time and groove | `play_along` |
 | Reading | `play_along`, `song_chart`, `exercise` |
 | Ear | `heard_chord`, `heard_progression`, `exercise` |
@@ -187,6 +187,56 @@ root and copies its type, and never uses the chord's notes.
 
 As with MOT-160, the installed map needs a new reference-data migration before app content
 may resolve these keys to IDs.
+
+### Chord-notes path amendment (MOT-200)
+
+The product owner approved the path `sh-chord-notes` on 2026-11-18, and its continuations on
+2026-11-24. Each skill is named as something a musician does with the music.
+
+The path follows `sh-first-notes` and adds three universal skills:
+
+- `find-intervals` (Reading, B) applies `interval-names`, `interval-quality` and
+  `tones-and-semitones`. It requires `count-semitone-steps` at `accurate`.
+- `find-chord-notes` (Chords and rhythm, B) applies `major-triads`, `minor-triads`,
+  `chord-construction` and `root-note`. It requires `find-intervals` at `accurate`.
+- `find-chords-of-key` (Chords and rhythm, EI) applies `diatonic-chords`, `major-scale` and
+  `key-center`. It requires `find-chord-notes` and `build-major-scale` at `accurate`.
+
+Two more skills carry these lessons into later paths:
+
+- `find-intervals-on-fretboard` (Fretboard fluency, EI, fretted) applies `interval-shapes`
+  and `interval-names`. It requires `find-intervals`. It is taught in the whole-neck paths
+  and in `ba-chord-tones`.
+- `find-seventh-chord-notes` (Chords and rhythm, EI) applies `seventh-chords`,
+  `dominant-seventh`, `diminished-seventh` and `chord-construction`. It requires
+  `find-chord-notes`. It is taught in the shared path `sh-seventh-chords`.
+
+The edges that point forward make the skills that use these methods require them:
+
+| Skill | Requires |
+|---|---|
+| `play-triad-arpeggios`, `play-chord-tone-lines` | `find-chord-notes`, `find-intervals-on-fretboard` |
+| `play-mpb-voicings`, `play-movable-sevenths` | `find-seventh-chord-notes` |
+| `find-key-by-ear`, `write-progression`, `play-shapes-in-any-key` | `find-chords-of-key` |
+
+All new edges require `accurate`. Each is `basis: Syn` because the method uses its
+prerequisite directly. The exception is `play-shapes-in-any-key`, which is `S`. These edges
+make the readiness model recommend each lesson's continuation, and they make the tree flag a
+plan that skips one.
+
+Levels:
+
+- `interval-names`, `interval-quality` and `chord-construction` move from EI to B, because
+  the path teaches every interval in the octave and builds major and minor chords from them.
+- `seventh-chords` moves from I to EI, because `play-open-seventh-chords` (B) and
+  `find-seventh-chord-notes` (EI) both apply it.
+- `diatonic-chords` stays EI, as "Theory enters through use" above says. That is why the
+  lesson that teaches it is EI inside a beginner path.
+
+The learner answers in writing or by choosing, so authored `exercise` items can assess the
+universal skills. `fretboard_cell` items can assess the fretboard one. As before, the
+installed map needs a new reference-data migration before app content may resolve these
+keys to IDs.
 
 ## Delivery
 

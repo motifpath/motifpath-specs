@@ -10,7 +10,7 @@ courses:
     level: beginner
     instruments: [guitar]
     status: planned
-    checkpoints: [ac-first-song, sh-steady-time, ac-clean-fingers, sh-read-chart, sh-ear-first]
+    checkpoints: [ac-first-song, sh-steady-time, ac-clean-fingers, sh-read-chart, sh-ear-first, sh-first-notes, sh-chord-notes]
 
   - key: el-foundation
     track: foundation
@@ -19,7 +19,7 @@ courses:
     level: beginner
     instruments: [electric-guitar]
     status: planned
-    checkpoints: [el-first-riff, sh-steady-time, el-clean-fingers, el-first-chords, sh-read-chart, sh-ear-first]
+    checkpoints: [el-first-riff, sh-steady-time, el-clean-fingers, el-first-chords, sh-read-chart, sh-ear-first, sh-first-notes, sh-chord-notes]
 
   - key: ba-foundation
     track: foundation
@@ -28,4 +28,4 @@ courses:
     level: beginner
     instruments: [electric-bass]
     status: planned
-    checkpoints: [ba-first-song, sh-steady-time, ba-two-fingers, sh-read-chart, sh-ear-first]
+    checkpoints: [ba-first-song, sh-steady-time, ba-two-fingers, sh-read-chart, sh-ear-first, sh-first-notes, sh-chord-notes]
