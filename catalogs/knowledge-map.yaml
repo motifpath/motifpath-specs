@@ -87,7 +87,7 @@ concepts:
   - {key: open-chord-shapes, parent: chords, names: {en: "Open chord shapes", pt_BR: "Acordes abertos (formatos)"}, instruments: guitars, level: B}
   - {key: barre-chord-shapes, parent: chords, names: {en: "Barre chord shapes", pt_BR: "Formatos de pestana"}, instruments: guitars, level: EI}
   - {key: dominant-seventh, parent: chords, names: {en: "Dominant seventh chord", pt_BR: "Acorde de sétima dominante (7)"}, instruments: all, level: EI}
-  - {key: seventh-chords, parent: chords, names: {en: "Seventh chords", pt_BR: "Tétrades (7M, m7, 7, m7(b5))"}, instruments: all, level: I}
+  - {key: seventh-chords, parent: chords, names: {en: "Seventh chords", pt_BR: "Tétrades (7M, m7, 7, m7(b5))"}, instruments: all, level: EI}
   - {key: sus-add-chords, parent: chords, names: {en: "Suspended and add chords", pt_BR: "Acordes suspensos e add9"}, instruments: all, level: EI}
   - {key: inversions, parent: chords, names: {en: "Chord inversions", pt_BR: "Inversões de acordes"}, instruments: all, level: I}
   - {key: chord-diagrams, parent: chords, names: {en: "Chord diagrams", pt_BR: "Diagrama de acordes"}, instruments: guitars, level: B}
@@ -205,6 +205,7 @@ skills:
   - {key: map-fretboard-caged, parent: fretboard-fluency, names: {en: "Map chords and scales with CAGED", pt_BR: "Mapear o braço com o Sistema CAGED"}, instruments: guitars, level: I, applies: [caged-system, barre-chord-shapes, major-scale]}
   - {key: play-shapes-in-any-key, parent: fretboard-fluency, names: {en: "Play shapes in any key", pt_BR: "Tocar os desenhos em qualquer tom"}, instruments: guitars, level: EI, applies: [transposition, key-center, note-names, circle-of-fifths, diatonic-chords]}
   - {key: find-root-fifth-octave, parent: fretboard-fluency, names: {en: "Find the root, fifth and octave from any note", pt_BR: "Achar tônica, quinta e oitava a partir de qualquer nota"}, instruments: bass, level: B, applies: [root-fifth-octave-shape]}
+  - {key: find-intervals-on-fretboard, parent: fretboard-fluency, names: {en: "Find intervals on the fretboard", pt_BR: "Achar intervalos no braço"}, instruments: fretted, level: EI, applies: [interval-shapes, interval-names]}
 
   # Fretting-hand technique
   - {key: fretting-technique, names: {en: "Fretting-hand technique", pt_BR: "Técnica da mão digitadora"}, instruments: fretted}
@@ -283,6 +284,7 @@ skills:
   - {key: transpose-chord-chart, parent: chords-rhythm, names: {en: "Transpose a chord chart to another key", pt_BR: "Passar uma cifra para outro tom"}, instruments: all, level: B, applies: [transposition, key-center, chord-charts]}
   - {key: find-chord-notes, parent: chords-rhythm, names: {en: "Find the notes of major and minor chords", pt_BR: "Achar as notas de acordes maiores e menores"}, instruments: all, level: B, applies: [major-triads, minor-triads, chord-construction, root-note]}
   - {key: find-chords-of-key, parent: chords-rhythm, names: {en: "Find the chords of a major key", pt_BR: "Achar os acordes de um tom maior"}, instruments: all, level: EI, applies: [diatonic-chords, major-scale, key-center]}
+  - {key: find-seventh-chord-notes, parent: chords-rhythm, names: {en: "Find the notes of seventh chords", pt_BR: "Achar as notas de acordes com sétima"}, instruments: all, level: EI, applies: [seventh-chords, dominant-seventh, diminished-seventh, chord-construction]}
   - {key: play-power-chords, parent: chords-rhythm, names: {en: "Play power chords", pt_BR: "Tocar power chords (acordes de quinta)"}, instruments: guitars, level: B, applies: [power-chord, interval-shapes]}
   - {key: play-riffs, parent: chords-rhythm, names: {en: "Play riffs", pt_BR: "Tocar riffs"}, instruments: fretted, level: B, applies: [power-chord, note-values, tablature]}
   - {key: play-barre-chords, parent: chords-rhythm, names: {en: "Play barre chords", pt_BR: "Fazer acordes com pestana"}, instruments: guitars}
@@ -500,6 +502,17 @@ requires:
   - {from: find-chord-notes, to: find-intervals, level: accurate, basis: Syn}
   - {from: find-chords-of-key, to: find-chord-notes, level: accurate, basis: Syn}
   - {from: find-chords-of-key, to: build-major-scale, level: accurate, basis: Syn}
+  - {from: find-seventh-chord-notes, to: find-chord-notes, level: accurate, basis: Syn}
+  - {from: find-intervals-on-fretboard, to: find-intervals, level: accurate, basis: Syn}
+  - {from: play-triad-arpeggios, to: find-chord-notes, level: accurate, basis: Syn}
+  - {from: play-triad-arpeggios, to: find-intervals-on-fretboard, level: accurate, basis: Syn}
+  - {from: play-chord-tone-lines, to: find-chord-notes, level: accurate, basis: Syn}
+  - {from: play-chord-tone-lines, to: find-intervals-on-fretboard, level: accurate, basis: Syn}
+  - {from: play-mpb-voicings, to: find-seventh-chord-notes, level: accurate, basis: Syn}
+  - {from: play-movable-sevenths, to: find-seventh-chord-notes, level: accurate, basis: Syn}
+  - {from: find-key-by-ear, to: find-chords-of-key, level: accurate, basis: Syn}
+  - {from: write-progression, to: find-chords-of-key, level: accurate, basis: Syn}
+  - {from: play-shapes-in-any-key, to: find-chords-of-key, level: accurate, basis: S}
   - {from: improvise-rhythm-part, to: strum-steady, level: fluent, basis: S}
   - {from: play-lick-in-time, to: learn-lick, level: fluent, basis: Syn}
   - {from: move-lick, to: play-all-pentatonic-positions, level: accurate, basis: Syn}
