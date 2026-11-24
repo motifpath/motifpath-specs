@@ -37,7 +37,7 @@ courses:
     level: early_intermediate
     instruments: [electric-guitar]
     status: idea
-    checkpoints: [el-worship-band, sh-song-map, sh-key-by-ear, sh-rhythm-groove, sh-practice-habits, sh-perform]
+    checkpoints: [sh-seventh-chords, el-worship-band, sh-song-map, sh-key-by-ear, sh-rhythm-groove, sh-practice-habits, sh-perform]
 
   - key: ba-worship
     track: worship

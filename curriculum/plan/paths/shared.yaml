@@ -78,7 +78,7 @@ paths:
       - {key: transpose-chord-chart, title: "Leve a cifra para o tom de quem canta", type: article, section: Cifra, skills: [transpose-chord-chart], concepts: [transposition, key-center, chord-charts]}
 
   - key: sh-chord-notes
-    title: "Descubra as notas de qualquer acorde da cifra"
+    title: "Saiba as notas de qualquer acorde da cifra"
     language: pt_BR
     level: beginner
     instruments: []
@@ -91,8 +91,25 @@ paths:
       # on an instrument, so it ends with the path challenge. The tree flags this on purpose.
     lessons:
       - {key: intervals, title: "Segunda, terça, quinta: meça a distância entre duas notas", type: article, section: Intervalos, skills: [find-intervals], concepts: [interval-names, interval-quality, tones-and-semitones]}
-      - {key: chord-notes, title: "Descubra as notas de qualquer acorde maior ou menor", type: article, section: Acordes, skills: [find-chord-notes], concepts: [major-triads, minor-triads, chord-construction, root-note]}
+      - {key: chord-notes, title: "Saiba as notas de qualquer acorde maior ou menor", type: article, section: Acordes, skills: [find-chord-notes], concepts: [major-triads, minor-triads, chord-construction, root-note]}
       - {key: chords-of-key, title: "Os sete acordes que cabem no tom da música", type: article, section: Harmonia, level: early_intermediate, skills: [find-chords-of-key], concepts: [diatonic-chords, major-scale, key-center]}
+
+  - key: sh-seventh-chords
+    title: "Saiba as notas de qualquer acorde com sétima"
+    language: pt_BR
+    level: early_intermediate
+    instruments: []
+    status: planned
+    intent:
+      anchor: find-seventh-chord-notes
+      supporting: [read-chord-charts, find-chords-of-key]
+      assumes: [find-chord-notes]
+      # No closing play-along (PO, 2026-11-24): as in sh-chord-notes, the path teaches no chord
+      # on an instrument, so it ends with its challenge. The tree flags this on purpose.
+    lessons:
+      - {key: seventh-chord-notes, title: "7, 7M e m7: saiba as notas dos acordes com sétima", type: article, section: Tétrades, skills: [find-seventh-chord-notes], concepts: [seventh-chords, dominant-seventh, chord-construction]}
+      - {key: half-diminished-diminished, title: "m7(♭5) e °: leia as sétimas da cifra brasileira", type: article, section: Tétrades, skills: [find-seventh-chord-notes, read-chord-charts], concepts: [seventh-chords, diminished-seventh, brazilian-cifra]}
+      - {key: sevenths-of-key, title: "Os acordes com sétima que cabem no tom", type: article, section: Harmonia, skills: [find-chords-of-key], concepts: [diatonic-chords, seventh-chords, key-center]}
 
   - key: sh-rhythm-groove
     title: "Sinta o groove: subdivisões e contratempo"

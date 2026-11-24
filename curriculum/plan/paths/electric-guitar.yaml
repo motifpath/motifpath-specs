@@ -229,12 +229,13 @@ paths:
     status: idea
     intent:
       anchor: play-all-pentatonic-positions
-      supporting: [find-notes-top-strings, find-octaves, position-shifts]
+      supporting: [find-notes-top-strings, find-octaves, find-intervals-on-fretboard, position-shifts]
       assumes: [play-pentatonic-position-1]
       ends_with: play-with-backing-track
     lessons:
       - {title: "As notas da corda Ré para cima", type: video, section: O braço, skills: [find-notes-top-strings], concepts: [note-names, fretboard-landmarks]}
       - {title: "As oitavas de qualquer nota", type: video, section: O braço, skills: [find-octaves], concepts: [octaves, fretboard-landmarks]}
+      - {title: "Intervalos no braço: o desenho de cada distância", type: video, section: O braço, skills: [find-intervals-on-fretboard], concepts: [interval-shapes, interval-names]}
       - {title: "Os cinco formatos da pentatônica", type: video, section: Escala, skills: [play-all-pentatonic-positions], concepts: [pentatonic-shapes, major-pentatonic]}
       - {title: "Mudando de região", type: video, section: Escala, skills: [position-shifts], concepts: [fretboard-landmarks]}
       - {title: "Solo pelo braço com a base", type: video, section: A música, skills: [play-with-backing-track], concepts: [song-form]}
