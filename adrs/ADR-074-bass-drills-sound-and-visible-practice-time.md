@@ -206,3 +206,24 @@ as shipped.
 ---
 
 *This ADR was proposed and accepted on 2026-11-12. To revise, create a new ADR with Status: Supersedes ADR-074.*
+
+## Amendment (2026-11-24) — minor 7 and major 7 join the chord-quality ear drill (MOT-201)
+
+**Status:** Accepted
+
+The PO (Gilson Yamada) found that the heard chord quality of §8 never asks a minor 7 or a major 7.
+Students meet both in almost every song chart, so the drill left them untrained on two of the most
+common chord sounds. Also, once a minor 7 can be asked, the dominant 7's option "With a seventh
+(7)" would fit it too.
+
+- **§8 Seven qualities.** Minor 7 and major 7 join the drill as two more items, held back like
+  diminished and augmented. They aren't asked until the student is fluent on major, minor and
+  dominant 7, and are always offered among all seven. Major, minor and dominant 7 are offered
+  among those three until the student is fluent on that item, then among all seven. The order is
+  always major, minor, dominant 7, minor 7, major 7, diminished, augmented.
+- **The dominant 7's option reads "Dominant seventh (7)"**, so no option fits two chords. Minor 7
+  reads "Minor seventh (m7)" and major 7 "Major seventh (maj7)".
+- *Rejected:* minor 7 alone. Major 7 has the same case and is told apart from dominant 7 only by
+  hearing both. *Rejected:* a separate drill for seventh chords. That is a second item kind for
+  the same skill node, and a student fluent on the triads would never hear a minor 7 offered next
+  to a minor triad.

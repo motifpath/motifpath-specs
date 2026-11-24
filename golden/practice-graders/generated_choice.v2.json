@@ -1650,7 +1650,7 @@
       }
     },
     {
-      "name": "chord quality by ear: five qualities once fluent",
+      "name": "chord quality by ear: seven qualities once fluent",
       "item_key": "heard_chord_quality:augmented",
       "response": {
         "response_type": "generated_choice",
@@ -1659,6 +1659,8 @@
           "major",
           "minor",
           "dominant7",
+          "minor7",
+          "major7",
           "diminished",
           "augmented"
         ],
@@ -1680,6 +1682,92 @@
               "major",
               "minor",
               "dominant7",
+              "minor7",
+              "major7",
+              "diminished",
+              "augmented"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "chord quality by ear: right, a minor seventh picked as minor7",
+      "item_key": "heard_chord_quality:minor7",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_quality_by_ear",
+        "options": [
+          "major",
+          "minor",
+          "dominant7",
+          "minor7",
+          "major7",
+          "diminished",
+          "augmented"
+        ],
+        "choice": "minor7",
+        "latency_ms": 2100,
+        "audio_ms": 1700
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": true,
+          "latency_ms": 2100,
+          "audio_ms": 1700,
+          "answer_key": {
+            "way": "chord_quality_by_ear",
+            "answer": "minor7",
+            "offered": [
+              "major",
+              "minor",
+              "dominant7",
+              "minor7",
+              "major7",
+              "diminished",
+              "augmented"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "chord quality by ear: wrong, a major seventh picked as dominant7",
+      "item_key": "heard_chord_quality:major7",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_quality_by_ear",
+        "options": [
+          "major",
+          "minor",
+          "dominant7",
+          "minor7",
+          "major7",
+          "diminished",
+          "augmented"
+        ],
+        "choice": "dominant7",
+        "latency_ms": 2100,
+        "audio_ms": 1700
+      },
+      "expected": {
+        "result": "graded",
+        "evidence": {
+          "source": "auto_graded",
+          "correct": false,
+          "latency_ms": 2100,
+          "audio_ms": 1700,
+          "answer_key": {
+            "way": "chord_quality_by_ear",
+            "answer": "major7",
+            "offered": [
+              "major",
+              "minor",
+              "dominant7",
+              "minor7",
+              "major7",
               "diminished",
               "augmented"
             ]
@@ -1767,6 +1855,30 @@
       "expected": {
         "result": "rejected",
         "reason": "response_does_not_fit_item"
+      }
+    },
+    {
+      "name": "rejected: a quality the drill does not ask",
+      "item_key": "heard_chord_quality:minor7",
+      "response": {
+        "response_type": "generated_choice",
+        "way": "chord_quality_by_ear",
+        "options": [
+          "major",
+          "minor",
+          "dominant7",
+          "minor7",
+          "major7",
+          "diminished",
+          "half_diminished7"
+        ],
+        "choice": "minor7",
+        "latency_ms": 2100,
+        "audio_ms": 1700
+      },
+      "expected": {
+        "result": "rejected",
+        "reason": "invalid_choices"
       }
     }
   ]

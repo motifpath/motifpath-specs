@@ -100,8 +100,8 @@ Feature: Generated drill questions challenge the student
     Then its own option is named "IV–V–I"
 
   # A heard chord quality: one chord alone, on a root picked each time, its quality picked
-  # (MOT-197, ADR-074). Diminished and augmented wait until the student is fluent on major, minor
-  # and dominant7, and are always offered among all five.
+  # (MOT-197, ADR-074). Minor7, major7, diminished and augmented wait until the student is fluent
+  # on major, minor and dominant7, and are always offered among all seven (MOT-201).
   @MOT-197
   Scenario: A heard chord quality plays one chord alone and offers three qualities
     Given "alice" is learning the heard chord quality "minor"
@@ -110,11 +110,35 @@ Feature: Generated drill questions challenge the student
     And it is asked in no key
     And it offers major, minor and dominant7, in that order
 
-  @MOT-197
-  Scenario: A heard chord quality offers five qualities once the student is fluent on it
+  @MOT-201
+  Scenario: A heard chord quality offers seven qualities once the student is fluent on it
     Given "alice" is fluent on the heard chord quality "minor"
     When it is planned for "alice"
-    Then it offers major, minor, dominant7, diminished and augmented, in that order
+    Then it offers major, minor, dominant7, minor7, major7, diminished and augmented, in that order
+
+  @MOT-201
+  Scenario Outline: A heard seventh chord plays its own seventh
+    Given "alice" is fluent on the heard chord qualities "major", "minor" and "dominant7"
+    And "alice" is learning the heard chord quality "<quality>"
+    When it is planned for "alice"
+    Then its playback has one bar, a <chord>, with no numeral
+    And it offers major, minor, dominant7, minor7, major7, diminished and augmented, in that order
+
+    Examples:
+      | quality | chord         |
+      | minor7  | minor seventh |
+      | major7  | major seventh |
+
+  @MOT-201
+  Scenario Outline: A heard seventh chord waits until the first three qualities are fluent
+    Given "alice" is learning the heard chord quality "major"
+    When "alice" composes 10 sessions with no instrument in hand
+    Then no session plans the heard chord quality "<quality>"
+
+    Examples:
+      | quality |
+      | minor7  |
+      | major7  |
 
   @MOT-197
   Scenario: A heard chord quality's root changes from one time to the next
@@ -191,13 +215,19 @@ Feature: Generated drill questions challenge the student
       | accurate |
       | fluent   |
 
-  @web @MOT-197
+  @web @MOT-201
   Scenario: A heard chord quality plays its chord and offers the qualities by name
     Given "alice"'s session in the head plans the heard chord quality "minor"
     When the item is shown
     Then "Which kind of chord is it?" is asked, with no chord name and no key shown
     And the chord plays once, and can be played again
-    And the options read "Major", "Minor" and "With a seventh (7)"
+    And the options read "Major", "Minor" and "Dominant seventh (7)"
+
+  @web @MOT-201
+  Scenario: A fluent student reads every quality by name
+    Given "alice"'s session in the head plans the heard chord quality "minor7" among all seven
+    When the item is shown
+    Then the options read "Major", "Minor", "Dominant seventh (7)", "Minor seventh (m7)", "Major seventh (maj7)", "Diminished" and "Augmented"
 
   @web @MOT-197
   Scenario: A heard progression's options read every bar heard

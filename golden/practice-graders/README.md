@@ -237,7 +237,7 @@ refused, is a possible answer.
 - **A heard chord quality** (`heard_chord_quality:<quality>`, added to this version as a new
   kind; no rule above changes) is asked `chord_quality_by_ear` only, any other way is
   `response_does_not_fit_item`. Its quality is one of `major`, `minor`, `dominant7`,
-  `diminished` and `augmented`, as its key says. It is asked on a root picked
+  `minor7`, `major7` (both since MOT-201), `diminished` and `augmented`, as its key says. It is asked on a root picked
   each time and in no key, so a `music_key` is `response_does_not_fit_item`. Every option is
   one of those qualities, with the item's own among them (`invalid_choices`). The right answer
   is the item's quality, and the answer key has no `music_key`.

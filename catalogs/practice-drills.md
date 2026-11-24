@@ -96,7 +96,7 @@ on the bass fretboard, at positions computed from the chord's formula and the tu
 | `chart_progression` | a progression (`progressions.yaml`) | `chart_to_numbers` (know): its chart in a key, pick the progression · `numbers_to_chart` (know): a progression and a key, pick its chart | each other | `read-chord-charts`, `common-progressions` | P1 |
 | `heard_chord` | a numeral in a major key | `cadence_then_chord` (hear): a cadence sets the key, a chord plays, pick the numeral; the tonic alone once accurate · `see_then_name` (hear): a key and the chord drawn, pick the numeral | each other, and comes back by ear | `hear-chord-quality`, `hear-progressions` | P2 |
 | `heard_progression` | a 4-bar progression | `progression_by_number` (hear): four chords in a random key, pick the progression, each option named by every bar heard; confusable progressions offered | comes back | `hear-progressions`, `common-progressions` | P2 |
-| `heard_chord_quality` | a chord quality: major, minor, dominant7, diminished or augmented | `chord_quality_by_ear` (hear): one chord alone, on a root picked each time, pick its quality | comes back | `hear-chord-quality` | MOT-197 |
+| `heard_chord_quality` | a chord quality: major, minor, dominant7, minor7, major7, diminished or augmented | `chord_quality_by_ear` (hear): one chord alone, on a root picked each time, pick its quality | comes back | `hear-chord-quality` | MOT-197, MOT-201 |
 | `chord_voicing` | a chord voicing (bass: a chord's root and fifth) | none, self-rated (play_clean) | — | `play-open-chords` (bass: `play-root-fifth-lines`) | P3 |
 | `chord_change` | two chords (bass: their roots) | none, ten cycles at a tempo rated by their clean share (play_in_time) | — | `change-chords` (bass: `play-root-notes`) | P3 |
 | `progression_keys` | a progression (`progressions.yaml`) on a layout | none, self-rated at a tempo; the key moves on after a clean take (move) | — | `common-progressions`, `play-shapes-in-any-key` (bass: `play-chord-tone-lines`) | P4 |
@@ -212,8 +212,8 @@ catalog, like the harmony drills, and recognised by ear in the head on every ins
   - `heard_progression`: every progression of the progression catalog with 2 to 4 bars, in a
     key of its mode picked each time among all 12. Longer ones are never asked by ear: they are
     too long to hold before answering.
-  - `heard_chord_quality`: the qualities major, minor, dominant7, diminished and augmented, 5
-    items, each asked on a root picked each time among all 12, in no key. It rolls up to
+  - `heard_chord_quality`: the qualities major, minor, dominant7, minor7, major7, diminished and
+    augmented, 7 items (minor7 and major7 since MOT-201), each asked on a root picked each time among all 12, in no key. It rolls up to
     `hear-chord-quality` only, beside that node's heard chords.
   - They roll up to the nodes of the families table, and a heard progression also to its
     progression's nodes. Like the harmony drills, they count toward their nodes from the day
@@ -247,7 +247,9 @@ catalog, like the harmony drills, and recognised by ear in the head on every ins
     numeral in order (IV–V–I–I), never by the catalog name, so the numerals shown always match
     the chords heard (MOT-197).
   - `chord_quality_by_ear`: major, minor and dominant7 until the student is fluent on the item;
-    then diminished and augmented too. Always in that order: where one sits says nothing.
+    then minor7, major7, diminished and augmented too. Always in that order: where one sits says
+    nothing. Minor7, major7, diminished and augmented are not asked until the student is fluent
+    on major, minor and dominant7, and are always offered among all seven (MOT-201).
 - **`see_then_name`** names the key and draws the chord, a box on guitar and a symbol on bass,
   by the session's reading (the harmony drills' rule). It plays nothing. It is the ear drill's
   second way, so a lucky guess by ear meets the chord's numeral by sight; the item also comes
