@@ -266,6 +266,11 @@ Feature: Grade a practice answer into evidence
     When "alice" answers the heard chord quality "dominant7", asked chord_quality_by_ear, by picking "major" among "major", "minor" and "dominant7"
     Then "alice" has auto-graded evidence for that question that is wrong
 
+  @MOT-201
+  Scenario: A minor seventh heard as a dominant seventh is graded wrong
+    When "alice" answers the heard chord quality "minor7", asked chord_quality_by_ear, by picking "dominant7" among "major", "minor", "dominant7", "minor7", "major7", "diminished" and "augmented"
+    Then "alice" has auto-graded evidence for that question that is wrong
+
   # A song is rated once, whole, with no measure (MOT-152).
   Scenario: A self-rated song is kept with its rating alone
     When "alice" rates the song "Amazing Grace" on guitar as "almost"

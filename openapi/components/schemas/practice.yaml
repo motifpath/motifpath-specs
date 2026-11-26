@@ -29,7 +29,8 @@ PracticeItemKey:
     - heard_progression:<progression key> — a drill progression of 2 to 4 bars recognised by
       ear. The key is picked each time.
     - heard_chord_quality:<quality> — a chord's quality recognised by ear, one chord heard
-      alone: major, minor, dominant7, diminished or augmented. The root is picked each time.
+      alone: major, minor, dominant7, minor7, major7, diminished or augmented. The root is
+      picked each time.
     - chord_voicing:<diagram id> — playing one chord voicing cleanly, untimed.
     - root_fifth:<layout instrument id>:<chord> — playing a chord's root and fifth on a bass
       layout, cleanly, a half note each at a tempo.
@@ -52,7 +53,7 @@ PracticeItemKey:
 
     Item kinds are an open set: a new kind adds its own prefix and key scheme here, a
     grader, and its golden cases.
-  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diagram_shape:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diatonic_chord:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chord_function:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chart_progression:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|heard_chord:(I|ii|iii|IV|V|vi|viio)|heard_progression:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|heard_chord_quality:(major|minor|dominant7|diminished|augmented)|chord_voicing:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|root_fifth:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|root_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|guide_tone:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|progression_keys:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|song:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$'
+  pattern: '^(fretboard_cell:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*:(0|[1-9][0-9]*)|exercise:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|play_along:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|chord_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diagram_shape:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|diatonic_chord:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chord_function:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B):(I|ii|iii|IV|V|vi|viio)|chart_progression:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|heard_chord:(I|ii|iii|IV|V|vi|viio)|heard_progression:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|heard_chord_quality:(major|minor|dominant7|minor7|major7|diminished|augmented)|chord_voicing:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|root_fifth:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|root_change:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?:(C|Db|D|Eb|E|F|F#|G|Ab|A|Bb|B)(m|dim|7)?|guide_tone:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|progression_keys:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:([0-9A-Za-z][0-9A-Za-z-]*|(major|minor)/[0-9A-Za-z#-]+)|song:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$'
   example: 'fretboard_cell:6ea2d087-ab9c-59dc-9657-8546025414d2:5:3'
 
 PracticeResponse:
@@ -304,7 +305,8 @@ GeneratedChoiceResponse:
         wrong answer the server made up would have if an admin created it, such as
         major/I-ii-IV-V); a chart, the progression's chord
         symbols one per bar separated by single spaces (G D Em C), for numbers_to_chart; a
-        quality (major, minor, dominant7, diminished, augmented) for chord_quality_by_ear. A
+        quality (major, minor, dominant7, minor7, major7, diminished, augmented) for
+        chord_quality_by_ear. A
         chord's root may be spelled either way (F# or Gb).
     choice:
       type: string
@@ -1215,8 +1217,8 @@ GeneratedChoiceQuestion:
             description: |
               The option as the response sends it back: a chord symbol, a numeral, a function, a
               progression key, a chart (its chord symbols one per bar, separated by single
-              spaces), or a chord quality (major, minor, dominant7, diminished, augmented), by
-              way.
+              spaces), or a chord quality (major, minor, dominant7, minor7, major7, diminished,
+              augmented), by way.
           name:
             type:
               - string
@@ -1251,8 +1253,10 @@ GeneratedChoiceQuestion:
         those are too few, progressions the server makes up by changing one of its bars. A
         made-up one is offered as the progression it would be if an admin created it: its key,
         its name (its numerals joined by –) and its chart. A heard chord quality offers major,
-        minor and dominant7 until the student is fluent on the item, then diminished and
-        augmented too, in that order rather than shuffled.
+        minor and dominant7 until the student is fluent on the item, then minor7, major7,
+        diminished and augmented too, in that order rather than shuffled. Minor7, major7,
+        diminished and augmented are asked only once the student is fluent on major, minor and
+        dominant7, and always among all seven.
     voicings:
       type: array
       items:
